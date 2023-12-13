@@ -1,22 +1,39 @@
 <template>
-  <div>
+  <div class="container">
     <h1>Соберем все призы вместе!</h1>
 
-    <p v-if="creating">Loading...</p>
-    <svg
-      v-else
-      width="800"
-      height="600"
-      viewBox="-20 -20 40 40"
-      style="padding: 10px; margin: 0 auto; outline: 1px solid #ddd"
-    >
-      <polygon
-        v-for="(item, index) in paths"
-        :key="index"
-        :points="item.spacePaths"
-        class="node"
-      />
-    </svg>
+    <p v-if="loading">Loading...</p>
+    <div class="map">
+      <svg
+        height="600"
+        width="100%"
+        :viewBox="viewBox"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <line
+          x1="0"
+          y1="-9999"
+          x2="0"
+          y2="9999"
+          style="stroke: black; stroke-width: 1"
+        />
+        <line
+          x1="-9999"
+          y1="0"
+          x2="9999"
+          y2="0"
+          style="stroke: black; stroke-width: 1"
+        />
+
+        <polygon
+          v-for="node in nodes"
+          :key="node.xyId"
+          :points="node.points"
+          class="node"
+          v-on:mouseenter="nodeMouseEnter(node)"
+        />
+      </svg>
+    </div>
 
     <p>Кликни на ячейку и впиши что в ней находится</p>
     <ol>
@@ -26,98 +43,171 @@
   </div>
 </template>
 <script>
+import HeroClient from "@/api/HeroClient";
+
+const SIDE = 100;
+const HALF_SIDE = 50;
+const HEIGHT = 40;
+
+const PAGE_ID = "homePage";
+
 export default {
+  client: new HeroClient(),
+
   name: "HomePage",
   components: {},
   data() {
     return {
-      creating: true,
       coordinates: [],
       paths: [],
+      loaded: false,
+      loadingIsland: false,
+      loadingNodes: false,
+      updating: false,
+      island: null,
+      nodes: [],
+      activeNode: null,
+      nodeDialogComponent: null,
     };
   },
+  computed: {
+    loading() {
+      return this.loaded === false || this.loadingIsland || this.loadingNodes;
+    },
+    viewBox() {
+      const side = SIDE * 5;
+      return `-${side} -${side} ${side * 2} ${side * 2}`;
+    },
+  },
+  created() {
+    this.loadState();
+  },
   mounted() {
-    this.createField();
+    this.loadIsland()
+      .then(() => {
+        this.loadNodes().then(() => (this.loaded = true));
+      })
+      .catch((error) => {
+        throw error;
+      });
+  },
+  unmounted() {
+    this.saveState();
   },
   methods: {
-    createField() {
-      this.creating = true;
-
-      const coordinates = [
-        [0, -10],
-        [0, 0],
-        [0, 10],
-        [-10, -10],
-        [-10, 0],
-        [-10, 10],
-        [10, -10],
-        [10, 0],
-        [10, 10],
-      ];
-
-      const leftNodeCount = 10;
-      const rightNodeCount = 10;
-      const topNodeCount = 5;
-      const bottomNodeCount = 5;
-
-      let paths = [];
-      const side = 4;
-      const halfSide = side / 2;
-      const h = (Math.sqrt(3) / 2) * side;
-
-      coordinates.forEach((item) => {
-        const x = item[0];
-        const y = item[1];
-
-        let arr = new Array(6);
-        console.log(arr);
-        arr[0] = { x: x + side, y: y };
-        arr[1] = { x: x + halfSide, y: y + h };
-        arr[2] = { x: x - halfSide, y: y + h };
-        arr[3] = { x: x - side, y: y };
-        arr[4] = { x: x - halfSide, y: y - h };
-        arr[5] = { x: x + halfSide, y: y - h };
-        console.log(arr);
-
-        paths.push({
-          coordinates: arr,
-          spacePaths: this.getPaths(arr),
+    onEditNodeClick() {
+      if (!this.updating) {
+        this.updating = true;
+        //this.nodeDialogComponent = shallowRef(NodeDialog);
+      }
+    },
+    onMountedNodeDialog() {
+      this.$refs.nodeDialog
+        .show()
+        .then((result) => {
+          if (result !== null && result !== undefined) {
+            // todo: reload node
+          }
+        })
+        .finally(() => {
+          this.nodeDialogComponent = null;
+          this.updating = false;
         });
-      });
-      console.log(paths);
+    },
+    async loadIsland() {
+      this.loadingIsland = true;
 
-      this.coordinates = coordinates;
-      this.paths = paths;
+      try {
+        this.island = await this.$options.client.getIsland();
+      } finally {
+        this.loadingIsland = false;
+      }
+    },
+    async loadNodes() {
+      this.nodes = [];
+      this.activeNode = null;
 
-      this.creating = false;
+      this.loadingNodes = true;
+      try {
+        const list = await this.$options.client.getNodes(this.island.id);
+        this.nodes = list.items.map((node) => this.drawNode(node));
+      } finally {
+        this.loadingNodes = false;
+      }
+    },
+    nodeMouseEnter(node) {
+      this.activeNode = node;
+    },
+    /**
+     * @param {Object} node
+     */
+    drawNode(node) {
+      const side = SIDE;
+      const h = HEIGHT;
+      const x = node.mx * (1.5 * side);
+      const y = node.my * 2 * h + (node.mx % 2 === 0 ? 0 : h);
+
+      let coordinates = new Array(6);
+      coordinates[0] = { x: x + side, y };
+      coordinates[1] = { x: x + HALF_SIDE, y: y + h };
+      coordinates[2] = { x: x - HALF_SIDE, y: y + h };
+      coordinates[3] = { x: x - side, y };
+      coordinates[4] = { x: x - HALF_SIDE, y: y - h };
+      coordinates[5] = { x: x + HALF_SIDE, y: y - h };
+
+      return {
+        ...node,
+        xyId: node.mx + "_" + node.my,
+        x,
+        y,
+        points: this.getPoints(coordinates),
+      };
+    },
+    /**
+     * @param {Array} coordinates
+     */
+    getPoints(coordinates) {
+      return coordinates.map((item) => item.x + "," + item.y).join(" ");
     },
     getPaths(coordinates) {
       return coordinates.map((item) => item.x + "," + item.y).join(" ");
     },
+    loadState() {
+      let state;
+
+      try {
+        state = JSON.parse(localStorage.getItem(PAGE_ID));
+      } catch (error) {
+        console.error(error);
+      }
+
+      if (!state) {
+        state = {};
+      }
+    },
+    saveState() {
+      const state = {};
+      localStorage.setItem(PAGE_ID, JSON.stringify(state));
+    },
   },
 };
-/*
-<circle
-        v-for="(item, index) in coordinates"
-        :key="index"
-        :cx="item[0]"
-        :cy="item[1]"
-        r="0.5"
-        stroke="black"
-        stroke-width="0.1"
-        fill="red"
-        class="circle"
-      />
-      */
 </script>
-<style scoped>
+<style>
+.container {
+  width: 1200px;
+  margin: 0 auto;
+}
 .node {
   fill: lime;
   stroke: purple;
-  stroke-width: 0.1
+  stroke-width: 0.1;
 }
-.node:hover {
-  fill: green;
-  cursor: pointer;
+</style>
+<style scoped>
+.map {
+  width: 100%;
+  height: 600px;
+  padding: 10px;
+  outline: 1px solid #dddddd;
 }
 </style>
