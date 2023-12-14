@@ -1,9 +1,10 @@
 version: '3.9'
 
 services:
-  nginx:
+  hero-wars-website__nginx:
     build: ./docker/images/nginx
-    container_name: hero-wars_nginx
+    container_name: hero-wars-website__nginx
+    image: hero-wars-website__nginx
     restart: unless-stopped
     tty: true
     ports:
@@ -12,9 +13,10 @@ services:
       - ./dist:/var/www
       - ./docker/images/nginx/nginx.conf:/etc/nginx/nginx.conf
       - ./docker/images/nginx/sites-available:/etc/nginx/sites-available
-  vue:
+  hero-wars-website__vue:
     build: ./docker/images/vue
-    container_name: hero-wars_vue
+    container_name: hero-wars-website__vue
+    image: hero-wars-website__vue
     tty: true
     working_dir: /app
     volumes:

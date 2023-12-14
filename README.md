@@ -13,24 +13,24 @@ docker-compose up --detach --build --force-recreate
 
 ```
 docker exec [контейнер] [команда]
-docker exec hero-wars_vue npm run build
-docker exec hero-wars_vue npm run lint --fix
+docker exec hero-wars-website__vue npm run build
+docker exec hero-wars-website__vue npm run lint --fix
 ```
 
 Для захода в **vue** контейнер
 
 ```bash
-docker exec -it --user "$(id -u):$(id -g)" hero-wars_vue bash
+docker exec -it --user "$(id -u):$(id -g)" hero-wars__vue bash
 ```
 
 ## Project setup
 
 Добавить в `/etc/hosts` на хостовом компьютере.
 
-127.0.0.1 hero-wars.local
+127.0.0.1 hero-wars.vyacheslaff.local
 
 Скачать проект на компьютер. Установить зависимости
 
 ```bash
-docker exec hero-wars_vue npm install
+docker exec hero-wars__vue npm install
 ```
