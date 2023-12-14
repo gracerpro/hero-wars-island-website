@@ -116,9 +116,8 @@ export default {
     },
     async loadIsland() {
       this.loadingIsland = true;
-
       try {
-        this.island = await this.$options.client.getIsland();
+        this.island = await this.$options.client.getIsland(1);
       } finally {
         this.loadingIsland = false;
       }
