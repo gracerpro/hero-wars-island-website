@@ -30,15 +30,18 @@
           class="node"
           v-on:mouseenter="nodeMouseEnter(node)"
         />
-        <image
-          v-for="item in nodeIcons"
-          :key="item.xyId"
-          :x="item.x"
-          :y="item.y"
-          :width="imageSide"
-          :height="imageSide"
-          :href="item.iconUrl"
-        />
+        <template v-for="item in nodeIcons" :key="item.xyId">
+          <image
+            :x="item.x"
+            :y="item.y"
+            :width="imageSide"
+            :height="imageSide"
+            :href="item.iconUrl"
+          />
+          <text :x="item.textX" :y="item.textY" class="node-text">
+            {{ item.name }}
+          </text>
+        </template>
       </svg>
 
       <p>Кликни на ячейку и впиши что в ней находится</p>
@@ -56,6 +59,7 @@ const SIDE = 100;
 const HALF_SIDE = 50;
 const HEIGHT = 40;
 const IMAGE_SIDE = 40;
+//const FONT_SIZE = 30;
 
 export default {
   client: new HeroClient(),
@@ -91,11 +95,16 @@ export default {
         if (node.items && node.items.length) {
           node.items.every((item) => {
             if (item.iconUrl) {
+              const x = node.x - 1.3 * HALF_SIDE;
+
               icons.push({
                 xyId: node.xyId,
-                x: node.x - HALF_SIDE,
+                x: x,
                 y: node.y - 0.5 * HEIGHT,
+                textX: x + 1.2 * IMAGE_SIDE,
+                textY: node.y + IMAGE_SIDE * 0.25,
                 iconUrl: item.iconUrl,
+                name: this.getHumanQunatity(item.quantity),
               });
 
               return false;
@@ -181,6 +190,16 @@ export default {
     getPoints(coordinates) {
       return coordinates.map((item) => item.x + "," + item.y).join(" ");
     },
+    getHumanQunatity(quantity) {
+      if (quantity > 1000000) {
+        return Math.floor(quantity / 1000000) + "M";
+      }
+      if (quantity > 1000) {
+        return Math.floor(quantity / 1000) + "K";
+      }
+
+      return quantity;
+    },
   },
 };
 </script>
@@ -192,6 +211,9 @@ export default {
 }
 .node:hover {
   fill: #527951;
+}
+.node-text {
+  font-size: 30px;
 }
 </style>
 <style scoped>
