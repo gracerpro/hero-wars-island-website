@@ -13,8 +13,8 @@
           <b>translate</b>
           <button type="button" @click="onChangeTranslate(-1, 0)">left</button>
           <button type="button" @click="onChangeTranslate(1, 0)">right</button>
-          <button type="button" @click="onChangeTranslate(0, 1)">top</button>
-          <button type="button" @click="onChangeTranslate(0, -1)">down</button>
+          <button type="button" @click="onChangeTranslate(0, -1)">top</button>
+          <button type="button" @click="onChangeTranslate(0, 1)">down</button>
           <button type="button" @click="onResetTranslate()">reset</button>
         </div>
       </div>
@@ -71,6 +71,11 @@
                 {{ item.name }}
               </text>
             </template>
+            <poligon
+              v-if="activeNode"
+              :points="getNodePoints(activeNode)"
+              class="node-active"
+            />
           </g>
         </svg>
 
@@ -225,6 +230,25 @@ export default {
      * @param {Object} node
      */
     drawNode(node) {
+      let nodeClass = null;
+      if (node.typeId === TYPE_START) {
+        nodeClass = "node-start";
+      } else if (node.typeId === TYPE_TOWN) {
+        nodeClass = "node-town";
+      }
+
+      const coordinates = this.getCoordinates(node);
+
+      return {
+        ...node,
+        xyId: node.mx + "_" + node.my,
+        x: coordinates.x,
+        y: coordinates.y,
+        points: this.getPoints(coordinates.coordinates),
+        class: nodeClass,
+      };
+    },
+    getCoordinates(node) {
       const side = SIDE;
       const h = HEIGHT;
       const x = node.mx * (1.5 * side);
@@ -238,21 +262,16 @@ export default {
       coordinates[4] = { x: x - HALF_SIDE, y: y - h };
       coordinates[5] = { x: x + HALF_SIDE, y: y - h };
 
-      let nodeClass = null;
-      if (node.typeId === TYPE_START) {
-        nodeClass = "node-start";
-      } else if (node.typeId === TYPE_TOWN) {
-        nodeClass = "node-town";
-      }
-
       return {
-        ...node,
-        xyId: node.mx + "_" + node.my,
         x,
         y,
-        points: this.getPoints(coordinates),
-        class: nodeClass,
+        coordinates,
       };
+    },
+    getNodePoints(node) {
+      const coordinates = this.getCoordinates(node);
+
+      return this.getPoints(coordinates.coordinates);
     },
     /**
      * @param {Boolean} inc
@@ -332,6 +351,9 @@ export default {
 }
 .node:hover {
   fill: #527951;
+}
+.node-active {
+  fill: red;
 }
 .node-start {
   fill: brown;
