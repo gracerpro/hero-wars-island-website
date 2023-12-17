@@ -28,6 +28,7 @@
           :key="node.xyId"
           :points="node.points"
           class="node"
+          :class="node.class"
           v-on:mouseenter="nodeMouseEnter(node)"
         />
         <template v-for="item in nodeIcons" :key="item.xyId">
@@ -53,7 +54,7 @@
   </div>
 </template>
 <script>
-import HeroClient from "@/api/HeroClient";
+import HeroClient, { TYPE_TOWN, TYPE_START } from "@/api/HeroClient";
 
 const SIDE = 100;
 const HALF_SIDE = 50;
@@ -90,27 +91,34 @@ export default {
     },
     nodeIcons() {
       let icons = [];
+      const maxIconCount = 2;
+      const textCX = 0.65 * SIDE;
 
       this.nodes.forEach((node) => {
         if (node.items && node.items.length) {
-          node.items.every((item) => {
-            if (item.iconUrl) {
-              const x = node.x - 1.3 * HALF_SIDE;
+          const itemCount = node.items.length;
 
+          let x =
+            itemCount === 1 ? node.x - 0.5 * HALF_SIDE : node.x - HALF_SIDE;
+          let y = node.y - 0.9 * HEIGHT;
+          let textX = itemCount === 1 ? node.x - 0.25 * SIDE : node.x - textCX;
+          let textY = node.y + 0.65 * HEIGHT;
+
+          node.items.forEach((item, index) => {
+            if (item.iconUrl && index < maxIconCount) {
               icons.push({
                 xyId: node.xyId,
                 x: x,
-                y: node.y - 0.5 * HEIGHT,
-                textX: x + 1.2 * IMAGE_SIDE,
-                textY: node.y + IMAGE_SIDE * 0.25,
+                y: y,
+                textX: textX,
+                textY: textY,
                 iconUrl: item.iconUrl,
                 name: this.getHumanQunatity(item.quantity),
               });
 
-              return false;
+              x += HALF_SIDE;
+              textX += textCX;
             }
-
-            return true;
           });
         }
       });
@@ -154,12 +162,20 @@ export default {
       coordinates[4] = { x: x - HALF_SIDE, y: y - h };
       coordinates[5] = { x: x + HALF_SIDE, y: y - h };
 
+      let nodeClass = null;
+      if (node.typeId === TYPE_START) {
+        nodeClass = "node-start";
+      } else if (node.typeId === TYPE_TOWN) {
+        nodeClass = "node-town";
+      }
+
       return {
         ...node,
         xyId: node.mx + "_" + node.my,
         x,
         y,
         points: this.getPoints(coordinates),
+        class: nodeClass,
       };
     },
     nodeMouseEnter(node) {
@@ -212,8 +228,16 @@ export default {
 .node:hover {
   fill: #527951;
 }
+.node-start {
+  fill: brown;
+}
+.node-town {
+  fill: orange;
+}
 .node-text {
-  font-size: 30px;
+  font-size: 22px;
+  fill: rgb(97, 97, 5);
+  font-weight: bold;
 }
 </style>
 <style scoped>
