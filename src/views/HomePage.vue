@@ -3,6 +3,7 @@
     <h1>Соберем все призы вместе!</h1>
 
     <p v-if="loading">Loading...</p>
+    <div v-else-if="!island">Карта не доступна.</div>
     <island-map v-else :island="island" />
   </div>
 </template>

@@ -47,7 +47,7 @@
               ' ' +
               translateY +
               ') scale(' +
-              scaleValue +
+              scale +
               ')'
             "
           >
@@ -59,22 +59,22 @@
               :class="node.class"
               v-on:mouseenter="nodeMouseEnter(node)"
             />
-            <template v-for="item in nodeIcons" :key="item.xyId">
+            <template v-for="item in visibleIconsItems" :key="item.uniqueId">
               <image
-                :x="item.x"
-                :y="item.y"
+                :x="item.iconX"
+                :y="item.iconY"
                 :width="imageSide"
                 :height="imageSide"
-                :href="item.iconUrl"
+                :href="item.item.iconUrl"
               />
               <text :x="item.textX" :y="item.textY" class="node-text">
-                {{ item.name }}
+                {{ item.humanQuantity }}
               </text>
             </template>
-            <poligon
+            <polyline
               v-if="activeNode"
-              :points="getNodePoints(activeNode)"
-              class="node-active"
+              :points="getActivePoints(activeNode)"
+              class="active-frame"
             />
           </g>
         </svg>
@@ -87,7 +87,7 @@
           </ol>
         </div>
 
-        <table v-if="nodeItems.length">
+        <table v-if="items.length">
           <thead>
             <tr>
               <th>
@@ -95,6 +95,7 @@
                 <input value="" />
               </th>
               <th>Количество</th>
+              <th>Стоимость в изумрудах</th>
               <th>
                 Показать на карте<br />
                 <button type="button">Сбросить</button>
@@ -102,9 +103,10 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="nodeItem in nodeItems" :key="nodeItem.id">
-              <td>{{ nodeItem.itemName }}</td>
-              <td>{{ nodeItem.quantity }}</td>
+            <tr v-for="item in items" :key="item.uniqueId">
+              <td>{{ item.item.name }}</td>
+              <td>{{ item.humanQuantity }}</td>
+              <td>{{ item.emeraldCost }}</td>
               <td><input type="checkbox" value="0" /></td>
             </tr>
           </tbody>
@@ -131,6 +133,7 @@ export default {
   name: "IslandMap",
   props: {
     island: { type: Object, required: true },
+    parentPageId: { type: String, required: true },
   },
   data: function () {
     return {
@@ -139,7 +142,8 @@ export default {
       nodeDialogComponent: null,
       updating: false,
       nodes: [],
-      scaleValue: 1,
+      items: [],
+      scale: 1,
       translateX: 0,
       translateY: 0,
     };
@@ -155,62 +159,24 @@ export default {
     height() {
       return HEIGHT;
     },
-    nodeIcons() {
-      let icons = [];
-      const maxIconCount = 2;
-      const textCX = 0.65 * SIDE;
-
-      this.nodes.forEach((node) => {
-        if (node.items && node.items.length) {
-          const itemCount = node.items.length;
-
-          let x =
-            itemCount === 1 ? node.x - 0.5 * HALF_SIDE : node.x - HALF_SIDE;
-          let y = node.y - 0.9 * HEIGHT;
-          let textX = itemCount === 1 ? node.x - 0.25 * SIDE : node.x - textCX;
-          let textY = y + IMAGE_SIDE + FONT_SIZE - 2;
-
-          node.items.forEach((item, index) => {
-            if (item.iconUrl && index < maxIconCount) {
-              icons.push({
-                xyId: node.xyId,
-                x: x,
-                y: y,
-                textX: textX,
-                textY: textY,
-                iconUrl: item.iconUrl,
-                name: this.getHumanQunatity(item.quantity),
-              });
-
-              x += HALF_SIDE;
-              textX += textCX;
-            }
-          });
-        }
-      });
-
-      return icons;
+    componentId() {
+      return this.parentPageId + "__map";
     },
-    nodeItems() {
-      let items = [];
-
-      this.nodes.forEach((node) => {
-        node.items.forEach((item, index) => {
-          items.push({
-            id: node.xyId + "_" + index,
-            itemName: item.name,
-            quantity: this.getHumanQunatity(item.quantity),
-          });
-        });
-      });
-
-      return items;
+    visibleIconsItems() {
+      return this.items.filter((item) => item.visibleIcon);
     },
+  },
+  created() {
+    this.loadState();
   },
   mounted() {
     this.loadNodes().then((nodes) => {
       this.nodes = nodes;
+      this.items = this.getItems(nodes);
     });
+  },
+  unmounted() {
+    this.saveState();
   },
   methods: {
     async loadNodes() {
@@ -226,6 +192,55 @@ export default {
 
       return nodes;
     },
+    getItems(nodes) {
+      let items = [];
+      const maxIconCount = 2;
+      const textCX = 0.65 * SIDE;
+
+      nodes.forEach((node) => {
+        const itemCount = node?.items.length;
+        if (!itemCount) {
+          return;
+        }
+        let iconX =
+          itemCount === 1 ? node.x - 0.5 * HALF_SIDE : node.x - HALF_SIDE;
+        let iconY = node.y - 0.9 * HEIGHT;
+        let textX = itemCount === 1 ? node.x - 0.25 * SIDE : node.x - textCX;
+        let textY = iconY + IMAGE_SIDE + FONT_SIZE - 2;
+
+        node.items.forEach((item, index) => {
+          let data = {
+            uniqueId: node.xyId + "_" + item.id,
+            iconUrl: item.iconUrl,
+            humanQuantity: this.getHumanQunatity(item.quantity),
+            emeraldCost:
+              item.emeraldCost !== null
+                ? item.emeraldCost * item.quantity
+                : null,
+
+            node,
+            item,
+          };
+
+          if (index < maxIconCount) {
+            data.visibleIcon = true;
+            data.iconX = iconX;
+            data.iconY = iconY;
+            data.textX = textX;
+            data.textY = textY;
+
+            iconX += HALF_SIDE;
+            textX += textCX;
+          } else {
+            data.visibleIcon = false;
+          }
+
+          items.push(data);
+        });
+      });
+
+      return items;
+    },
     /**
      * @param {Object} node
      */
@@ -237,14 +252,14 @@ export default {
         nodeClass = "node-town";
       }
 
-      const coordinates = this.getCoordinates(node);
+      const data = this.getCoordinates(node);
 
       return {
         ...node,
         xyId: node.mx + "_" + node.my,
-        x: coordinates.x,
-        y: coordinates.y,
-        points: this.getPoints(coordinates.coordinates),
+        x: data.x,
+        y: data.y,
+        points: this.getPoints(data.coordinates),
         class: nodeClass,
       };
     },
@@ -268,25 +283,26 @@ export default {
         coordinates,
       };
     },
-    getNodePoints(node) {
-      const coordinates = this.getCoordinates(node);
+    getActivePoints(node) {
+      let data = this.getCoordinates(node);
+      data.coordinates.push(data.coordinates[0]);
 
-      return this.getPoints(coordinates.coordinates);
+      return this.getPoints(data.coordinates);
     },
     /**
      * @param {Boolean} inc
      */
     onChangeScale(inc) {
-      this.scaleValue += inc ? 0.1 : -0.1;
+      this.scale += inc ? 0.1 : -0.1;
 
-      if (this.scaleValue > MAX_SCALE) {
-        this.scaleValue = MAX_SCALE;
-      } else if (this.scaleValue < MIN_SCALE) {
-        this.scaleValue = MIN_SCALE;
+      if (this.scale > MAX_SCALE) {
+        this.scale = MAX_SCALE;
+      } else if (this.scale < MIN_SCALE) {
+        this.scale = MIN_SCALE;
       }
     },
     onResetScale() {
-      this.scaleValue = 1;
+      this.scale = 1;
     },
     onChangeTranslate(dx, dy) {
       const value = 5;
@@ -340,6 +356,35 @@ export default {
 
       return quantity;
     },
+    loadState() {
+      let state;
+
+      try {
+        state = JSON.parse(localStorage.getItem(this.componentId));
+      } catch (error) {
+        console.error(error);
+      }
+
+      if (!state) {
+        state = {
+          scale: 1,
+          translateX: 0,
+          translateY: 0,
+        };
+      }
+
+      this.scale = state.scale;
+      this.translateX = state.translateX;
+      this.translateY = state.translateY;
+    },
+    saveState() {
+      const state = {
+        scale: this.scale,
+        translateX: this.translateX,
+        translateY: this.translateY,
+      };
+      localStorage.setItem(this.componentId, JSON.stringify(state));
+    },
   },
 };
 </script>
@@ -352,8 +397,10 @@ export default {
 .node:hover {
   fill: #527951;
 }
-.node-active {
-  fill: red;
+.active-frame {
+  fill: none;
+  stroke: red;
+  stroke-width: 3;
 }
 .node-start {
   fill: brown;
