@@ -1,7 +1,7 @@
 <template>
   <div>
     <div v-if="loadingNodes">Loading...</div>
-    <template v-else>
+    <div v-else>
       <div class="actions">
         <div>
           <b>scale</b>
@@ -78,47 +78,46 @@
             />
           </g>
         </svg>
-
-        <div style="max-width: 30em">
-          <p>Кликни на ячейку и впиши что в ней находится</p>
-          <ol>
-            <li>Название</li>
-            <li>Кличество, если больше 1</li>
-          </ol>
-        </div>
-
-        <table class="">
-          <thead>
-            <tr>
-              <th>
-                Предмет<br />
-                <input v-model.trim="filter.itemName" @input="onInput" /><br />
-                <span style="font-size: 0.9em; color: #aaaaaa"
-                  >Нужно ввести от {{ minCharsCount }} символов</span
-                >
-              </th>
-              <th>Количество</th>
-              <th>Стоимость в изумрудах</th>
-              <th>
-                Показать на карте<br />
-                <button type="button">Сбросить</button>
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-if="!visibleItems.length">
-              <td colspan="4">Нет данных.</td>
-            </tr>
-            <tr v-else v-for="item in visibleItems" :key="item.uniqueId">
-              <td>{{ item.item.name }}</td>
-              <td>{{ item.humanQuantity }}</td>
-              <td>{{ item.emeraldCost }}</td>
-              <td><input type="checkbox" value="0" /></td>
-            </tr>
-          </tbody>
-        </table>
       </div>
-    </template>
+      <div style="max-width: 30em">
+        <p>Кликни на ячейку и впиши что в ней находится</p>
+        <ol>
+          <li>Название</li>
+          <li>Кличество, если больше 1</li>
+        </ol>
+      </div>
+
+      <table class="">
+        <thead>
+          <tr>
+            <th>
+              Предмет<br />
+              <input v-model.trim="filter.itemName" @input="onInput" /><br />
+              <span style="font-size: 0.9em; color: #aaaaaa"
+                >Нужно ввести от {{ minCharsCount }} символов</span
+              >
+            </th>
+            <th>Количество</th>
+            <th>Стоимость в изумрудах</th>
+            <th>
+              Показать на карте<br />
+              <button type="button">Сбросить</button>
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-if="!visibleItems.length">
+            <td colspan="4">Нет данных.</td>
+          </tr>
+          <tr v-else v-for="item in visibleItems" :key="item.uniqueId">
+            <td>{{ item.item.name }}</td>
+            <td>{{ item.humanQuantity }}</td>
+            <td>{{ item.emeraldCost }}</td>
+            <td><input type="checkbox" value="0" /></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 </template>
 <script>
