@@ -87,12 +87,15 @@
           </ol>
         </div>
 
-        <table v-if="items.length">
+        <table class="">
           <thead>
             <tr>
               <th>
                 Предмет<br />
-                <input value="" />
+                <input v-model.trim="filter.itemName" @input="onInput" /><br />
+                <span style="font-size: 0.9em; color: #aaaaaa"
+                  >Нужно ввести от {{ minCharsCount }} символов</span
+                >
               </th>
               <th>Количество</th>
               <th>Стоимость в изумрудах</th>
@@ -103,7 +106,10 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="item in items" :key="item.uniqueId">
+            <tr v-if="!visibleItems.length">
+              <td colspan="4">Нет данных.</td>
+            </tr>
+            <tr v-else v-for="item in visibleItems" :key="item.uniqueId">
               <td>{{ item.item.name }}</td>
               <td>{{ item.humanQuantity }}</td>
               <td>{{ item.emeraldCost }}</td>
@@ -146,12 +152,18 @@ export default {
       scale: 1,
       translateX: 0,
       translateY: 0,
+      filter: {
+        itemName: "",
+      },
     };
   },
   computed: {
     viewBox() {
       const side = SIDE * 5;
       return `-${side} -${side} ${side * 2} ${side * 2}`;
+    },
+    minCharsCount() {
+      return 3;
     },
     imageSide() {
       return IMAGE_SIDE;
@@ -162,8 +174,17 @@ export default {
     componentId() {
       return this.parentPageId + "__map";
     },
+    visibleItems() {
+      if (this.filter.itemName.length >= this.minCharsCount) {
+        return this.items.filter((item) =>
+          item.item.name.includes(this.filter.itemName)
+        );
+      }
+
+      return this.items;
+    },
     visibleIconsItems() {
-      return this.items.filter((item) => item.visibleIcon);
+      return this.visibleItems.filter((item) => item.visibleIcon);
     },
   },
   created() {
@@ -321,6 +342,11 @@ export default {
     nodeMouseEnter(node) {
       this.activeNode = node;
     },
+    onInputItemName() {
+      if (this.filter.itemName.length < this.minCharsCount) {
+        return;
+      }
+    },
     onEditNodeClick() {
       if (!this.updating) {
         this.updating = true;
@@ -372,16 +398,24 @@ export default {
           translateY: 0,
         };
       }
+      if (!state.filter) {
+        state.filter = {};
+      }
+      if (!state.filter.itemName) {
+        state.filter.itemName = "";
+      }
 
       this.scale = state.scale;
       this.translateX = state.translateX;
       this.translateY = state.translateY;
+      this.filter.itemName = state.filter.itemName;
     },
     saveState() {
       const state = {
         scale: this.scale,
         translateX: this.translateX,
         translateY: this.translateY,
+        filter: this.filter,
       };
       localStorage.setItem(this.componentId, JSON.stringify(state));
     },
