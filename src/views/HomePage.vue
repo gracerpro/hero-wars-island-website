@@ -2,9 +2,9 @@
   <div class="container">
     <h1>Соберем все призы вместе!</h1>
 
-    <p v-if="loading">Loading...</p>
+    <div v-if="loading">Loading...</div>
     <div v-else-if="!island">Карта не доступна.</div>
-    <island-map v-else :island="island" />
+    <island-map v-else :island="island" :parent-page-id="pageId" />
   </div>
 </template>
 <script>
@@ -29,6 +29,9 @@ export default {
   computed: {
     loading() {
       return this.loaded === false || this.loadingIsland;
+    },
+    pageId() {
+      return PAGE_ID;
     },
   },
   created() {
