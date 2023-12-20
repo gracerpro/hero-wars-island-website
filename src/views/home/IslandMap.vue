@@ -27,6 +27,7 @@
           @mousedown="onMouseDown"
           @mouseup="onMouseUp"
           @mousemove="onMouseMove"
+          @wheel="onMouseWheel"
         >
           <line
             x1="0"
@@ -125,8 +126,9 @@ const FONT_SIZE = 22;
 const MAX_SCALE = 3;
 const MIN_SCALE = 0.3;
 
-const TRANSLATE_X = 5;
-const TRANSLATE_Y = 5;
+const DELTA_SCALE = 0.1;
+const TRANSLATE_X = 6;
+const TRANSLATE_Y = 6;
 
 export default {
   client: new HeroClient(),
@@ -322,46 +324,58 @@ export default {
      * @param {Object} button
      */
     onMouseMove(button) {
-      if (this.$options.mouse.isDown) {
-        const mouse = this.$options.mouse;
+      if (!this.$options.mouse.isDown) {
+        return;
+      }
 
-        if (mouse.preventX === null) {
-          mouse.preventX = button.pageX;
-        }
-        if (mouse.preventY === null) {
-          mouse.preventY = button.pageY;
-        }
+      const mouse = this.$options.mouse;
 
-        const isLeft = button.pageX < mouse.preventX;
-        const isRight = button.pageX > mouse.preventX;
-        const isTop = button.pageY < mouse.preventY;
-        const isBottom = button.pageY > mouse.preventY;
-
-        if (isLeft) {
-          this.translateX -= TRANSLATE_X;
-        }
-        if (isRight) {
-          this.translateX += TRANSLATE_X;
-        }
-        if (isTop) {
-          this.translateY -= TRANSLATE_Y;
-        }
-        if (isBottom) {
-          this.translateY += TRANSLATE_Y;
-        }
-
+      if (mouse.preventX === null) {
         mouse.preventX = button.pageX;
+      }
+      if (mouse.preventY === null) {
         mouse.preventY = button.pageY;
       }
+
+      const isLeft = button.pageX < mouse.preventX;
+      const isRight = button.pageX > mouse.preventX;
+      const isTop = button.pageY < mouse.preventY;
+      const isBottom = button.pageY > mouse.preventY;
+
+      if (isLeft) {
+        this.translateX -= TRANSLATE_X;
+      }
+      if (isRight) {
+        this.translateX += TRANSLATE_X;
+      }
+      if (isTop) {
+        this.translateY -= TRANSLATE_Y;
+      }
+      if (isBottom) {
+        this.translateY += TRANSLATE_Y;
+      }
+
+      mouse.preventX = button.pageX;
+      mouse.preventY = button.pageY;
     },
     onMouseUp() {
       this.$options.mouse.isDown = false;
+    },
+    onMouseWheel(event) {
+      this.changeScale(event.deltaY > 0 ? DELTA_SCALE : -DELTA_SCALE);
+      event.preventDefault();
     },
     /**
      * @param {Boolean} inc
      */
     onChangeScale(inc) {
-      this.scale += inc ? 0.1 : -0.1;
+      this.changeScale(2 * (inc ? DELTA_SCALE : -DELTA_SCALE));
+    },
+    /**
+     * @param {Number} value
+     */
+    changeScale(value) {
+      this.scale += value;
 
       if (this.scale > MAX_SCALE) {
         this.scale = MAX_SCALE;
