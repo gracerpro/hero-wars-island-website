@@ -20,7 +20,7 @@ docker exec hero-wars-website__vue npm run lint --fix
 Для захода в **vue** контейнер
 
 ```bash
-docker exec -it --user "$(id -u):$(id -g)" hero-wars__vue bash
+docker exec -it --user "$(id -u):$(id -g)" hero-wars-website__vue bash
 ```
 
 ## Project setup
@@ -32,5 +32,5 @@ docker exec -it --user "$(id -u):$(id -g)" hero-wars__vue bash
 Скачать проект на компьютер. Установить зависимости
 
 ```bash
-docker exec hero-wars__vue npm install
+docker exec hero-wars-website__vue npm install
 ```
