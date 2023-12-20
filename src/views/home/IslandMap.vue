@@ -40,17 +40,7 @@
             style="stroke: black; stroke-width: 1"
           />
 
-          <g
-            :transform="
-              'translate(' +
-              translateX +
-              ' ' +
-              translateY +
-              ') scale(' +
-              scale +
-              ')'
-            "
-          >
+          <g :transform="'translate(' + translateX + ' ' + translateY + ')'">
             <polygon
               v-for="node in nodes"
               :key="node.xyId"
@@ -158,7 +148,7 @@ export default {
   },
   computed: {
     viewBox() {
-      const side = SIDE * 5;
+      const side = SIDE * 5 * this.scale;
       return `-${side} -${side} ${side * 2} ${side * 2}`;
     },
     minCharsCount() {
