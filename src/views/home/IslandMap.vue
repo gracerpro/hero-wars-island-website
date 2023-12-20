@@ -24,6 +24,9 @@
           width="100%"
           :viewBox="viewBox"
           xmlns="http://www.w3.org/2000/svg"
+          @mousedown="onMouseDown"
+          @mouseup="onMouseUp"
+          @mousemove="onMouseMove"
         >
           <line
             x1="0"
@@ -122,8 +125,16 @@ const FONT_SIZE = 22;
 const MAX_SCALE = 3;
 const MIN_SCALE = 0.3;
 
+const TRANSLATE_X = 5;
+const TRANSLATE_Y = 5;
+
 export default {
   client: new HeroClient(),
+  mouse: {
+    isDown: false,
+    preventX: null,
+    preventY: null,
+  },
 
   name: "IslandMap",
   props: {
@@ -300,6 +311,53 @@ export default {
       return this.getPoints(data.coordinates);
     },
     /**
+     * @param {Object} button
+     */
+    onMouseDown(button) {
+      this.$options.mouse.preventX = button.pageX;
+      this.$options.mouse.preventY = button.pageY;
+      this.$options.mouse.isDown = true;
+    },
+    /**
+     * @param {Object} button
+     */
+    onMouseMove(button) {
+      if (this.$options.mouse.isDown) {
+        const mouse = this.$options.mouse;
+
+        if (mouse.preventX === null) {
+          mouse.preventX = button.pageX;
+        }
+        if (mouse.preventY === null) {
+          mouse.preventY = button.pageY;
+        }
+
+        const isLeft = button.pageX < mouse.preventX;
+        const isRight = button.pageX > mouse.preventX;
+        const isTop = button.pageY < mouse.preventY;
+        const isBottom = button.pageY > mouse.preventY;
+
+        if (isLeft) {
+          this.translateX -= TRANSLATE_X;
+        }
+        if (isRight) {
+          this.translateX += TRANSLATE_X;
+        }
+        if (isTop) {
+          this.translateY -= TRANSLATE_Y;
+        }
+        if (isBottom) {
+          this.translateY += TRANSLATE_Y;
+        }
+
+        mouse.preventX = button.pageX;
+        mouse.preventY = button.pageY;
+      }
+    },
+    onMouseUp() {
+      this.$options.mouse.isDown = false;
+    },
+    /**
      * @param {Boolean} inc
      */
     onChangeScale(inc) {
@@ -315,13 +373,11 @@ export default {
       this.scale = 1;
     },
     onChangeTranslate(dx, dy) {
-      const value = 5;
-
       if (dx !== 0) {
-        this.translateX += dx > 0 ? value : -value;
+        this.translateX += 5 * (dx > 0 ? TRANSLATE_X : -TRANSLATE_X);
       }
       if (dy !== 0) {
-        this.translateY += dy > 0 ? value : -value;
+        this.translateY += 5 * (dy > 0 ? TRANSLATE_Y : -TRANSLATE_Y);
       }
     },
     onResetTranslate() {
