@@ -21,11 +21,19 @@ export default class HeroClient {
   }
 
   /**
-   *
    * @param {Number} islandId
    * @returns {Object}
    */
   async getNodes(islandId) {
     return await this._apiRequest.get(`/islands/${islandId}/nodes`);
+  }
+
+  /**
+   * @param {Number} nodeId
+   * @param {Object} data
+   * @returns {Object}
+   */
+  async updateNode(nodeId, data) {
+    return await this._apiRequest.post(`/island-nodes/${nodeId}/update`, data);
   }
 }

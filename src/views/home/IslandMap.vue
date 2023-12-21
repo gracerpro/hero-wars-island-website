@@ -71,6 +71,7 @@
               :x="item.x"
               :y="item.y"
               class="unknown-text"
+              @click="onEditNodeClick(item.node)"
             >
               ?
             </text>
@@ -82,6 +83,7 @@
           </g>
         </svg>
       </div>
+
       <div style="max-width: 30em">
         <p>Кликни на ячейку и впиши что в ней находится</p>
         <ol>
@@ -121,10 +123,19 @@
         </tbody>
       </table>
     </div>
+
+    <component
+      :is="nodeDialog.component"
+      :node="nodeDialog.node"
+      ref="nodeDialog"
+      @mounted="onMountedNodeDialog"
+    ></component>
   </div>
 </template>
 <script>
 import HeroClient, { TYPE_TOWN, TYPE_START } from "@/api/HeroClient";
+import UpdateNodeDialog from "./UpdateNodeDialog.vue";
+import { shallowRef } from "vue";
 
 const SIDE = 86;
 const HALF_SIDE = SIDE / 2;
@@ -157,7 +168,10 @@ export default {
     return {
       loadingNodes: true,
       activeNode: null,
-      nodeDialogComponent: null,
+      nodeDialog: {
+        node: null,
+        component: null,
+      },
       updating: false,
       nodes: [],
       items: [],
@@ -430,10 +444,11 @@ export default {
         return;
       }
     },
-    onEditNodeClick() {
+    onEditNodeClick(node) {
       if (!this.updating) {
         this.updating = true;
-        //this.nodeDialogComponent = shallowRef(NodeDialog);
+        this.nodeDialog.node = node;
+        this.nodeDialog.component = shallowRef(UpdateNodeDialog);
       }
     },
     onMountedNodeDialog() {
@@ -442,10 +457,12 @@ export default {
         .then((result) => {
           if (result !== null && result !== undefined) {
             // todo: reload node
+            console.log(result);
           }
         })
         .finally(() => {
-          this.nodeDialogComponent = null;
+          this.nodeDialog.component = null;
+          this.nodeDialog.node = null;
           this.updating = false;
         });
     },
