@@ -65,6 +65,15 @@
                 {{ item.humanQuantity }}
               </text>
             </template>
+            <text
+              v-for="item in unknownItems"
+              :key="item.node.xyId"
+              :x="item.x"
+              :y="item.y"
+              class="unknown-text"
+            >
+              ?
+            </text>
             <polyline
               v-if="activeNode"
               :points="getActivePoints(activeNode)"
@@ -120,6 +129,7 @@ import HeroClient, { TYPE_TOWN, TYPE_START } from "@/api/HeroClient";
 const SIDE = 86;
 const HALF_SIDE = SIDE / 2;
 const HEIGHT = 36;
+//const HALF_HEIGHT = HEIGHT / 2;
 const IMAGE_SIDE = 40;
 const FONT_SIZE = 22;
 
@@ -185,6 +195,21 @@ export default {
 
       return this.items;
     },
+    unknownItems() {
+      let items = [];
+
+      this.nodes.forEach((node) => {
+        if (!node?.items.length && node.typeId !== TYPE_START) {
+          items.push({
+            node,
+            x: node.x - 0.2 * SIDE,
+            y: node.y + 0.4 * HEIGHT,
+          });
+        }
+      });
+
+      return items;
+    },
     visibleIconsItems() {
       return this.visibleItems.filter((item) => item.visibleIcon);
     },
@@ -240,7 +265,6 @@ export default {
               item.emeraldCost !== null
                 ? item.emeraldCost * item.quantity
                 : null,
-
             node,
             item,
           };
@@ -505,6 +529,15 @@ export default {
   font-size: 22px;
   fill: rgb(97, 97, 5);
   font-weight: bold;
+}
+.unknown-text {
+  font-size: 50px;
+  fill: rgb(235, 235, 102);
+  font-weight: bold;
+  cursor: pointer;
+}
+.unknown-text:hover {
+  fill: rgb(151, 151, 62);
 }
 </style>
 <style scoped>
