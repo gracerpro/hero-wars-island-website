@@ -140,6 +140,7 @@ import HeroClient, {
   TYPE_TOWN,
   TYPE_START,
   STATUS_ON_MODERATION,
+  STATUS_ACCEPTED_SUCCESS,
 } from "@/api/HeroClient";
 import UpdateNodeDialog from "./UpdateNodeDialog.vue";
 import { shallowRef } from "vue";
@@ -220,7 +221,11 @@ export default {
       let items = [];
 
       this.nodes.forEach((node) => {
-        if (!node?.items.length && node.typeId !== TYPE_START) {
+        if (
+          !node?.items.length &&
+          node.typeId !== TYPE_START &&
+          node.statusId !== STATUS_ACCEPTED_SUCCESS
+        ) {
           items.push({
             node,
             x: node.x - 0.2 * SIDE,

@@ -1,5 +1,15 @@
 <template>
   <form @submit.prevent="onSubmit" :id="formId">
+    <div v-if="isShowStatus" class="mb-3">
+      <label :for="formId + '__status'" class="form-label">Статус</label>
+      <input
+        class="form-control"
+        :id="formId + '__status'"
+        :value="statusName"
+        disabled
+        readonly
+      />
+    </div>
     <div class="mb-3">
       <label :for="formId + '__comment'" class="form-label">Комментарий</label>
       <input
@@ -24,7 +34,10 @@
   </form>
 </template>
 <script>
-import HeroClient from "@/api/HeroClient";
+import HeroClient, {
+  STATUS_ACCEPTED_SUCCESS,
+  STATUS_ON_MODERATION,
+} from "@/api/HeroClient";
 import UserError from "@/exceptions/UserError";
 
 const EVENT_SUCCESS_SAVE = "success-save";
@@ -46,6 +59,23 @@ export default {
       comment: "",
       quantity: "",
     };
+  },
+  computed: {
+    isShowStatus() {
+      return (
+        this.node.statusId === STATUS_ACCEPTED_SUCCESS ||
+        this.node.statusId === STATUS_ON_MODERATION
+      );
+    },
+    statusName() {
+      if (this.node.statusId === STATUS_ACCEPTED_SUCCESS) {
+        return "Принято";
+      }
+      if (this.node.statusId === STATUS_ON_MODERATION) {
+        return "На модерации";
+      }
+      return "";
+    },
   },
   created() {
     this.comment = this.node.userComment;
