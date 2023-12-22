@@ -54,7 +54,7 @@ class ApiRequest {
       body: JSON.stringify(data),
     };
     const response = await fetch(
-      process.env.VUE_APP_EXTERNAL_API_URL + url,
+      process.env.VUE_APP_BACKEND_API_URL + url,
       options
     );
 
