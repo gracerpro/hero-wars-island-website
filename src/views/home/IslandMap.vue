@@ -70,7 +70,10 @@
               :key="item.node.xyId"
               :x="item.x"
               :y="item.y"
-              class="unknown-text"
+              :class="[
+                'unknown-text',
+                item.isOnModeration ? '-on-moderation' : '',
+              ]"
               @click="onEditNodeClick(item.node)"
             >
               ?
@@ -133,7 +136,11 @@
   </div>
 </template>
 <script>
-import HeroClient, { TYPE_TOWN, TYPE_START } from "@/api/HeroClient";
+import HeroClient, {
+  TYPE_TOWN,
+  TYPE_START,
+  STATUS_ON_MODERATION,
+} from "@/api/HeroClient";
 import UpdateNodeDialog from "./UpdateNodeDialog.vue";
 import { shallowRef } from "vue";
 
@@ -218,6 +225,7 @@ export default {
             node,
             x: node.x - 0.2 * SIDE,
             y: node.y + 0.4 * HEIGHT,
+            isOnModeration: node.statusId === STATUS_ON_MODERATION,
           });
         }
       });
@@ -454,10 +462,14 @@ export default {
     onMountedNodeDialog() {
       this.$refs.nodeDialog
         .show()
-        .then((result) => {
-          if (result !== null && result !== undefined) {
-            // todo: reload node
-            console.log(result);
+        .then((node) => {
+          if (node !== null && node !== undefined) {
+            const index = this.nodes.findIndex(
+              (arrNode) => arrNode.id === node.id
+            );
+            if (index >= 0) {
+              this.nodes[index] = this.drawNode(node);
+            }
           }
         })
         .finally(() => {
@@ -531,11 +543,6 @@ export default {
 .node:hover {
   fill: #527951;
 }
-.active-frame {
-  fill: none;
-  stroke: red;
-  stroke-width: 3;
-}
 .node-start {
   fill: brown;
 }
@@ -556,6 +563,9 @@ export default {
 .unknown-text:hover {
   fill: rgb(151, 151, 62);
 }
+.-on-moderation {
+  fill: green;
+}
 </style>
 <style scoped>
 .map {
@@ -566,5 +576,10 @@ export default {
 }
 .actions {
   margin-bottom: 10px;
+}
+.active-frame {
+  fill: none;
+  stroke: red;
+  stroke-width: 3;
 }
 </style>
