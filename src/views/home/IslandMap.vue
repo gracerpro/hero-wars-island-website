@@ -2,20 +2,66 @@
   <div>
     <div v-if="loadingNodes">Loading...</div>
     <div v-else>
-      <div class="actions">
-        <div>
-          <b>scale</b>
-          <button type="button" @click="onChangeScale(true)">+ up</button>
-          <button type="button" @click="onChangeScale(false)">- down</button>
-          <button type="button" @click="onResetScale()">reset</button>
+      <div class="btn-toolbar mb-3" role="toolbar">
+        <div class="btn-group me-2" role="group">
+          <button
+            type="button"
+            class="btn btn-secondary"
+            @click="onChangeScale(true)"
+          >
+            + up
+          </button>
+          <button
+            type="button"
+            class="btn btn-secondary"
+            @click="onChangeScale(false)"
+          >
+            - down
+          </button>
+          <button
+            type="button"
+            class="btn btn-secondary"
+            @click="onResetScale()"
+          >
+            reset
+          </button>
         </div>
-        <div>
-          <b>translate</b>
-          <button type="button" @click="onChangeTranslate(-1, 0)">left</button>
-          <button type="button" @click="onChangeTranslate(1, 0)">right</button>
-          <button type="button" @click="onChangeTranslate(0, -1)">top</button>
-          <button type="button" @click="onChangeTranslate(0, 1)">down</button>
-          <button type="button" @click="onResetTranslate()">reset</button>
+        <div class="btn-group me-2" role="group">
+          <button
+            type="button"
+            class="btn btn-secondary"
+            @click="onChangeTranslate(-1, 0)"
+          >
+            left
+          </button>
+          <button
+            type="button"
+            class="btn btn-secondary"
+            @click="onChangeTranslate(1, 0)"
+          >
+            right
+          </button>
+          <button
+            type="button"
+            class="btn btn-secondary"
+            @click="onChangeTranslate(0, -1)"
+          >
+            top
+          </button>
+          <button
+            type="button"
+            class="btn btn-secondary"
+            @click="onChangeTranslate(0, 1)"
+          >
+            down
+          </button>
+          <button
+            type="button"
+            class="btn btn-secondary"
+            @click="onResetTranslate()"
+          >
+            reset
+          </button>
         </div>
       </div>
       <div class="map">
@@ -578,9 +624,6 @@ export default {
   height: 600px;
   padding: 10px;
   outline: 1px solid #dddddd;
-}
-.actions {
-  margin-bottom: 10px;
 }
 .active-frame {
   fill: none;
