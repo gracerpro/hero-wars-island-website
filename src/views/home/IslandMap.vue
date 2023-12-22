@@ -9,21 +9,21 @@
             class="btn btn-secondary"
             @click="onChangeScale(true)"
           >
-            + up
+            +
           </button>
           <button
             type="button"
             class="btn btn-secondary"
             @click="onChangeScale(false)"
           >
-            - down
+            -
           </button>
           <button
             type="button"
             class="btn btn-secondary"
             @click="onResetScale()"
           >
-            reset
+            Сбросить
           </button>
         </div>
         <div class="btn-group me-2" role="group">
@@ -32,35 +32,35 @@
             class="btn btn-secondary"
             @click="onChangeTranslate(-1, 0)"
           >
-            left
+            Влево
           </button>
           <button
             type="button"
             class="btn btn-secondary"
             @click="onChangeTranslate(1, 0)"
           >
-            right
+            Вправо
           </button>
           <button
             type="button"
             class="btn btn-secondary"
             @click="onChangeTranslate(0, -1)"
           >
-            top
+            Вверх
           </button>
           <button
             type="button"
             class="btn btn-secondary"
             @click="onChangeTranslate(0, 1)"
           >
-            down
+            Вниз
           </button>
           <button
             type="button"
             class="btn btn-secondary"
             @click="onResetTranslate()"
           >
-            reset
+            Сбросить
           </button>
         </div>
       </div>
