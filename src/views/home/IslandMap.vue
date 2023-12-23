@@ -2,8 +2,8 @@
   <div>
     <loading-map v-if="loadingNodes" />
     <div v-else>
-      <div class="btn-toolbar mb-3" role="toolbar">
-        <div class="btn-group me-2" role="group">
+      <div class="btn-toolbar -left-toolbar" role="toolbar">
+        <div class="btn-group-vertical w-100 mb-2" role="group">
           <button
             type="button"
             class="btn btn-secondary"
@@ -23,12 +23,13 @@
           <button
             type="button"
             class="btn btn-secondary"
+            title="Сбросить"
             @click="onResetScale()"
           >
-            Сбросить
+            0
           </button>
         </div>
-        <div class="btn-group me-2" role="group">
+        <div class="btn-group-vertical w-100" role="group">
           <button
             type="button"
             class="btn btn-secondary"
@@ -60,9 +61,10 @@
           <button
             type="button"
             class="btn btn-secondary"
+            title="Сбросить"
             @click="onResetTranslate()"
           >
-            Сбросить
+            0
           </button>
         </div>
       </div>
@@ -638,6 +640,7 @@ export default {
 </style>
 <style scoped>
 .map {
+  margin-left: 45px;
   width: 100%;
   height: 600px;
   outline: 1px solid #dddddd;
@@ -646,5 +649,9 @@ export default {
   fill: none;
   stroke: red;
   stroke-width: 3;
+}
+.-left-toolbar {
+  width: 40px;
+  float: left;
 }
 </style>
