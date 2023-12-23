@@ -2,7 +2,7 @@
   <div class="container">
     <h1>Соберем все призы вместе!</h1>
 
-    <div v-if="loading">Loading...</div>
+    <loading-map v-if="loading" />
     <div v-else-if="!island">Карта не доступна.</div>
     <island-map v-else :island="island" :parent-page-id="pageId" />
   </div>
@@ -10,6 +10,7 @@
 <script>
 import HeroClient from "@/api/HeroClient";
 import IslandMap from "./home/IslandMap.vue";
+import LoadingMap from "./home/LoadingMap.vue";
 
 const PAGE_ID = "homePage";
 
@@ -17,7 +18,7 @@ export default {
   client: new HeroClient(),
 
   name: "HomePage",
-  components: { IslandMap },
+  components: { IslandMap, LoadingMap },
   data() {
     return {
       loaded: false,

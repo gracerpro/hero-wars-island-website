@@ -1,12 +1,13 @@
 <template>
   <div>
-    <div v-if="loadingNodes">Loading...</div>
+    <loading-map v-if="loadingNodes" />
     <div v-else>
       <div class="btn-toolbar mb-3" role="toolbar">
         <div class="btn-group me-2" role="group">
           <button
             type="button"
             class="btn btn-secondary"
+            title="Увеличить"
             @click="onChangeScale(true)"
           >
             +
@@ -14,6 +15,7 @@
           <button
             type="button"
             class="btn btn-secondary"
+            title="Уменьшить"
             @click="onChangeScale(false)"
           >
             -
@@ -32,28 +34,28 @@
             class="btn btn-secondary"
             @click="onChangeTranslate(-1, 0)"
           >
-            Влево
+            &larr;
           </button>
           <button
             type="button"
             class="btn btn-secondary"
             @click="onChangeTranslate(1, 0)"
           >
-            Вправо
+            &rarr;
           </button>
           <button
             type="button"
             class="btn btn-secondary"
             @click="onChangeTranslate(0, -1)"
           >
-            Вверх
+            &uarr;
           </button>
           <button
             type="button"
             class="btn btn-secondary"
             @click="onChangeTranslate(0, 1)"
           >
-            Вниз
+            &darr;
           </button>
           <button
             type="button"
@@ -141,44 +143,50 @@
         </ol>
       </div>
 
-      <table class="">
-        <thead>
-          <tr>
-            <th>
-              Предмет<br />
-              <input v-model.trim="filter.itemName" @input="onInput" /><br />
-              <span style="font-size: 0.9em; color: #aaaaaa"
-                >Нужно ввести от {{ minCharsCount }} символов</span
-              >
-            </th>
-            <th>Количество</th>
-            <th>Стоимость в изумрудах</th>
-            <th>
-              Показать на карте<br />
-              <button type="button">Сбросить</button>
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-if="!visibleItems.length">
-            <td colspan="4">Нет данных.</td>
-          </tr>
-          <tr v-else v-for="item in visibleItems" :key="item.uniqueId">
-            <td>{{ item.item.name }}</td>
-            <td>{{ item.humanQuantity }}</td>
-            <td>{{ item.emeraldCost }}</td>
-            <td><input type="checkbox" value="0" /></td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
+      <div class="row">
+        <div class="col-lg-6">
+          <table class="table table-striped table-hover table-sm">
+            <thead>
+              <tr>
+                <th>
+                  <label for="table__itemName" class="form-label"
+                    >Предмет</label
+                  >
+                  <input
+                    v-model.trim="filter.itemName"
+                    id="table__itemName"
+                    class="form-control"
+                    @input="onInput"
+                  />
+                  <div class="form-text fw-normal">
+                    Нужно ввести от {{ minCharsCount }} символов
+                  </div>
+                </th>
+                <th class="align-top">Количество</th>
+                <th class="align-top">Стоимость в изумрудах</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-if="!visibleItems.length">
+                <td colspan="4">Нет данных.</td>
+              </tr>
+              <tr v-else v-for="item in visibleItems" :key="item.uniqueId">
+                <td>{{ item.item.name }}</td>
+                <td>{{ item.humanQuantity }}</td>
+                <td>{{ item.emeraldCost }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
 
-    <component
-      :is="nodeDialog.component"
-      :node="nodeDialog.node"
-      ref="nodeDialog"
-      @mounted="onMountedNodeDialog"
-    ></component>
+      <component
+        :is="nodeDialog.component"
+        :node="nodeDialog.node"
+        ref="nodeDialog"
+        @mounted="onMountedNodeDialog"
+      ></component>
+    </div>
   </div>
 </template>
 <script>
@@ -189,6 +197,7 @@ import HeroClient, {
   STATUS_ACCEPTED_SUCCESS,
 } from "@/api/HeroClient";
 import UpdateNodeDialog from "./UpdateNodeDialog.vue";
+import LoadingMap from "./LoadingMap.vue";
 import { shallowRef } from "vue";
 
 const SIDE = 86;
@@ -205,6 +214,8 @@ const DELTA_SCALE = 0.1;
 const TRANSLATE_X = 6;
 const TRANSLATE_Y = 6;
 
+const MIDDLE_BUTTON = 1;
+
 export default {
   client: new HeroClient(),
   mouse: {
@@ -218,6 +229,7 @@ export default {
     island: { type: Object, required: true },
     parentPageId: { type: String, required: true },
   },
+  components: { LoadingMap },
   data: function () {
     return {
       loadingNodes: true,
@@ -412,10 +424,13 @@ export default {
     /**
      * @param {Object} button
      */
-    onMouseDown(button) {
-      this.$options.mouse.preventX = button.pageX;
-      this.$options.mouse.preventY = button.pageY;
-      this.$options.mouse.isDown = true;
+    onMouseDown(event) {
+      console.log(event.button);
+      if (event.button === MIDDLE_BUTTON) {
+        this.$options.mouse.preventX = event.button.pageX;
+        this.$options.mouse.preventY = event.button.pageY;
+        this.$options.mouse.isDown = true;
+      }
     },
     /**
      * @param {Object} button
@@ -455,8 +470,11 @@ export default {
       mouse.preventX = button.pageX;
       mouse.preventY = button.pageY;
     },
-    onMouseUp() {
-      this.$options.mouse.isDown = false;
+    onMouseUp(event) {
+      console.log(event.button);
+      if (event.button === MIDDLE_BUTTON) {
+        this.$options.mouse.isDown = false;
+      }
     },
     onMouseWheel(event) {
       this.changeScale(event.deltaY > 0 ? DELTA_SCALE : -DELTA_SCALE);
@@ -622,7 +640,6 @@ export default {
 .map {
   width: 100%;
   height: 600px;
-  padding: 10px;
   outline: 1px solid #dddddd;
 }
 .active-frame {
