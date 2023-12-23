@@ -7,7 +7,7 @@
           <button
             type="button"
             class="btn btn-secondary"
-            title="Увеличить"
+            title="Уменьшить"
             @click="onChangeScale(true)"
           >
             +
@@ -15,7 +15,7 @@
           <button
             type="button"
             class="btn btn-secondary"
-            title="Уменьшить"
+            title="Увеличить"
             @click="onChangeScale(false)"
           >
             -
@@ -29,7 +29,7 @@
             0
           </button>
         </div>
-        <div class="btn-group-vertical w-100" role="group">
+        <div class="btn-group-vertical w-100 mb-2" role="group">
           <button
             type="button"
             class="btn btn-secondary"
@@ -65,6 +65,11 @@
             @click="onResetTranslate()"
           >
             0
+          </button>
+        </div>
+        <div class="btn-group-vertical w-100" role="group">
+          <button type="button" class="btn btn-secondary" @click="onHelpClick">
+            ?
           </button>
         </div>
       </div>
@@ -136,16 +141,7 @@
           </g>
         </svg>
       </div>
-
-      <div style="max-width: 30em">
-        <p>Кликни на ячейку и впиши что в ней находится</p>
-        <ol>
-          <li>Название</li>
-          <li>Кличество, если больше 1</li>
-        </ol>
-      </div>
-
-      <div class="row">
+      <div class="row mt-3">
         <div class="col-lg-6">
           <table class="table table-striped table-hover table-sm">
             <thead>
@@ -187,7 +183,12 @@
         :node="nodeDialog.node"
         ref="nodeDialog"
         @mounted="onMountedNodeDialog"
-      ></component>
+      />
+      <component
+        :is="helpDialogComponent"
+        ref="helpDialog"
+        @mounted="onMountedHelpDialog"
+      />
     </div>
   </div>
 </template>
@@ -199,6 +200,7 @@ import HeroClient, {
   STATUS_ACCEPTED_SUCCESS,
 } from "@/api/HeroClient";
 import UpdateNodeDialog from "./UpdateNodeDialog.vue";
+import HelpDialog from "./HelpDialog.vue";
 import LoadingMap from "./LoadingMap.vue";
 import { shallowRef } from "vue";
 
@@ -249,6 +251,7 @@ export default {
       filter: {
         itemName: "",
       },
+      helpDialogComponent: null,
     };
   },
   computed: {
@@ -427,7 +430,6 @@ export default {
      * @param {Object} button
      */
     onMouseDown(event) {
-      console.log(event.button);
       if (event.button === MIDDLE_BUTTON) {
         this.$options.mouse.preventX = event.button.pageX;
         this.$options.mouse.preventY = event.button.pageY;
@@ -473,7 +475,6 @@ export default {
       mouse.preventY = button.pageY;
     },
     onMouseUp(event) {
-      console.log(event.button);
       if (event.button === MIDDLE_BUTTON) {
         this.$options.mouse.isDown = false;
       }
@@ -548,6 +549,14 @@ export default {
           this.nodeDialog.node = null;
           this.updating = false;
         });
+    },
+    onHelpClick() {
+      this.helpDialogComponent = shallowRef(HelpDialog);
+    },
+    onMountedHelpDialog() {
+      this.$refs.helpDialog.show().finally(() => {
+        this.helpDialogComponent = null;
+      });
     },
     /**
      * @param {Array} coordinates
