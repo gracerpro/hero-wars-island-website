@@ -20,38 +20,11 @@
       />
       <div class="row mt-3">
         <div class="col-lg-6">
-          <div>
-            <label for="table__itemName" class="form-label">Предмет</label>
-            <input
-              v-model.trim="filter.itemName"
-              id="table__itemName"
-              class="form-control"
-              @input="onInputItemName"
-            />
-            <div class="form-text fw-normal">
-              Нужно ввести от {{ minCharsCount }} символов
-            </div>
-          </div>
-
-          <table class="table table-striped table-hover table-sm">
-            <thead>
-              <tr>
-                <th>Предмет</th>
-                <th>Количество</th>
-                <th>Стоимость в изумрудах</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-if="!visibleItems.length">
-                <td colspan="4">Нет данных.</td>
-              </tr>
-              <tr v-else v-for="item in visibleItems" :key="item.uniqueId">
-                <td>{{ item.item.name }}</td>
-                <td class="text-end">{{ item.humanQuantity }}</td>
-                <td class="text-end">{{ item.emeraldCost }}</td>
-              </tr>
-            </tbody>
-          </table>
+          <map-filter
+            v-model:item-name="filter.itemName"
+            :min-chars-count="minCharsCount"
+          />
+          <map-table :items="visibleItems" />
         </div>
       </div>
     </div>
@@ -62,6 +35,8 @@ import HeroClient from "@/api/HeroClient";
 import LoadingMap from "./LoadingMap.vue";
 import MapToolbar from "./MapToolbar.vue";
 import MapContainer from "./MapContainer.vue";
+import MapFilter from "./MapFilter.vue";
+import MapTable from "./MapTable.vue";
 
 const MAX_SCALE = 3;
 const MIN_SCALE = 0.3;
@@ -74,7 +49,7 @@ export default {
     island: { type: Object, required: true },
     parentPageId: { type: String, required: true },
   },
-  components: { LoadingMap, MapToolbar, MapContainer },
+  components: { LoadingMap, MapToolbar, MapContainer, MapFilter, MapTable },
   data: function () {
     return {
       loaded: false,
@@ -202,11 +177,6 @@ export default {
       const index = this.nodes.findIndex((item) => item.id === node.id);
       if (index >= 0) {
         this.nodes[index] = node;
-      }
-    },
-    onInputItemName() {
-      if (this.filter.itemName.length < this.minCharsCount) {
-        return;
       }
     },
     getHumanQunatity(quantity) {
