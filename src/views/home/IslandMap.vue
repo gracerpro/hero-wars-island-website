@@ -2,77 +2,12 @@
   <div>
     <loading-map v-if="loadingNodes" />
     <div v-else>
-      <div class="btn-toolbar -left-toolbar" role="toolbar">
-        <div class="btn-group-vertical w-100 mb-2" role="group">
-          <button
-            type="button"
-            class="btn btn-secondary"
-            title="Уменьшить"
-            @click="onChangeScale(true)"
-          >
-            +
-          </button>
-          <button
-            type="button"
-            class="btn btn-secondary"
-            title="Увеличить"
-            @click="onChangeScale(false)"
-          >
-            -
-          </button>
-          <button
-            type="button"
-            class="btn btn-secondary"
-            title="Сбросить"
-            @click="onResetScale()"
-          >
-            0
-          </button>
-        </div>
-        <div class="btn-group-vertical w-100 mb-2" role="group">
-          <button
-            type="button"
-            class="btn btn-secondary"
-            @click="onChangeTranslate(-1, 0)"
-          >
-            &larr;
-          </button>
-          <button
-            type="button"
-            class="btn btn-secondary"
-            @click="onChangeTranslate(1, 0)"
-          >
-            &rarr;
-          </button>
-          <button
-            type="button"
-            class="btn btn-secondary"
-            @click="onChangeTranslate(0, -1)"
-          >
-            &uarr;
-          </button>
-          <button
-            type="button"
-            class="btn btn-secondary"
-            @click="onChangeTranslate(0, 1)"
-          >
-            &darr;
-          </button>
-          <button
-            type="button"
-            class="btn btn-secondary"
-            title="Сбросить"
-            @click="onResetTranslate()"
-          >
-            0
-          </button>
-        </div>
-        <div class="btn-group-vertical w-100" role="group">
-          <button type="button" class="btn btn-secondary" @click="onHelpClick">
-            ?
-          </button>
-        </div>
-      </div>
+      <map-toolbar
+        @reset-scale="onResetScale"
+        @reset-translate="onResetTranslate"
+        @change-scale="onChangeScale"
+        @change-translate="onChangeTranslate"
+      />
       <div class="map">
         <svg
           height="600"
@@ -143,25 +78,25 @@
       </div>
       <div class="row mt-3">
         <div class="col-lg-6">
+          <div>
+            <label for="table__itemName" class="form-label">Предмет</label>
+            <input
+              v-model.trim="filter.itemName"
+              id="table__itemName"
+              class="form-control"
+              @input="onInput"
+            />
+            <div class="form-text fw-normal">
+              Нужно ввести от {{ minCharsCount }} символов
+            </div>
+          </div>
+
           <table class="table table-striped table-hover table-sm">
             <thead>
               <tr>
-                <th>
-                  <label for="table__itemName" class="form-label"
-                    >Предмет</label
-                  >
-                  <input
-                    v-model.trim="filter.itemName"
-                    id="table__itemName"
-                    class="form-control"
-                    @input="onInput"
-                  />
-                  <div class="form-text fw-normal">
-                    Нужно ввести от {{ minCharsCount }} символов
-                  </div>
-                </th>
-                <th class="align-top">Количество</th>
-                <th class="align-top">Стоимость в изумрудах</th>
+                <th>Предмет</th>
+                <th>Количество</th>
+                <th>Стоимость в изумрудах</th>
               </tr>
             </thead>
             <tbody>
@@ -170,8 +105,8 @@
               </tr>
               <tr v-else v-for="item in visibleItems" :key="item.uniqueId">
                 <td>{{ item.item.name }}</td>
-                <td>{{ item.humanQuantity }}</td>
-                <td>{{ item.emeraldCost }}</td>
+                <td class="text-end">{{ item.humanQuantity }}</td>
+                <td class="text-end">{{ item.emeraldCost }}</td>
               </tr>
             </tbody>
           </table>
@@ -184,11 +119,6 @@
         ref="nodeDialog"
         @mounted="onMountedNodeDialog"
       />
-      <component
-        :is="helpDialogComponent"
-        ref="helpDialog"
-        @mounted="onMountedHelpDialog"
-      />
     </div>
   </div>
 </template>
@@ -200,8 +130,8 @@ import HeroClient, {
   STATUS_ACCEPTED_SUCCESS,
 } from "@/api/HeroClient";
 import UpdateNodeDialog from "./UpdateNodeDialog.vue";
-import HelpDialog from "./HelpDialog.vue";
 import LoadingMap from "./LoadingMap.vue";
+import MapToolbar from "./MapToolbar.vue";
 import { shallowRef } from "vue";
 
 const SIDE = 86;
@@ -233,7 +163,7 @@ export default {
     island: { type: Object, required: true },
     parentPageId: { type: String, required: true },
   },
-  components: { LoadingMap },
+  components: { LoadingMap, MapToolbar },
   data: function () {
     return {
       loadingNodes: true,
@@ -251,7 +181,6 @@ export default {
       filter: {
         itemName: "",
       },
-      helpDialogComponent: null,
     };
   },
   computed: {
@@ -550,14 +479,6 @@ export default {
           this.updating = false;
         });
     },
-    onHelpClick() {
-      this.helpDialogComponent = shallowRef(HelpDialog);
-    },
-    onMountedHelpDialog() {
-      this.$refs.helpDialog.show().finally(() => {
-        this.helpDialogComponent = null;
-      });
-    },
     /**
      * @param {Array} coordinates
      */
@@ -650,7 +571,6 @@ export default {
 <style scoped>
 .map {
   margin-left: 45px;
-  width: 100%;
   height: 600px;
   outline: 1px solid #dddddd;
 }

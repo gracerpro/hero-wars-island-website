@@ -17,6 +17,7 @@
         </div>
         <div class="modal-footer">
           <button
+            v-if="isShowSubmit"
             type="submit"
             :form="formId"
             class="btn btn-primary"
@@ -61,6 +62,7 @@ export default {
     formId: { type: String, default: "" },
     header: { type: String, default: "" },
     size: { type: String, default: "lg" },
+    isShowSubmit: { type: Boolean, default: true },
     initResult: {
       type: [Object, Number, String, null, undefined],
       default: null,
