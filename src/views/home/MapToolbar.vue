@@ -80,11 +80,16 @@
 <script>
 import HelpDialog from "./HelpDialog.vue";
 import { shallowRef } from "vue";
+import {
+  TRANSLATE_X,
+  TRANSLATE_Y,
+  EVENT_CHANGE_TRANSLATE,
+  DELTA_SCALE,
+  EVENT_CHANGE_SCALE,
+} from "./map";
 
 const EVENT_RESET_TRANSLATE = "reset-translate";
-const EVENT_CHANGE_TRANSLATE = "change-translate";
 const EVENT_RESET_SCALE = "reset-scale";
-const EVENT_CHANGE_SCALE = "change-scale";
 
 export default {
   name: "MapToolbar",
@@ -104,13 +109,23 @@ export default {
       this.$emit(EVENT_RESET_TRANSLATE);
     },
     onChangeTranslate(dx, dy) {
-      this.$emit(EVENT_CHANGE_TRANSLATE, dx, dy);
+      let x = 0,
+        y = 0;
+
+      if (dx !== 0) {
+        x = 5 * dx * TRANSLATE_X;
+      }
+      if (dy !== 0) {
+        y = 5 * dy * TRANSLATE_Y;
+      }
+
+      this.$emit(EVENT_CHANGE_TRANSLATE, x, y);
     },
     onResetScale() {
       this.$emit(EVENT_RESET_SCALE);
     },
     onChangeScale(inc) {
-      this.$emit(EVENT_CHANGE_SCALE, inc);
+      this.$emit(EVENT_CHANGE_SCALE, 2 * (inc ? DELTA_SCALE : -DELTA_SCALE));
     },
     onHelpClick() {
       this.helpDialogComponent = shallowRef(HelpDialog);

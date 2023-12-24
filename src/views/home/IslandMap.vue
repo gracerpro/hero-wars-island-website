@@ -1,6 +1,6 @@
 <template>
   <div>
-    <loading-map v-if="loadingNodes" />
+    <loading-map v-if="loading" />
     <div v-else>
       <map-toolbar
         @reset-scale="onResetScale"
@@ -8,74 +8,16 @@
         @change-scale="onChangeScale"
         @change-translate="onChangeTranslate"
       />
-      <div class="map">
-        <svg
-          height="600"
-          width="100%"
-          :viewBox="viewBox"
-          xmlns="http://www.w3.org/2000/svg"
-          @mousedown="onMouseDown"
-          @mouseup="onMouseUp"
-          @mousemove="onMouseMove"
-          @wheel="onMouseWheel"
-        >
-          <line
-            x1="0"
-            y1="-9999"
-            x2="0"
-            y2="9999"
-            style="stroke: black; stroke-width: 1"
-          />
-          <line
-            x1="-9999"
-            y1="0"
-            x2="9999"
-            y2="0"
-            style="stroke: black; stroke-width: 1"
-          />
-
-          <g :transform="'translate(' + translateX + ' ' + translateY + ')'">
-            <polygon
-              v-for="node in nodes"
-              :key="node.xyId"
-              :points="node.points"
-              class="node"
-              :class="node.class"
-              v-on:mouseenter="nodeMouseEnter(node)"
-            />
-            <template v-for="item in visibleIconsItems" :key="item.uniqueId">
-              <image
-                :x="item.iconX"
-                :y="item.iconY"
-                :width="imageSide"
-                :height="imageSide"
-                :href="item.item.iconUrl"
-              />
-              <text :x="item.textX" :y="item.textY" class="node-text">
-                {{ item.humanQuantity }}
-              </text>
-            </template>
-            <text
-              v-for="item in unknownItems"
-              :key="item.node.xyId"
-              :x="item.x"
-              :y="item.y"
-              :class="[
-                'unknown-text',
-                item.isOnModeration ? '-on-moderation' : '',
-              ]"
-              @click="onEditNodeClick(item.node)"
-            >
-              ?
-            </text>
-            <polyline
-              v-if="activeNode"
-              :points="getActivePoints(activeNode)"
-              class="active-frame"
-            />
-          </g>
-        </svg>
-      </div>
+      <map-container
+        :scale="scale"
+        :translate-x="translateX"
+        :translate-y="translateY"
+        :items="visibleItems"
+        :input-nodes="nodes"
+        @change-translate="onChangeTranslate"
+        @change-scale="onChangeScale"
+        @change-node="onChangeNode"
+      />
       <div class="row mt-3">
         <div class="col-lg-6">
           <div>
@@ -84,7 +26,7 @@
               v-model.trim="filter.itemName"
               id="table__itemName"
               class="form-control"
-              @input="onInput"
+              @input="onInputItemName"
             />
             <div class="form-text fw-normal">
               Нужно ввести от {{ minCharsCount }} символов
@@ -112,90 +54,51 @@
           </table>
         </div>
       </div>
-
-      <component
-        :is="nodeDialog.component"
-        :node="nodeDialog.node"
-        ref="nodeDialog"
-        @mounted="onMountedNodeDialog"
-      />
     </div>
   </div>
 </template>
 <script>
-import HeroClient, {
-  TYPE_TOWN,
-  TYPE_START,
-  STATUS_ON_MODERATION,
-  STATUS_ACCEPTED_SUCCESS,
-} from "@/api/HeroClient";
-import UpdateNodeDialog from "./UpdateNodeDialog.vue";
+import HeroClient from "@/api/HeroClient";
 import LoadingMap from "./LoadingMap.vue";
 import MapToolbar from "./MapToolbar.vue";
-import { shallowRef } from "vue";
-
-const SIDE = 86;
-const HALF_SIDE = SIDE / 2;
-const HEIGHT = 36;
-//const HALF_HEIGHT = HEIGHT / 2;
-const IMAGE_SIDE = 40;
-const FONT_SIZE = 22;
+import MapContainer from "./MapContainer.vue";
 
 const MAX_SCALE = 3;
 const MIN_SCALE = 0.3;
 
-const DELTA_SCALE = 0.1;
-const TRANSLATE_X = 6;
-const TRANSLATE_Y = 6;
-
-const MIDDLE_BUTTON = 1;
-
 export default {
   client: new HeroClient(),
-  mouse: {
-    isDown: false,
-    preventX: null,
-    preventY: null,
-  },
 
   name: "IslandMap",
   props: {
     island: { type: Object, required: true },
     parentPageId: { type: String, required: true },
   },
-  components: { LoadingMap, MapToolbar },
+  components: { LoadingMap, MapToolbar, MapContainer },
   data: function () {
     return {
+      loaded: false,
       loadingNodes: true,
-      activeNode: null,
-      nodeDialog: {
-        node: null,
-        component: null,
-      },
-      updating: false,
+      loadingItems: false,
+
       nodes: [],
       items: [],
+
       scale: 1,
       translateX: 0,
       translateY: 0,
+
       filter: {
         itemName: "",
       },
     };
   },
   computed: {
-    viewBox() {
-      const side = SIDE * 5 * this.scale;
-      return `-${side} -${side} ${side * 2} ${side * 2}`;
+    loading() {
+      return this.loadingNodes || this.loadingItems || !this.loaded;
     },
     minCharsCount() {
       return 3;
-    },
-    imageSide() {
-      return IMAGE_SIDE;
-    },
-    height() {
-      return HEIGHT;
     },
     componentId() {
       return this.parentPageId + "__map";
@@ -209,29 +112,6 @@ export default {
 
       return this.items;
     },
-    unknownItems() {
-      let items = [];
-
-      this.nodes.forEach((node) => {
-        if (
-          !node?.items.length &&
-          node.typeId !== TYPE_START &&
-          node.statusId !== STATUS_ACCEPTED_SUCCESS
-        ) {
-          items.push({
-            node,
-            x: node.x - 0.2 * SIDE,
-            y: node.y + 0.4 * HEIGHT,
-            isOnModeration: node.statusId === STATUS_ON_MODERATION,
-          });
-        }
-      });
-
-      return items;
-    },
-    visibleIconsItems() {
-      return this.visibleItems.filter((item) => item.visibleIcon);
-    },
   },
   created() {
     this.loadState();
@@ -239,7 +119,8 @@ export default {
   mounted() {
     this.loadNodes().then((nodes) => {
       this.nodes = nodes;
-      this.items = this.getItems(nodes);
+      this.items = this.calculateItems(nodes);
+      this.loaded = true;
     });
   },
   unmounted() {
@@ -252,176 +133,48 @@ export default {
       this.loadingNodes = true;
       try {
         const list = await this.$options.client.getNodes(this.island.id);
-        nodes = list.items.map((node) => this.drawNode(node));
+        nodes = list.items;
       } finally {
         this.loadingNodes = false;
       }
 
       return nodes;
     },
-    getItems(nodes) {
+    calculateItems(nodes) {
+      this.loadingItems = true;
+
       let items = [];
-      const maxIconCount = 2;
-      const textCX = 0.65 * SIDE;
 
       nodes.forEach((node) => {
         const itemCount = node?.items.length;
         if (!itemCount) {
           return;
         }
-        let iconX =
-          itemCount === 1 ? node.x - 0.5 * HALF_SIDE : node.x - HALF_SIDE;
-        let iconY = node.y - 0.9 * HEIGHT;
-        let textX = itemCount === 1 ? node.x - 0.25 * SIDE : node.x - textCX;
-        let textY = iconY + IMAGE_SIDE + FONT_SIZE - 2;
 
         node.items.forEach((item, index) => {
-          let data = {
-            uniqueId: node.xyId + "_" + item.id,
+          items.push({
+            uniqueId: node.mx + "_" + node.my + "_" + item.id,
             iconUrl: item.iconUrl,
             humanQuantity: this.getHumanQunatity(item.quantity),
             emeraldCost:
               item.emeraldCost !== null
                 ? item.emeraldCost * item.quantity
                 : null,
+            nodeIndex: index,
             node,
             item,
-          };
-
-          if (index < maxIconCount) {
-            data.visibleIcon = true;
-            data.iconX = iconX;
-            data.iconY = iconY;
-            data.textX = textX;
-            data.textY = textY;
-
-            iconX += HALF_SIDE;
-            textX += textCX;
-          } else {
-            data.visibleIcon = false;
-          }
-
-          items.push(data);
+          });
         });
       });
+
+      this.loadingItems = false;
 
       return items;
     },
     /**
-     * @param {Object} node
-     */
-    drawNode(node) {
-      let nodeClass = null;
-      if (node.typeId === TYPE_START) {
-        nodeClass = "node-start";
-      } else if (node.typeId === TYPE_TOWN) {
-        nodeClass = "node-town";
-      }
-
-      const data = this.getCoordinates(node);
-
-      return {
-        ...node,
-        xyId: node.mx + "_" + node.my,
-        x: data.x,
-        y: data.y,
-        points: this.getPoints(data.coordinates),
-        class: nodeClass,
-      };
-    },
-    getCoordinates(node) {
-      const side = SIDE;
-      const h = HEIGHT;
-      const x = node.mx * (1.5 * side);
-      const y = node.my * 2 * h + (node.mx % 2 === 0 ? 0 : h);
-
-      let coordinates = new Array(6);
-      coordinates[0] = { x: x + side, y };
-      coordinates[1] = { x: x + HALF_SIDE, y: y + h };
-      coordinates[2] = { x: x - HALF_SIDE, y: y + h };
-      coordinates[3] = { x: x - side, y };
-      coordinates[4] = { x: x - HALF_SIDE, y: y - h };
-      coordinates[5] = { x: x + HALF_SIDE, y: y - h };
-
-      return {
-        x,
-        y,
-        coordinates,
-      };
-    },
-    getActivePoints(node) {
-      let data = this.getCoordinates(node);
-      data.coordinates.push(data.coordinates[0]);
-
-      return this.getPoints(data.coordinates);
-    },
-    /**
-     * @param {Object} button
-     */
-    onMouseDown(event) {
-      if (event.button === MIDDLE_BUTTON) {
-        this.$options.mouse.preventX = event.button.pageX;
-        this.$options.mouse.preventY = event.button.pageY;
-        this.$options.mouse.isDown = true;
-      }
-    },
-    /**
-     * @param {Object} button
-     */
-    onMouseMove(button) {
-      if (!this.$options.mouse.isDown) {
-        return;
-      }
-
-      const mouse = this.$options.mouse;
-
-      if (mouse.preventX === null) {
-        mouse.preventX = button.pageX;
-      }
-      if (mouse.preventY === null) {
-        mouse.preventY = button.pageY;
-      }
-
-      const isLeft = button.pageX < mouse.preventX;
-      const isRight = button.pageX > mouse.preventX;
-      const isTop = button.pageY < mouse.preventY;
-      const isBottom = button.pageY > mouse.preventY;
-
-      if (isLeft) {
-        this.translateX -= TRANSLATE_X;
-      }
-      if (isRight) {
-        this.translateX += TRANSLATE_X;
-      }
-      if (isTop) {
-        this.translateY -= TRANSLATE_Y;
-      }
-      if (isBottom) {
-        this.translateY += TRANSLATE_Y;
-      }
-
-      mouse.preventX = button.pageX;
-      mouse.preventY = button.pageY;
-    },
-    onMouseUp(event) {
-      if (event.button === MIDDLE_BUTTON) {
-        this.$options.mouse.isDown = false;
-      }
-    },
-    onMouseWheel(event) {
-      this.changeScale(event.deltaY > 0 ? DELTA_SCALE : -DELTA_SCALE);
-      event.preventDefault();
-    },
-    /**
      * @param {Boolean} inc
      */
-    onChangeScale(inc) {
-      this.changeScale(2 * (inc ? DELTA_SCALE : -DELTA_SCALE));
-    },
-    /**
-     * @param {Number} value
-     */
-    changeScale(value) {
+    onChangeScale(value) {
       this.scale += value;
 
       if (this.scale > MAX_SCALE) {
@@ -435,55 +188,26 @@ export default {
     },
     onChangeTranslate(dx, dy) {
       if (dx !== 0) {
-        this.translateX += 5 * (dx > 0 ? TRANSLATE_X : -TRANSLATE_X);
+        this.translateX += dx;
       }
       if (dy !== 0) {
-        this.translateY += 5 * (dy > 0 ? TRANSLATE_Y : -TRANSLATE_Y);
+        this.translateY += dy;
       }
     },
     onResetTranslate() {
       this.translateX = 0;
       this.translateY = 0;
     },
-    nodeMouseEnter(node) {
-      this.activeNode = node;
+    onChangeNode(node) {
+      const index = this.nodes.findIndex((item) => item.id === node.id);
+      if (index >= 0) {
+        this.nodes[index] = node;
+      }
     },
     onInputItemName() {
       if (this.filter.itemName.length < this.minCharsCount) {
         return;
       }
-    },
-    onEditNodeClick(node) {
-      if (!this.updating) {
-        this.updating = true;
-        this.nodeDialog.node = node;
-        this.nodeDialog.component = shallowRef(UpdateNodeDialog);
-      }
-    },
-    onMountedNodeDialog() {
-      this.$refs.nodeDialog
-        .show()
-        .then((node) => {
-          if (node !== null && node !== undefined) {
-            const index = this.nodes.findIndex(
-              (arrNode) => arrNode.id === node.id
-            );
-            if (index >= 0) {
-              this.nodes[index] = this.drawNode(node);
-            }
-          }
-        })
-        .finally(() => {
-          this.nodeDialog.component = null;
-          this.nodeDialog.node = null;
-          this.updating = false;
-        });
-    },
-    /**
-     * @param {Array} coordinates
-     */
-    getPoints(coordinates) {
-      return coordinates.map((item) => item.x + "," + item.y).join(" ");
     },
     getHumanQunatity(quantity) {
       if (quantity > 1000000) {
@@ -535,50 +259,13 @@ export default {
   },
 };
 </script>
-<style>
-.node {
-  fill: #96d895;
-  stroke: #dddddd;
-  stroke-width: 1;
-}
-.node:hover {
-  fill: #527951;
-}
-.node-start {
-  fill: brown;
-}
-.node-town {
-  fill: orange;
-}
-.node-text {
-  font-size: 22px;
-  fill: rgb(97, 97, 5);
-  font-weight: bold;
-}
-.unknown-text {
-  font-size: 50px;
-  fill: rgb(235, 235, 102);
-  font-weight: bold;
-  cursor: pointer;
-}
-.unknown-text:hover {
-  fill: rgb(151, 151, 62);
-}
-.-on-moderation {
-  fill: green;
-}
-</style>
 <style scoped>
 .map {
   margin-left: 45px;
   height: 600px;
   outline: 1px solid #dddddd;
 }
-.active-frame {
-  fill: none;
-  stroke: red;
-  stroke-width: 3;
-}
+
 .-left-toolbar {
   width: 40px;
   float: left;
