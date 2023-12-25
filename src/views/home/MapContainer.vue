@@ -30,9 +30,9 @@
           v-for="node in nodes"
           :key="node.xyId"
           :points="node.points"
-          class="node"
-          :class="node.class"
-          v-on:mouseenter="nodeMouseEnter(node)"
+          :class="['node', node.class, isUserNode(node) ? 'user-node' : '']"
+          @mouseenter="nodeMouseEnter(node)"
+          @click="onNodeClick(node)"
         />
         <template v-for="item in visibleIconsItems" :key="item.uniqueId">
           <image
@@ -41,8 +41,14 @@
             :width="imageSide"
             :height="imageSide"
             :href="item.item.iconUrl"
+            @click="onNodeClick(item.node)"
           />
-          <text :x="item.textX" :y="item.textY" class="node-text">
+          <text
+            :x="item.textX"
+            :y="item.textY"
+            class="node-text"
+            @click="onNodeClick(item.node)"
+          >
             {{ item.humanQuantity }}
           </text>
         </template>
@@ -87,6 +93,7 @@ import {
   EVENT_CHANGE_TRANSLATE,
   EVENT_CHANGE_SCALE,
   DELTA_SCALE,
+  canSelectNode,
 } from "./map";
 
 const SIDE = 86;
@@ -99,6 +106,7 @@ const FONT_SIZE = 22;
 const MIDDLE_BUTTON = 1;
 
 const EVENT_CHANGE_NODE = "change-node";
+const EVENT_SELECT_NODE = "select-node";
 
 export default {
   mouse: {
@@ -108,13 +116,19 @@ export default {
   },
 
   name: "MapContainer",
-  emits: [EVENT_CHANGE_TRANSLATE, EVENT_CHANGE_SCALE, EVENT_CHANGE_NODE],
+  emits: [
+    EVENT_CHANGE_TRANSLATE,
+    EVENT_CHANGE_SCALE,
+    EVENT_CHANGE_NODE,
+    EVENT_SELECT_NODE,
+  ],
   props: {
     scale: { type: Number, required: true },
     translateX: { type: Number, required: true },
     translateY: { type: Number, required: true },
     items: { type: Array, required: true },
     inputNodes: { type: Array, required: true },
+    userNodes: { type: Array, required: true },
   },
   data: function () {
     return {
@@ -221,12 +235,17 @@ export default {
      * @param {Object} node
      */
     drawNode(node) {
-      let nodeClass = null;
+      let nodeClass = "";
+
       if (node.typeId === TYPE_START) {
         nodeClass = "node-start";
       } else if (node.typeId === TYPE_TOWN) {
         nodeClass = "node-town";
       }
+
+      //if (this.isUserNode(node)) {
+      //  nodeClass += " ";
+      //}
 
       const data = this.getCoordinates(node);
 
@@ -270,6 +289,13 @@ export default {
     },
     nodeMouseEnter(node) {
       this.activeNode = node;
+    },
+    onNodeClick(node) {
+      if (!canSelectNode(node)) {
+        return;
+      }
+      const isRemove = this.userNodes.includes(node.id);
+      this.$emit(EVENT_SELECT_NODE, node.id, isRemove);
     },
     /**
      * @param {Object} button
@@ -357,6 +383,9 @@ export default {
           this.updating = false;
         });
     },
+    isUserNode(node) {
+      return this.userNodes.includes(node.id);
+    },
   },
 };
 </script>
@@ -368,6 +397,9 @@ export default {
 }
 .node:hover {
   fill: #527951;
+}
+.node.user-node {
+  fill: #6668f8;
 }
 .unknown-text {
   font-size: 50px;

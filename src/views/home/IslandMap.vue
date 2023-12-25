@@ -14,9 +14,11 @@
         :translate-y="translateY"
         :items="visibleItems"
         :input-nodes="nodes"
+        :user-nodes="userNodes"
         @change-translate="onChangeTranslate"
         @change-scale="onChangeScale"
         @change-node="onChangeNode"
+        @select-node="onSelectNode"
       />
       <div class="row mt-3">
         <div class="col-lg-6">
@@ -25,6 +27,23 @@
             :min-chars-count="minCharsCount"
           />
           <map-table :items="visibleItems" />
+        </div>
+        <div class="col-lg-6">
+          <h5>Мои ходы</h5>
+          <p>
+            <b class="fs-2 me-2 align-middle">{{ userNodes.length }}</b>
+            <button
+              type="button"
+              :class="[
+                'btn btn-secondary align-middle',
+                userNodes.length > 0 ? '' : 'disabled',
+              ]"
+              @click="onResetUserNodes"
+            >
+              Сбросить
+            </button>
+          </p>
+          <p>...</p>
         </div>
       </div>
     </div>
@@ -37,12 +56,14 @@ import MapToolbar from "./MapToolbar.vue";
 import MapContainer from "./MapContainer.vue";
 import MapFilter from "./MapFilter.vue";
 import MapTable from "./MapTable.vue";
+import { canSelectNode } from "./map";
 
 const MAX_SCALE = 3;
 const MIN_SCALE = 0.3;
 
 export default {
   client: new HeroClient(),
+  userNodeIds: [],
 
   name: "IslandMap",
   props: {
@@ -58,6 +79,7 @@ export default {
 
       nodes: [],
       items: [],
+      userNodes: [],
 
       scale: 1,
       translateX: 0,
@@ -95,6 +117,15 @@ export default {
     this.loadNodes().then((nodes) => {
       this.nodes = nodes;
       this.items = this.calculateItems(nodes);
+
+      this.userNodes = [];
+      this.$options.userNodeIds.forEach((id) => {
+        const node = this.nodes.find((item) => item.id === id);
+        if (node && canSelectNode(node)) {
+          this.userNodes.push(id);
+        }
+      });
+
       this.loaded = true;
     });
   },
@@ -179,6 +210,19 @@ export default {
         this.nodes[index] = node;
       }
     },
+    onSelectNode(id, isRemove) {
+      if (isRemove) {
+        const index = this.userNodes.findIndex((nodeId) => nodeId === id);
+        if (index >= 0) {
+          this.userNodes.splice(index, 1);
+        }
+      } else {
+        this.userNodes.push(id);
+      }
+    },
+    onResetUserNodes() {
+      this.userNodes = [];
+    },
     getHumanQunatity(quantity) {
       if (quantity > 1000000) {
         return Math.floor(quantity / 1000000) + "M";
@@ -211,11 +255,16 @@ export default {
       if (!state.filter.itemName) {
         state.filter.itemName = "";
       }
+      if (!state.userNodeIds) {
+        state.userNodeIds = [];
+      }
 
       this.scale = state.scale;
       this.translateX = state.translateX;
       this.translateY = state.translateY;
       this.filter.itemName = state.filter.itemName;
+
+      this.$options.userNodeIds = state.userNodeIds;
     },
     saveState() {
       const state = {
@@ -223,6 +272,7 @@ export default {
         translateX: this.translateX,
         translateY: this.translateY,
         filter: this.filter,
+        userNodeIds: this.userNodes,
       };
       localStorage.setItem(this.componentId, JSON.stringify(state));
     },
