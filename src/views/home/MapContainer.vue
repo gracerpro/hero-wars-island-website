@@ -94,6 +94,7 @@ import {
   EVENT_CHANGE_SCALE,
   DELTA_SCALE,
   canSelectNode,
+  canSelectNextNode,
 } from "./map";
 
 const SIDE = 86;
@@ -128,7 +129,7 @@ export default {
     translateY: { type: Number, required: true },
     items: { type: Array, required: true },
     inputNodes: { type: Array, required: true },
-    userNodes: { type: Array, required: true },
+    userNodesIds: { type: Array, required: true },
   },
   data: function () {
     return {
@@ -172,6 +173,18 @@ export default {
     },
     visibleIconsItems() {
       return this.items.filter((item) => item.visibleIcon);
+    },
+    userNodes() {
+      let nodes = [];
+
+      this.userNodesIds.forEach((id) => {
+        const node = this.nodes[id];
+        if (node) {
+          nodes.push(node);
+        }
+      });
+
+      return nodes;
     },
   },
   mounted() {
@@ -294,7 +307,22 @@ export default {
       if (!canSelectNode(node)) {
         return;
       }
-      const isRemove = this.userNodes.includes(node.id);
+      const isRemove = this.userNodesIds.includes(node.id);
+
+      if (!isRemove) {
+        let message = null;
+        try {
+          message = canSelectNextNode(this.nodes, this.userNodes, node);
+        } catch (error) {
+          console.log(error);
+          message = "Не удалось выделить узел.";
+        }
+        if (message) {
+          alert(message);
+          return;
+        }
+      }
+
       this.$emit(EVENT_SELECT_NODE, node.id, isRemove);
     },
     /**
@@ -384,7 +412,7 @@ export default {
         });
     },
     isUserNode(node) {
-      return this.userNodes.includes(node.id);
+      return this.userNodesIds.includes(node.id);
     },
   },
 };

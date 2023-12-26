@@ -14,7 +14,7 @@
         :translate-y="translateY"
         :items="visibleItems"
         :input-nodes="nodes"
-        :user-nodes="userNodes"
+        :user-nodes-ids="userNodesIds"
         @change-translate="onChangeTranslate"
         @change-scale="onChangeScale"
         @change-node="onChangeNode"
@@ -31,12 +31,12 @@
         <div class="col-lg-6">
           <h5>Мои ходы</h5>
           <p>
-            <b class="fs-2 me-2 align-middle">{{ userNodes.length }}</b>
+            <b class="fs-2 me-2 align-middle">{{ userNodesIds.length }}</b>
             <button
               type="button"
               :class="[
                 'btn btn-secondary align-middle',
-                userNodes.length > 0 ? '' : 'disabled',
+                userNodesIds.length > 0 ? '' : 'disabled',
               ]"
               @click="onResetUserNodes"
             >
@@ -63,7 +63,7 @@ const MIN_SCALE = 0.3;
 
 export default {
   client: new HeroClient(),
-  userNodeIds: [],
+  userNodesIds: [],
 
   name: "IslandMap",
   props: {
@@ -79,7 +79,7 @@ export default {
 
       nodes: [],
       items: [],
-      userNodes: [],
+      userNodesIds: [],
 
       scale: 1,
       translateX: 0,
@@ -118,11 +118,11 @@ export default {
       this.nodes = nodes;
       this.items = this.calculateItems(nodes);
 
-      this.userNodes = [];
-      this.$options.userNodeIds.forEach((id) => {
+      this.userNodesIds = [];
+      this.$options.userNodesIds.forEach((id) => {
         const node = this.nodes.find((item) => item.id === id);
         if (node && canSelectNode(node)) {
-          this.userNodes.push(id);
+          this.userNodesIds.push(id);
         }
       });
 
@@ -212,16 +212,16 @@ export default {
     },
     onSelectNode(id, isRemove) {
       if (isRemove) {
-        const index = this.userNodes.findIndex((nodeId) => nodeId === id);
+        const index = this.userNodesIds.findIndex((nodeId) => nodeId === id);
         if (index >= 0) {
-          this.userNodes.splice(index, 1);
+          this.userNodesIds.splice(index, 1);
         }
       } else {
-        this.userNodes.push(id);
+        this.userNodesIds.push(id);
       }
     },
     onResetUserNodes() {
-      this.userNodes = [];
+      this.userNodesIds = [];
     },
     getHumanQunatity(quantity) {
       if (quantity > 1000000) {
@@ -255,8 +255,8 @@ export default {
       if (!state.filter.itemName) {
         state.filter.itemName = "";
       }
-      if (!state.userNodeIds) {
-        state.userNodeIds = [];
+      if (!state.userNodesIds) {
+        state.userNodesIds = [];
       }
 
       this.scale = state.scale;
@@ -264,7 +264,7 @@ export default {
       this.translateY = state.translateY;
       this.filter.itemName = state.filter.itemName;
 
-      this.$options.userNodeIds = state.userNodeIds;
+      this.$options.userNodesIds = state.userNodesIds;
     },
     saveState() {
       const state = {
@@ -272,7 +272,7 @@ export default {
         translateX: this.translateX,
         translateY: this.translateY,
         filter: this.filter,
-        userNodeIds: this.userNodes,
+        userNodesIds: this.userNodesIds,
       };
       localStorage.setItem(this.componentId, JSON.stringify(state));
     },
