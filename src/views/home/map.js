@@ -15,14 +15,17 @@ export function canSelectNode(node) {
 
 /**
  * @param {Object} nodes
- * @param {Array} selectedNodes
+ * @param {Object} selectedNodes
  * @param {Object} node
  * @returns {String|null}
  */
 export function canSelectNextNode(nodes, selectedNodes, nextNode) {
   let result = null;
 
-  if (!selectedNodes.length) {
+  // если нет связи следующего узла с выделенным ранее или входным
+  // то запрет
+
+  if (Object.keys(selectedNodes).length === 0) {
     let isFound = false;
     for (const id in nodes) {
       const node = nodes[id];
@@ -36,21 +39,39 @@ export function canSelectNextNode(nodes, selectedNodes, nextNode) {
       }
     }
     if (!isFound) {
-      throw new Error("Could not find a start node.");
+      result = "Не найден узел входа. Обратитесь к администраторам.";
     }
   } else {
-    result = "TODO";
+    let isFound = false;
+    for (const id in nodes) {
+      const node = nodes[id];
+
+      if (nextNode.xyId === node.xyId) {
+        continue;
+      }
+      if (isNearNode(nextNode, node)) {
+        if (node.typeId === TYPE_START) {
+          isFound = true;
+          break;
+        }
+        if (selectedNodes[node.id]) {
+          isFound = true;
+          break;
+        }
+      }
+    }
+    if (!isFound) {
+      result = "Можно выделить узел только около выделенного узла или начала.";
+    }
   }
 
   return result;
 }
 
 function isNearNode(nextNode, node) {
-  console.log(nextNode, node.mx, node.my);
+  const dx = Math.abs(nextNode.mx - node.mx);
+  const dy = nextNode.my - node.my;
+  const maxY = nextNode.mx == node.mx ? 1 : 0;
 
-  // если нет связи следующего узла с выделенным ранее или входным
-  // то запрет
-  return (
-    Math.abs(nextNode.mx - node.mx) <= 1 && Math.abs(nextNode.my - node.my) <= 1
-  );
+  return dx <= 1 && dy >= -1 && dy <= maxY;
 }

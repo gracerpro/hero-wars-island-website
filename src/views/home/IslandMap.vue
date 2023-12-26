@@ -211,6 +211,8 @@ export default {
       }
     },
     onSelectNode(id, isRemove) {
+      console.log(id, isRemove);
+
       if (isRemove) {
         const index = this.userNodesIds.findIndex((nodeId) => nodeId === id);
         if (index >= 0) {

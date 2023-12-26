@@ -26,32 +26,18 @@
       />
 
       <g :transform="'translate(' + translateX + ' ' + translateY + ')'">
-        <polygon
-          v-for="node in nodes"
-          :key="node.xyId"
-          :points="node.points"
-          :class="['node', node.class, isUserNode(node) ? 'user-node' : '']"
-          @mouseenter="nodeMouseEnter(node)"
-          @click="onNodeClick(node)"
-        />
-        <template v-for="item in visibleIconsItems" :key="item.uniqueId">
-          <image
-            :x="item.iconX"
-            :y="item.iconY"
-            :width="imageSide"
-            :height="imageSide"
-            :href="item.item.iconUrl"
-            @click="onNodeClick(item.node)"
+        <template v-for="node in nodes" :key="node.xyId">
+          <polygon
+            :points="node.points"
+            :class="['node', node.class, isUserNode(node) ? 'user-node' : '']"
+            @mouseenter="nodeMouseEnter(node)"
+            @click="onNodeClick(node)"
           />
-          <text
-            :x="item.textX"
-            :y="item.textY"
-            class="node-text"
-            @click="onNodeClick(item.node)"
-          >
-            {{ item.humanQuantity }}
+          <text :x="node.x" :y="node.y" class="node-text">
+            {{ node.id }}
           </text>
         </template>
+
         <text
           v-for="item in unknownItems"
           :key="item.node.xyId"
@@ -175,12 +161,12 @@ export default {
       return this.items.filter((item) => item.visibleIcon);
     },
     userNodes() {
-      let nodes = [];
+      let nodes = {};
 
       this.userNodesIds.forEach((id) => {
         const node = this.nodes[id];
         if (node) {
-          nodes.push(node);
+          nodes[id] = node;
         }
       });
 
@@ -310,13 +296,8 @@ export default {
       const isRemove = this.userNodesIds.includes(node.id);
 
       if (!isRemove) {
-        let message = null;
-        try {
-          message = canSelectNextNode(this.nodes, this.userNodes, node);
-        } catch (error) {
-          console.log(error);
-          message = "Не удалось выделить узел.";
-        }
+        const message = canSelectNextNode(this.nodes, this.userNodes, node);
+        console.log(message, !!message);
         if (message) {
           alert(message);
           return;
