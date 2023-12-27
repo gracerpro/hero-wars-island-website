@@ -19,6 +19,7 @@ export default {
 
   name: "HomePage",
   components: { IslandMap, LoadingMap },
+  inject: ["setMetaInfo"],
   data() {
     return {
       loaded: false,
@@ -36,16 +37,18 @@ export default {
     },
   },
   created() {
+    this.setMetaInfo({
+      title: "Хроники хаоса Эра доминиона карта острова",
+      description:
+        "В игре Хроники Хаоса на карте острова открыты все узлы, соберем все призы вместе!",
+      keywords: "Хроники хаоса, Эра доминиона, карта острова, карта",
+    });
     this.loadState();
   },
   mounted() {
     this.loadIsland()
       .then((island) => {
         this.island = island;
-      })
-      .catch((error) => {
-        //...
-        throw error;
       })
       .finally(() => {
         this.loaded = true;
