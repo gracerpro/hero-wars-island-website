@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <h1>Соберем все призы вместе!</h1>
+    <h1>Хроники хаоса Эра доминиона - карта острова</h1>
 
     <loading-map v-if="loading" />
     <div v-else-if="!island">Карта не доступна.</div>
