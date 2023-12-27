@@ -1,4 +1,4 @@
-import { STATUS_ACCEPTED_SUCCESS, TYPE_START } from "@/api/HeroClient";
+import { TYPE_START } from "@/api/HeroClient";
 
 export const TRANSLATE_X = 6;
 export const TRANSLATE_Y = 6;
@@ -8,9 +8,7 @@ export const DELTA_SCALE = 0.1;
 export const EVENT_CHANGE_SCALE = "change-scale";
 
 export function canSelectNode(node) {
-  return (
-    node.statusId === STATUS_ACCEPTED_SUCCESS && node.typeId !== TYPE_START
-  );
+  return node.typeId !== TYPE_START;
 }
 
 /**
@@ -21,6 +19,10 @@ export function canSelectNode(node) {
  */
 export function canSelectNextNode(nodes, selectedNodes, nextNode) {
   let result = null;
+
+  if (nextNode.typeId === TYPE_START) {
+    return "Невозможно выбрать стартовый узел.";
+  }
 
   // если нет связи следующего узла с выделенным ранее или входным
   // то запрет
@@ -42,6 +44,8 @@ export function canSelectNextNode(nodes, selectedNodes, nextNode) {
       result = "Не найден узел входа. Обратитесь к администраторам.";
     }
   } else {
+    console.log(selectedNodes);
+
     let isFound = false;
     for (const id in nodes) {
       const node = nodes[id];
@@ -61,7 +65,7 @@ export function canSelectNextNode(nodes, selectedNodes, nextNode) {
       }
     }
     if (!isFound) {
-      result = "Можно выделить узел только около выделенного узла или начала.";
+      result = "Выделить узел можно только около выделенного узла или входа.";
     }
   }
 
@@ -69,9 +73,13 @@ export function canSelectNextNode(nodes, selectedNodes, nextNode) {
 }
 
 function isNearNode(nextNode, node) {
-  const dx = Math.abs(nextNode.mx - node.mx);
   const dy = nextNode.my - node.my;
-  const maxY = nextNode.mx == node.mx ? 1 : 0;
 
-  return dx <= 1 && dy >= -1 && dy <= maxY;
+  if (nextNode.mx == node.mx) {
+    return dy >= -1 && dy <= 1;
+  }
+
+  const dx = nextNode.mx - node.mx;
+
+  return dx >= -1 && dx <= 1 && dy >= 0 && dy <= 1;
 }

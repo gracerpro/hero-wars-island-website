@@ -26,15 +26,30 @@
       />
 
       <g :transform="'translate(' + translateX + ' ' + translateY + ')'">
-        <template v-for="node in nodes" :key="node.xyId">
-          <polygon
-            :points="node.points"
-            :class="['node', node.class, isUserNode(node) ? 'user-node' : '']"
-            @mouseenter="nodeMouseEnter(node)"
-            @click="onNodeClick(node)"
+        <polygon
+          v-for="node in nodes"
+          :key="node.xyId"
+          :points="node.points"
+          :class="['node', node.class, isUserNode(node) ? 'user-node' : '']"
+          @mouseenter="nodeMouseEnter(node)"
+          @click="onNodeClick(node)"
+        />
+        <template v-for="item in visibleIconsItems" :key="item.uniqueId">
+          <image
+            :x="item.iconX"
+            :y="item.iconY"
+            :width="imageSide"
+            :height="imageSide"
+            :href="item.item.iconUrl"
+            @click="onNodeClick(item.node)"
           />
-          <text :x="node.x" :y="node.y" class="node-text">
-            {{ node.id }}
+          <text
+            :x="item.textX"
+            :y="item.textY"
+            class="node-text"
+            @click="onNodeClick(item.node)"
+          >
+            {{ item.humanQuantity }}
           </text>
         </template>
 
@@ -290,14 +305,14 @@ export default {
       this.activeNode = node;
     },
     onNodeClick(node) {
-      if (!canSelectNode(node)) {
-        return;
-      }
       const isRemove = this.userNodesIds.includes(node.id);
 
-      if (!isRemove) {
+      if (isRemove) {
+        if (!canSelectNode(node)) {
+          return;
+        }
+      } else {
         const message = canSelectNextNode(this.nodes, this.userNodes, node);
-        console.log(message, !!message);
         if (message) {
           alert(message);
           return;
