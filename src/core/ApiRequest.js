@@ -5,8 +5,9 @@ class ApiRequest {
   /**
    * @return {Promise<Object|Array>}
    * @param {String} url
+   * @param {Object} params
    */
-  async get(url) {
+  async get(url, params) {
     const options = {
       method: "GET",
       redirect: "follow",
@@ -15,8 +16,14 @@ class ApiRequest {
         Accept: "application/json",
       },
     };
+    let searchParams = null;
+    if (params) {
+      searchParams = new URLSearchParams(params);
+    }
     const response = await fetch(
-      process.env.VUE_APP_BACKEND_API_URL + url,
+      process.env.VUE_APP_BACKEND_API_URL +
+        url +
+        (searchParams ? `?${searchParams}` : ""),
       options
     );
 

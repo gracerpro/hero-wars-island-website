@@ -11,13 +11,29 @@
       />
     </div>
     <div class="mb-3">
-      <label :for="formId + '__comment'" class="form-label">Комментарий</label>
+      <label :for="formId + '__comment'" class="form-label">Ресурс</label>
       <input
         v-model.trim="comment"
         required
         class="form-control"
         :id="formId + '__comment'"
+        :list="formId + '__comment__datalist'"
+        @input="onCommentInput"
+        @change="onCommentChange"
+        autocomplete="off"
+        :aria-describedby="formId + '__commentHelp'"
       />
+      <div class="form-text" :id="formId + '__commentHelp'">
+        При вводе от {{ minCharsCount }} символов можно выбрать из списка, нажав
+        клавишу "Вниз", затем "Ввод".
+      </div>
+      <datalist :id="formId + '__comment__datalist'">
+        <option
+          v-for="item in items"
+          :key="item.id"
+          :value="item.name"
+        ></option>
+      </datalist>
     </div>
     <div class="mb-3">
       <label :for="formId + '__quantity'" class="form-label">Количество</label>
@@ -26,6 +42,7 @@
         required
         class="form-control"
         :id="formId + '__quantity'"
+        autocomplete="off"
       />
     </div>
     <div v-show="errorMessage.length" class="alert alert-danger mb-0">
@@ -58,9 +75,14 @@ export default {
       errorMessage: "",
       comment: "",
       quantity: "",
+      itemId: null,
+      items: [],
     };
   },
   computed: {
+    minCharsCount() {
+      return 3;
+    },
     isShowStatus() {
       return (
         this.node.statusId === STATUS_ACCEPTED_SUCCESS ||
@@ -107,10 +129,27 @@ export default {
           this.$emit(EVENT_SAVING, false);
         });
     },
+    onCommentInput() {
+      if (this.comment.length >= this.minCharsCount) {
+        this.$options.client
+          .getItems(10, { name: this.comment })
+          .then((list) => {
+            this.items = list.items;
+          });
+      }
+    },
+    onCommentChange() {
+      this.items.forEach((item) => {
+        if (item.name === this.comment) {
+          this.itemId = item.id;
+        }
+      });
+    },
     getData() {
       return {
         comment: this.comment,
         quantity: this.quantity,
+        itemId: this.itemId,
       };
     },
   },

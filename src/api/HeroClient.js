@@ -14,7 +14,7 @@ export default class HeroClient {
   }
 
   /**
-   * @returns {Object|null}
+   * @returns {Promise<Object|null>}
    */
   async getActualIsland() {
     return await this._apiRequest.get("/islands/actual");
@@ -22,7 +22,7 @@ export default class HeroClient {
 
   /**
    * @param {Number} islandId
-   * @returns {Object}
+   * @returns {Promise<Object>}
    */
   async getNodes(islandId) {
     return await this._apiRequest.get(`/islands/${islandId}/nodes`);
@@ -31,9 +31,26 @@ export default class HeroClient {
   /**
    * @param {Number} nodeId
    * @param {Object} data
-   * @returns {Object}
+   * @returns {Promise<Object>}
    */
   async updateNode(nodeId, data) {
     return await this._apiRequest.post(`/island-nodes/${nodeId}/update`, data);
+  }
+
+  /**
+   * @param {Object|null} filter
+   * @param {Number} limit
+   * @returns {Promise<Object>}
+   */
+  async getItems(limit, filter = null) {
+    let params = { limit };
+
+    if (filter) {
+      Object.keys(filter).forEach((key) => {
+        params[`filter[${key}]`] = filter[key];
+      });
+    }
+
+    return await this._apiRequest.get("/items", params);
   }
 }
