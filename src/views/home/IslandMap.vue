@@ -29,21 +29,24 @@
           <map-table :items="visibleItems" />
         </div>
         <div class="col-lg-6">
-          <h5>Мои ходы</h5>
-          <p>
-            <b class="fs-2 me-2 align-middle">{{ userNodesCount }}</b>
-            <button
-              type="button"
-              :class="[
-                'btn btn-secondary align-middle',
-                userNodesCount > 0 ? '' : 'disabled',
-              ]"
-              @click="onResetUserNodes"
-            >
-              Сбросить
-            </button>
-          </p>
-          <p>...</p>
+          <div>
+            <div class="mb-2">Мои ходы</div>
+            <div>
+              <b class="fs-4 me-2 align-middle">{{ userNodesCount }}</b>
+              <button
+                type="button"
+                :class="[
+                  'btn btn-secondary align-middle',
+                  userNodesCount > 0 ? '' : 'disabled',
+                ]"
+                @click="onResetUserNodes"
+              >
+                Сбросить
+              </button>
+            </div>
+            <div class="form-text fw-normal">&nbsp;</div>
+          </div>
+          <map-table :items="userItems" />
         </div>
       </div>
     </div>
@@ -108,6 +111,11 @@ export default {
       }
 
       return this.items;
+    },
+    userItems() {
+      return this.items.filter((item) => {
+        return this.userNodes[item.node.id] !== undefined;
+      });
     },
     userNodesCount() {
       return Object.keys(this.userNodes).length;
