@@ -129,8 +129,8 @@ export default {
     translateX: { type: Number, required: true },
     translateY: { type: Number, required: true },
     items: { type: Array, required: true },
-    inputNodes: { type: Array, required: true },
-    userNodesIds: { type: Array, required: true },
+    inputNodes: { type: Object, required: true },
+    userNodes: { type: Object, required: true },
   },
   data: function () {
     return {
@@ -175,37 +175,20 @@ export default {
     visibleIconsItems() {
       return this.items.filter((item) => item.visibleIcon);
     },
-    userNodes() {
-      let nodes = {};
-
-      this.userNodesIds.forEach((id) => {
-        const node = this.nodes[id];
-        if (node) {
-          nodes[id] = node;
-        }
-      });
-
-      return nodes;
-    },
   },
   mounted() {
     this.prepareNodes();
     this.prepareItems();
   },
   methods: {
-    /**
-     * @param {Array} nodes
-     */
     prepareNodes() {
       this.nodes = {};
 
-      this.inputNodes.forEach((node) => {
+      for (const id in this.inputNodes) {
+        const node = this.inputNodes[id];
         this.nodes[node.id] = this.drawNode(node);
-      });
+      }
     },
-    /**
-     * @param {Array} items
-     */
     prepareItems() {
       this.loadingItems = true;
 
@@ -257,10 +240,6 @@ export default {
         nodeClass = "node-town";
       }
 
-      //if (this.isUserNode(node)) {
-      //  nodeClass += " ";
-      //}
-
       const data = this.getCoordinates(node);
 
       return {
@@ -305,7 +284,7 @@ export default {
       this.activeNode = node;
     },
     onNodeClick(node) {
-      const isRemove = this.userNodesIds.includes(node.id);
+      const isRemove = this.isUserNode(node);
 
       if (isRemove) {
         if (!canSelectNode(node)) {
@@ -408,7 +387,7 @@ export default {
         });
     },
     isUserNode(node) {
-      return this.userNodesIds.includes(node.id);
+      return this.userNodes[node.id] !== undefined;
     },
   },
 };

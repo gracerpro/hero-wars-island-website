@@ -44,8 +44,6 @@ export function canSelectNextNode(nodes, selectedNodes, nextNode) {
       result = "Не найден узел входа. Обратитесь к администраторам.";
     }
   } else {
-    console.log(selectedNodes);
-
     let isFound = false;
     for (const id in nodes) {
       const node = nodes[id];

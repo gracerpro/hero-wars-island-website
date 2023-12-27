@@ -14,7 +14,7 @@
         :translate-y="translateY"
         :items="visibleItems"
         :input-nodes="nodes"
-        :user-nodes-ids="userNodesIds"
+        :user-nodes="userNodes"
         @change-translate="onChangeTranslate"
         @change-scale="onChangeScale"
         @change-node="onChangeNode"
@@ -31,12 +31,12 @@
         <div class="col-lg-6">
           <h5>Мои ходы</h5>
           <p>
-            <b class="fs-2 me-2 align-middle">{{ userNodesIds.length }}</b>
+            <b class="fs-2 me-2 align-middle">{{ userNodesCount }}</b>
             <button
               type="button"
               :class="[
                 'btn btn-secondary align-middle',
-                userNodesIds.length > 0 ? '' : 'disabled',
+                userNodesCount > 0 ? '' : 'disabled',
               ]"
               @click="onResetUserNodes"
             >
@@ -79,7 +79,7 @@ export default {
 
       nodes: [],
       items: [],
-      userNodesIds: [],
+      userNodes: {},
 
       scale: 1,
       translateX: 0,
@@ -109,6 +109,9 @@ export default {
 
       return this.items;
     },
+    userNodesCount() {
+      return Object.keys(this.userNodes).length;
+    },
   },
   created() {
     this.loadState();
@@ -118,11 +121,11 @@ export default {
       this.nodes = nodes;
       this.items = this.calculateItems(nodes);
 
-      this.userNodesIds = [];
+      this.userNodes = {};
       this.$options.userNodesIds.forEach((id) => {
-        const node = this.nodes.find((item) => item.id === id);
+        const node = this.nodes[id];
         if (node && canSelectNode(node)) {
-          this.userNodesIds.push(id);
+          this.userNodes[id] = node;
         }
       });
 
@@ -134,27 +137,33 @@ export default {
   },
   methods: {
     async loadNodes() {
-      let nodes = [];
+      let nodes = {};
 
       this.loadingNodes = true;
       try {
         const list = await this.$options.client.getNodes(this.island.id);
-        nodes = list.items;
+        list.items.forEach((node) => {
+          nodes[node.id] = node;
+        });
       } finally {
         this.loadingNodes = false;
       }
 
       return nodes;
     },
+    /**
+     * @param {Object} nodes
+     */
     calculateItems(nodes) {
       this.loadingItems = true;
 
       let items = [];
 
-      nodes.forEach((node) => {
+      for (const id in nodes) {
+        const node = nodes[id];
         const itemCount = node?.items.length;
         if (!itemCount) {
-          return;
+          continue;
         }
 
         node.items.forEach((item, index) => {
@@ -171,7 +180,7 @@ export default {
             item,
           });
         });
-      });
+      }
 
       this.loadingItems = false;
 
@@ -205,23 +214,23 @@ export default {
       this.translateY = 0;
     },
     onChangeNode(node) {
-      const index = this.nodes.findIndex((item) => item.id === node.id);
-      if (index >= 0) {
-        this.nodes[index] = node;
+      if (!this.nodes[node.id]) {
+        throw new Error("Узел не найден. Обратитесь к администраторам.");
       }
+      this.nodes[node.id] = node;
     },
     onSelectNode(id, isRemove) {
       if (isRemove) {
-        const index = this.userNodesIds.findIndex((nodeId) => nodeId === id);
-        if (index >= 0) {
-          this.userNodesIds.splice(index, 1);
-        }
+        delete this.userNodes[id];
       } else {
-        this.userNodesIds.push(id);
+        if (!this.nodes[id]) {
+          throw new Error("Узел не найден. Обратитесь к администраторам.");
+        }
+        this.userNodes[id] = this.nodes[id];
       }
     },
     onResetUserNodes() {
-      this.userNodesIds = [];
+      this.userNodes = {};
     },
     getHumanQunatity(quantity) {
       if (quantity > 1000000) {
@@ -272,7 +281,7 @@ export default {
         translateX: this.translateX,
         translateY: this.translateY,
         filter: this.filter,
-        userNodesIds: this.userNodesIds,
+        userNodesIds: Object.keys(this.userNodes),
       };
       localStorage.setItem(this.componentId, JSON.stringify(state));
     },
