@@ -2,7 +2,7 @@
   <table class="table table-striped table-hover table-sm mt-3">
     <thead>
       <tr>
-        <th>Предмет</th>
+        <th>Ресурс</th>
         <th>Количество</th>
         <th>Стоимость в изумрудах</th>
       </tr>

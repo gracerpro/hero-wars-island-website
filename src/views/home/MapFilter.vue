@@ -1,6 +1,6 @@
 <template>
   <div>
-    <label :for="formId + '__itemName'" class="form-label">Предмет</label>
+    <label :for="formId + '__itemName'" class="form-label">Ресурс</label>
     <input
       :id="formId + '__itemName'"
       class="form-control"
