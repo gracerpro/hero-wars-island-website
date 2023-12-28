@@ -36,13 +36,26 @@
         />
         <template v-for="item in visibleIconsItems" :key="item.uniqueId">
           <image
+            v-if="item.item.iconUrl"
             :x="item.iconX"
             :y="item.iconY"
             :width="imageSide"
             :height="imageSide"
             :href="item.item.iconUrl"
             @click="onNodeClick(item.node)"
-          />
+          >
+            <title>{{ item.item.name }}</title>
+          </image>
+          <rect
+            v-else
+            :x="item.iconX"
+            :y="item.iconY"
+            :width="imageSide"
+            :height="imageSide"
+            class="item-image"
+          >
+            <title>Изображение не привязано</title>
+          </rect>
           <text
             :x="item.textX"
             :y="item.textY"
@@ -62,6 +75,7 @@
           @click="onEditNodeClick(item.node)"
         >
           ?
+          <title>Предметы не привязаны</title>
         </text>
         <polyline
           v-if="activeNode"
@@ -203,12 +217,12 @@ export default {
             itemCount === 1
               ? node.x - 0.5 * HALF_SIDE
               : node.x - HALF_SIDE * item.nodeIndex;
-          let iconY = node.y - 0.9 * HEIGHT;
+          let iconY = node.y - 0.85 * HEIGHT;
           let textX =
             itemCount === 1
               ? node.x - 0.25 * SIDE
               : node.x - textCX * item.nodeIndex;
-          let textY = iconY + IMAGE_SIDE + FONT_SIZE - 2;
+          let textY = iconY + IMAGE_SIDE + FONT_SIZE;
 
           item.visibleIcon = true;
           item.iconX = iconX;
@@ -426,6 +440,11 @@ export default {
 }
 .node-town {
   fill: orange;
+}
+.item-image {
+  stroke: #999;
+  stroke-width: 2;
+  fill: #fff;
 }
 </style>
 <style scoped>
