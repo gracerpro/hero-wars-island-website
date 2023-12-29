@@ -36,11 +36,11 @@
 </template>
 <script>
 export default {
-  name: "AboutView",
+  name: "TheAboutView",
   inject: ["setMetaInfo"],
   created() {
     this.setMetaInfo({
-      title: "Хроники хаоса Эра доминиона карта острова - О проекте",
+      title: "О проекте",
       description:
         "В игре Хроники Хаоса на карте острова находятся узлы, чтобы их открыть нужно потратить ход исследователя. Ходы можно получить от событий игры. Соберем все призы вместе!",
       keywords:
