@@ -77,10 +77,34 @@
               class="btn btn-primary mb-3 w-100"
               :disabled="submiting"
             >
+              <span
+                v-show="submiting"
+                class="spinner-border spinner-border-sm"
+                aria-hidden="true"
+              ></span>
               Отправить
             </button>
           </div>
         </form>
+      </div>
+    </div>
+    <div class="toast-container position-fixed bottom-0 end-0 p-3">
+      <div
+        id="liveToast"
+        class="toast align-items-center text-bg-success border-0"
+        role="alert"
+        aria-live="assertive"
+        aria-atomic="true"
+      >
+        <div class="d-flex">
+          <div class="toast-body">Сообщение успешно создано.</div>
+          <button
+            type="button"
+            class="btn-close btn-close-white me-2 m-auto"
+            data-bs-dismiss="toast"
+            aria-label="Close"
+          ></button>
+        </div>
       </div>
     </div>
   </div>
@@ -88,6 +112,7 @@
 <script>
 import UserError from "@/exceptions/UserError";
 import HeroClient from "@/api/HeroClient";
+import { Toast } from "bootstrap";
 
 export default {
   client: new HeroClient(),
@@ -138,6 +163,12 @@ export default {
         .then(() => {
           this.feedback.message = "";
           this.feedback.subject = "";
+
+          const toastBootstrap = new Toast(
+            document.getElementById("liveToast"),
+            { delay: 2000 }
+          );
+          toastBootstrap.show();
         })
         .catch((error) => {
           if (error instanceof UserError) {

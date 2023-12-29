@@ -1,4 +1,3 @@
-import UserError from "@/exceptions/UserError";
 import ApiRequest from "../core/ApiRequest";
 
 export const TYPE_NODE = 0;
@@ -57,9 +56,11 @@ export default class HeroClient {
 
   /**
    * @param {Object} data
+   * @returns {Promise<Object>}
    */
   async createFeedback(data) {
-    console.log(data);
-    throw new UserError("TODO");
+    const item = await this._apiRequest.post("/feedback-items/create", data);
+
+    return item;
   }
 }
