@@ -54,7 +54,7 @@
             :height="imageSide"
             class="item-image"
           >
-            <title>Изображение не привязано</title>
+            <title>{{ item.item.name }}, изображение не привязано</title>
           </rect>
           <text
             :x="item.textX"
@@ -207,7 +207,7 @@ export default {
       this.loadingItems = true;
 
       const maxIconCount = 2;
-      const textCX = 0.65 * SIDE;
+      const textCX = 0.55 * SIDE;
 
       this.items.forEach((item) => {
         if (item.nodeIndex < maxIconCount) {
@@ -222,7 +222,7 @@ export default {
             itemCount === 1
               ? node.x - 0.25 * SIDE
               : node.x - textCX * item.nodeIndex;
-          let textY = iconY + IMAGE_SIDE + FONT_SIZE;
+          let textY = iconY + IMAGE_SIDE + FONT_SIZE - 2;
 
           item.visibleIcon = true;
           item.iconX = iconX;
@@ -432,7 +432,7 @@ export default {
 }
 .node-text {
   font-size: 22px;
-  fill: rgb(97, 97, 5);
+  fill: #000;
   font-weight: bold;
 }
 .node-start {

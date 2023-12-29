@@ -39,11 +39,14 @@
       <label :for="formId + '__quantity'" class="form-label">Количество</label>
       <input
         v-model.trim="quantity"
-        required
         class="form-control"
         :id="formId + '__quantity'"
         autocomplete="off"
+        :aria-describedby="formId + '__quantityHelp'"
       />
+      <div class="form-text" :id="formId + '__quantityHelp'">
+        По-умолчанию 1
+      </div>
     </div>
     <div v-show="errorMessage.length" class="alert alert-danger mb-0">
       {{ errorMessage }}
