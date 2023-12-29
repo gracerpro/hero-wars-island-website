@@ -17,7 +17,7 @@ const PAGE_ID = "homePage";
 export default {
   client: new HeroClient(),
 
-  name: "HomePage",
+  name: "HomeView",
   components: { IslandMap, LoadingMap },
   inject: ["setMetaInfo"],
   data() {
