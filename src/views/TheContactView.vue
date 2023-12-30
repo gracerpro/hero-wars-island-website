@@ -88,40 +88,27 @@
         </form>
       </div>
     </div>
-    <div class="toast-container position-fixed bottom-0 end-0 p-3">
-      <div
-        id="liveToast"
-        class="toast align-items-center text-bg-success border-0"
-        role="alert"
-        aria-live="assertive"
-        aria-atomic="true"
-      >
-        <div class="d-flex">
-          <div class="toast-body">Сообщение успешно создано.</div>
-          <button
-            type="button"
-            class="btn-close btn-close-white me-2 m-auto"
-            data-bs-dismiss="toast"
-            aria-label="Close"
-          ></button>
-        </div>
-      </div>
-    </div>
+    <toast-message ref="toast" element-id="contactToast" :type="quickType" />
   </div>
 </template>
 <script>
 import UserError from "@/exceptions/UserError";
 import HeroClient from "@/api/HeroClient";
-import { Toast } from "bootstrap";
+import ToastMessage, {
+  TYPE_SUCCESS,
+  TYPE_DANGER,
+} from "@/components/ToastMessage.vue";
 
 export default {
   client: new HeroClient(),
 
   name: "TheContactView",
   inject: ["setMetaInfo"],
+  components: { ToastMessage },
   data: () => ({
     submiting: false,
     errorMessage: "",
+    quickType: TYPE_SUCCESS,
     createdDate: new Date(),
     feedback: {
       username: "",
@@ -164,15 +151,15 @@ export default {
           this.feedback.message = "";
           this.feedback.subject = "";
 
-          const toastBootstrap = new Toast(
-            document.getElementById("liveToast"),
-            { delay: 2000 }
-          );
-          toastBootstrap.show();
+          this.quickType = TYPE_SUCCESS;
+          this.$refs.toast.show("Сообщение успешно создано.");
         })
         .catch((error) => {
           if (error instanceof UserError) {
             this.errorMessage = error.message;
+
+            this.quickType = TYPE_DANGER;
+            this.$refs.toast.show(error.message);
           } else {
             throw error;
           }
