@@ -64,14 +64,9 @@ export default {
       }
 
       const element = document.getElementById(this.elementId);
-      element.addEventListener(
-        "hide.bs.toast",
-        () => {
-          console.log("hide");
-          this.isShow = false;
-        },
-        { once: true }
-      );
+      element.addEventListener("hide.bs.toast", () => (this.isShow = false), {
+        once: true,
+      });
 
       const toast = new Toast(element, {
         delay: 2000,
