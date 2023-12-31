@@ -2,7 +2,11 @@
   <div class="toast-container position-fixed bottom-0 end-0 p-3">
     <div
       :id="elementId"
-      :class="['toast align-items-center border-0', this.classType]"
+      :class="[
+        'toast align-items-center border-0',
+        classType,
+        isShow ? 'show' : '',
+      ]"
       role="alert"
       aria-live="assertive"
       aria-atomic="true"
@@ -29,11 +33,12 @@ export default {
   name: "ToastMessage",
   props: {
     elementId: { type: String, required: true },
-    type: { type: String, default: TYPE_SUCCESS },
   },
   data: function () {
     return {
       message: "",
+      type: TYPE_SUCCESS,
+      isShow: false,
     };
   },
   computed: {
@@ -48,14 +53,32 @@ export default {
     },
   },
   methods: {
-    show(message) {
+    /**
+     * @param {String} message
+     * @param {String|null} type
+     */
+    show(message, type) {
       this.message = message;
+      if (type) {
+        this.type = type;
+      }
 
-      const toastBootstrap = new Toast(
-        document.getElementById(this.elementId),
-        { delay: 2000 }
+      const element = document.getElementById(this.elementId);
+      element.addEventListener(
+        "hide.bs.toast",
+        () => {
+          console.log("hide");
+          this.isShow = false;
+        },
+        { once: true }
       );
-      toastBootstrap.show();
+
+      const toast = new Toast(element, {
+        delay: 2000,
+        autohide: true,
+      });
+      toast.show();
+      this.isShow = true;
     },
   },
 };

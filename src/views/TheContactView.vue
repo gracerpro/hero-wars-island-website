@@ -138,28 +138,27 @@ export default {
         return;
       }
 
+      this.submiting = true;
+
       const data = { ...this.feedback };
       data.contactEmail = "";
       data.tempField = "1";
       data.submitTimeInMs = new Date().getTime() - this.createdDate.getTime();
-
       this.errorMessage = "";
-      this.submiting = true;
+
       this.$options.client
         .createFeedback(data)
         .then(() => {
           this.feedback.message = "";
           this.feedback.subject = "";
 
-          this.quickType = TYPE_SUCCESS;
-          this.$refs.toast.show("Сообщение успешно создано.");
+          this.$refs.toast.show("Сообщение успешно создано.", TYPE_SUCCESS);
         })
         .catch((error) => {
           if (error instanceof UserError) {
             this.errorMessage = error.message;
 
-            this.quickType = TYPE_DANGER;
-            this.$refs.toast.show(error.message);
+            this.$refs.toast.show(error.message, TYPE_DANGER);
           } else {
             throw error;
           }
