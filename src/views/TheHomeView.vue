@@ -3,7 +3,15 @@
     <h1>Хроники хаоса Эра доминиона - карта острова</h1>
 
     <loading-map v-if="loading" />
-    <div v-else-if="!island">Карта не доступна.</div>
+    <div v-else-if="!island" class="position-relative">
+      <img
+        src="images/map-not-found.svg"
+        width="440"
+        height="220"
+        class="d-block mx-auto"
+      />
+      <div class="text-center text-warning fw-bold">Карта не доступна</div>
+    </div>
     <island-map v-else :island="island" :parent-page-id="pageId" />
   </div>
 </template>
