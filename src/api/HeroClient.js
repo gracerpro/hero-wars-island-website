@@ -59,8 +59,6 @@ export default class HeroClient {
    * @returns {Promise<Object>}
    */
   async createFeedback(data) {
-    const item = await this._apiRequest.post("/feedback-items/create", data);
-
-    return item;
+    return await this._apiRequest.post("/feedback-items/create", data);
   }
 }

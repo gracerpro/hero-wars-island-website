@@ -1,6 +1,9 @@
 <template>
   <div>
     <loading-map v-if="loading" />
+    <div v-else-if="errorMessage" class="alert alert-danger">
+      {{ errorMessage }}
+    </div>
     <div v-else>
       <map-toolbar
         @reset-scale="onResetScale"
@@ -78,7 +81,8 @@ export default {
     return {
       loaded: false,
       loadingNodes: true,
-      loadingItems: false,
+      calculatingItems: false,
+      errorMessage: "",
 
       nodes: [],
       items: [],
@@ -95,7 +99,7 @@ export default {
   },
   computed: {
     loading() {
-      return this.loadingNodes || this.loadingItems || !this.loaded;
+      return this.loadingNodes || this.calculatingItems || !this.loaded;
     },
     minCharsCount() {
       return 3;
@@ -128,14 +132,7 @@ export default {
     this.loadNodes().then((nodes) => {
       this.nodes = nodes;
       this.items = this.calculateItems(nodes);
-
-      this.userNodes = {};
-      this.$options.userNodesIds.forEach((id) => {
-        const node = this.nodes[id];
-        if (node && canSelectNode(node)) {
-          this.userNodes[id] = node;
-        }
-      });
+      this.userNodes = this.initUserNodes(nodes);
 
       this.loaded = true;
     });
@@ -153,17 +150,31 @@ export default {
         list.items.forEach((node) => {
           nodes[node.id] = node;
         });
+      } catch (error) {
+        this.errorMessage = "Не удалось загрузить узлы карты.";
       } finally {
         this.loadingNodes = false;
       }
 
       return nodes;
     },
+    initUserNodes(nodes) {
+      let resultNodes = {};
+
+      this.$options.userNodesIds.forEach((id) => {
+        const node = nodes[id];
+        if (node && canSelectNode(node)) {
+          resultNodes[id] = node;
+        }
+      });
+
+      return resultNodes;
+    },
     /**
      * @param {Object} nodes
      */
     calculateItems(nodes) {
-      this.loadingItems = true;
+      this.calculatingItems = true;
 
       let items = [];
 
@@ -190,7 +201,7 @@ export default {
         });
       }
 
-      this.loadingItems = false;
+      this.calculatingItems = false;
 
       return items;
     },

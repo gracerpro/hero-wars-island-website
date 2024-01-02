@@ -3,6 +3,9 @@
     <h1>Хроники хаоса Эра доминиона - карта острова</h1>
 
     <loading-map v-if="loading" />
+    <div v-else-if="errorMessage" class="alert alert-danger">
+      {{ errorMessage }}
+    </div>
     <div v-else-if="!island" class="position-relative">
       <img
         src="images/map-not-found.svg"
@@ -10,7 +13,9 @@
         height="220"
         class="d-block mx-auto"
       />
-      <div class="text-center text-warning fw-bold">Карта не доступна</div>
+      <div class="text-center text-warning fw-bold">
+        Актуальная карта не доступна
+      </div>
     </div>
     <island-map v-else :island="island" :parent-page-id="pageId" />
   </div>
@@ -34,6 +39,7 @@ export default {
       loadingIsland: false,
       island: null,
       nodes: [],
+      errorMessage: "",
     };
   },
   computed: {
@@ -57,6 +63,10 @@ export default {
     this.loadIsland()
       .then((island) => {
         this.island = island;
+      })
+      .catch(() => {
+        this.errorMessage =
+          "Не удалось загрузить карту. Разработчики видят проблему и в скором времени починят.";
       })
       .finally(() => {
         this.loaded = true;

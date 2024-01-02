@@ -15,7 +15,7 @@
       <input
         v-model.trim="comment"
         required
-        class="form-control"
+        :class="['form-control', commentErrorMessage ? 'is-invalid' : '']"
         :id="formId + '__comment'"
         :list="formId + '__comment__datalist'"
         @input="onCommentInput"
@@ -23,7 +23,14 @@
         autocomplete="off"
         :aria-describedby="formId + '__commentHelp'"
       />
-      <div class="form-text" :id="formId + '__commentHelp'">
+      <div
+        v-if="commentErrorMessage"
+        class="invalid-feedback"
+        :id="formId + '__commentHelp'"
+      >
+        {{ commentErrorMessage }}
+      </div>
+      <div v-else class="form-text" :id="formId + '__commentHelp'">
         При вводе от {{ minCharsCount }} символов можно выбрать из списка, нажав
         клавишу "Вниз", затем "Ввод".
       </div>
@@ -76,6 +83,7 @@ export default {
     return {
       saving: false,
       errorMessage: "",
+      commentErrorMessage: "",
       comment: "",
       quantity: "",
       itemId: null,
@@ -124,6 +132,7 @@ export default {
           if (error instanceof UserError) {
             this.errorMessage = error.message;
           } else {
+            this.errorMessage = "Возникла внутренняя ошибка.";
             throw error;
           }
         })
@@ -136,8 +145,17 @@ export default {
       if (this.comment.length >= this.minCharsCount) {
         this.$options.client
           .getItems(10, { name: this.comment })
+          .catch((error) => {
+            if (error instanceof UserError) {
+              this.commentErrorMessage = error.message;
+            } else {
+              this.commentErrorMessage = "Возникла внутренняя ошибка.";
+            }
+            throw error;
+          })
           .then((list) => {
             this.items = list.items;
+            this.commentErrorMessage = "";
           });
       }
     },

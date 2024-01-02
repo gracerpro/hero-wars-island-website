@@ -157,9 +157,9 @@ export default {
         .catch((error) => {
           if (error instanceof UserError) {
             this.errorMessage = error.message;
-
             this.$refs.toast.show(error.message, TYPE_DANGER);
           } else {
+            this.errorMessage = "Возникла внутренняя ошибка.";
             throw error;
           }
         })
