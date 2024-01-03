@@ -32,7 +32,7 @@
       </div>
       <div v-else class="form-text" :id="formId + '__commentHelp'">
         При вводе от {{ minCharsCount }} символов можно выбрать из списка, нажав
-        клавишу "Вниз", затем "Ввод".
+        клавишу "Вниз", затем "Ввод". Несколько названий разделяется запятой.
       </div>
       <datalist :id="formId + '__comment__datalist'">
         <option
@@ -52,7 +52,8 @@
         :aria-describedby="formId + '__quantityHelp'"
       />
       <div class="form-text" :id="formId + '__quantityHelp'">
-        По-умолчанию 1
+        По-умолчанию 1. Если названий несколько, то первое количество
+        соответстветствует первому названию и т. д.
       </div>
     </div>
     <div v-show="errorMessage.length" class="alert alert-danger mb-0">
@@ -72,6 +73,8 @@ const EVENT_SAVING = "saving";
 
 export default {
   client: new HeroClient(),
+  lastInputTime: 0,
+  inputTimerId: 0,
 
   name: "NodeForm",
   props: {
@@ -143,21 +146,36 @@ export default {
     },
     onCommentInput() {
       if (this.comment.length >= this.minCharsCount) {
-        this.$options.client
-          .getItems(10, { name: this.comment })
-          .catch((error) => {
-            if (error instanceof UserError) {
-              this.commentErrorMessage = error.message;
-            } else {
-              this.commentErrorMessage = "Возникла внутренняя ошибка.";
-            }
-            throw error;
-          })
-          .then((list) => {
-            this.items = list.items;
-            this.commentErrorMessage = "";
-          });
+        // поиск включается спустя время, чтобы убрать множественные запросы на сервер
+        const diff = 400;
+        const now = new Date();
+
+        if (now - this.$options.lastInputTime < diff) {
+          if (this.$options.inputTimerId) {
+            clearTimeout(this.$options.inputTimerId);
+          }
+          this.$options.inputTimerId = 0;
+        }
+
+        this.$options.lastInputTime = now;
+        this.$options.inputTimerId = setTimeout(this.getItems, diff);
       }
+    },
+    getItems() {
+      this.$options.client
+        .getItems(10, { name: this.comment })
+        .catch((error) => {
+          if (error instanceof UserError) {
+            this.commentErrorMessage = error.message;
+          } else {
+            this.commentErrorMessage = "Возникла внутренняя ошибка.";
+          }
+          throw error;
+        })
+        .then((list) => {
+          this.items = list.items;
+          this.commentErrorMessage = "";
+        });
     },
     onCommentChange() {
       this.items.forEach((item) => {
