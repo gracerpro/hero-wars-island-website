@@ -14,19 +14,23 @@
     </div>
     <ol v-else>
       <li v-for="island in islands" :key="island.id">
-        <router-link :to="{ name: 'island', params: { id: island.id } }">{{
-          island.name
-        }}</router-link>
+        <router-link
+          :to="{ name: 'island', params: { id: island.id } }"
+          :class="[isActual(island) ? '' : 'text-secondary']"
+          >{{ island.name + " " + getIslandHint(island) }}</router-link
+        >
       </li>
     </ol>
 
-    <h3>Новости</h3>
-    <div v-if="!news.length" class="alert alert-warning">Нет данных.</div>
-    <p v-else>...</p>
+    <div v-if="news.length">
+      <h3>Новости</h3>
+      <p>...</p>
+    </div>
   </div>
 </template>
 <script>
 import HeroClient from "@/api/HeroClient";
+import { formatDate } from "@/helpers/formatter";
 
 export default {
   client: new HeroClient(),
@@ -59,6 +63,29 @@ export default {
     this.loadIslands();
   },
   methods: {
+    isActual(island) {
+      const now = new Date();
+
+      return island.eventEndAt > now;
+    },
+    getIslandHint(island) {
+      const now = new Date();
+      let result = "";
+
+      if (island.eventEndAt < now) {
+        result =
+          "от " +
+          formatDate(island.eventStartAt) +
+          " до " +
+          formatDate(island.eventEndAt);
+      } else {
+        const days = Math.ceil((island.eventEndAt - now) / 1000 / 60 / 60 / 24);
+        result =
+          "до " + formatDate(island.eventEndAt) + " осталось дней " + days;
+      }
+
+      return result;
+    },
     loadIslands() {
       this.loadingIslands = true;
       this.$options.client

@@ -18,7 +18,11 @@ export default class HeroClient {
    * @returns {Promise<Object|null>}
    */
   async getIsland(id) {
-    return this._apiRequest.get("/islands/" + id);
+    let island = await this._apiRequest.get("/islands/" + id);
+
+    this.modifyIsland(island);
+
+    return island;
   }
 
   /**
@@ -33,7 +37,13 @@ export default class HeroClient {
       params.pageNumber = pageNumber;
     }
 
-    return this._apiRequest.get("/islands", params);
+    let list = await this._apiRequest.get("/islands", params);
+
+    if (list.items) {
+      list.items.forEach((island) => this.modifyIsland(island));
+    }
+
+    return list;
   }
 
   /**
@@ -42,6 +52,19 @@ export default class HeroClient {
    */
   async getNodes(islandId) {
     return this._apiRequest.get(`/islands/${islandId}/nodes`);
+  }
+
+  /**
+   * @param {Object} island
+   * @private
+   */
+  modifyIsland(island) {
+    if (island.eventStartAt) {
+      island.eventStartAt = new Date(island.eventStartAt);
+    }
+    if (island.eventEndAt) {
+      island.eventEndAt = new Date(island.eventEndAt);
+    }
   }
 
   /**
