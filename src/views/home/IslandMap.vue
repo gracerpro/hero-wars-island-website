@@ -6,6 +6,8 @@
     </div>
     <div v-else>
       <map-toolbar
+        :is-only-image="isOnlyImage"
+        @update:is-only-image="onChangeOnlyImage"
         @reset-scale="onResetScale"
         @reset-translate="onResetTranslate"
         @change-scale="onChangeScale"
@@ -15,6 +17,7 @@
         :scale="scale"
         :translate-x="translateX"
         :translate-y="translateY"
+        :is-only-image="isOnlyImage"
         :items="visibleItems"
         :input-nodes="nodes"
         :user-nodes="userNodes"
@@ -91,6 +94,7 @@ export default {
       scale: 1,
       translateX: 0,
       translateY: 0,
+      isOnlyImage: false,
 
       filter: {
         itemName: "",
@@ -232,6 +236,9 @@ export default {
       this.translateX = 0;
       this.translateY = 0;
     },
+    onChangeOnlyImage() {
+      this.isOnlyImage = !this.isOnlyImage;
+    },
     onChangeNode(node) {
       if (!this.nodes[node.id]) {
         throw new Error("Узел не найден. Обратитесь к администраторам.");
@@ -286,11 +293,15 @@ export default {
       if (!state.userNodesIds) {
         state.userNodesIds = [];
       }
+      if (!state.isOnlyImage) {
+        state.isOnlyImage = false;
+      }
 
       this.scale = state.scale;
       this.translateX = state.translateX;
       this.translateY = state.translateY;
       this.filter.itemName = state.filter.itemName;
+      this.isOnlyImage = state.isOnlyImage;
 
       this.$options.userNodesIds = state.userNodesIds;
     },
@@ -300,6 +311,7 @@ export default {
         translateX: this.translateX,
         translateY: this.translateY,
         filter: this.filter,
+        isOnlyImage: this.isOnlyImage,
         userNodesIds: Object.keys(this.userNodes),
       };
       localStorage.setItem(this.componentId, JSON.stringify(state));

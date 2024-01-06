@@ -39,8 +39,8 @@
             v-if="item.item.iconUrl"
             :x="item.iconX"
             :y="item.iconY"
-            :width="imageSide"
-            :height="imageSide"
+            :width="item.iconWidth"
+            :height="item.iconHeight"
             :href="item.item.iconUrl"
             @click="onNodeClick(item.node)"
           >
@@ -50,14 +50,14 @@
             v-else
             :x="item.iconX"
             :y="item.iconY"
-            :width="imageSide"
-            :height="imageSide"
+            :width="item.iconWidth"
+            :height="item.iconHeight"
             class="item-image"
           >
             <title>{{ item.item.name }}, изображение не привязано</title>
           </rect>
           <text
-            v-if="item.item.quantity > 1"
+            v-if="!isOnlyImage && item.item.quantity > 1"
             :x="item.textX"
             :y="item.textY"
             class="node-text"
@@ -142,6 +142,7 @@ export default {
     scale: { type: Number, required: true },
     translateX: { type: Number, required: true },
     translateY: { type: Number, required: true },
+    isOnlyImage: { type: Boolean, required: true },
     items: { type: Array, required: true },
     inputNodes: { type: Object, required: true },
     userNodes: { type: Object, required: true },
@@ -190,6 +191,11 @@ export default {
       return this.items.filter((item) => item.visibleIcon);
     },
   },
+  watch: {
+    isOnlyImage() {
+      this.prepareItems();
+    },
+  },
   mounted() {
     this.prepareNodes();
     this.prepareItems();
@@ -209,30 +215,47 @@ export default {
       const maxIconCount = 2;
       const textCX = 0.86 * SIDE;
 
-      this.items.forEach((item) => {
-        if (item.nodeIndex < maxIconCount) {
-          const node = this.nodes[item.node.id];
-          const itemCount = item.node?.items.length;
-          let iconX =
-            itemCount === 1
-              ? node.x - 0.5 * HALF_SIDE
-              : node.x - HALF_SIDE * item.nodeIndex;
-          let iconY = node.y - 0.85 * HEIGHT;
-          let textX =
-            itemCount === 1
-              ? node.x - 0.25 * SIDE
-              : node.x - textCX * item.nodeIndex;
-          let textY = iconY + IMAGE_SIDE + FONT_SIZE - 2;
+      if (this.isOnlyImage) {
+        this.items.forEach((item) => {
+          if (item.nodeIndex === 0) {
+            const node = this.nodes[item.node.id];
+            item.iconWidth = IMAGE_SIDE * 2.3;
+            item.iconHeight = IMAGE_SIDE * 2.3;
+            item.iconX = node.x - item.iconWidth / 2;
+            item.iconY = node.y - item.iconHeight / 2;
+            item.visibleIcon = true;
+          } else {
+            item.visibleIcon = false;
+          }
+        });
+      } else {
+        this.items.forEach((item) => {
+          if (item.nodeIndex < maxIconCount) {
+            const node = this.nodes[item.node.id];
+            const itemCount = item.node?.items.length;
+            let iconX =
+              itemCount === 1
+                ? node.x - 0.5 * HALF_SIDE
+                : node.x - HALF_SIDE * item.nodeIndex;
+            let iconY = node.y - 0.85 * HEIGHT;
+            let textX =
+              itemCount === 1
+                ? node.x - 0.25 * SIDE
+                : node.x - textCX * item.nodeIndex;
+            let textY = iconY + IMAGE_SIDE + FONT_SIZE - 2;
 
-          item.visibleIcon = true;
-          item.iconX = iconX;
-          item.iconY = iconY;
-          item.textX = textX;
-          item.textY = textY;
-        } else {
-          item.visibleIcon = false;
-        }
-      });
+            item.visibleIcon = true;
+            item.iconX = iconX;
+            item.iconY = iconY;
+            item.iconWidth = IMAGE_SIDE;
+            item.iconHeight = IMAGE_SIDE;
+            item.textX = textX;
+            item.textY = textY;
+          } else {
+            item.visibleIcon = false;
+          }
+        });
+      }
 
       this.loadingItems = false;
     },
