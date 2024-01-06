@@ -1,53 +1,50 @@
 <template>
   <div class="container">
-    <h1>Хроники хаоса Эра доминиона - карта острова</h1>
+    <h1>Хроники хаоса Эра доминиона - откроем остров вместе!</h1>
+    <p>
+      В игре появилось новое собитие <b>Остров приключений</b>. На котором нужно
+      тратить ходы исследователя и открывать узлы карты, получать подарки.
+      Изначально вся карта закрыта и неизвестно в какую сторону двигаться чтобы
+      получить лучший приз.
+    </p>
 
-    <loading-map v-if="loading" />
-    <div v-else-if="errorMessage" class="alert alert-danger">
-      {{ errorMessage }}
+    <h3>Острова</h3>
+    <div v-if="!islands.length" class="alert alert-warning">
+      Не найдено доступных островов.
     </div>
-    <div v-else-if="!island" class="position-relative">
-      <img
-        src="images/map-not-found.svg"
-        width="440"
-        height="220"
-        class="d-block mx-auto"
-      />
-      <div class="text-center text-warning fw-bold">
-        Актуальная карта не доступна
-      </div>
-    </div>
-    <island-map v-else :island="island" :parent-page-id="pageId" />
+    <ol v-else v-for="island in islands" :key="island.id">
+      <li>
+        <router-link :to="{ name: 'island', params: { id: island.id } }">{{
+          island.name
+        }}</router-link>
+      </li>
+    </ol>
+
+    <h3>Новости</h3>
+    <div v-if="!news.length" class="alert alert-warning">Нет данных.</div>
+    <p v-else>...</p>
   </div>
 </template>
 <script>
 import HeroClient from "@/api/HeroClient";
-import IslandMap from "./home/IslandMap.vue";
-import LoadingMap from "./home/LoadingMap.vue";
-
-const PAGE_ID = "homePage";
 
 export default {
   client: new HeroClient(),
 
   name: "TheHomeView",
-  components: { IslandMap, LoadingMap },
   inject: ["setMetaInfo"],
   data() {
     return {
-      loaded: false,
-      loadingIsland: false,
-      island: null,
-      nodes: [],
-      errorMessage: "",
+      //loaded: false,
+      loadingIslands: false,
+      islands: [],
+      islandsCount: 0,
+      news: [],
     };
   },
   computed: {
     loading() {
-      return this.loaded === false || this.loadingIsland;
-    },
-    pageId() {
-      return PAGE_ID;
+      return /*this.loaded === false || */ this.loadingIslands;
     },
   },
   created() {
@@ -55,55 +52,26 @@ export default {
       title: "Хроники хаоса Эра доминиона карта острова",
       description:
         "В игре Хроники Хаоса на карте острова открыты все узлы, соберем все призы вместе!",
-      keywords: "Хроники хаоса, Эра доминиона, карта острова, карта",
+      keywords: "Хроники хаоса, Эра доминиона, карта острова, карта, событие",
     });
-    this.loadState();
   },
   mounted() {
-    this.loadIsland()
-      .then((island) => {
-        this.island = island;
-      })
-      .catch(() => {
-        this.errorMessage =
-          "Не удалось загрузить карту. Разработчики видят проблему и в скором времени починят.";
-      })
-      .finally(() => {
-        this.loaded = true;
-      });
-  },
-  unmounted() {
-    this.saveState();
+    this.loadIslands();
   },
   methods: {
-    async loadIsland() {
-      let island = null;
-
-      this.loadingIsland = true;
-      try {
-        island = await this.$options.client.getActualIsland();
-      } finally {
-        this.loadingIsland = false;
-      }
-
-      return island;
-    },
-    loadState() {
-      let state;
-
-      try {
-        state = JSON.parse(localStorage.getItem(PAGE_ID));
-      } catch (error) {
-        console.error(error);
-      }
-
-      if (!state) {
-        state = {};
-      }
-    },
-    saveState() {
-      const state = {};
-      localStorage.setItem(PAGE_ID, JSON.stringify(state));
+    loadIslands() {
+      this.loadingIslands = true;
+      this.$options.client
+        .getIslandList()
+        .then((list) => {
+          this.islands = list.items;
+          this.islandsCount = list.totalCount;
+        })
+        .catch(() => {
+          this.errorMessage =
+            "Не удалось загрузить острова. Разработчики видят проблему и в скором времени починят.";
+        })
+        .finally(() => (this.loadingIslands = false));
     },
   },
 };

@@ -17,7 +17,14 @@ export default class HeroClient {
    * @returns {Promise<Object|null>}
    */
   async getActualIsland() {
-    return await this._apiRequest.get("/islands/actual");
+    return this._apiRequest.get("/islands/actual");
+  }
+
+  /**
+   * @returns {Promise<Object|null>}
+   */
+  async getIslandList() {
+    return this._apiRequest.get("/islands");
   }
 
   /**
@@ -25,7 +32,7 @@ export default class HeroClient {
    * @returns {Promise<Object>}
    */
   async getNodes(islandId) {
-    return await this._apiRequest.get(`/islands/${islandId}/nodes`);
+    return this._apiRequest.get(`/islands/${islandId}/nodes`);
   }
 
   /**
@@ -34,7 +41,7 @@ export default class HeroClient {
    * @returns {Promise<Object>}
    */
   async updateNode(nodeId, data) {
-    return await this._apiRequest.post(`/island-nodes/${nodeId}/update`, data);
+    return this._apiRequest.post(`/island-nodes/${nodeId}/update`, data);
   }
 
   /**
@@ -51,7 +58,7 @@ export default class HeroClient {
       });
     }
 
-    return await this._apiRequest.get("/items", params);
+    return this._apiRequest.get("/items", params);
   }
 
   /**
@@ -59,6 +66,6 @@ export default class HeroClient {
    * @returns {Promise<Object>}
    */
   async createFeedback(data) {
-    return await this._apiRequest.post("/feedback-items/create", data);
+    return this._apiRequest.post("/feedback-items/create", data);
   }
 }
