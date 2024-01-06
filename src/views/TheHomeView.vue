@@ -12,8 +12,8 @@
     <div v-if="!islands.length" class="alert alert-warning">
       Не найдено доступных островов.
     </div>
-    <ol v-else v-for="island in islands" :key="island.id">
-      <li>
+    <ol v-else>
+      <li v-for="island in islands" :key="island.id">
         <router-link :to="{ name: 'island', params: { id: island.id } }">{{
           island.name
         }}</router-link>
@@ -62,7 +62,7 @@ export default {
     loadIslands() {
       this.loadingIslands = true;
       this.$options.client
-        .getIslandList()
+        .getIslandList(5)
         .then((list) => {
           this.islands = list.items;
           this.islandsCount = list.totalCount;

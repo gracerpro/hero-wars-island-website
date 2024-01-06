@@ -21,10 +21,18 @@ export default class HeroClient {
   }
 
   /**
+   * @param {Number} pageSize
+   * @param {Number} [pageNumber=1]
    * @returns {Promise<Object|null>}
    */
-  async getIslandList() {
-    return this._apiRequest.get("/islands");
+  async getIslandList(pageSize, pageNumber = 1) {
+    let params = { pageSize };
+
+    if (pageNumber > 1) {
+      params.pageNumber = pageNumber;
+    }
+
+    return this._apiRequest.get("/islands", params);
   }
 
   /**
