@@ -7,7 +7,7 @@
         title="Уменьшить"
         @click="onChangeScale(true)"
       >
-        +
+        -
       </button>
       <button
         type="button"
@@ -15,7 +15,7 @@
         title="Увеличить"
         @click="onChangeScale(false)"
       >
-        -
+        +
       </button>
       <button
         type="button"
@@ -67,6 +67,7 @@
     <div class="btn-group-vertical w-100 mb-2" role="group">
       <button
         type="button"
+        title="Показывать только иконку? Без количества"
         :class="[
           'btn',
           isOnlyImage ? 'btn-secondary' : 'btn-outline-secondary',

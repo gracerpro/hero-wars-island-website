@@ -60,7 +60,7 @@
             v-if="!isOnlyImage && item.item.quantity > 1"
             :x="item.textX"
             :y="item.textY"
-            class="node-text"
+            class="text"
             @click="onNodeClick(item.node)"
           >
             {{ item.humanQuantity }}
@@ -99,6 +99,7 @@ import UpdateNodeDialog from "./UpdateNodeDialog.vue";
 import {
   TYPE_START,
   TYPE_TOWN,
+  TYPE_CHEST,
   STATUS_ON_MODERATION,
   STATUS_ACCEPTED_SUCCESS,
 } from "@/api/HeroClient";
@@ -275,6 +276,8 @@ export default {
         nodeClass = "node-start";
       } else if (node.typeId === TYPE_TOWN) {
         nodeClass = "node-town";
+      } else if (node.typeId === TYPE_CHEST) {
+        nodeClass = "node-chest";
       }
 
       const data = this.getCoordinates(node);
@@ -429,15 +432,38 @@ export default {
 </script>
 <style>
 .node {
-  fill: #96d895;
+  fill: #9da7c9;
   stroke: #dddddd;
   stroke-width: 1;
 }
 .node:hover {
-  fill: #527951;
+  fill: #bcc5e6;
+}
+.node-start {
+  fill: #55211d;
+}
+.node-start:hover {
+  fill: #796b6a;
+}
+.node-town {
+  fill: #94440e;
+}
+.node-town:hover {
+  fill: #88776c;
+}
+.node-chest {
+  fill: #1a660b;
+}
+.node-chest:hover {
+  fill: #566d51;
 }
 .node.user-node {
   fill: #6668f8;
+}
+.text {
+  font-size: 20px;
+  fill: #000;
+  font-weight: bold;
 }
 .unknown-text {
   font-size: 50px;
@@ -450,17 +476,6 @@ export default {
 }
 .-on-moderation {
   fill: green;
-}
-.node-text {
-  font-size: 20px;
-  fill: #000;
-  font-weight: bold;
-}
-.node-start {
-  fill: brown;
-}
-.node-town {
-  fill: orange;
 }
 .item-image {
   stroke: #999;
