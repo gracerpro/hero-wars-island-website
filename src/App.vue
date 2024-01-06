@@ -20,7 +20,9 @@ export default {
   },
   methods: {
     setMetaInfo(info) {
-      document.title = info.title;
+      if (info.title) {
+        document.title = info.title;
+      }
 
       const descriptionEl = document.querySelector(
         "head meta[name='description']"

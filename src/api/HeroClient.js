@@ -14,10 +14,11 @@ export default class HeroClient {
   }
 
   /**
+   * @param {Number} id
    * @returns {Promise<Object|null>}
    */
-  async getActualIsland() {
-    return this._apiRequest.get("/islands/actual");
+  async getIsland(id) {
+    return this._apiRequest.get("/islands/" + id);
   }
 
   /**

@@ -23,19 +23,21 @@
 import HeroClient from "@/api/HeroClient";
 import IslandMap from "./home/IslandMap.vue";
 import LoadingMap from "./home/LoadingMap.vue";
+import HttpError from "@/exceptions/HttpError";
 
 const PAGE_ID = "islandPage";
 
 export default {
   client: new HeroClient(),
+  id: null,
 
   name: "TheIslandView",
   components: { IslandMap, LoadingMap },
   inject: ["setMetaInfo"],
   data() {
     return {
-      loaded: false,
-      loadingIsland: false,
+      // loaded: false,
+      loadingIsland: true,
       island: null,
       nodes: [],
       errorMessage: "",
@@ -43,7 +45,7 @@ export default {
   },
   computed: {
     loading() {
-      return this.loaded === false || this.loadingIsland;
+      return /*this.loaded === false || */ this.loadingIsland;
     },
     pageId() {
       return PAGE_ID;
@@ -55,55 +57,35 @@ export default {
       description: "",
       keywords: "Хроники хаоса, Эра доминиона, карта острова, карта",
     });
-    this.loadState();
 
-    // get ID from query
+    this.$options.id = this.$route.params.id;
   },
   mounted() {
-    this.loadIsland()
-      .then((island) => {
-        this.island = island;
-      })
-      .catch(() => {
-        this.errorMessage =
-          "Не удалось загрузить карту. Разработчики видят проблему и в скором времени починят.";
-      })
-      .finally(() => {
-        this.loaded = true;
-      });
-  },
-  unmounted() {
-    this.saveState();
+    if (this.$options.id > 0) {
+      this.loadIsland();
+    }
   },
   methods: {
-    async loadIsland() {
-      let island = null;
-
+    loadIsland() {
+      this.island = null;
       this.loadingIsland = true;
-      try {
-        island = await this.$options.client.getActualIsland();
-      } finally {
-        this.loadingIsland = false;
-      }
-
-      return island;
-    },
-    loadState() {
-      let state;
-
-      try {
-        state = JSON.parse(localStorage.getItem(PAGE_ID));
-      } catch (error) {
-        console.error(error);
-      }
-
-      if (!state) {
-        state = {};
-      }
-    },
-    saveState() {
-      const state = {};
-      localStorage.setItem(PAGE_ID, JSON.stringify(state));
+      this.$options.client
+        .getIsland(this.$options.id)
+        .then((island) => {
+          this.island = island;
+          this.setMetaInfo({
+            title: island.name + " - Карта острова",
+          });
+        })
+        .catch((error) => {
+          if (error instanceof HttpError && error.statusCode === 404) {
+            this.errorMessage = "Карта не найдена.";
+          } else {
+            this.errorMessage =
+              "Не удалось загрузить карту. Разработчики видят проблему и в скором времени починят.";
+          }
+        })
+        .finally(() => (this.loadingIsland = false));
     },
   },
 };
