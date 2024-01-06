@@ -30,7 +30,7 @@
 </template>
 <script>
 import HeroClient from "@/api/HeroClient";
-import { formatDate } from "@/helpers/formatter";
+import { fromCurrentDate } from "@/helpers/formatter";
 
 export default {
   client: new HeroClient(),
@@ -75,13 +75,16 @@ export default {
       if (island.eventEndAt < now) {
         result =
           "от " +
-          formatDate(island.eventStartAt) +
+          fromCurrentDate(island.eventStartAt) +
           " до " +
-          formatDate(island.eventEndAt);
+          fromCurrentDate(island.eventEndAt);
       } else {
         const days = Math.ceil((island.eventEndAt - now) / 1000 / 60 / 60 / 24);
         result =
-          "до " + formatDate(island.eventEndAt) + " осталось дней " + days;
+          "до " +
+          fromCurrentDate(island.eventEndAt) +
+          ", осталось дней " +
+          days;
       }
 
       return result;
