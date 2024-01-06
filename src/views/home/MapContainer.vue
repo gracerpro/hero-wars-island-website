@@ -57,6 +57,7 @@
             <title>{{ item.item.name }}, изображение не привязано</title>
           </rect>
           <text
+            v-if="item.item.quantity > 1"
             :x="item.textX"
             :y="item.textY"
             class="node-text"
@@ -112,12 +113,11 @@ import {
   canSelectNextNode,
 } from "./map";
 
-const SIDE = 86;
+const SIDE = 50;
 const HALF_SIDE = SIDE / 2;
-const HEIGHT = 36;
-//const HALF_HEIGHT = HEIGHT / 2;
-const IMAGE_SIDE = 40;
-const FONT_SIZE = 22;
+const HEIGHT = 34;
+const IMAGE_SIDE = 24;
+const FONT_SIZE = 20;
 
 const MIDDLE_BUTTON = 1;
 
@@ -207,7 +207,7 @@ export default {
       this.loadingItems = true;
 
       const maxIconCount = 2;
-      const textCX = 0.55 * SIDE;
+      const textCX = 0.86 * SIDE;
 
       this.items.forEach((item) => {
         if (item.nodeIndex < maxIconCount) {
@@ -350,14 +350,12 @@ export default {
 
       if (isLeft) {
         x = -TRANSLATE_X;
-      }
-      if (isRight) {
+      } else if (isRight) {
         x = TRANSLATE_X;
       }
       if (isTop) {
         y = -TRANSLATE_Y;
-      }
-      if (isBottom) {
+      } else if (isBottom) {
         y = TRANSLATE_Y;
       }
 
@@ -431,7 +429,7 @@ export default {
   fill: green;
 }
 .node-text {
-  font-size: 22px;
+  font-size: 20px;
   fill: #000;
   font-weight: bold;
 }
