@@ -9,7 +9,11 @@
     </p>
 
     <h3>Острова</h3>
-    <div v-if="loadingIslands"></div>
+    <div v-if="loadingIslands">
+      <span class="placeholder col-4"></span><br />
+      <span class="placeholder col-4"></span><br />
+      <span class="placeholder col-4"></span>
+    </div>
     <div v-else-if="!islands.length" class="alert alert-warning">
       Не найдено доступных.
     </div>
