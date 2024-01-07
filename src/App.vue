@@ -3,6 +3,12 @@
     <div class="container">
       <div class="navbar-nav">
         <router-link to="/" class="nav-link">Гланая</router-link>
+        <router-link
+          v-if="actualIsland"
+          :to="{ name: 'island', params: { id: actualIsland.id } }"
+          class="nav-link"
+          >Актуальный остров</router-link
+        >
         <router-link to="/contact" class="nav-link">Контакты</router-link>
         <router-link to="/about" class="nav-link">О проекте</router-link>
       </div>
@@ -11,12 +17,26 @@
   <router-view />
 </template>
 <script>
+import HeroClient from "./api/HeroClient";
+
 export default {
+  client: new HeroClient(),
+
   name: "App",
   provide() {
     return {
       setMetaInfo: this.setMetaInfo,
     };
+  },
+  data: function () {
+    return {
+      actualIsland: null,
+    };
+  },
+  created() {
+    this.$options.client.getActualIsland().then((island) => {
+      this.actualIsland = island;
+    });
   },
   methods: {
     setMetaInfo(info) {

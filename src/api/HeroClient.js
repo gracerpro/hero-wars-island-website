@@ -21,7 +21,22 @@ export default class HeroClient {
   async getIsland(id) {
     let island = await this._apiRequest.get("/islands/" + id);
 
-    this.modifyIsland(island);
+    if (island) {
+      this.modifyIsland(island);
+    }
+
+    return island;
+  }
+
+  /**
+   * @returns {Promise<Object|null>}
+   */
+  async getActualIsland() {
+    let island = await this._apiRequest.get("/islands/actual");
+
+    if (island) {
+      this.modifyIsland(island);
+    }
 
     return island;
   }
