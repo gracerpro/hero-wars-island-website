@@ -44,7 +44,7 @@
             :href="item.item.iconUrl"
             @click="onNodeClick(item.node)"
           >
-            <title>{{ item.item.name }}</title>
+            <title>{{ item.item.name + ", " + item.humanQuantity }}</title>
           </image>
           <rect
             v-else
