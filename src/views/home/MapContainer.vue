@@ -34,7 +34,7 @@
           @mouseenter="nodeMouseEnter(node)"
           @click="onNodeClick(node)"
         />
-        <template v-for="item in visibleIconsItems" :key="item.uniqueId">
+        <template v-for="item in iconsItems" :key="item.uniqueId">
           <image
             v-if="item.item.iconUrl"
             :x="item.iconX"
@@ -68,7 +68,7 @@
         </template>
 
         <text
-          v-for="item in unknownItems"
+          v-for="item in unknownNodes"
           :key="item.node.xyId"
           :x="item.x"
           :y="item.y"
@@ -76,7 +76,9 @@
           @click="onEditNodeClick(item.node)"
         >
           ?
-          <title>Предметы не привязаны</title>
+          <title>
+            {{ item.isOnModeration ? "На модерации" : "Предметы не привязаны" }}
+          </title>
         </text>
         <polyline
           v-if="activeNode"
@@ -150,7 +152,7 @@ export default {
   },
   data: function () {
     return {
-      nodes: {},
+      //  nodes: {},
       updating: false,
       nodeDialog: {
         node: null,
@@ -164,10 +166,7 @@ export default {
       const side = SIDE * 5 * this.scale;
       return `-${side} -${side} ${side * 2} ${side * 2}`;
     },
-    imageSide() {
-      return IMAGE_SIDE;
-    },
-    unknownItems() {
+    unknownNodes() {
       let items = [];
 
       for (let id in this.nodes) {
@@ -191,25 +190,94 @@ export default {
     visibleIconsItems() {
       return this.items.filter((item) => item.visibleIcon);
     },
-  },
-  watch: {
-    isOnlyImage() {
-      this.prepareItems();
-    },
-  },
-  mounted() {
-    this.prepareNodes();
-    this.prepareItems();
-  },
-  methods: {
-    prepareNodes() {
-      this.nodes = {};
+    nodes() {
+      let nodes = {};
 
       for (const id in this.inputNodes) {
         const node = this.inputNodes[id];
-        this.nodes[node.id] = this.drawNode(node);
+        nodes[id] = this.drawNode(node);
       }
+
+      return nodes;
     },
+    iconsItems() {
+      let countsByNode = {};
+
+      this.items.forEach((item) => {
+        const nodeId = item.node.id;
+
+        if (!countsByNode[nodeId]) {
+          countsByNode[nodeId] = 0;
+        }
+        countsByNode[nodeId]++;
+      });
+
+      let resultItems = [];
+      let indexesByNode = {};
+
+      this.items.forEach((item) => {
+        const node = this.nodes[item.node.id];
+
+        if (this.isOnlyImage) {
+          const count = countsByNode[node.id];
+
+          if (count === 1) {
+            item.iconWidth = IMAGE_SIDE * 2.2;
+            item.iconHeight = IMAGE_SIDE * 2.2;
+            item.iconX = node.x - item.iconWidth / 2;
+            item.iconY = node.y - item.iconHeight / 2;
+          } else {
+            if (!indexesByNode[node.id]) {
+              indexesByNode[node.id] = 0;
+            }
+            const index = indexesByNode[node.id];
+            const borderWidth = 2;
+
+            if (count === 2) {
+              item.iconWidth = IMAGE_SIDE * 1.4;
+              item.iconHeight = IMAGE_SIDE * 1.4;
+              const cx = item.iconWidth + borderWidth;
+              const srartX = node.x - cx + borderWidth / 2;
+              item.iconX = srartX + cx * index;
+              item.iconY = node.y - item.iconHeight / 2;
+            } else if (index <= 3) {
+              // count >= 3
+              // 0,0   1,0
+              //     *
+              // 0,1   1,1
+              item.iconWidth = IMAGE_SIDE;
+              item.iconHeight = IMAGE_SIDE;
+              const cx = item.iconWidth + borderWidth;
+              const srartX = node.x - cx + borderWidth / 2;
+              item.iconX = srartX + (index % 2 === 0 ? 0 : cx);
+              const cy = item.iconHeight + borderWidth;
+              const srartY = node.y - cy + borderWidth / 2;
+              item.iconY = srartY + (index < 2 ? 0 : cy);
+            } else {
+              item = false;
+            }
+
+            indexesByNode[node.id]++;
+          }
+
+          if (item) {
+            resultItems.push(item);
+          }
+        }
+      });
+
+      return resultItems;
+    },
+  },
+  watch: {
+    isOnlyImage() {
+      //this.prepareItems();
+    },
+  },
+  mounted() {
+    // this.prepareItems();
+  },
+  methods: {
     prepareItems() {
       this.loadingItems = true;
 
@@ -415,7 +483,7 @@ export default {
         .then((node) => {
           if (node !== null && node !== undefined) {
             this.$emit(EVENT_CHANGE_NODE, node);
-            this.nodes[node.id] = this.drawNode(node);
+            // this.nodes[node.id] = this.drawNode(node);
           }
         })
         .finally(() => {

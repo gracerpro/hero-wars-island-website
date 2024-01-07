@@ -14,9 +14,7 @@
       <li><span class="node-box node-start"></span>Начало, вход</li>
       <li><span class="node-box node"></span>Один ресурс</li>
       <li><span class="node-box node-town"></span>Башня</li>
-      <li>
-        <span class="node-box node-chest"></span>Сундук, несколько ресурсов
-      </li>
+      <li><span class="node-box node-chest"></span>Сундук</li>
     </ul>
     <h4>Хочешь помочь?</h4>
     <p>На ячейке со знаком вопроса нужно вписать или поправить ресурс.</p>
