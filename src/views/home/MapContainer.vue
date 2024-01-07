@@ -57,10 +57,10 @@
             <title>{{ item.item.name }}, изображение не привязано</title>
           </rect>
           <text
-            v-if="!isOnlyImage && item.item.quantity > 1"
+            v-if="item.textX && item.textY"
             :x="item.textX"
             :y="item.textY"
-            class="text"
+            :class="['text', item.fontClass ? item.fontClass : '']"
             @click="onNodeClick(item.node)"
           >
             {{ item.humanQuantity }}
@@ -68,7 +68,7 @@
         </template>
 
         <text
-          v-for="item in unknownNodes"
+          v-for="item in noItemsNodes"
           :key="item.node.xyId"
           :x="item.x"
           :y="item.y"
@@ -120,7 +120,6 @@ const SIDE = 50;
 const HALF_SIDE = SIDE / 2;
 const HEIGHT = 34;
 const IMAGE_SIDE = 24;
-const FONT_SIZE = 20;
 
 const MIDDLE_BUTTON = 1;
 
@@ -166,7 +165,7 @@ export default {
       const side = SIDE * 5 * this.scale;
       return `-${side} -${side} ${side * 2} ${side * 2}`;
     },
-    unknownNodes() {
+    noItemsNodes() {
       let items = [];
 
       for (let id in this.nodes) {
@@ -187,9 +186,6 @@ export default {
 
       return items;
     },
-    visibleIconsItems() {
-      return this.items.filter((item) => item.visibleIcon);
-    },
     nodes() {
       let nodes = {};
 
@@ -201,133 +197,100 @@ export default {
       return nodes;
     },
     iconsItems() {
-      let countsByNode = {};
-
-      this.items.forEach((item) => {
-        const nodeId = item.node.id;
-
-        if (!countsByNode[nodeId]) {
-          countsByNode[nodeId] = 0;
-        }
-        countsByNode[nodeId]++;
-      });
-
+      let countsByNode = getCountsByNode(this.items);
       let resultItems = [];
       let indexesByNode = {};
 
       this.items.forEach((item) => {
         const node = this.nodes[item.node.id];
+        const count = countsByNode[node.id];
+        const isShowText = item.item.quantity > 1 && !this.isOnlyImage;
 
-        if (this.isOnlyImage) {
-          const count = countsByNode[node.id];
+        item.textX = null;
+        item.textY = null;
+        item.fontClass = null;
 
-          if (count === 1) {
-            item.iconWidth = IMAGE_SIDE * 2.2;
-            item.iconHeight = IMAGE_SIDE * 2.2;
-            item.iconX = node.x - item.iconWidth / 2;
-            item.iconY = node.y - item.iconHeight / 2;
+        if (count === 1) {
+          const fontSize = 20;
+          item.iconWidth = IMAGE_SIDE * (isShowText ? 1.9 : 2.2);
+          item.iconHeight = IMAGE_SIDE * (isShowText ? 1.9 : 2.2);
+          item.iconX = node.x - item.iconWidth / 2;
+          item.iconY =
+            node.y - item.iconHeight / 2 - (isShowText ? fontSize / 2 : 0);
+          if (isShowText) {
+            item.textX = item.iconX + item.iconWidth * 0.05;
+            item.textY = node.y + HEIGHT - 3;
+          }
+        } else {
+          if (!indexesByNode[node.id]) {
+            indexesByNode[node.id] = 0;
+          }
+          const index = indexesByNode[node.id];
+          const borderWidth = 2;
+
+          if (count === 2) {
+            const fontSize = 16;
+            item.iconWidth = IMAGE_SIDE * (isShowText ? 1.3 : 1.4);
+            item.iconHeight = IMAGE_SIDE * (isShowText ? 1.3 : 1.4);
+            const cx = item.iconWidth + borderWidth;
+            const srartX = node.x - cx + borderWidth / 2;
+            item.iconX = srartX + cx * index;
+            item.iconY =
+              node.y - item.iconHeight / 2 - (isShowText ? fontSize / 2 : 0);
+
+            if (isShowText) {
+              item.textX = srartX + cx * index;
+              item.textY = node.y + HEIGHT - fontSize * 0.7;
+              item.fontClass = "text-2";
+            }
+          } else if (index <= 3) {
+            // count >= 3
+            // 0,0   1,0
+            //     *
+            // 0,1   1,1
+            item.iconWidth = IMAGE_SIDE * 1.1;
+            item.iconHeight = IMAGE_SIDE * 1.1;
+            const cx = item.iconWidth + borderWidth;
+            const srartX = node.x - cx + borderWidth / 2;
+            item.iconX = srartX + (index % 2 === 0 ? 0 : cx);
+            const cy = item.iconHeight + borderWidth;
+            const srartY = node.y - cy + borderWidth / 2;
+            item.iconY = srartY + (index < 2 ? 0 : cy);
           } else {
-            if (!indexesByNode[node.id]) {
-              indexesByNode[node.id] = 0;
-            }
-            const index = indexesByNode[node.id];
-            const borderWidth = 2;
-
-            if (count === 2) {
-              item.iconWidth = IMAGE_SIDE * 1.4;
-              item.iconHeight = IMAGE_SIDE * 1.4;
-              const cx = item.iconWidth + borderWidth;
-              const srartX = node.x - cx + borderWidth / 2;
-              item.iconX = srartX + cx * index;
-              item.iconY = node.y - item.iconHeight / 2;
-            } else if (index <= 3) {
-              // count >= 3
-              // 0,0   1,0
-              //     *
-              // 0,1   1,1
-              item.iconWidth = IMAGE_SIDE;
-              item.iconHeight = IMAGE_SIDE;
-              const cx = item.iconWidth + borderWidth;
-              const srartX = node.x - cx + borderWidth / 2;
-              item.iconX = srartX + (index % 2 === 0 ? 0 : cx);
-              const cy = item.iconHeight + borderWidth;
-              const srartY = node.y - cy + borderWidth / 2;
-              item.iconY = srartY + (index < 2 ? 0 : cy);
-            } else {
-              item = false;
-            }
-
-            indexesByNode[node.id]++;
+            item = false;
           }
 
-          if (item) {
-            resultItems.push(item);
-          }
+          indexesByNode[node.id]++;
+        }
+
+        if (item) {
+          resultItems.push(item);
         }
       });
 
       return resultItems;
-    },
-  },
-  watch: {
-    isOnlyImage() {
-      //this.prepareItems();
-    },
-  },
-  mounted() {
-    // this.prepareItems();
-  },
-  methods: {
-    prepareItems() {
-      this.loadingItems = true;
 
-      const maxIconCount = 2;
-      const textCX = 0.86 * SIDE;
+      function getCountsByNode(items) {
+        let countsByNode = {};
 
-      if (this.isOnlyImage) {
-        this.items.forEach((item) => {
-          if (item.nodeIndex === 0) {
-            const node = this.nodes[item.node.id];
-            item.iconWidth = IMAGE_SIDE * 2.3;
-            item.iconHeight = IMAGE_SIDE * 2.3;
-            item.iconX = node.x - item.iconWidth / 2;
-            item.iconY = node.y - item.iconHeight / 2;
-            item.visibleIcon = true;
-          } else {
-            item.visibleIcon = false;
+        items.forEach((item) => {
+          const nodeId = item.node.id;
+
+          if (!countsByNode[nodeId]) {
+            countsByNode[nodeId] = 0;
           }
+          countsByNode[nodeId]++;
         });
-      } else {
-        this.items.forEach((item) => {
-          if (item.nodeIndex < maxIconCount) {
-            const node = this.nodes[item.node.id];
-            const itemCount = item.node?.items.length;
-            let iconX =
-              itemCount === 1
-                ? node.x - 0.5 * HALF_SIDE
-                : node.x - HALF_SIDE * item.nodeIndex;
-            let iconY = node.y - 0.85 * HEIGHT;
-            let textX =
-              itemCount === 1
-                ? node.x - 0.25 * SIDE
-                : node.x - textCX * item.nodeIndex;
-            let textY = iconY + IMAGE_SIDE + FONT_SIZE - 2;
 
-            item.visibleIcon = true;
-            item.iconX = iconX;
-            item.iconY = iconY;
-            item.iconWidth = IMAGE_SIDE;
-            item.iconHeight = IMAGE_SIDE;
-            item.textX = textX;
-            item.textY = textY;
-          } else {
-            item.visibleIcon = false;
-          }
-        });
+        return countsByNode;
       }
-
-      this.loadingItems = false;
     },
+  },
+  mounted() {},
+  methods: {
+    /**
+     * @param {Object} node
+     */
     getActivePoints(node) {
       let data = this.getCoordinates(node);
       data.coordinates.push(data.coordinates[0]);
@@ -338,16 +301,11 @@ export default {
      * @param {Object} node
      */
     drawNode(node) {
-      let nodeClass = "";
-
-      if (node.typeId === TYPE_START) {
-        nodeClass = "node-start";
-      } else if (node.typeId === TYPE_TOWN) {
-        nodeClass = "node-town";
-      } else if (node.typeId === TYPE_CHEST) {
-        nodeClass = "node-chest";
-      }
-
+      const classes = {
+        [TYPE_START]: "node-start",
+        [TYPE_TOWN]: "node-town",
+        [TYPE_CHEST]: "node-chest",
+      };
       const data = this.getCoordinates(node);
 
       return {
@@ -356,7 +314,7 @@ export default {
         x: data.x,
         y: data.y,
         points: this.getPoints(data.coordinates),
-        class: nodeClass,
+        class: classes[node.typeId] ? classes[node.typeId] : "",
       };
     },
     /**
@@ -532,6 +490,9 @@ export default {
   font-size: 20px;
   fill: #000;
   font-weight: bold;
+}
+.text-2 {
+  font-size: 16px;
 }
 .unknown-text {
   font-size: 50px;

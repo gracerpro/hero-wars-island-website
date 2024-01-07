@@ -10,7 +10,7 @@
       Прокручивать средней кнопкой мышки - увеличение или уменьшение.
     </p>
     <h4>Узлы</h4>
-    <ul>
+    <ul class="list-unstyled">
       <li><span class="node-box node-start"></span>Начало, вход</li>
       <li><span class="node-box node"></span>Один ресурс</li>
       <li><span class="node-box node-town"></span>Башня</li>
