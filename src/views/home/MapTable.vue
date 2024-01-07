@@ -2,6 +2,7 @@
   <table class="table table-striped table-hover table-sm mt-3">
     <thead>
       <tr>
+        <th></th>
         <th>Ресурс</th>
         <th>Количество</th>
         <th>Стоимость в изумрудах</th>
@@ -12,6 +13,15 @@
         <td colspan="4">Нет данных.</td>
       </tr>
       <tr v-else v-for="item in items" :key="item.uniqueId">
+        <td>
+          <img
+            v-if="item.item.iconUrl"
+            :src="item.item.iconUrl"
+            :width="item.item.iconWidth"
+            :height="item.item.iconHeight"
+            class="icon"
+          />
+        </td>
         <td>{{ item.item.name }}</td>
         <td class="text-end">{{ item.humanQuantity }}</td>
         <td class="text-end">{{ item.emeraldCost }}</td>
@@ -27,3 +37,9 @@ export default {
   },
 };
 </script>
+<style scoped>
+.icon {
+  width: 24px;
+  height: 24px;
+}
+</style>

@@ -9,8 +9,9 @@
     </p>
 
     <h3>Острова</h3>
-    <div v-if="!islands.length" class="alert alert-warning">
-      Не найдено доступных островов.
+    <div v-if="loadingIslands"></div>
+    <div v-else-if="!islands.length" class="alert alert-warning">
+      Не найдено доступных.
     </div>
     <ol v-else>
       <li v-for="island in islands" :key="island.id">
@@ -18,6 +19,9 @@
           :to="{ name: 'island', params: { id: island.id } }"
           :class="[isActual(island) ? '' : 'text-secondary']"
           >{{ island.name + " " + getIslandHint(island) }}</router-link
+        >
+        <span v-if="isActual(island)" class="badge text-bg-primary ms-2"
+          >актуально</span
         >
       </li>
     </ol>
@@ -39,17 +43,11 @@ export default {
   inject: ["setMetaInfo"],
   data() {
     return {
-      //loaded: false,
-      loadingIslands: false,
+      loadingIslands: true,
       islands: [],
       islandsCount: 0,
       news: [],
     };
-  },
-  computed: {
-    loading() {
-      return /*this.loaded === false || */ this.loadingIslands;
-    },
   },
   created() {
     this.setMetaInfo({

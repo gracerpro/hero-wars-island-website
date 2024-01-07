@@ -54,7 +54,10 @@
             :height="item.iconHeight"
             class="item-image"
           >
-            <title>{{ item.item.name }}, изображение не привязано</title>
+            <title>
+              {{ item.item.name + ", " + item.humanQuantity }}, изображение не
+              привязано
+            </title>
           </rect>
           <text
             v-if="item.textX && item.textY"
