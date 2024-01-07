@@ -114,7 +114,9 @@ export default {
     visibleItems() {
       if (this.filter.itemName.length >= this.minCharsCount) {
         return this.items.filter((item) =>
-          item.item.name.includes(this.filter.itemName)
+          item.item.name
+            .toLowerCase()
+            .includes(this.filter.itemName.toLowerCase())
         );
       }
 
