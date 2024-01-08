@@ -97,10 +97,12 @@
       ref="nodeDialog"
       @mounted="onMountedNodeDialog"
     />
+    <toast-message ref="toast" element-id="mapContainerToast" />
   </div>
 </template>
 <script>
 import UpdateNodeDialog from "./UpdateNodeDialog.vue";
+import ToastMessage, { TYPE_DANGER } from "@/components/ToastMessage.vue";
 import {
   TYPE_START,
   TYPE_TOWN,
@@ -137,6 +139,7 @@ export default {
   },
 
   name: "MapContainer",
+  components: { ToastMessage },
   emits: [
     EVENT_CHANGE_TRANSLATE,
     EVENT_CHANGE_SCALE,
@@ -289,7 +292,6 @@ export default {
       }
     },
   },
-  mounted() {},
   methods: {
     /**
      * @param {Object} node
@@ -362,7 +364,7 @@ export default {
       } else {
         const message = canSelectNextNode(this.nodes, this.userNodes, node);
         if (message) {
-          alert(message);
+          this.$refs.toast.show(message, TYPE_DANGER);
           return;
         }
       }

@@ -88,7 +88,7 @@
         </form>
       </div>
     </div>
-    <toast-message ref="toast" element-id="contactToast" :type="quickType" />
+    <toast-message ref="toast" element-id="contactToast" />
   </div>
 </template>
 <script>
@@ -108,7 +108,6 @@ export default {
   data: () => ({
     submiting: false,
     errorMessage: "",
-    quickType: TYPE_SUCCESS,
     createdDate: new Date(),
     feedback: {
       username: "",
