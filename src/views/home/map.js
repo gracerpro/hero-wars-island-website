@@ -79,5 +79,7 @@ function isNearNode(nextNode, node) {
 
   const dx = nextNode.mx - node.mx;
 
-  return dx >= -1 && dx <= 1 && dy >= 0 && dy <= 1;
+  const canY = nextNode.mx % 2 === 0 ? dy >= 0 && dy <= 1 : dy >= -1 && dy <= 0;
+
+  return dx >= -1 && dx <= 1 && canY;
 }
