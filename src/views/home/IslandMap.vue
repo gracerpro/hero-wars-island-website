@@ -7,7 +7,9 @@
     <div v-else>
       <map-toolbar
         :is-only-image="isOnlyImage"
+        :is-show-no-moderate="isShowNoModerate"
         @update:is-only-image="onChangeOnlyImage"
+        @update:is-show-no-moderate="onChangeIsShowNoModerate"
         @reset-scale="onResetScale"
         @reset-translate="onResetTranslate"
         @change-scale="onChangeScale"
@@ -18,6 +20,7 @@
         :translate-x="translateX"
         :translate-y="translateY"
         :is-only-image="isOnlyImage"
+        :is-show-no-moderate="isShowNoModerate"
         :items="visibleItems"
         :input-nodes="nodes"
         :user-nodes="userNodes"
@@ -95,6 +98,7 @@ export default {
       translateX: 0,
       translateY: 0,
       isOnlyImage: false,
+      isShowNoModerate: true,
 
       filter: {
         itemName: "",
@@ -240,6 +244,9 @@ export default {
     onChangeOnlyImage() {
       this.isOnlyImage = !this.isOnlyImage;
     },
+    onChangeIsShowNoModerate() {
+      this.isShowNoModerate = !this.isShowNoModerate;
+    },
     onChangeNode(node) {
       if (!this.nodes[node.id]) {
         throw new Error("Узел не найден. Обратитесь к администраторам.");
@@ -260,10 +267,10 @@ export default {
       this.userNodes = {};
     },
     getHumanQunatity(quantity) {
-      if (quantity > 1000000) {
+      if (quantity >= 1000000) {
         return Math.floor(quantity / 1000000) + "M";
       }
-      if (quantity > 1000) {
+      if (quantity >= 1000) {
         return Math.floor(quantity / 1000) + "K";
       }
 
@@ -297,12 +304,16 @@ export default {
       if (!state.isOnlyImage) {
         state.isOnlyImage = false;
       }
+      if (state.isShowNoModerate === undefined) {
+        state.isShowNoModerate = true;
+      }
 
       this.scale = state.scale;
       this.translateX = state.translateX;
       this.translateY = state.translateY;
       this.filter.itemName = state.filter.itemName;
       this.isOnlyImage = state.isOnlyImage;
+      this.isShowNoModerate = state.isShowNoModerate;
 
       this.$options.userNodesIds = state.userNodesIds;
     },
@@ -313,6 +324,7 @@ export default {
         translateY: this.translateY,
         filter: this.filter,
         isOnlyImage: this.isOnlyImage,
+        isShowNoModerate: this.isShowNoModerate,
         userNodesIds: Object.keys(this.userNodes),
       };
       localStorage.setItem(this.componentId, JSON.stringify(state));

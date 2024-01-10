@@ -151,6 +151,7 @@ export default {
     translateX: { type: Number, required: true },
     translateY: { type: Number, required: true },
     isOnlyImage: { type: Boolean, required: true },
+    isShowNoModerate: { type: Boolean, required: true },
     items: { type: Array, required: true },
     inputNodes: { type: Object, required: true },
     userNodes: { type: Object, required: true },
@@ -172,6 +173,10 @@ export default {
       return `-${side} -${side} ${side * 2} ${side * 2}`;
     },
     noItemsNodes() {
+      if (!this.isShowNoModerate) {
+        return [];
+      }
+
       let items = [];
 
       for (let id in this.nodes) {

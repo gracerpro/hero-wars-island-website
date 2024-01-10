@@ -76,10 +76,26 @@
       >
         Im
       </button>
+      <button
+        type="button"
+        title="Показывать узлы без ресуров?"
+        :class="[
+          'btn',
+          isShowNoModerate ? 'btn-secondary' : 'btn-outline-secondary',
+        ]"
+        @click="onChangeIsShowNoModerate"
+      >
+        ?
+      </button>
     </div>
     <div class="btn-group-vertical w-100" role="group">
-      <button type="button" class="btn btn-secondary" @click="onHelpClick">
-        ?
+      <button
+        type="button"
+        class="btn btn-secondary"
+        @click="onHelpClick"
+        title="Помощь"
+      >
+        h
       </button>
     </div>
 
@@ -104,11 +120,13 @@ import {
 const EVENT_RESET_TRANSLATE = "reset-translate";
 const EVENT_RESET_SCALE = "reset-scale";
 const EVENT_CHANGE_ONLY_IMAGE = "update:is-only-image";
+const EVENT_CHANGE_IS_SHOW_NO_MODERATE = "update:is-show-no-moderate";
 
 export default {
   name: "MapToolbar",
   props: {
     isOnlyImage: { type: Boolean, required: true },
+    isShowNoModerate: { type: Boolean, required: true },
   },
   emits: [
     EVENT_RESET_TRANSLATE,
@@ -116,6 +134,7 @@ export default {
     EVENT_RESET_SCALE,
     EVENT_CHANGE_SCALE,
     EVENT_CHANGE_ONLY_IMAGE,
+    EVENT_CHANGE_IS_SHOW_NO_MODERATE,
   ],
   data: function () {
     return {
@@ -150,6 +169,9 @@ export default {
     },
     onChangeOnlyImage() {
       this.$emit(EVENT_CHANGE_ONLY_IMAGE);
+    },
+    onChangeIsShowNoModerate() {
+      this.$emit(EVENT_CHANGE_IS_SHOW_NO_MODERATE);
     },
     onMountedHelpDialog() {
       this.$refs.helpDialog.show().finally(() => {
