@@ -191,7 +191,7 @@ export default {
           continue;
         }
 
-        node.items.forEach((item, index) => {
+        node.items.forEach((item) => {
           items.push({
             uniqueId: node.mx + "_" + node.my + "_" + item.id,
             iconUrl: item.iconUrl,
@@ -200,7 +200,6 @@ export default {
               item.emeraldCost !== null
                 ? item.emeraldCost * item.quantity
                 : null,
-            nodeIndex: index,
             node,
             item,
           });

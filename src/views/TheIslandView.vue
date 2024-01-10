@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <loading-map v-if="loading" />
+    <loading-map v-if="loadingIsland" />
     <div v-else-if="errorMessage" class="alert alert-danger">
       {{ errorMessage }}
     </div>
@@ -36,7 +36,6 @@ export default {
   inject: ["setMetaInfo"],
   data() {
     return {
-      // loaded: false,
       loadingIsland: true,
       island: null,
       nodes: [],
@@ -44,9 +43,6 @@ export default {
     };
   },
   computed: {
-    loading() {
-      return /*this.loaded === false || */ this.loadingIsland;
-    },
     pageId() {
       return PAGE_ID;
     },

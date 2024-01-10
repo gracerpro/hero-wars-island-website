@@ -44,22 +44,24 @@ export default {
         document.title = info.title;
       }
 
-      const descriptionEl = document.querySelector(
-        "head meta[name='description']"
-      );
-      const description = info.description ? info.description : "";
-      if (!descriptionEl) {
-        createMeta("description", description);
-      } else {
-        descriptionEl.setAttribute("content", description);
+      if (info.description !== undefined) {
+        const descriptionEl = document.querySelector(
+          "head meta[name='description']"
+        );
+        if (!descriptionEl) {
+          createMeta("description", info.description);
+        } else {
+          descriptionEl.setAttribute("content", info.description);
+        }
       }
 
-      const keywordsEl = document.querySelector("head meta[name='keywords']");
-      const keywords = info.keywords ? info.keywords : "";
-      if (!keywordsEl) {
-        createMeta("keywords", keywords);
-      } else {
-        keywordsEl.setAttribute("content", keywords);
+      if (info.keywords !== undefined) {
+        const keywordsEl = document.querySelector("head meta[name='keywords']");
+        if (!keywordsEl) {
+          createMeta("keywords", info.keywords);
+        } else {
+          keywordsEl.setAttribute("content", info.keywords);
+        }
       }
 
       function createMeta(name, content) {
