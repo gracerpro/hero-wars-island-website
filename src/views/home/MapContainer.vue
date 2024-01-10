@@ -55,7 +55,7 @@
             class="item-image"
           >
             <title>
-              {{ item.item.name + ", " + item.humanQuantity }}, изображение не
+              {{ item.item.name + ", " + item.item.quantity }}, изображение не
               привязано
             </title>
           </rect>
