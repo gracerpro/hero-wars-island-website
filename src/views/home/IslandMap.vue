@@ -38,23 +38,26 @@
           <map-table :items="visibleItems" />
         </div>
         <div class="col-lg-6">
-          <div>
-            <div class="mb-2">Мои ходы</div>
-            <div>
-              <b class="fs-4 me-2 align-middle">{{ userNodesCount }}</b>
-              <button
-                type="button"
-                :class="[
-                  'btn btn-secondary align-middle',
-                  userNodesCount > 0 ? '' : 'disabled',
-                ]"
-                @click="onResetUserNodes"
-              >
-                Сбросить
-              </button>
-            </div>
-            <div class="form-text fw-normal">&nbsp;</div>
+          <div class="mb-2">
+            <router-link to="/contact" class="float-end"
+              >Есть ошибка или предложение?</router-link
+            >
+            Мои ходы
           </div>
+          <div>
+            <b class="fs-4 me-2 align-middle">{{ userNodesCount }}</b>
+            <button
+              type="button"
+              :class="[
+                'btn btn-secondary align-middle',
+                userNodesCount > 0 ? '' : 'disabled',
+              ]"
+              @click="onResetUserNodes"
+            >
+              Сбросить
+            </button>
+          </div>
+          <div class="form-text fw-normal">&nbsp;</div>
           <map-table :items="userItems" />
         </div>
       </div>
