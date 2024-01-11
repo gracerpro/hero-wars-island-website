@@ -44,7 +44,7 @@
             :href="item.item.iconUrl"
             @click="onNodeClick(item.node)"
           >
-            <title>{{ item.item.name + ", " + item.humanQuantity }}</title>
+            <title>{{ item.item.name + getQuantity(item) }}</title>
           </image>
           <rect
             v-else
@@ -55,8 +55,7 @@
             class="item-image"
           >
             <title>
-              {{ item.item.name + ", " + item.item.quantity }}, изображение не
-              привязано
+              {{ item.item.name + getQuantity(item) }}, изображение не привязано
             </title>
           </rect>
           <text
@@ -463,6 +462,9 @@ export default {
     isUserNode(node) {
       return this.userNodes[node.id] !== undefined;
     },
+    getQuantity(item) {
+      return item.item.quantity > 1 ? ", " + item.item.quantity : "";
+    },
   },
 };
 </script>
@@ -476,10 +478,10 @@ export default {
   fill: #bcc5e6;
 }
 .node-start {
-  fill: #55211d;
+  fill: #a6f3fd;
 }
 .node-start:hover {
-  fill: #796b6a;
+  fill: #d6f7fc;
 }
 .node-town {
   fill: #94440e;
@@ -498,7 +500,7 @@ export default {
 }
 .text {
   font-size: 20px;
-  fill: #000;
+  fill: #ebdd60;
   font-weight: bold;
 }
 .text-2 {
@@ -506,12 +508,12 @@ export default {
 }
 .unknown-text {
   font-size: 50px;
-  fill: rgb(235, 235, 102);
+  fill: #ebdd60;
   font-weight: bold;
   cursor: pointer;
 }
 .unknown-text:hover {
-  fill: rgb(151, 151, 62);
+  fill: #ffe500;
 }
 .-on-moderation {
   fill: green;
