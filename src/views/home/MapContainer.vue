@@ -79,7 +79,7 @@
         >
           ?
           <title>
-            {{ item.isOnModeration ? "На модерации" : "Предметы не привязаны" }}
+            {{ getWarningTitle(item) }}
           </title>
         </text>
         <polyline
@@ -108,6 +108,8 @@ import {
   TYPE_CHEST,
   STATUS_ON_MODERATION,
   STATUS_ACCEPTED_SUCCESS,
+  STATUS_NOT_SURE,
+  getStatusName,
 } from "@/api/HeroClient";
 import { shallowRef } from "vue";
 import {
@@ -181,9 +183,8 @@ export default {
       for (let id in this.nodes) {
         const node = this.nodes[id];
         if (
-          !node?.items.length ||
-          (node.typeId !== TYPE_START &&
-            node.statusId !== STATUS_ACCEPTED_SUCCESS)
+          node.typeId !== TYPE_START &&
+          (!node?.items.length || node.statusId !== STATUS_ACCEPTED_SUCCESS)
         ) {
           items.push({
             node,
@@ -461,6 +462,19 @@ export default {
     },
     isUserNode(node) {
       return this.userNodes[node.id] !== undefined;
+    },
+    getWarningTitle(item) {
+      if (
+        item.node.statusId === STATUS_ON_MODERATION ||
+        item.node.statusId === STATUS_NOT_SURE
+      ) {
+        return getStatusName(item.node.statusId);
+      }
+      if (!item.node.items || !item.node.items.length) {
+        return "Ресурсы не привязаны";
+      }
+
+      return "";
     },
     getQuantity(item) {
       return item.item.quantity > 1 ? ", " + item.item.quantity : "";

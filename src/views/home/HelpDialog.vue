@@ -70,7 +70,7 @@ export default {
   background-color: #9da7c9;
 }
 .node-start {
-  background-color: #55211d;
+  background-color: #a6f3fd;
 }
 .node-town {
   background-color: #94440e;

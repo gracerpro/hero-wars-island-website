@@ -1,15 +1,34 @@
 <template>
   <form @submit.prevent="onSubmit" :id="formId">
-    <div v-if="isShowStatus" class="mb-3">
-      <label :for="formId + '__status'" class="form-label">Статус</label>
-      <input
-        class="form-control"
-        :id="formId + '__status'"
-        :value="statusName"
-        disabled
-        readonly
-      />
+    <div class="row">
+      <div v-if="isShowStatus" class="col-md-4 mb-3">
+        <label :for="formId + '__status'" class="form-label">Статус</label>
+        <input
+          class="form-control"
+          :id="formId + '__status'"
+          :value="statusName"
+          disabled
+          readonly
+        />
+      </div>
+      <div class="col-md-8" v-if="nodeItems">
+        <label class="form-label">Ресурсы</label>
+        <ul class="list-unstyled">
+          <li v-for="item in nodeItems" :key="item.id" class="mb-1">
+            <img
+              v-if="item.iconUrl"
+              class="icon"
+              :src="item.iconUrl"
+              :width="item.iconWidth"
+              :height="item.iconHeight"
+            />
+            {{ item.quantity }}
+            {{ item.name }}
+          </li>
+        </ul>
+      </div>
     </div>
+
     <div class="mb-3">
       <label :for="formId + '__comment'" class="form-label">Ресурс</label>
       <input
@@ -100,6 +119,9 @@ export default {
     statusName() {
       return getStatusName(this.node.statusId);
     },
+    nodeItems() {
+      return this.node.items && this.node.items.length ? this.node.items : null;
+    },
   },
   created() {
     this.comment = this.node.userComment;
@@ -182,3 +204,12 @@ export default {
   },
 };
 </script>
+<style scoped>
+.icon {
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+  outline: 1px solid #ddd;
+  margin-right: 5px;
+}
+</style>
