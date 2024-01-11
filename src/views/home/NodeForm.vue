@@ -207,8 +207,8 @@ export default {
 <style scoped>
 .icon {
   display: inline-block;
-  width: 24px;
-  height: 24px;
+  width: 32px;
+  height: 32px;
   outline: 1px solid #ddd;
   margin-right: 5px;
 }
