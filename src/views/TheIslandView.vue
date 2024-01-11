@@ -38,7 +38,6 @@ export default {
     return {
       loadingIsland: true,
       island: null,
-      nodes: [],
       errorMessage: "",
     };
   },

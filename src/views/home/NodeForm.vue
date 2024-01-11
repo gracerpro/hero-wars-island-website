@@ -61,7 +61,7 @@
         ></option>
       </datalist>
     </div>
-    <div class="mb-3">
+    <div>
       <label :for="formId + '__quantity'" class="form-label">Количество</label>
       <input
         v-model.trim="quantity"
@@ -75,7 +75,7 @@
         соответстветствует первому названию и т. д.
       </div>
     </div>
-    <div v-show="errorMessage.length" class="alert alert-danger mb-0">
+    <div v-show="errorMessage.length" class="alert alert-danger mb-0 mt-3">
       {{ errorMessage }}
     </div>
   </form>

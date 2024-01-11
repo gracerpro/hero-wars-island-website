@@ -451,7 +451,6 @@ export default {
         .then((node) => {
           if (node !== null && node !== undefined) {
             this.$emit(EVENT_CHANGE_NODE, node);
-            // this.nodes[node.id] = this.drawNode(node);
           }
         })
         .finally(() => {

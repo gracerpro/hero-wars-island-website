@@ -78,7 +78,7 @@
       </button>
       <button
         type="button"
-        title="Показывать узлы без ресуров?"
+        title="Показывать не принятые узлы?"
         :class="[
           'btn',
           isShowNoModerate ? 'btn-secondary' : 'btn-outline-secondary',
