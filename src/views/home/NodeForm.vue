@@ -62,10 +62,7 @@
   </form>
 </template>
 <script>
-import HeroClient, {
-  STATUS_ACCEPTED_SUCCESS,
-  STATUS_ON_MODERATION,
-} from "@/api/HeroClient";
+import HeroClient, { STATUS_CREATED, getStatusName } from "@/api/HeroClient";
 import UserError from "@/exceptions/UserError";
 
 const EVENT_SUCCESS_SAVE = "success-save";
@@ -98,19 +95,10 @@ export default {
       return 3;
     },
     isShowStatus() {
-      return (
-        this.node.statusId === STATUS_ACCEPTED_SUCCESS ||
-        this.node.statusId === STATUS_ON_MODERATION
-      );
+      return this.node.statusId !== STATUS_CREATED;
     },
     statusName() {
-      if (this.node.statusId === STATUS_ACCEPTED_SUCCESS) {
-        return "Принято";
-      }
-      if (this.node.statusId === STATUS_ON_MODERATION) {
-        return "На модерации";
-      }
-      return "";
+      return getStatusName(this.node.statusId);
     },
   },
   created() {

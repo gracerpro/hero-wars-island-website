@@ -70,7 +70,7 @@
         </template>
 
         <text
-          v-for="item in noItemsNodes"
+          v-for="item in warningNodes"
           :key="item.node.xyId"
           :x="item.x"
           :y="item.y"
@@ -171,7 +171,7 @@ export default {
       const side = SIDE * 5 * this.scale;
       return `-${side} -${side} ${side * 2} ${side * 2}`;
     },
-    noItemsNodes() {
+    warningNodes() {
       if (!this.isShowNoModerate) {
         return [];
       }
@@ -181,14 +181,14 @@ export default {
       for (let id in this.nodes) {
         const node = this.nodes[id];
         if (
-          !node?.items.length &&
-          node.typeId !== TYPE_START &&
-          node.statusId !== STATUS_ACCEPTED_SUCCESS
+          !node?.items.length ||
+          (node.typeId !== TYPE_START &&
+            node.statusId !== STATUS_ACCEPTED_SUCCESS)
         ) {
           items.push({
             node,
             x: node.x - 0.2 * SIDE,
-            y: node.y + 0.4 * HEIGHT,
+            y: node.y + 0.64 * HEIGHT,
             isOnModeration: node.statusId === STATUS_ON_MODERATION,
           });
         }
@@ -507,7 +507,7 @@ export default {
   font-size: 16px;
 }
 .unknown-text {
-  font-size: 50px;
+  font-size: 58px;
   fill: #ebdd60;
   font-weight: bold;
   cursor: pointer;
