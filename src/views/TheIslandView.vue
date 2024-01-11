@@ -46,6 +46,12 @@ export default {
       return PAGE_ID;
     },
   },
+  watch: {
+    "$route.params.id"(newId) {
+      this.$options.id = parseInt(newId);
+      this.loadIsland();
+    },
+  },
   created() {
     this.setMetaInfo({
       title: "Карта острова",
@@ -53,7 +59,7 @@ export default {
       keywords: "Хроники хаоса, Эра доминиона, карта острова, карта",
     });
 
-    this.$options.id = this.$route.params.id;
+    this.$options.id = parseInt(this.$route.params.id);
   },
   mounted() {
     if (this.$options.id > 0) {

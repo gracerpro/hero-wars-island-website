@@ -75,7 +75,7 @@ const MIN_SCALE = 0.3;
 
 export default {
   client: new HeroClient(),
-  userNodesIds: [],
+  userNodesIds: {},
 
   name: "IslandMap",
   props: {
@@ -170,8 +170,11 @@ export default {
     },
     initUserNodes(nodes) {
       let resultNodes = {};
+      const ids = this.$options.userNodesIds[this.island.id]
+        ? this.$options.userNodesIds[this.island.id]
+        : [];
 
-      this.$options.userNodesIds.forEach((id) => {
+      ids.forEach((id) => {
         const node = nodes[id];
         if (node && canSelectNode(node)) {
           resultNodes[id] = node;
@@ -306,8 +309,8 @@ export default {
       if (!state.filter.itemName) {
         state.filter.itemName = "";
       }
-      if (!state.userNodesIds) {
-        state.userNodesIds = [];
+      if (!state.userNodesIds || typeof state.userNodesIds !== "object") {
+        state.userNodesIds = {};
       }
       if (!state.isOnlyImage) {
         state.isOnlyImage = false;
@@ -326,6 +329,10 @@ export default {
       this.$options.userNodesIds = state.userNodesIds;
     },
     saveState() {
+      let userNodesIds = this.$options.userNodesIds;
+
+      userNodesIds[this.island.id] = Object.keys(this.userNodes);
+
       const state = {
         scale: this.scale,
         translateX: this.translateX,
@@ -333,7 +340,7 @@ export default {
         filter: this.filter,
         isOnlyImage: this.isOnlyImage,
         isShowNoModerate: this.isShowNoModerate,
-        userNodesIds: Object.keys(this.userNodes),
+        userNodesIds,
       };
       localStorage.setItem(this.componentId, JSON.stringify(state));
     },
