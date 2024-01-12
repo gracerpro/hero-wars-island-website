@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <loading-map v-if="loadingIsland" />
+    <island-map-loading v-if="loadingIsland" />
     <div v-else-if="errorMessage" class="alert alert-danger">
       {{ errorMessage }}
     </div>
@@ -21,8 +21,8 @@
 </template>
 <script>
 import HeroClient from "@/api/HeroClient";
-import IslandMap from "./home/IslandMap.vue";
-import LoadingMap from "./home/LoadingMap.vue";
+import IslandMap from "./island/IslandMap.vue";
+import IslandMapLoading from "./island/IslandMapLoading.vue";
 import HttpError from "@/exceptions/HttpError";
 
 const PAGE_ID = "islandPage";
@@ -32,7 +32,7 @@ export default {
   id: null,
 
   name: "TheIslandView",
-  components: { IslandMap, LoadingMap },
+  components: { IslandMap, IslandMapLoading },
   inject: ["setMetaInfo"],
   data() {
     return {

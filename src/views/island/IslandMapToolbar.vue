@@ -123,7 +123,7 @@ const EVENT_CHANGE_ONLY_IMAGE = "update:is-only-image";
 const EVENT_CHANGE_IS_SHOW_NO_MODERATE = "update:is-show-no-moderate";
 
 export default {
-  name: "MapToolbar",
+  name: "IslandMapToolbar",
   props: {
     isOnlyImage: { type: Boolean, required: true },
     isShowNoModerate: { type: Boolean, required: true },

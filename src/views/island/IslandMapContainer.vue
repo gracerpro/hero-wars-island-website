@@ -139,7 +139,7 @@ export default {
     preventY: null,
   },
 
-  name: "MapContainer",
+  name: "IslandMapContainer",
   components: { ToastMessage },
   emits: [
     EVENT_CHANGE_TRANSLATE,

@@ -29,7 +29,7 @@
 </template>
 <script>
 export default {
-  name: "MapTable",
+  name: "IslandMapTable",
   props: {
     items: { type: Array, required: true },
   },

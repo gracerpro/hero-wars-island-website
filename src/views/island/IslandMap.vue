@@ -1,11 +1,11 @@
 <template>
   <div>
-    <loading-map v-if="loading" />
+    <island-map-loading v-if="loading" />
     <div v-else-if="errorMessage" class="alert alert-danger">
       {{ errorMessage }}
     </div>
     <div v-else>
-      <map-toolbar
+      <island-map-toolbar
         :is-only-image="isOnlyImage"
         :is-show-no-moderate="isShowNoModerate"
         @update:is-only-image="onChangeOnlyImage"
@@ -15,7 +15,7 @@
         @change-scale="onChangeScale"
         @change-translate="onChangeTranslate"
       />
-      <map-container
+      <island-map-container
         :scale="scale"
         :translate-x="translateX"
         :translate-y="translateY"
@@ -31,12 +31,12 @@
       />
       <div class="row mt-3">
         <div class="col-lg-6">
-          <map-filter
+          <island-map-filter
             v-model:item-name="filter.itemName"
             v-model:type-id="filter.typeId"
             :min-chars-count="minCharsCount"
           />
-          <map-table :items="visibleItems" />
+          <island-map-table :items="visibleItems" />
         </div>
         <div class="col-lg-6">
           <div class="mb-2">
@@ -59,7 +59,7 @@
             </button>
           </div>
           <div class="form-text fw-normal">&nbsp;</div>
-          <map-table :items="userItems" />
+          <island-map-table :items="userItems" />
         </div>
       </div>
     </div>
@@ -67,11 +67,11 @@
 </template>
 <script>
 import HeroClient from "@/api/HeroClient";
-import LoadingMap from "./LoadingMap.vue";
-import MapToolbar from "./MapToolbar.vue";
-import MapContainer from "./MapContainer.vue";
-import MapFilter from "./MapFilter.vue";
-import MapTable from "./MapTable.vue";
+import IslandMapLoading from "./IslandMapLoading.vue";
+import IslandMapToolbar from "./IslandMapToolbar.vue";
+import IslandMapContainer from "./IslandMapContainer.vue";
+import IslandMapFilter from "./IslandMapFilter.vue";
+import IslandMapTable from "./IslandMapTable.vue";
 import { canSelectNode } from "./map";
 
 const MAX_SCALE = 3;
@@ -86,7 +86,13 @@ export default {
     island: { type: Object, required: true },
     parentPageId: { type: String, required: true },
   },
-  components: { LoadingMap, MapToolbar, MapContainer, MapFilter, MapTable },
+  components: {
+    IslandMapLoading,
+    IslandMapToolbar,
+    IslandMapContainer,
+    IslandMapFilter,
+    IslandMapTable,
+  },
   data: function () {
     return {
       loaded: false,

@@ -27,7 +27,7 @@
 </template>
 <script>
 export default {
-  name: "LoadingMap",
+  name: "IslandMapLoading",
 };
 </script>
 <style scoped>

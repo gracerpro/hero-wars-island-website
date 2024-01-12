@@ -31,7 +31,7 @@ const EVENT_UPDATE_ITEM_NAME = "update:item-name";
 const EVENT_UPDATE_TYPE = "update:type-id";
 
 export default {
-  name: "MapFilter",
+  name: "IslandMapFilter",
   components: { TextInput, ClearSelect },
   props: {
     itemName: { type: String, required: true },
