@@ -1,0 +1,4 @@
+User-agent: *
+Host: hero-wars.vyacheslaff.ru
+
+sitemap: http://hero-wars.vyacheslaff.ru/sitemap.xml
