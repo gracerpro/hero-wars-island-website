@@ -13,21 +13,18 @@
     </div>
     <div class="col-md-6">
       <label :for="formId + '__typeId'" class="form-label">Тип</label>
-      <select
-        :id="formId + '__typeId'"
-        @change="onChangeType"
-        class="form-select"
-      >
-        <option value=""></option>
-        <option v-for="(name, typeId) in types" :key="typeId" :value="typeId">
-          {{ name }}
-        </option>
-      </select>
+      <clear-select
+        :value="typeId"
+        :input-id="formId + '__typeId'"
+        :select-values="types"
+        @update:value="onChangeType"
+      />
     </div>
   </div>
 </template>
 <script>
 import TextInput from "@/components/TextInput.vue";
+import ClearSelect from "@/components/ClearSelect.vue";
 import { getLabelsByTypes } from "@/api/item";
 
 const EVENT_UPDATE_ITEM_NAME = "update:item-name";
@@ -35,7 +32,7 @@ const EVENT_UPDATE_TYPE = "update:type-id";
 
 export default {
   name: "MapFilter",
-  components: { TextInput },
+  components: { TextInput, ClearSelect },
   props: {
     itemName: { type: String, required: true },
     typeId: { type: [Number, null], required: true },
@@ -54,11 +51,8 @@ export default {
     onUpdateName(name) {
       this.$emit(EVENT_UPDATE_ITEM_NAME, name.trim());
     },
-    onChangeType(event) {
-      this.$emit(
-        EVENT_UPDATE_TYPE,
-        event.target.value === "" ? null : parseInt(event.target.value)
-      );
+    onChangeType(typeId) {
+      this.$emit(EVENT_UPDATE_TYPE, typeId);
     },
   },
 };
