@@ -2,7 +2,7 @@
   <nav class="navbar navbar-expand-lg bg-body-tertiary">
     <div class="container">
       <div class="navbar-nav">
-        <router-link to="/" class="nav-link">Гланая</router-link>
+        <router-link to="/" class="nav-link">Главная</router-link>
         <router-link
           v-if="actualIsland"
           :to="{ name: 'island', params: { id: actualIsland.id } }"
