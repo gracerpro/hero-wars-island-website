@@ -1,4 +1,4 @@
-import { TYPE_START } from "@/api/HeroClient";
+import { TYPE_START } from "@/api/node";
 
 export const TRANSLATE_X = 6;
 export const TRANSLATE_Y = 6;

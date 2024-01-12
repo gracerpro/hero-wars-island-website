@@ -110,7 +110,7 @@ import {
   STATUS_ACCEPTED_SUCCESS,
   STATUS_NOT_SURE,
   getStatusName,
-} from "@/api/HeroClient";
+} from "@/api/node";
 import { shallowRef } from "vue";
 import {
   TRANSLATE_X,

@@ -33,6 +33,7 @@
         <div class="col-lg-6">
           <map-filter
             v-model:item-name="filter.itemName"
+            v-model:type-id="filter.typeId"
             :min-chars-count="minCharsCount"
           />
           <map-table :items="visibleItems" />
@@ -105,6 +106,7 @@ export default {
 
       filter: {
         itemName: "",
+        typeId: null,
       },
     };
   },
@@ -119,15 +121,20 @@ export default {
       return this.parentPageId + "__map";
     },
     visibleItems() {
+      let items = this.items;
+
       if (this.filter.itemName.length >= this.minCharsCount) {
-        return this.items.filter((item) =>
+        items = items.filter((item) =>
           item.item.name
             .toLowerCase()
             .includes(this.filter.itemName.toLowerCase())
         );
       }
+      if (this.filter.typeId > 0) {
+        items = items.filter((item) => item.item.typeId === this.filter.typeId);
+      }
 
-      return this.items;
+      return items;
     },
     userItems() {
       return this.items.filter((item) => {
@@ -312,6 +319,9 @@ export default {
       if (!state.filter.itemName) {
         state.filter.itemName = "";
       }
+      if (!state.filter.typeId) {
+        state.filter.typeId = null;
+      }
       if (!state.userNodesIds || typeof state.userNodesIds !== "object") {
         state.userNodesIds = {};
       }
@@ -326,6 +336,7 @@ export default {
       this.translateX = state.translateX;
       this.translateY = state.translateY;
       this.filter.itemName = state.filter.itemName;
+      this.filter.typeId = state.filter.typeId;
       this.isOnlyImage = state.isOnlyImage;
       this.isShowNoModerate = state.isShowNoModerate;
 

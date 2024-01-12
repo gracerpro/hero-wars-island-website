@@ -81,7 +81,8 @@
   </form>
 </template>
 <script>
-import HeroClient, { STATUS_CREATED, getStatusName } from "@/api/HeroClient";
+import HeroClient from "@/api/HeroClient";
+import { STATUS_CREATED, getStatusName } from "@/api/node";
 import UserError from "@/exceptions/UserError";
 
 const EVENT_SUCCESS_SAVE = "success-save";
