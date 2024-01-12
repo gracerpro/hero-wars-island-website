@@ -11,6 +11,7 @@
         >
         <router-link to="/contact" class="nav-link">Контакты</router-link>
         <router-link to="/about" class="nav-link">О проекте</router-link>
+        <router-link to="/help" class="nav-link">Помощь</router-link>
       </div>
     </div>
   </nav>

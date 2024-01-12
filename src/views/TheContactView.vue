@@ -7,6 +7,11 @@
       следующие поля на форме для связи с нами. Спасибо!
     </p>
 
+    <p>
+      Если что то не работает то, возможно, волшебное обновление страницы
+      поможет, Ctrl+F5.
+    </p>
+
     <div class="row">
       <div class="col-lg-8 offset-lg-2 border border-primary rounded-3">
         <form @submit.prevent="onSubmit">
