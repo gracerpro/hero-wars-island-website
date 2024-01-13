@@ -34,6 +34,20 @@ const routes = [
     component: () =>
       import(/* webpackChunkName: "help" */ "../views/TheHelpView.vue"),
   },
+  {
+    path: "/404",
+    name: "404",
+    component: () =>
+      import(
+        /* webpackChunkName: "404" */ "../views/status-pages/NotFoundPage.vue"
+      ),
+  },
+  {
+    path: "/:catchAll(.*)",
+    redirect: (to) => {
+      return { path: "/404", query: { returnUrl: to.path } };
+    },
+  },
 ];
 
 const router = createRouter({
@@ -44,7 +58,7 @@ const router = createRouter({
 });
 
 router.beforeEach((to, from, next) => {
-  if (to.path.length > 1 && to.path[to.path.length - 1] === "/") {
+  if (to.path.length > 1 && to.path.endsWith("/")) {
     const newTo = { ...to };
     newTo.path = to.path.slice(0, -1);
 
