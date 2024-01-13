@@ -3,9 +3,10 @@
     <div class="col-md-6">
       <label :for="formId + '__itemName'" class="form-label">Ресурс</label>
       <text-input
-        :value="itemName"
+        :modelValue="itemName"
+        :modelModifiers="{ trim: true }"
         :input-id="formId + '__itemName'"
-        @update:value="onUpdateName"
+        @update:model-value="onUpdateName"
       />
       <div class="form-text fw-normal">
         Нужно ввести от {{ minCharsCount }} символов
@@ -14,10 +15,10 @@
     <div class="col-md-6">
       <label :for="formId + '__typeId'" class="form-label">Тип</label>
       <clear-select
-        :value="typeId"
+        :modelValue="typeId"
         :input-id="formId + '__typeId'"
         :select-values="types"
-        @update:value="onChangeType"
+        @update:model-value="onChangeType"
       />
     </div>
   </div>
@@ -49,7 +50,7 @@ export default {
   },
   methods: {
     onUpdateName(name) {
-      this.$emit(EVENT_UPDATE_ITEM_NAME, name.trim());
+      this.$emit(EVENT_UPDATE_ITEM_NAME, name);
     },
     onChangeType(typeId) {
       this.$emit(EVENT_UPDATE_TYPE, typeId);
