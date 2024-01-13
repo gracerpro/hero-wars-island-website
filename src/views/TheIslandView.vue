@@ -1,7 +1,7 @@
 <template>
   <div class="container">
     <island-map-loading v-if="loadingIsland" />
-    <div v-else-if="errorMessage" class="alert alert-danger">
+    <div v-else-if="errorMessage" class="alert alert-danger mt-3">
       {{ errorMessage }}
     </div>
     <div v-else-if="!island" class="position-relative">
@@ -36,7 +36,7 @@ export default {
   inject: ["setMetaInfo"],
   data() {
     return {
-      loadingIsland: true,
+      loadingIsland: false,
       island: null,
       errorMessage: "",
     };
@@ -48,8 +48,9 @@ export default {
   },
   watch: {
     "$route.params.id"(newId) {
-      this.$options.id = parseInt(newId);
-      this.loadIsland();
+      if (this.queryId(newId)) {
+        this.loadIsland();
+      }
     },
   },
   created() {
@@ -59,14 +60,27 @@ export default {
       keywords: "Хроники хаоса, Эра доминиона, карта острова, карта",
     });
 
-    this.$options.id = parseInt(this.$route.params.id);
-  },
-  mounted() {
-    if (this.$options.id > 0) {
+    if (this.queryId(this.$route.params.id)) {
       this.loadIsland();
     }
   },
   methods: {
+    /**
+     * @param {String} sourseId
+     * @returns {Number|null}
+     */
+    queryId(sourseId) {
+      let intId = parseInt(sourseId);
+
+      if (intId != sourseId) {
+        this.errorMessage = "Некорректный ID острова.";
+        intId = null;
+      } else {
+        this.$options.id = intId;
+      }
+
+      return intId;
+    },
     loadIsland() {
       this.island = null;
       this.loadingIsland = true;

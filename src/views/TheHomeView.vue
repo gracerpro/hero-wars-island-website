@@ -14,6 +14,9 @@
       <span class="placeholder col-4"></span><br />
       <span class="placeholder col-4"></span>
     </div>
+    <div v-else-if="errorMessage" class="alert alert-danger">
+      {{ errorMessage }}
+    </div>
     <div v-else-if="!islands.length" class="alert alert-warning">
       Не найдено доступных.
     </div>
@@ -51,6 +54,7 @@ export default {
       islands: [],
       islandsCount: 0,
       news: [],
+      errorMessage: "",
     };
   },
   created() {
@@ -101,7 +105,7 @@ export default {
         })
         .catch(() => {
           this.errorMessage =
-            "Не удалось загрузить острова. Разработчики видят проблему и в скором времени починят.";
+            "Не удалось загрузить. Разработчики видят проблему и в скором времени починят.";
         })
         .finally(() => (this.loadingIslands = false));
     },
