@@ -52,7 +52,6 @@ export default {
     return {
       loadingIslands: true,
       islands: [],
-      islandsCount: 0,
       news: [],
       errorMessage: "",
     };
@@ -101,7 +100,6 @@ export default {
         .getIslandList(5)
         .then((list) => {
           this.islands = list.items;
-          this.islandsCount = list.totalCount;
         })
         .catch(() => {
           this.errorMessage =
