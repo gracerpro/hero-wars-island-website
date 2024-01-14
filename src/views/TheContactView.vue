@@ -16,19 +16,13 @@
     </div>
   </div>
 </template>
-<script>
+<script setup>
+import { setMetaInfo } from "@/services/page-meta";
 import ContactForm from "./ContactForm.vue";
 
-export default {
-  name: "TheContactView",
-  inject: ["setMetaInfo"],
-  components: { ContactForm },
-  created() {
-    this.setMetaInfo({
-      title: "Контакты",
-      description: "Оставить обратную связь, связаться с администратором",
-      keywords: "контакты, связаться с автором, связь, обратная связь",
-    });
-  },
-};
+setMetaInfo({
+  title: "Контакты",
+  description: "Оставить обратную связь, связаться с администратором",
+  keywords: "контакты, связаться с автором, связь, обратная связь",
+});
 </script>

@@ -10,8 +10,4 @@
     </ul>
   </div>
 </template>
-<script>
-export default {
-  name: "TheHelpView",
-};
-</script>
+<script setup></script>

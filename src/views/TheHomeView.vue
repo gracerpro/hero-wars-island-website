@@ -9,7 +9,7 @@
     </p>
 
     <h3>Острова</h3>
-    <div v-if="loadingIslands">
+    <div v-if="islandsLoading">
       <span class="placeholder col-4"></span><br />
       <span class="placeholder col-4"></span><br />
       <span class="placeholder col-4"></span>
@@ -42,38 +42,46 @@
 <script>
 import HeroClient from "@/api/HeroClient";
 import { fromCurrentDate } from "@/helpers/formatter";
+import { setMetaInfo } from "@/services/page-meta";
+import { ref } from "vue";
 
 export default {
-  client: new HeroClient(),
+  setup() {
+    const client = new HeroClient();
 
-  name: "TheHomeView",
-  inject: ["setMetaInfo"],
-  data() {
-    return {
-      loadingIslands: true,
-      islands: [],
-      news: [],
-      errorMessage: "",
-    };
-  },
-  created() {
-    this.setMetaInfo({
+    const islands = ref([]);
+    const islandsLoading = ref(false);
+    const news = ref([]);
+    const errorMessage = ref("");
+
+    setMetaInfo({
       title: "Хроники хаоса Эра доминиона карта острова",
       description:
         "В игре Хроники Хаоса на карте острова открыты все узлы, соберем все призы вместе!",
       keywords: "Хроники хаоса, Эра доминиона, карта острова, карта, событие",
     });
-  },
-  mounted() {
-    this.loadIslands();
-  },
-  methods: {
-    isActual(island) {
+
+    const loadIslands = () => {
+      islandsLoading.value = true;
+      client
+        .getIslandList(5)
+        .then((list) => {
+          islands.value = list.items;
+        })
+        .catch(() => {
+          errorMessage.value =
+            "Не удалось загрузить. Разработчики видят проблему и в скором времени починят.";
+        })
+        .finally(() => (islandsLoading.value = false));
+    };
+
+    const isActual = (island) => {
       const now = new Date();
 
       return island.eventEndAt > now;
-    },
-    getIslandHint(island) {
+    };
+
+    const getIslandHint = (island) => {
       const now = new Date();
       let result = "";
 
@@ -93,20 +101,19 @@ export default {
       }
 
       return result;
-    },
-    loadIslands() {
-      this.loadingIslands = true;
-      this.$options.client
-        .getIslandList(5)
-        .then((list) => {
-          this.islands = list.items;
-        })
-        .catch(() => {
-          this.errorMessage =
-            "Не удалось загрузить. Разработчики видят проблему и в скором времени починят.";
-        })
-        .finally(() => (this.loadingIslands = false));
-    },
+    };
+
+    loadIslands();
+
+    return {
+      errorMessage,
+      islands,
+      islandsLoading,
+      news,
+      //
+      isActual,
+      getIslandHint,
+    };
   },
 };
 </script>
