@@ -80,6 +80,10 @@
     </div>
   </form>
 </template>
+<script>
+const EVENT_SUCCESS_SAVE = "success-save";
+const EVENT_SAVING = "saving";
+</script>
 <script setup>
 import HeroClient from "@/api/HeroClient";
 import { STATUS_CREATED, getStatusName } from "@/api/node";
@@ -197,9 +201,3 @@ const getData = () => {
   margin-right: 5px;
 }
 </style>
-<script>
-const EVENT_SUCCESS_SAVE = "success-save";
-const EVENT_SAVING = "saving";
-
-export default {};
-</script>

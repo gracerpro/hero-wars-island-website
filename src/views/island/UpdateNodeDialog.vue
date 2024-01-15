@@ -35,5 +35,9 @@ const formId = computed(() => dialogId.value + "__form");
 const onSaving = (value) => (saving.value = value);
 const onSuccessSave = (result) => dialog.value.confirm(result);
 
-export const show = () => dialog.value.show();
+const show = () => dialog.value.show();
+
+defineExpose({
+  show,
+});
 </script>

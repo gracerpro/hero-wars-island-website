@@ -41,7 +41,11 @@ const dialogId = "node-help-dialog";
 
 const dialog = ref(null);
 
-export const show = () => dialog.value.show();
+const show = () => dialog.value.show();
+
+defineExpose({
+  show,
+});
 </script>
 <style scoped>
 .node-box {

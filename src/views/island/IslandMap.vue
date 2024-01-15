@@ -73,14 +73,7 @@ import IslandMapContainer from "./IslandMapContainer.vue";
 import IslandMapFilter from "./IslandMapFilter.vue";
 import IslandMapTable from "./IslandMapTable.vue";
 import { canSelectNode } from "./map";
-import {
-  onMounted,
-  onUnmounted,
-  ref,
-  reactive,
-  computed,
-  shallowReactive,
-} from "vue";
+import { onMounted, onUnmounted, ref, computed, shallowReactive } from "vue";
 
 const MAX_SCALE = 3;
 const MIN_SCALE = 0.3;
@@ -98,7 +91,7 @@ const calculatingItems = ref(false);
 const errorMessage = ref("");
 const nodes = ref([]);
 const items = ref([]);
-let userNodes = reactive({});
+const userNodes = ref({});
 const scale = ref(1);
 const translateX = ref(0);
 const translateY = ref(0);
@@ -113,15 +106,15 @@ const minCharsCount = 3;
 const componentId = props.parentPageId + "__map";
 const loading = computed(() => loadingNodes.value || calculatingItems.value);
 const visibleItems = computed(() => {
-  let resultItems = items;
+  let resultItems = items.value;
 
   if (filter.itemName.length >= minCharsCount) {
-    resultItems.value = resultItems.value.filter((item) =>
+    resultItems = resultItems.filter((item) =>
       item.item.name.toLowerCase().includes(filter.itemName.toLowerCase()),
     );
   }
   if (filter.typeId > 0) {
-    resultItems.value = resultItems.value.filter(
+    resultItems = resultItems.filter(
       (item) => item.item.typeId === filter.typeId,
     );
   }
@@ -130,25 +123,25 @@ const visibleItems = computed(() => {
 });
 const userItems = computed(() => {
   return items.value.filter((item) => {
-    return userNodes[item.node.id] !== undefined;
+    return userNodes.value[item.node.id] !== undefined;
   });
 });
-const userNodesCount = computed(() => Object.keys(userNodes).length);
+const userNodesCount = computed(() => Object.keys(userNodes.value).length);
 
 loadState();
 
 onMounted(() => {
-  loadNodes().then((nodes) => {
-    nodes.value = nodes;
-    items.value = calculateItems(nodes);
-    userNodes = reactive(initUserNodes(nodes));
+  loadNodes().then((responseNodes) => {
+    nodes.value = responseNodes;
+    items.value = calculateItems(responseNodes);
+    userNodes.value = initUserNodes(responseNodes);
   });
 });
 onUnmounted(() => {
   saveState();
 });
 
-const loadNodes = async () => {
+async function loadNodes() {
   let nodes = {};
 
   loadingNodes.value = true;
@@ -164,8 +157,11 @@ const loadNodes = async () => {
   }
 
   return nodes;
-};
-const initUserNodes = (nodes) => {
+}
+/**
+ * @param {Object} nodes
+ */
+function initUserNodes(nodes) {
   let resultNodes = {};
   const ids = userNodesIds[props.island.id]
     ? userNodesIds[props.island.id]
@@ -179,11 +175,11 @@ const initUserNodes = (nodes) => {
   });
 
   return resultNodes;
-};
+}
 /**
  * @param {Object} nodes
  */
-const calculateItems = (nodes) => {
+function calculateItems(nodes) {
   calculatingItems.value = true;
 
   let items = [];
@@ -211,7 +207,7 @@ const calculateItems = (nodes) => {
   calculatingItems.value = false;
 
   return items;
-};
+}
 /**
  * @param {Boolean} inc
  */
@@ -244,22 +240,22 @@ const onChangeIsShowNoModerate = () => {
   isShowNoModerate.value = !isShowNoModerate.value;
 };
 const onChangeNode = (node) => {
-  if (!nodes[node.id]) {
+  if (!nodes.value[node.id]) {
     throw new Error("Узел не найден. Обратитесь к администраторам.");
   }
   nodes.value[node.id] = node;
 };
 const onSelectNode = (id, isRemove) => {
   if (isRemove) {
-    delete userNodes[id];
+    delete userNodes.value[id];
   } else {
     if (!nodes.value[id]) {
       throw new Error("Узел не найден. Обратитесь к администраторам.");
     }
-    userNodes[id] = nodes.value[id];
+    userNodes.value[id] = nodes.value[id];
   }
 };
-const onResetUserNodes = () => (userNodes = reactive({}));
+const onResetUserNodes = () => (userNodes.value = {});
 
 function loadState() {
   let state;
@@ -309,7 +305,7 @@ function loadState() {
 function saveState() {
   let savedUserNodesIds = userNodesIds;
 
-  savedUserNodesIds[props.island.id] = Object.keys(userNodes);
+  savedUserNodesIds[props.island.id] = Object.keys(userNodes.value);
 
   const state = {
     scale: scale.value,

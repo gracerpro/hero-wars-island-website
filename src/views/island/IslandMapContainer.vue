@@ -53,6 +53,7 @@
             :width="item.iconWidth"
             :height="item.iconHeight"
             class="item-image"
+            @click="onNodeClick(item.node)"
           >
             <title>
               {{ item.item.name + getQuantity(item) }}, изображение не привязано
@@ -94,11 +95,15 @@
       :is="nodeDialog.component"
       :node="nodeDialog.node"
       ref="editNodeDialog"
-      @hook:mounted="onMountedNodeDialog"
+      @vue:mounted="onMountedNodeDialog"
     />
     <toast-message ref="toast" element-id="mapContainerToast" />
   </div>
 </template>
+<script>
+const EVENT_CHANGE_NODE = "change-node";
+const EVENT_SELECT_NODE = "select-node";
+</script>
 <script setup>
 import UpdateNodeDialog from "./UpdateNodeDialog.vue";
 import ToastMessage, { TYPE_DANGER } from "@/components/ToastMessage.vue";
@@ -111,7 +116,7 @@ import {
   STATUS_NOT_SURE,
   getStatusName,
 } from "@/api/node";
-import { shallowRef, ref, shallowReactive, computed } from "vue";
+import { ref, shallowReactive, computed } from "vue";
 import {
   TRANSLATE_X,
   TRANSLATE_Y,
@@ -182,8 +187,9 @@ const warningNodes = computed(() => {
 
   let items = [];
 
-  for (let id in nodes) {
-    const node = nodes[id];
+  for (let id in nodes.value) {
+    const node = nodes.value[id];
+
     if (
       node.typeId !== TYPE_START &&
       (!node?.items.length || node.statusId !== STATUS_ACCEPTED_SUCCESS)
@@ -205,7 +211,7 @@ const iconsItems = computed(() => {
   let indexesByNode = {};
 
   props.items.forEach((item) => {
-    const node = nodes[item.node.id];
+    const node = nodes.value[item.node.id];
     const count = countsByNode[node.id];
     const isShowText = item.item.quantity > 1 && !props.isOnlyImage;
 
@@ -298,7 +304,7 @@ const getActivePoints = () => {
 /**
  * @param {Object} node
  */
-const drawNode = (node) => {
+function drawNode(node) {
   const classes = {
     [TYPE_START]: "node-start",
     [TYPE_TOWN]: "node-town",
@@ -314,17 +320,17 @@ const drawNode = (node) => {
     points: getPoints(data.coordinates),
     class: classes[node.typeId] ? classes[node.typeId] : "",
   };
-};
+}
 /**
  * @param {Array} coordinates
  */
-const getPoints = (coordinates) => {
+function getPoints(coordinates) {
   return coordinates.map((item) => item.x + "," + item.y).join(" ");
-};
+}
 /**
  * @param {Object} node
  */
-const getCoordinates = (node) => {
+function getCoordinates(node) {
   const side = SIDE;
   const h = HEIGHT;
   const x = node.mx * (1.5 * side);
@@ -343,7 +349,7 @@ const getCoordinates = (node) => {
     y,
     coordinates,
   };
-};
+}
 const nodeMouseEnter = (node) => {
   activeNode = node;
 };
@@ -355,7 +361,7 @@ const onNodeClick = (node) => {
       return;
     }
   } else {
-    const message = canSelectNextNode(nodes, props.userNodes, node);
+    const message = canSelectNextNode(nodes.value, props.userNodes, node);
     if (message) {
       toast.value.show(message, TYPE_DANGER);
       return;
@@ -425,7 +431,7 @@ const onEditNodeClick = (node) => {
   if (!updating.value) {
     updating.value = true;
     nodeDialog.node = node;
-    nodeDialog.component = shallowRef(UpdateNodeDialog);
+    nodeDialog.component = UpdateNodeDialog;
   }
 };
 const onMountedNodeDialog = () => {
@@ -525,9 +531,3 @@ const getQuantity = (item) => {
   stroke-width: 3;
 }
 </style>
-<script>
-const EVENT_CHANGE_NODE = "change-node";
-const EVENT_SELECT_NODE = "select-node";
-
-export default {};
-</script>

@@ -17,12 +17,16 @@
       <clear-select
         :modelValue="typeId"
         :input-id="formId + '__typeId'"
-        :select-values="getLabelsByTypes"
+        :select-values="getLabelsByTypes()"
         @update:model-value="onChangeType"
       />
     </div>
   </div>
 </template>
+<script>
+const EVENT_UPDATE_ITEM_NAME = "update:item-name";
+const EVENT_UPDATE_TYPE = "update:type-id";
+</script>
 <script setup>
 import TextInput from "@/components/TextInput.vue";
 import ClearSelect from "@/components/ClearSelect.vue";
@@ -43,10 +47,4 @@ const onUpdateName = (name) => {
 const onChangeType = (typeId) => {
   emit(EVENT_UPDATE_TYPE, typeId);
 };
-</script>
-<script>
-const EVENT_UPDATE_ITEM_NAME = "update:item-name";
-const EVENT_UPDATE_TYPE = "update:type-id";
-
-export default {};
 </script>

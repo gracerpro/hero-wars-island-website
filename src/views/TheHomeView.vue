@@ -32,88 +32,63 @@
         >
       </li>
     </ol>
-
-    <div v-if="news.length">
-      <h3>Новости</h3>
-      <p>...</p>
-    </div>
   </div>
 </template>
-<script>
+<script setup>
 import HeroClient from "@/api/HeroClient";
 import { fromCurrentDate } from "@/helpers/formatter";
 import { setMetaInfo } from "@/services/page-meta";
 import { ref } from "vue";
 
-export default {
-  setup() {
-    const client = new HeroClient();
+const client = new HeroClient();
+const now = new Date();
 
-    const islands = ref([]);
-    const islandsLoading = ref(false);
-    const news = ref([]);
-    const errorMessage = ref("");
+const islands = ref([]);
+const islandsLoading = ref(false);
+const errorMessage = ref("");
 
-    setMetaInfo({
-      title: "Хроники хаоса Эра доминиона карта острова",
-      description:
-        "В игре Хроники Хаоса на карте острова открыты все узлы, соберем все призы вместе!",
-      keywords: "Хроники хаоса, Эра доминиона, карта острова, карта, событие",
-    });
+setMetaInfo({
+  title: "Хроники хаоса Эра доминиона карта острова",
+  description:
+    "В игре Хроники Хаоса на карте острова открыты все узлы, соберем все призы вместе!",
+  keywords: "Хроники хаоса, Эра доминиона, карта острова, карта, событие",
+});
 
-    const loadIslands = () => {
-      islandsLoading.value = true;
-      client
-        .getIslandList(5)
-        .then((list) => {
-          islands.value = list.items;
-        })
-        .catch(() => {
-          errorMessage.value =
-            "Не удалось загрузить. Разработчики видят проблему и в скором времени починят.";
-        })
-        .finally(() => (islandsLoading.value = false));
-    };
+loadIslands();
 
-    const isActual = (island) => {
-      const now = new Date();
+function loadIslands() {
+  islandsLoading.value = true;
+  client
+    .getIslandList(5)
+    .then((list) => {
+      islands.value = list.items;
+    })
+    .catch(() => {
+      errorMessage.value =
+        "Не удалось загрузить. Разработчики видят проблему и в скором времени починят.";
+    })
+    .finally(() => (islandsLoading.value = false));
+}
 
-      return island.eventEndAt > now;
-    };
+function isActual(island) {
+  return island.eventEndAt > now;
+}
 
-    const getIslandHint = (island) => {
-      const now = new Date();
-      let result = "";
+function getIslandHint(island) {
+  let result = "";
 
-      if (island.eventEndAt < now) {
-        result =
-          "от " +
-          fromCurrentDate(island.eventStartAt) +
-          " до " +
-          fromCurrentDate(island.eventEndAt);
-      } else {
-        const days = Math.ceil((island.eventEndAt - now) / 1000 / 60 / 60 / 24);
-        result =
-          "до " +
-          fromCurrentDate(island.eventEndAt) +
-          ", осталось дней " +
-          days;
-      }
+  if (island.eventEndAt < now) {
+    result =
+      "от " +
+      fromCurrentDate(island.eventStartAt) +
+      " до " +
+      fromCurrentDate(island.eventEndAt);
+  } else {
+    const days = Math.ceil((island.eventEndAt - now) / 1000 / 60 / 60 / 24);
+    result =
+      "до " + fromCurrentDate(island.eventEndAt) + ", осталось дней " + days;
+  }
 
-      return result;
-    };
-
-    loadIslands();
-
-    return {
-      errorMessage,
-      islands,
-      islandsLoading,
-      news,
-      //
-      isActual,
-      getIslandHint,
-    };
-  },
-};
+  return result;
+}
 </script>

@@ -102,13 +102,19 @@
     <component
       :is="helpDialogComponent"
       ref="helpDialog"
-      @hook:mounted="onMountedHelpDialog"
+      @vue:mounted="onMountedHelpDialog"
     />
   </div>
 </template>
+<script>
+const EVENT_RESET_TRANSLATE = "reset-translate";
+const EVENT_RESET_SCALE = "reset-scale";
+const EVENT_CHANGE_ONLY_IMAGE = "update:is-only-image";
+const EVENT_CHANGE_IS_SHOW_NO_MODERATE = "update:is-show-no-moderate";
+</script>
 <script setup>
 import HelpDialog from "./HelpDialog.vue";
-import { ref, shallowRef } from "vue";
+import { ref } from "vue";
 import {
   TRANSLATE_X,
   TRANSLATE_Y,
@@ -132,7 +138,7 @@ const emit = defineEmits([
 ]);
 
 const helpDialog = ref(null);
-let helpDialogComponent = shallowRef(null);
+const helpDialogComponent = ref(null);
 
 const onResetTranslate = () => {
   emit(EVENT_RESET_TRANSLATE);
@@ -157,25 +163,17 @@ const onChangeScale = (inc) => {
   emit(EVENT_CHANGE_SCALE, 2 * (inc ? DELTA_SCALE : -DELTA_SCALE));
 };
 const onHelpClick = () => {
-  helpDialogComponent = shallowRef(HelpDialog);
+  helpDialogComponent.value = HelpDialog;
 };
 const onChangeOnlyImage = () => {
   emit(EVENT_CHANGE_ONLY_IMAGE);
 };
 const onChangeIsShowNoModerate = () => {
-  this.$emit(EVENT_CHANGE_IS_SHOW_NO_MODERATE);
+  emit(EVENT_CHANGE_IS_SHOW_NO_MODERATE);
 };
 const onMountedHelpDialog = () => {
   helpDialog.value.show().finally(() => {
-    helpDialogComponent = shallowRef(null);
+    helpDialogComponent.value = null;
   });
 };
-</script>
-<script>
-const EVENT_RESET_TRANSLATE = "reset-translate";
-const EVENT_RESET_SCALE = "reset-scale";
-const EVENT_CHANGE_ONLY_IMAGE = "update:is-only-image";
-const EVENT_CHANGE_IS_SHOW_NO_MODERATE = "update:is-show-no-moderate";
-
-export default {};
 </script>

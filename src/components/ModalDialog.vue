@@ -1,6 +1,6 @@
 <template>
   <div class="modal fade" tabindex="-1" :id="elementId" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered" :class="[sizeClass]">
+    <div class="modal-dialog modal-dialog-centered" :class="sizeClass">
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title">{{ header }}</h5>
@@ -46,89 +46,83 @@
   </div>
 </template>
 
-<script>
+<script setup>
 import { Modal } from "bootstrap";
+import { computed } from "vue";
 
-export default {
-  resolve: null,
-  reject: null,
-  modal: null,
-  result: null,
+let moduleResolve = null;
+let modal = null;
+let dialogResult = null;
 
-  name: "ModalDialog",
-  props: {
-    elementId: { type: String, required: true },
-    saving: { type: Boolean, default: false },
-    formId: { type: String, default: "" },
-    header: { type: String, default: "" },
-    size: { type: String, default: "lg" },
-    isShowSubmit: { type: Boolean, default: true },
-    initResult: {
-      type: [Object, Number, String, null, undefined],
-      default: null,
-    },
+const props = defineProps({
+  elementId: { type: String, required: true },
+  saving: { type: Boolean, default: false },
+  formId: { type: String, default: "" },
+  header: { type: String, default: "" },
+  size: { type: String, default: "lg" },
+  isShowSubmit: { type: Boolean, default: true },
+  initResult: {
+    type: [Object, Number, String, null, undefined],
+    default: null,
   },
-  computed: {
-    sizeClass() {
-      let size = "";
+});
 
-      switch (this.size) {
-        case "sm":
-          size = "modal-sm";
-          break;
-        case "lg":
-          size = "modal-lg";
-          break;
-        case "xl":
-          size = "modal-xl";
-          break;
-      }
+const sizeClass = computed(() => {
+  let size = "";
 
-      return size;
+  switch (props.size) {
+    case "sm":
+      size = "modal-sm";
+      break;
+    case "lg":
+      size = "modal-lg";
+      break;
+    case "xl":
+      size = "modal-xl";
+      break;
+  }
+
+  return size;
+});
+
+const show = () => {
+  if (modal) {
+    throw new Error("The modal dialog is already open.");
+  }
+
+  let promise = new Promise((resolve) => {
+    moduleResolve = resolve;
+  });
+
+  const modalElement = document.getElementById(props.elementId);
+  modalElement.addEventListener(
+    "hidden.bs.modal",
+    () => {
+      hide();
     },
-  },
-  methods: {
-    show() {
-      if (this.$options.modal) {
-        throw new Error("The modal dialog is already open.");
-      }
+    { once: true },
+  );
 
-      let localResolve;
-      let localReject;
+  dialogResult = props.initResult;
+  modal = new Modal(modalElement, {});
+  modal.show();
 
-      let promise = new Promise((resolve, reject) => {
-        localResolve = resolve;
-        localReject = reject;
-      });
-
-      this.$options.resolve = localResolve;
-      this.$options.reject = localReject;
-
-      const modalElement = document.getElementById(this.elementId);
-      modalElement.addEventListener(
-        "hidden.bs.modal",
-        () => {
-          this.hide();
-        },
-        { once: true },
-      );
-
-      this.$options.result = this.$options.initResult;
-      this.$options.modal = new Modal(modalElement, {});
-      this.$options.modal.show();
-
-      return promise;
-    },
-    confirm(result) {
-      this.$options.result = result;
-      this.$options.modal.hide();
-    },
-    hide() {
-      this.$options.modal.dispose();
-      this.$options.modal = null;
-
-      this.$options.resolve(this.$options.result);
-    },
-  },
+  return promise;
 };
+const confirm = (confirmResult) => {
+  dialogResult = confirmResult;
+  modal.hide();
+};
+const hide = () => {
+  modal.dispose();
+  modal = null;
+
+  moduleResolve(dialogResult);
+};
+
+defineExpose({
+  show,
+  confirm,
+  hide,
+});
 </script>

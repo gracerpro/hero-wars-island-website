@@ -11,6 +11,7 @@
 <script setup>
 import { setMetaInfo } from "@/services/page-meta";
 import { computed } from "vue";
+import { useRoute } from "vue-router";
 
 setMetaInfo({
   title: "Страница не найдена",
@@ -18,5 +19,6 @@ setMetaInfo({
   keywords: "404, страница не найдена",
 });
 
-const returnUrl = computed(() => this.$route.query.returnUrl);
+const route = useRoute();
+const returnUrl = computed(() => route.query.returnUrl);
 </script>

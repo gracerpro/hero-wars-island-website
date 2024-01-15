@@ -19,7 +19,7 @@
     </div>
   </div>
 </template>
-<script>
+<script setup>
 import HeroClient from "@/api/HeroClient";
 import IslandMap from "./island/IslandMap.vue";
 import IslandMapLoading from "./island/IslandMapLoading.vue";
@@ -28,87 +28,74 @@ import { setMetaInfo } from "@/services/page-meta";
 import { ref, watch } from "vue";
 import { useRoute } from "vue-router";
 
-const PAGE_ID = "islandPage";
+const pageId = "islandPage";
+const client = new HeroClient();
+const route = useRoute();
 
-export default {
-  components: { IslandMap, IslandMapLoading },
-  setup() {
-    const client = new HeroClient();
-    const route = useRoute();
+const island = ref(null);
+const islandLoading = ref(false);
+const errorMessage = ref("");
 
-    const islandLoading = ref(false);
-    const island = ref(null);
-    const errorMessage = ref("");
-
-    setMetaInfo({
-      title: "Карта острова",
-      description: "",
-      keywords: "Хроники хаоса, Эра доминиона, карта острова, карта",
-    });
-
-    /**
-     * @param {String} sourseId
-     * @returns {Number|null}
-     */
-    const queryId = (sourseId) => {
-      let intId = parseInt(sourseId);
-
-      if (intId != sourseId) {
-        errorMessage.value = "Некорректный ID острова.";
-        intId = null;
-      }
-
-      return intId;
-    };
-
-    /**
-     * @param {Number} id
-     */
-    const loadIsland = (id) => {
-      island.value = null;
-      islandLoading.value = true;
-      client
-        .getIsland(id)
-        .then((responseIsland) => {
-          island.value = responseIsland;
-          if (responseIsland) {
-            setMetaInfo({
-              title: responseIsland.name + " - Карта острова",
-            });
-          }
-        })
-        .catch((error) => {
-          if (error instanceof HttpError && error.statusCode === 404) {
-            errorMessage.value = "Карта не найдена.";
-          } else {
-            errorMessage.value =
-              "Не удалось загрузить карту. Разработчики видят проблему и в скором времени починят.";
-          }
-        })
-        .finally(() => (islandLoading.value = false));
-    };
-
-    const id = queryId(route.params.id);
+watch(
+  () => route.params.id,
+  (newId) => {
+    const id = queryId(newId);
     if (id) {
       loadIsland(id);
     }
-
-    watch(
-      () => route.params.id,
-      (newId) => {
-        const id = queryId(newId);
-        if (id) {
-          loadIsland(id);
-        }
-      },
-    );
-
-    return {
-      pageId: PAGE_ID,
-      errorMessage,
-      island,
-      islandLoading,
-    };
   },
-};
+);
+
+setMetaInfo({
+  title: "Карта острова",
+  description: "",
+  keywords: "Хроники хаоса, Эра доминиона, карта острова, карта",
+});
+
+const id = queryId(route.params.id);
+if (id) {
+  loadIsland(id);
+}
+
+/**
+ * @param {String} sourseId
+ * @returns {Number|null}
+ */
+function queryId(sourseId) {
+  let intId = parseInt(sourseId);
+
+  if (intId != sourseId) {
+    errorMessage.value = "Некорректный ID острова.";
+    intId = null;
+  }
+
+  return intId;
+}
+
+/**
+ * @param {Number} id
+ */
+function loadIsland(id) {
+  island.value = null;
+  islandLoading.value = true;
+  client
+    .getIsland(id)
+    .then((responseIsland) => {
+      island.value = responseIsland;
+      if (responseIsland) {
+        setMetaInfo({
+          title: responseIsland.name + " - Карта острова",
+        });
+      }
+    })
+    .catch((error) => {
+      if (error instanceof HttpError && error.statusCode === 404) {
+        errorMessage.value = "Карта не найдена.";
+      } else {
+        errorMessage.value =
+          "Не удалось загрузить карту. Разработчики видят проблему и в скором времени починят.";
+      }
+    })
+    .finally(() => (islandLoading.value = false));
+}
 </script>
