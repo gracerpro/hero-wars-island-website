@@ -27,13 +27,10 @@
     </tbody>
   </table>
 </template>
-<script>
-export default {
-  name: "IslandMapTable",
-  props: {
-    items: { type: Array, required: true },
-  },
-};
+<script setup>
+defineProps({
+  items: { type: Array, required: true },
+});
 </script>
 <style scoped>
 .icon {

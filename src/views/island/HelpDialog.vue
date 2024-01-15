@@ -33,29 +33,15 @@
     </ul>
   </modal-dialog>
 </template>
-<script>
+<script setup>
 import ModalDialog from "@/components/ModalDialog.vue";
+import { ref } from "vue";
 
-const EVENT_MOUNTED = "mounted";
+const dialogId = "node-help-dialog";
 
-export default {
-  name: "HelpDialog",
-  components: { ModalDialog },
-  emits: [EVENT_MOUNTED],
-  computed: {
-    dialogId() {
-      return "node-help-dialog";
-    },
-  },
-  mounted() {
-    this.$emit(EVENT_MOUNTED);
-  },
-  methods: {
-    show() {
-      return this.$refs.dialog.show();
-    },
-  },
-};
+const dialog = ref(null);
+
+export const show = () => dialog.value.show();
 </script>
 <style scoped>
 .node-box {

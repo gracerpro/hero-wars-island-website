@@ -24,7 +24,7 @@ class ApiRequest {
       process.env.VUE_APP_BACKEND_API_URL +
         url +
         (searchParams ? `?${searchParams}` : ""),
-      options
+      options,
     );
 
     if (!response.ok) {
@@ -62,7 +62,7 @@ class ApiRequest {
     };
     const response = await fetch(
       process.env.VUE_APP_BACKEND_API_URL + url,
-      options
+      options,
     );
 
     if (!response.ok) {

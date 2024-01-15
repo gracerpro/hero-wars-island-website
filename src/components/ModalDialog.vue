@@ -110,7 +110,7 @@ export default {
         () => {
           this.hide();
         },
-        { once: true }
+        { once: true },
       );
 
       this.$options.result = this.$options.initResult;

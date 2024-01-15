@@ -100,7 +100,7 @@ export default {
         if (id) {
           loadIsland(id);
         }
-      }
+      },
     );
 
     return {

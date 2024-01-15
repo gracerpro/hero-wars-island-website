@@ -8,7 +8,7 @@ export function setMetaInfo(info) {
 
   if (info.description !== undefined) {
     const descriptionEl = document.querySelector(
-      "head meta[name='description']"
+      "head meta[name='description']",
     );
     if (!descriptionEl) {
       createMeta("description", info.description);

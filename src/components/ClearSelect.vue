@@ -42,7 +42,7 @@ export default {
     onChange(event) {
       this.$emit(
         EVENT_UPDATE_VALUE,
-        event.target.value === "" ? null : parseInt(event.target.value)
+        event.target.value === "" ? null : parseInt(event.target.value),
       );
     },
     onClear() {

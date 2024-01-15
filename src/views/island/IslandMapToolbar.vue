@@ -102,13 +102,13 @@
     <component
       :is="helpDialogComponent"
       ref="helpDialog"
-      @mounted="onMountedHelpDialog"
+      @hook:mounted="onMountedHelpDialog"
     />
   </div>
 </template>
-<script>
+<script setup>
 import HelpDialog from "./HelpDialog.vue";
-import { shallowRef } from "vue";
+import { ref, shallowRef } from "vue";
 import {
   TRANSLATE_X,
   TRANSLATE_Y,
@@ -117,67 +117,65 @@ import {
   EVENT_CHANGE_SCALE,
 } from "./map";
 
+defineProps({
+  isOnlyImage: { type: Boolean, required: true },
+  isShowNoModerate: { type: Boolean, required: true },
+});
+
+const emit = defineEmits([
+  EVENT_RESET_TRANSLATE,
+  EVENT_CHANGE_TRANSLATE,
+  EVENT_RESET_SCALE,
+  EVENT_CHANGE_SCALE,
+  EVENT_CHANGE_ONLY_IMAGE,
+  EVENT_CHANGE_IS_SHOW_NO_MODERATE,
+]);
+
+const helpDialog = ref(null);
+let helpDialogComponent = shallowRef(null);
+
+const onResetTranslate = () => {
+  emit(EVENT_RESET_TRANSLATE);
+};
+const onChangeTranslate = (dx, dy) => {
+  let x = 0,
+    y = 0;
+
+  if (dx !== 0) {
+    x = 5 * dx * TRANSLATE_X;
+  }
+  if (dy !== 0) {
+    y = 5 * dy * TRANSLATE_Y;
+  }
+
+  emit(EVENT_CHANGE_TRANSLATE, x, y);
+};
+const onResetScale = () => {
+  emit(EVENT_RESET_SCALE);
+};
+const onChangeScale = (inc) => {
+  emit(EVENT_CHANGE_SCALE, 2 * (inc ? DELTA_SCALE : -DELTA_SCALE));
+};
+const onHelpClick = () => {
+  helpDialogComponent = shallowRef(HelpDialog);
+};
+const onChangeOnlyImage = () => {
+  emit(EVENT_CHANGE_ONLY_IMAGE);
+};
+const onChangeIsShowNoModerate = () => {
+  this.$emit(EVENT_CHANGE_IS_SHOW_NO_MODERATE);
+};
+const onMountedHelpDialog = () => {
+  helpDialog.value.show().finally(() => {
+    helpDialogComponent = shallowRef(null);
+  });
+};
+</script>
+<script>
 const EVENT_RESET_TRANSLATE = "reset-translate";
 const EVENT_RESET_SCALE = "reset-scale";
 const EVENT_CHANGE_ONLY_IMAGE = "update:is-only-image";
 const EVENT_CHANGE_IS_SHOW_NO_MODERATE = "update:is-show-no-moderate";
 
-export default {
-  name: "IslandMapToolbar",
-  props: {
-    isOnlyImage: { type: Boolean, required: true },
-    isShowNoModerate: { type: Boolean, required: true },
-  },
-  emits: [
-    EVENT_RESET_TRANSLATE,
-    EVENT_CHANGE_TRANSLATE,
-    EVENT_RESET_SCALE,
-    EVENT_CHANGE_SCALE,
-    EVENT_CHANGE_ONLY_IMAGE,
-    EVENT_CHANGE_IS_SHOW_NO_MODERATE,
-  ],
-  data: function () {
-    return {
-      helpDialogComponent: null,
-    };
-  },
-  methods: {
-    onResetTranslate() {
-      this.$emit(EVENT_RESET_TRANSLATE);
-    },
-    onChangeTranslate(dx, dy) {
-      let x = 0,
-        y = 0;
-
-      if (dx !== 0) {
-        x = 5 * dx * TRANSLATE_X;
-      }
-      if (dy !== 0) {
-        y = 5 * dy * TRANSLATE_Y;
-      }
-
-      this.$emit(EVENT_CHANGE_TRANSLATE, x, y);
-    },
-    onResetScale() {
-      this.$emit(EVENT_RESET_SCALE);
-    },
-    onChangeScale(inc) {
-      this.$emit(EVENT_CHANGE_SCALE, 2 * (inc ? DELTA_SCALE : -DELTA_SCALE));
-    },
-    onHelpClick() {
-      this.helpDialogComponent = shallowRef(HelpDialog);
-    },
-    onChangeOnlyImage() {
-      this.$emit(EVENT_CHANGE_ONLY_IMAGE);
-    },
-    onChangeIsShowNoModerate() {
-      this.$emit(EVENT_CHANGE_IS_SHOW_NO_MODERATE);
-    },
-    onMountedHelpDialog() {
-      this.$refs.helpDialog.show().finally(() => {
-        this.helpDialogComponent = null;
-      });
-    },
-  },
-};
+export default {};
 </script>
