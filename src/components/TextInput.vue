@@ -18,6 +18,9 @@
     </span>
   </div>
 </template>
+<script>
+const EVENT_UPDATE_VALUE = "update:model-value";
+</script>
 <script setup>
 const props = defineProps({
   inputId: { type: String, required: true },
@@ -40,9 +43,4 @@ const onInput = (event) => {
 const onClear = () => {
   emit(EVENT_UPDATE_VALUE, "");
 };
-</script>
-<script>
-const EVENT_UPDATE_VALUE = "update:model-value";
-
-export default {};
 </script>

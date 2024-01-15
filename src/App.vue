@@ -17,23 +17,15 @@
   </nav>
   <router-view />
 </template>
-<script>
+<script setup>
 import HeroClient from "./api/HeroClient";
 import { ref } from "vue";
 
-export default {
-  setup() {
-    const client = new HeroClient();
+const client = new HeroClient();
 
-    const actualIsland = ref(null);
+const actualIsland = ref(null);
 
-    client.getActualIsland().then((island) => {
-      actualIsland.value = island;
-    });
-
-    return {
-      actualIsland,
-    };
-  },
-};
+client.getActualIsland().then((island) => {
+  actualIsland.value = island;
+});
 </script>

@@ -45,7 +45,6 @@
     </div>
   </div>
 </template>
-
 <script setup>
 import { Modal } from "bootstrap";
 import { computed } from "vue";
@@ -68,21 +67,13 @@ const props = defineProps({
 });
 
 const sizeClass = computed(() => {
-  let size = "";
+  const sizes = {
+    sm: "modal-sm",
+    lg: "modal-lg",
+    xl: "modal-xl",
+  };
 
-  switch (props.size) {
-    case "sm":
-      size = "modal-sm";
-      break;
-    case "lg":
-      size = "modal-lg";
-      break;
-    case "xl":
-      size = "modal-xl";
-      break;
-  }
-
-  return size;
+  return sizes[props.size] ? sizes[props.size] : "";
 });
 
 const show = () => {

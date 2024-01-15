@@ -1,23 +1,23 @@
-# Hero-wars website
+# Hero-wars island
 
-## Как запускать
+## Docker
 
-Для поднятия контейнеров
+Up the containers
 
 ```bash
 docker-compose up --detach
 docker-compose up --detach --build --force-recreate
 ```
 
-Для выполнения команды, без захода в контейнер
+Run a command, without log in to the container
 
 ```
-docker exec [контейнер] [команда]
+docker exec [container] [command]
 docker exec hero-wars-website__vue npm run build
 docker exec hero-wars-website__vue npm run lint --fix
 ```
 
-Для захода в **vue** контейнер
+Log in to the container
 
 ```bash
 docker exec -it --user "$(id -u):$(id -g)" hero-wars-website__vue bash
@@ -25,12 +25,28 @@ docker exec -it --user "$(id -u):$(id -g)" hero-wars-website__vue bash
 
 ## Project setup
 
-Добавить в `/etc/hosts` на хостовом компьютере.
+Add to `/etc/hosts` file on host computer this text
 
+```
 127.0.0.1 hero-wars.vyacheslaff.local
+```
 
-Скачать проект на компьютер. Установить зависимости
+Install docker and docker-compose on host computer.
+
+Download a sourse code.
+
+Configure a docker-compose file...
+
+Up a docker containers.
+
+Install dependencies
 
 ```bash
 docker exec hero-wars-website__vue npm install
+```
+
+Build
+
+```
+docker exec hero-wars-website__vue npm run build
 ```

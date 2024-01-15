@@ -74,6 +74,7 @@ import IslandMapFilter from "./IslandMapFilter.vue";
 import IslandMapTable from "./IslandMapTable.vue";
 import { canSelectNode } from "./map";
 import { onMounted, onUnmounted, ref, computed, shallowReactive } from "vue";
+import { getHumanQunatity } from "@/helpers/formatter";
 
 const MAX_SCALE = 3;
 const MIN_SCALE = 0.3;
@@ -128,8 +129,6 @@ const userItems = computed(() => {
 });
 const userNodesCount = computed(() => Object.keys(userNodes.value).length);
 
-loadState();
-
 onMounted(() => {
   loadNodes().then((responseNodes) => {
     nodes.value = responseNodes;
@@ -140,6 +139,8 @@ onMounted(() => {
 onUnmounted(() => {
   saveState();
 });
+
+loadState();
 
 async function loadNodes() {
   let nodes = {};
@@ -317,25 +318,6 @@ function saveState() {
     userNodesIds: savedUserNodesIds,
   };
   localStorage.setItem(componentId, JSON.stringify(state));
-}
-
-function getHumanQunatity(quantity) {
-  // max 4 chars
-
-  if (quantity >= 1000000) {
-    if (quantity % 100000 === 0) {
-      return quantity / 1000000 + "M";
-    }
-    return Math.floor(quantity / 1000000) + "M";
-  }
-  if (quantity >= 1000) {
-    if (quantity % 100 === 0) {
-      return quantity / 1000 + "K";
-    }
-    return Math.floor(quantity / 1000) + "K";
-  }
-
-  return quantity;
 }
 </script>
 <style scoped>
