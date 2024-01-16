@@ -24,30 +24,28 @@
 </template>
 <script>
 const EVENT_UPDATE_VALUE = "update:model-value";
+</script>
+<script setup>
+import { computed } from "vue";
 
-export default {
-  name: "ClearSelect",
-  props: {
-    inputId: { type: String, required: true },
-    selectValues: { type: Object, required: true },
-    modelValue: { type: [Number, null], default: null },
-  },
-  emits: [EVENT_UPDATE_VALUE],
-  computed: {
-    isDisabled() {
-      return (this.modelValue === null) | (this.modelValue === 0);
-    },
-  },
-  methods: {
-    onChange(event) {
-      this.$emit(
-        EVENT_UPDATE_VALUE,
-        event.target.value === "" ? null : parseInt(event.target.value)
-      );
-    },
-    onClear() {
-      this.$emit(EVENT_UPDATE_VALUE, null);
-    },
-  },
+const props = defineProps({
+  inputId: { type: String, required: true },
+  selectValues: { type: Object, required: true },
+  modelValue: { type: [Number, null], default: null },
+});
+const emit = defineEmits([EVENT_UPDATE_VALUE]);
+
+const isDisabled = computed(
+  () => (props.modelValue === null) | (props.modelValue === 0),
+);
+
+const onChange = (event) => {
+  emit(
+    EVENT_UPDATE_VALUE,
+    event.target.value === "" ? null : parseInt(event.target.value),
+  );
+};
+const onClear = () => {
+  emit(EVENT_UPDATE_VALUE, null);
 };
 </script>

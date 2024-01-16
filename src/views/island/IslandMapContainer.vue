@@ -53,6 +53,7 @@
             :width="item.iconWidth"
             :height="item.iconHeight"
             class="item-image"
+            @click="onNodeClick(item.node)"
           >
             <title>
               {{ item.item.name + getQuantity(item) }}, изображение не привязано
@@ -84,7 +85,7 @@
         </text>
         <polyline
           v-if="activeNode"
-          :points="getActivePoints(activeNode)"
+          :points="getActivePoints()"
           class="active-frame"
         />
       </g>
@@ -93,13 +94,17 @@
     <component
       :is="nodeDialog.component"
       :node="nodeDialog.node"
-      ref="nodeDialog"
-      @mounted="onMountedNodeDialog"
+      ref="editNodeDialog"
+      @vue:mounted="onMountedNodeDialog"
     />
     <toast-message ref="toast" element-id="mapContainerToast" />
   </div>
 </template>
 <script>
+const EVENT_CHANGE_NODE = "change-node";
+const EVENT_SELECT_NODE = "select-node";
+</script>
+<script setup>
 import UpdateNodeDialog from "./UpdateNodeDialog.vue";
 import ToastMessage, { TYPE_DANGER } from "@/components/ToastMessage.vue";
 import {
@@ -111,7 +116,7 @@ import {
   STATUS_NOT_SURE,
   getStatusName,
 } from "@/api/node";
-import { shallowRef } from "vue";
+import { ref, shallowReactive, computed } from "vue";
 import {
   TRANSLATE_X,
   TRANSLATE_Y,
@@ -120,7 +125,7 @@ import {
   DELTA_SCALE,
   canSelectNode,
   canSelectNextNode,
-} from "./map";
+} from "@/services/island-map";
 
 const SIDE = 50;
 const HALF_SIDE = SIDE / 2;
@@ -129,356 +134,338 @@ const IMAGE_SIDE = 24;
 
 const MIDDLE_BUTTON = 1;
 
-const EVENT_CHANGE_NODE = "change-node";
-const EVENT_SELECT_NODE = "select-node";
+const mouse = {
+  isDown: false,
+  preventX: null,
+  preventY: null,
+};
 
-export default {
-  mouse: {
-    isDown: false,
-    preventX: null,
-    preventY: null,
-  },
+const emit = defineEmits([
+  EVENT_CHANGE_TRANSLATE,
+  EVENT_CHANGE_SCALE,
+  EVENT_CHANGE_NODE,
+  EVENT_SELECT_NODE,
+]);
+const props = defineProps({
+  scale: { type: Number, required: true },
+  translateX: { type: Number, required: true },
+  translateY: { type: Number, required: true },
+  isOnlyImage: { type: Boolean, required: true },
+  isShowNoModerate: { type: Boolean, required: true },
+  items: { type: Array, required: true },
+  inputNodes: { type: Object, required: true },
+  userNodes: { type: Object, required: true },
+});
 
-  name: "IslandMapContainer",
-  components: { ToastMessage },
-  emits: [
-    EVENT_CHANGE_TRANSLATE,
-    EVENT_CHANGE_SCALE,
-    EVENT_CHANGE_NODE,
-    EVENT_SELECT_NODE,
-  ],
-  props: {
-    scale: { type: Number, required: true },
-    translateX: { type: Number, required: true },
-    translateY: { type: Number, required: true },
-    isOnlyImage: { type: Boolean, required: true },
-    isShowNoModerate: { type: Boolean, required: true },
-    items: { type: Array, required: true },
-    inputNodes: { type: Object, required: true },
-    userNodes: { type: Object, required: true },
-  },
-  data: function () {
-    return {
-      //  nodes: {},
-      updating: false,
-      nodeDialog: {
-        node: null,
-        component: null,
-      },
-      activeNode: null,
-    };
-  },
-  computed: {
-    viewBox() {
-      const side = SIDE * 5 * this.scale;
-      return `-${side} -${side} ${side * 2} ${side * 2}`;
-    },
-    warningNodes() {
-      if (!this.isShowNoModerate) {
-        return [];
-      }
+const toast = ref(null);
+const updating = ref(false);
+const editNodeDialog = ref(null);
+const nodeDialog = shallowReactive({
+  node: null,
+  component: null,
+});
+let activeNode = null;
 
-      let items = [];
+const viewBox = computed(() => {
+  const side = SIDE * 5 * props.scale;
+  return `-${side} -${side} ${side * 2} ${side * 2}`;
+});
+const nodes = computed(() => {
+  let nodes = {};
 
-      for (let id in this.nodes) {
-        const node = this.nodes[id];
-        if (
-          node.typeId !== TYPE_START &&
-          (!node?.items.length || node.statusId !== STATUS_ACCEPTED_SUCCESS)
-        ) {
-          items.push({
-            node,
-            x: node.x - 0.2 * SIDE,
-            y: node.y + 0.64 * HEIGHT,
-            isOnModeration: node.statusId === STATUS_ON_MODERATION,
-          });
-        }
-      }
+  for (const id in props.inputNodes) {
+    const node = props.inputNodes[id];
+    nodes[id] = drawNode(node);
+  }
 
-      return items;
-    },
-    nodes() {
-      let nodes = {};
+  return nodes;
+});
+const warningNodes = computed(() => {
+  if (!props.isShowNoModerate) {
+    return [];
+  }
 
-      for (const id in this.inputNodes) {
-        const node = this.inputNodes[id];
-        nodes[id] = this.drawNode(node);
-      }
+  let items = [];
 
-      return nodes;
-    },
-    iconsItems() {
-      let countsByNode = getCountsByNode(this.items);
-      let resultItems = [];
-      let indexesByNode = {};
+  for (let id in nodes.value) {
+    const node = nodes.value[id];
 
-      this.items.forEach((item) => {
-        const node = this.nodes[item.node.id];
-        const count = countsByNode[node.id];
-        const isShowText = item.item.quantity > 1 && !this.isOnlyImage;
-
-        item.textX = null;
-        item.textY = null;
-        item.fontClass = null;
-
-        if (count === 1) {
-          const fontSize = 20;
-          item.iconWidth = IMAGE_SIDE * (isShowText ? 1.9 : 2.2);
-          item.iconHeight = IMAGE_SIDE * (isShowText ? 1.9 : 2.2);
-          item.iconX = node.x - item.iconWidth / 2;
-          item.iconY =
-            node.y - item.iconHeight / 2 - (isShowText ? fontSize / 2 : 0);
-          if (isShowText) {
-            item.textX = item.iconX + item.iconWidth * 0.05;
-            item.textY = node.y + HEIGHT - 3;
-          }
-        } else {
-          if (!indexesByNode[node.id]) {
-            indexesByNode[node.id] = 0;
-          }
-          const index = indexesByNode[node.id];
-          const borderWidth = 2;
-
-          if (count === 2) {
-            const fontSize = 16;
-            item.iconWidth = IMAGE_SIDE * (isShowText ? 1.3 : 1.4);
-            item.iconHeight = IMAGE_SIDE * (isShowText ? 1.3 : 1.4);
-            const cx = item.iconWidth + borderWidth;
-            const srartX = node.x - cx + borderWidth / 2;
-            item.iconX = srartX + cx * index;
-            item.iconY =
-              node.y - item.iconHeight / 2 - (isShowText ? fontSize / 2 : 0);
-
-            if (isShowText) {
-              item.textX = srartX + cx * index;
-              item.textY = node.y + HEIGHT - fontSize * 0.7;
-              item.fontClass = "text-2";
-            }
-          } else if (index <= 3) {
-            // count >= 3
-            // 0,0   1,0
-            //     *
-            // 0,1   1,1
-            item.iconWidth = IMAGE_SIDE * 1.1;
-            item.iconHeight = IMAGE_SIDE * 1.1;
-            const cx = item.iconWidth + borderWidth;
-            const srartX = node.x - cx + borderWidth / 2;
-            item.iconX = srartX + (index % 2 === 0 ? 0 : cx);
-            const cy = item.iconHeight + borderWidth;
-            const srartY = node.y - cy + borderWidth / 2;
-            item.iconY = srartY + (index < 2 ? 0 : cy);
-          } else {
-            item = false;
-          }
-
-          indexesByNode[node.id]++;
-        }
-
-        if (item) {
-          resultItems.push(item);
-        }
+    if (
+      node.typeId !== TYPE_START &&
+      (!node?.items.length || node.statusId !== STATUS_ACCEPTED_SUCCESS)
+    ) {
+      items.push({
+        node,
+        x: node.x - 0.2 * SIDE,
+        y: node.y + 0.64 * HEIGHT,
+        isOnModeration: node.statusId === STATUS_ON_MODERATION,
       });
+    }
+  }
 
-      return resultItems;
+  return items;
+});
+const iconsItems = computed(() => {
+  let countsByNode = getCountsByNode(props.items);
+  let resultItems = [];
+  let indexesByNode = {};
 
-      function getCountsByNode(items) {
-        let countsByNode = {};
+  props.items.forEach((item) => {
+    const node = nodes.value[item.node.id];
+    const count = countsByNode[node.id];
+    const isShowText = item.item.quantity > 1 && !props.isOnlyImage;
 
-        items.forEach((item) => {
-          const nodeId = item.node.id;
+    item.textX = null;
+    item.textY = null;
+    item.fontClass = null;
 
-          if (!countsByNode[nodeId]) {
-            countsByNode[nodeId] = 0;
-          }
-          countsByNode[nodeId]++;
-        });
-
-        return countsByNode;
+    if (count === 1) {
+      const fontSize = 20;
+      item.iconWidth = IMAGE_SIDE * (isShowText ? 1.9 : 2.2);
+      item.iconHeight = IMAGE_SIDE * (isShowText ? 1.9 : 2.2);
+      item.iconX = node.x - item.iconWidth / 2;
+      item.iconY =
+        node.y - item.iconHeight / 2 - (isShowText ? fontSize / 2 : 0);
+      if (isShowText) {
+        item.textX = item.iconX + item.iconWidth * 0.05;
+        item.textY = node.y + HEIGHT - 3;
       }
-    },
-  },
-  methods: {
-    /**
-     * @param {Object} node
-     */
-    getActivePoints(node) {
-      let data = this.getCoordinates(node);
-      data.coordinates.push(data.coordinates[0]);
+    } else {
+      if (!indexesByNode[node.id]) {
+        indexesByNode[node.id] = 0;
+      }
+      const index = indexesByNode[node.id];
+      const borderWidth = 2;
 
-      return this.getPoints(data.coordinates);
-    },
-    /**
-     * @param {Object} node
-     */
-    drawNode(node) {
-      const classes = {
-        [TYPE_START]: "node-start",
-        [TYPE_TOWN]: "node-town",
-        [TYPE_CHEST]: "node-chest",
-      };
-      const data = this.getCoordinates(node);
+      if (count === 2) {
+        const fontSize = 16;
+        item.iconWidth = IMAGE_SIDE * (isShowText ? 1.3 : 1.4);
+        item.iconHeight = IMAGE_SIDE * (isShowText ? 1.3 : 1.4);
+        const cx = item.iconWidth + borderWidth;
+        const srartX = node.x - cx + borderWidth / 2;
+        item.iconX = srartX + cx * index;
+        item.iconY =
+          node.y - item.iconHeight / 2 - (isShowText ? fontSize / 2 : 0);
 
-      return {
-        ...node,
-        xyId: node.mx + "_" + node.my,
-        x: data.x,
-        y: data.y,
-        points: this.getPoints(data.coordinates),
-        class: classes[node.typeId] ? classes[node.typeId] : "",
-      };
-    },
-    /**
-     * @param {Array} coordinates
-     */
-    getPoints(coordinates) {
-      return coordinates.map((item) => item.x + "," + item.y).join(" ");
-    },
-    /**
-     * @param {Object} node
-     */
-    getCoordinates(node) {
-      const side = SIDE;
-      const h = HEIGHT;
-      const x = node.mx * (1.5 * side);
-      const y = node.my * 2 * h + (node.mx % 2 === 0 ? 0 : h);
-
-      let coordinates = new Array(6);
-      coordinates[0] = { x: x + side, y };
-      coordinates[1] = { x: x + HALF_SIDE, y: y + h };
-      coordinates[2] = { x: x - HALF_SIDE, y: y + h };
-      coordinates[3] = { x: x - side, y };
-      coordinates[4] = { x: x - HALF_SIDE, y: y - h };
-      coordinates[5] = { x: x + HALF_SIDE, y: y - h };
-
-      return {
-        x,
-        y,
-        coordinates,
-      };
-    },
-    nodeMouseEnter(node) {
-      this.activeNode = node;
-    },
-    onNodeClick(node) {
-      const isRemove = this.isUserNode(node);
-
-      if (isRemove) {
-        if (!canSelectNode(node)) {
-          return;
+        if (isShowText) {
+          item.textX = srartX + cx * index;
+          item.textY = node.y + HEIGHT - fontSize * 0.7;
+          item.fontClass = "text-2";
         }
+      } else if (index <= 3) {
+        // count >= 3
+        // 0,0   1,0
+        //     *
+        // 0,1   1,1
+        item.iconWidth = IMAGE_SIDE * 1.1;
+        item.iconHeight = IMAGE_SIDE * 1.1;
+        const cx = item.iconWidth + borderWidth;
+        const srartX = node.x - cx + borderWidth / 2;
+        item.iconX = srartX + (index % 2 === 0 ? 0 : cx);
+        const cy = item.iconHeight + borderWidth;
+        const srartY = node.y - cy + borderWidth / 2;
+        item.iconY = srartY + (index < 2 ? 0 : cy);
       } else {
-        const message = canSelectNextNode(this.nodes, this.userNodes, node);
-        if (message) {
-          this.$refs.toast.show(message, TYPE_DANGER);
-          return;
-        }
+        item = false;
       }
 
-      this.$emit(EVENT_SELECT_NODE, node.id, isRemove);
-    },
-    /**
-     * @param {Object} button
-     */
-    onMouseDown(event) {
-      if (event.button === MIDDLE_BUTTON) {
-        this.$options.mouse.preventX = event.button.pageX;
-        this.$options.mouse.preventY = event.button.pageY;
-        this.$options.mouse.isDown = true;
-      }
-    },
-    /**
-     * @param {Object} button
-     */
-    onMouseMove(button) {
-      if (!this.$options.mouse.isDown) {
-        return;
-      }
+      indexesByNode[node.id]++;
+    }
 
-      const mouse = this.$options.mouse;
+    if (item) {
+      resultItems.push(item);
+    }
+  });
 
-      if (mouse.preventX === null) {
-        mouse.preventX = button.pageX;
-      }
-      if (mouse.preventY === null) {
-        mouse.preventY = button.pageY;
-      }
+  return resultItems;
 
-      const isLeft = button.pageX < mouse.preventX;
-      const isRight = button.pageX > mouse.preventX;
-      const isTop = button.pageY < mouse.preventY;
-      const isBottom = button.pageY > mouse.preventY;
-      let x = 0,
-        y = 0;
+  function getCountsByNode(items) {
+    let countsByNode = {};
 
-      if (isLeft) {
-        x = -TRANSLATE_X;
-      } else if (isRight) {
-        x = TRANSLATE_X;
-      }
-      if (isTop) {
-        y = -TRANSLATE_Y;
-      } else if (isBottom) {
-        y = TRANSLATE_Y;
-      }
+    items.forEach((item) => {
+      const nodeId = item.node.id;
 
-      this.$emit(EVENT_CHANGE_TRANSLATE, x, y);
+      if (!countsByNode[nodeId]) {
+        countsByNode[nodeId] = 0;
+      }
+      countsByNode[nodeId]++;
+    });
 
-      mouse.preventX = button.pageX;
-      mouse.preventY = button.pageY;
-    },
-    onMouseUp(event) {
-      if (event.button === MIDDLE_BUTTON) {
-        this.$options.mouse.isDown = false;
-      }
-    },
-    onMouseWheel(event) {
-      this.$emit(
-        EVENT_CHANGE_SCALE,
-        event.deltaY > 0 ? DELTA_SCALE : -DELTA_SCALE
-      );
-      event.preventDefault();
-    },
-    onEditNodeClick(node) {
-      if (!this.updating) {
-        this.updating = true;
-        this.nodeDialog.node = node;
-        this.nodeDialog.component = shallowRef(UpdateNodeDialog);
-      }
-    },
-    onMountedNodeDialog() {
-      this.$refs.nodeDialog
-        .show()
-        .then((node) => {
-          if (node !== null && node !== undefined) {
-            this.$emit(EVENT_CHANGE_NODE, node);
-          }
-        })
-        .finally(() => {
-          this.nodeDialog.component = null;
-          this.nodeDialog.node = null;
-          this.updating = false;
-        });
-    },
-    isUserNode(node) {
-      return this.userNodes[node.id] !== undefined;
-    },
-    getWarningTitle(item) {
-      if (
-        item.node.statusId === STATUS_ON_MODERATION ||
-        item.node.statusId === STATUS_NOT_SURE
-      ) {
-        return getStatusName(item.node.statusId);
-      }
-      if (!item.node.items || !item.node.items.length) {
-        return "Ресурсы не привязаны";
-      }
+    return countsByNode;
+  }
+});
 
-      return "";
-    },
-    getQuantity(item) {
-      return item.item.quantity > 1 ? ", " + item.item.quantity : "";
-    },
-  },
+const getActivePoints = () => {
+  let data = getCoordinates(activeNode);
+  data.coordinates.push(data.coordinates[0]);
+
+  return getPoints(data.coordinates);
+};
+/**
+ * @param {Object} node
+ */
+function drawNode(node) {
+  const classes = {
+    [TYPE_START]: "node-start",
+    [TYPE_TOWN]: "node-town",
+    [TYPE_CHEST]: "node-chest",
+  };
+  const data = getCoordinates(node);
+
+  return {
+    ...node,
+    xyId: node.mx + "_" + node.my,
+    x: data.x,
+    y: data.y,
+    points: getPoints(data.coordinates),
+    class: classes[node.typeId] ? classes[node.typeId] : "",
+  };
+}
+/**
+ * @param {Array} coordinates
+ */
+function getPoints(coordinates) {
+  return coordinates.map((item) => item.x + "," + item.y).join(" ");
+}
+/**
+ * @param {Object} node
+ */
+function getCoordinates(node) {
+  const side = SIDE;
+  const h = HEIGHT;
+  const x = node.mx * (1.5 * side);
+  const y = node.my * 2 * h + (node.mx % 2 === 0 ? 0 : h);
+
+  let coordinates = new Array(6);
+  coordinates[0] = { x: x + side, y };
+  coordinates[1] = { x: x + HALF_SIDE, y: y + h };
+  coordinates[2] = { x: x - HALF_SIDE, y: y + h };
+  coordinates[3] = { x: x - side, y };
+  coordinates[4] = { x: x - HALF_SIDE, y: y - h };
+  coordinates[5] = { x: x + HALF_SIDE, y: y - h };
+
+  return {
+    x,
+    y,
+    coordinates,
+  };
+}
+const nodeMouseEnter = (node) => {
+  activeNode = node;
+};
+const onNodeClick = (node) => {
+  const isRemove = isUserNode(node);
+
+  if (isRemove) {
+    if (!canSelectNode(node)) {
+      return;
+    }
+  } else {
+    const message = canSelectNextNode(nodes.value, props.userNodes, node);
+    if (message) {
+      toast.value.show(message, TYPE_DANGER);
+      return;
+    }
+  }
+
+  emit(EVENT_SELECT_NODE, node.id, isRemove);
+};
+/**
+ * @param {Object} button
+ */
+const onMouseDown = (event) => {
+  if (event.button === MIDDLE_BUTTON) {
+    mouse.preventX = event.button.pageX;
+    mouse.preventY = event.button.pageY;
+    mouse.isDown = true;
+  }
+};
+/**
+ * @param {Object} button
+ */
+const onMouseMove = (button) => {
+  if (!mouse.isDown) {
+    return;
+  }
+
+  if (mouse.preventX === null) {
+    mouse.preventX = button.pageX;
+  }
+  if (mouse.preventY === null) {
+    mouse.preventY = button.pageY;
+  }
+
+  const isLeft = button.pageX < mouse.preventX;
+  const isRight = button.pageX > mouse.preventX;
+  const isTop = button.pageY < mouse.preventY;
+  const isBottom = button.pageY > mouse.preventY;
+  let x = 0,
+    y = 0;
+
+  if (isLeft) {
+    x = -TRANSLATE_X;
+  } else if (isRight) {
+    x = TRANSLATE_X;
+  }
+  if (isTop) {
+    y = -TRANSLATE_Y;
+  } else if (isBottom) {
+    y = TRANSLATE_Y;
+  }
+
+  emit(EVENT_CHANGE_TRANSLATE, x, y);
+
+  mouse.preventX = button.pageX;
+  mouse.preventY = button.pageY;
+};
+const onMouseUp = (event) => {
+  if (event.button === MIDDLE_BUTTON) {
+    mouse.isDown = false;
+  }
+};
+const onMouseWheel = (event) => {
+  emit(EVENT_CHANGE_SCALE, event.deltaY > 0 ? DELTA_SCALE : -DELTA_SCALE);
+  event.preventDefault();
+};
+const onEditNodeClick = (node) => {
+  if (!updating.value) {
+    updating.value = true;
+    nodeDialog.node = node;
+    nodeDialog.component = UpdateNodeDialog;
+  }
+};
+const onMountedNodeDialog = () => {
+  editNodeDialog.value
+    .show()
+    .then((node) => {
+      if (node !== null && node !== undefined) {
+        emit(EVENT_CHANGE_NODE, node);
+      }
+    })
+    .finally(() => {
+      nodeDialog.component = null;
+      nodeDialog.node = null;
+      updating.value = false;
+    });
+};
+const isUserNode = (node) => {
+  return props.userNodes[node.id] !== undefined;
+};
+const getWarningTitle = (item) => {
+  if (
+    item.node.statusId === STATUS_ON_MODERATION ||
+    item.node.statusId === STATUS_NOT_SURE
+  ) {
+    return getStatusName(item.node.statusId);
+  }
+  if (!item.node.items || !item.node.items.length) {
+    return "Ресурсы не привязаны";
+  }
+
+  return "";
+};
+const getQuantity = (item) => {
+  return item.item.quantity > 1 ? ", " + item.item.quantity : "";
 };
 </script>
 <style>

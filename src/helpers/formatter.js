@@ -4,7 +4,7 @@
  */
 export function formatDate(date) {
   if (!date) {
-    return null;
+    return "";
   }
 
   return date.toLocaleDateString("ru-RU");
@@ -40,4 +40,23 @@ export function fromCurrentDate(date) {
   }
 
   return result;
+}
+
+export function getHumanQunatity(quantity) {
+  // max 4 chars
+
+  if (quantity >= 1000000) {
+    if (quantity % 100000 === 0) {
+      return quantity / 1000000 + "M";
+    }
+    return Math.floor(quantity / 1000000) + "M";
+  }
+  if (quantity >= 1000) {
+    if (quantity % 100 === 0) {
+      return quantity / 1000 + "K";
+    }
+    return Math.floor(quantity / 1000) + "K";
+  }
+
+  return quantity;
 }

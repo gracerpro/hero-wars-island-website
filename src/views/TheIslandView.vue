@@ -1,12 +1,12 @@
 <template>
   <div class="container">
-    <island-map-loading v-if="loadingIsland" />
+    <island-map-loading v-if="islandLoading" />
     <div v-else-if="errorMessage" class="alert alert-danger mt-3">
       {{ errorMessage }}
     </div>
     <div v-else-if="!island" class="position-relative">
       <img
-        src="images/map-not-found.svg"
+        src="/images/map-not-found.svg"
         width="440"
         height="220"
         class="d-block mx-auto"
@@ -19,89 +19,83 @@
     </div>
   </div>
 </template>
-<script>
+<script setup>
 import HeroClient from "@/api/HeroClient";
 import IslandMap from "./island/IslandMap.vue";
 import IslandMapLoading from "./island/IslandMapLoading.vue";
 import HttpError from "@/exceptions/HttpError";
+import { setMetaInfo } from "@/services/page-meta";
+import { ref, watch } from "vue";
+import { useRoute } from "vue-router";
 
-const PAGE_ID = "islandPage";
+const pageId = "islandPage";
+const client = new HeroClient();
+const route = useRoute();
 
-export default {
-  client: new HeroClient(),
-  id: null,
+const island = ref(null);
+const islandLoading = ref(false);
+const errorMessage = ref("");
 
-  name: "TheIslandView",
-  components: { IslandMap, IslandMapLoading },
-  inject: ["setMetaInfo"],
-  data() {
-    return {
-      loadingIsland: false,
-      island: null,
-      errorMessage: "",
-    };
-  },
-  computed: {
-    pageId() {
-      return PAGE_ID;
-    },
-  },
-  watch: {
-    "$route.params.id"(newId) {
-      if (this.queryId(newId)) {
-        this.loadIsland();
-      }
-    },
-  },
-  created() {
-    this.setMetaInfo({
-      title: "Карта острова",
-      description: "",
-      keywords: "Хроники хаоса, Эра доминиона, карта острова, карта",
-    });
-
-    if (this.queryId(this.$route.params.id)) {
-      this.loadIsland();
+watch(
+  () => route.params.id,
+  (newId) => {
+    const id = queryId(newId);
+    if (id) {
+      loadIsland(id);
     }
   },
-  methods: {
-    /**
-     * @param {String} sourseId
-     * @returns {Number|null}
-     */
-    queryId(sourseId) {
-      let intId = parseInt(sourseId);
+);
 
-      if (intId != sourseId) {
-        this.errorMessage = "Некорректный ID острова.";
-        intId = null;
-      } else {
-        this.$options.id = intId;
+setMetaInfo({
+  title: "Карта острова",
+  description: "",
+  keywords: "Хроники хаоса, Эра доминиона, карта острова, карта",
+});
+
+const id = queryId(route.params.id);
+if (id) {
+  loadIsland(id);
+}
+
+/**
+ * @param {String} sourseId
+ * @returns {Number|null}
+ */
+function queryId(sourseId) {
+  let intId = parseInt(sourseId);
+
+  if (intId != sourseId) {
+    errorMessage.value = "Некорректный ID острова.";
+    intId = null;
+  }
+
+  return intId;
+}
+
+/**
+ * @param {Number} id
+ */
+function loadIsland(id) {
+  island.value = null;
+  islandLoading.value = true;
+  client
+    .getIsland(id)
+    .then((responseIsland) => {
+      island.value = responseIsland;
+      if (responseIsland) {
+        setMetaInfo({
+          title: responseIsland.name + " - Карта острова",
+        });
       }
-
-      return intId;
-    },
-    loadIsland() {
-      this.island = null;
-      this.loadingIsland = true;
-      this.$options.client
-        .getIsland(this.$options.id)
-        .then((island) => {
-          this.island = island;
-          this.setMetaInfo({
-            title: island.name + " - Карта острова",
-          });
-        })
-        .catch((error) => {
-          if (error instanceof HttpError && error.statusCode === 404) {
-            this.errorMessage = "Карта не найдена.";
-          } else {
-            this.errorMessage =
-              "Не удалось загрузить карту. Разработчики видят проблему и в скором времени починят.";
-          }
-        })
-        .finally(() => (this.loadingIsland = false));
-    },
-  },
-};
+    })
+    .catch((error) => {
+      if (error instanceof HttpError && error.statusCode === 404) {
+        errorMessage.value = "Карта не найдена.";
+      } else {
+        errorMessage.value =
+          "Не удалось загрузить карту. Разработчики видят проблему и в скором времени починят.";
+      }
+    })
+    .finally(() => (islandLoading.value = false));
+}
 </script>

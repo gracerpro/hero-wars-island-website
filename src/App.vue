@@ -17,61 +17,15 @@
   </nav>
   <router-view />
 </template>
-<script>
+<script setup>
 import HeroClient from "./api/HeroClient";
+import { ref } from "vue";
 
-export default {
-  client: new HeroClient(),
+const client = new HeroClient();
 
-  name: "App",
-  provide() {
-    return {
-      setMetaInfo: this.setMetaInfo,
-    };
-  },
-  data: function () {
-    return {
-      actualIsland: null,
-    };
-  },
-  created() {
-    this.$options.client.getActualIsland().then((island) => {
-      this.actualIsland = island;
-    });
-  },
-  methods: {
-    setMetaInfo(info) {
-      if (info.title) {
-        document.title = info.title;
-      }
+const actualIsland = ref(null);
 
-      if (info.description !== undefined) {
-        const descriptionEl = document.querySelector(
-          "head meta[name='description']"
-        );
-        if (!descriptionEl) {
-          createMeta("description", info.description);
-        } else {
-          descriptionEl.setAttribute("content", info.description);
-        }
-      }
-
-      if (info.keywords !== undefined) {
-        const keywordsEl = document.querySelector("head meta[name='keywords']");
-        if (!keywordsEl) {
-          createMeta("keywords", info.keywords);
-        } else {
-          keywordsEl.setAttribute("content", info.keywords);
-        }
-      }
-
-      function createMeta(name, content) {
-        var meta = document.createElement("meta");
-        meta.name = name;
-        meta.content = content;
-        document.getElementsByTagName("head")[0].appendChild(meta);
-      }
-    },
-  },
-};
+client.getActualIsland().then((island) => {
+  actualIsland.value = island;
+});
 </script>

@@ -12,7 +12,7 @@
       aria-atomic="true"
     >
       <div class="d-flex">
-        <div class="toast-body">{{ message }}</div>
+        <div class="toast-body">{{ toastMessage }}</div>
         <button
           type="button"
           class="btn-close btn-close-white me-2 m-auto"
@@ -24,57 +24,55 @@
   </div>
 </template>
 <script>
-import { Toast } from "bootstrap";
-
 export const TYPE_SUCCESS = "success";
 export const TYPE_DANGER = "danger";
+</script>
+<script setup>
+import { Toast } from "bootstrap";
+import { ref, computed } from "vue";
 
-export default {
-  name: "ToastMessage",
-  props: {
-    elementId: { type: String, required: true },
-  },
-  data: function () {
-    return {
-      message: "",
-      type: TYPE_SUCCESS,
-      isShow: false,
-    };
-  },
-  computed: {
-    classType() {
-      if (this.type === TYPE_SUCCESS) {
-        return "text-bg-success";
-      }
-      if (this.type === TYPE_DANGER) {
-        return "text-bg-danger";
-      }
-      return "";
-    },
-  },
-  methods: {
-    /**
-     * @param {String} message
-     * @param {String|null} type
-     */
-    show(message, type) {
-      this.message = message;
-      if (type) {
-        this.type = type;
-      }
+const props = defineProps({
+  elementId: { type: String, required: true },
+});
 
-      const element = document.getElementById(this.elementId);
-      element.addEventListener("hide.bs.toast", () => (this.isShow = false), {
-        once: true,
-      });
+const toastMessage = ref("");
+const toastType = ref(TYPE_SUCCESS);
+const isShow = ref(false);
 
-      const toast = new Toast(element, {
-        delay: 2000,
-        autohide: true,
-      });
-      toast.show();
-      this.isShow = true;
-    },
-  },
+const classType = computed(() => {
+  if (toastType.value === TYPE_SUCCESS) {
+    return "text-bg-success";
+  }
+  if (toastType.value === TYPE_DANGER) {
+    return "text-bg-danger";
+  }
+  return "";
+});
+
+/**
+ * @param {String} message
+ * @param {String|null} type
+ */
+const show = (message, type) => {
+  toastMessage.value = message;
+  if (type) {
+    toastType.value = type;
+  }
+
+  const element = document.getElementById(props.elementId);
+  element.addEventListener("hide.bs.toast", () => (isShow.value = false), {
+    once: true,
+  });
+
+  const toast = new Toast(element, {
+    delay: 2000,
+    autohide: true,
+  });
+  toast.show();
+  isShow.value = true;
 };
+
+defineExpose({
+  show,
+});
 </script>

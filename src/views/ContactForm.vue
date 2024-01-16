@@ -77,74 +77,64 @@
     <toast-message ref="toast" element-id="contactToast" />
   </form>
 </template>
-<script>
+<script setup>
 import UserError from "@/exceptions/UserError";
 import HeroClient from "@/api/HeroClient";
 import ToastMessage, {
   TYPE_SUCCESS,
   TYPE_DANGER,
 } from "@/components/ToastMessage.vue";
+import { ref, shallowReactive, onMounted } from "vue";
 
-export default {
-  client: new HeroClient(),
-  createdDate: new Date(),
+const client = new HeroClient();
+const createdDate = new Date();
 
-  name: "ContactForm",
-  components: { ToastMessage },
-  data: function () {
-    return {
-      submiting: false,
-      errorMessage: "",
-      feedback: {
-        username: "",
-        email: "",
-        subject: "",
-        message: "",
-      },
-    };
-  },
-  computed: {
-    formId() {
-      return "contactForm";
-    },
-  },
-  mounted() {
-    setTimeout(() => this.$refs.formSubject.focus(), 300);
-  },
-  methods: {
-    onSubmit() {
-      if (this.submiting) {
-        return;
+const submiting = ref(false);
+const errorMessage = ref("");
+const feedback = shallowReactive({
+  username: "",
+  email: "",
+  subject: "",
+  message: "",
+});
+const toast = ref(null);
+const formSubject = ref(null);
+const formId = "contactForm";
+
+onMounted(() => {
+  setTimeout(() => formSubject.value.focus(), 300);
+});
+
+const onSubmit = () => {
+  if (submiting.value) {
+    return;
+  }
+
+  submiting.value = true;
+
+  const data = { ...feedback };
+  data.contactEmail = "";
+  data.tempField = "1";
+  data.submitTimeInMs = new Date().getTime() - createdDate.getTime();
+  errorMessage.value = "";
+
+  client
+    .createFeedback(data)
+    .then(() => {
+      feedback.message = "";
+      feedback.subject = "";
+
+      toast.value.show("Сообщение успешно создано.", TYPE_SUCCESS);
+    })
+    .catch((error) => {
+      if (error instanceof UserError) {
+        errorMessage.value = error.message;
+        toast.value.show(error.message, TYPE_DANGER);
+      } else {
+        errorMessage.value = "Возникла внутренняя ошибка.";
+        throw error;
       }
-
-      this.submiting = true;
-
-      const data = { ...this.feedback };
-      data.contactEmail = "";
-      data.tempField = "1";
-      data.submitTimeInMs =
-        new Date().getTime() - this.$options.createdDate.getTime();
-      this.errorMessage = "";
-
-      this.$options.client
-        .createFeedback(data)
-        .then(() => {
-          this.feedback.message = "";
-          this.feedback.subject = "";
-
-          this.$refs.toast.show("Сообщение успешно создано.", TYPE_SUCCESS);
-        })
-        .catch((error) => {
-          if (error instanceof UserError) {
-            this.errorMessage = error.message;
-            this.$refs.toast.show(error.message, TYPE_DANGER);
-          } else {
-            this.errorMessage = "Возникла внутренняя ошибка.";
-            throw error;
-          }
-        })
-        .finally(() => (this.submiting = false));
-    },
-  },
+    })
+    .finally(() => (submiting.value = false));
 };
 </script>

@@ -9,7 +9,7 @@
     </p>
 
     <h3>Острова</h3>
-    <div v-if="loadingIslands">
+    <div v-if="islandsLoading">
       <span class="placeholder col-4"></span><br />
       <span class="placeholder col-4"></span><br />
       <span class="placeholder col-4"></span>
@@ -32,81 +32,63 @@
         >
       </li>
     </ol>
-
-    <div v-if="news.length">
-      <h3>Новости</h3>
-      <p>...</p>
-    </div>
   </div>
 </template>
-<script>
+<script setup>
 import HeroClient from "@/api/HeroClient";
 import { fromCurrentDate } from "@/helpers/formatter";
+import { setMetaInfo } from "@/services/page-meta";
+import { ref } from "vue";
 
-export default {
-  client: new HeroClient(),
+const client = new HeroClient();
+const now = new Date();
 
-  name: "TheHomeView",
-  inject: ["setMetaInfo"],
-  data() {
-    return {
-      loadingIslands: true,
-      islands: [],
-      news: [],
-      errorMessage: "",
-    };
-  },
-  created() {
-    this.setMetaInfo({
-      title: "Хроники хаоса Эра доминиона карта острова",
-      description:
-        "В игре Хроники Хаоса на карте острова открыты все узлы, соберем все призы вместе!",
-      keywords: "Хроники хаоса, Эра доминиона, карта острова, карта, событие",
-    });
-  },
-  mounted() {
-    this.loadIslands();
-  },
-  methods: {
-    isActual(island) {
-      const now = new Date();
+const islands = ref([]);
+const islandsLoading = ref(false);
+const errorMessage = ref("");
 
-      return island.eventEndAt > now;
-    },
-    getIslandHint(island) {
-      const now = new Date();
-      let result = "";
+setMetaInfo({
+  title: "Хроники хаоса Эра доминиона карта острова",
+  description:
+    "В игре Хроники Хаоса на карте острова открыты все узлы, соберем все призы вместе!",
+  keywords: "Хроники хаоса, Эра доминиона, карта острова, карта, событие",
+});
 
-      if (island.eventEndAt < now) {
-        result =
-          "от " +
-          fromCurrentDate(island.eventStartAt) +
-          " до " +
-          fromCurrentDate(island.eventEndAt);
-      } else {
-        const days = Math.ceil((island.eventEndAt - now) / 1000 / 60 / 60 / 24);
-        result =
-          "до " +
-          fromCurrentDate(island.eventEndAt) +
-          ", осталось дней " +
-          days;
-      }
+loadIslands();
 
-      return result;
-    },
-    loadIslands() {
-      this.loadingIslands = true;
-      this.$options.client
-        .getIslandList(5)
-        .then((list) => {
-          this.islands = list.items;
-        })
-        .catch(() => {
-          this.errorMessage =
-            "Не удалось загрузить. Разработчики видят проблему и в скором времени починят.";
-        })
-        .finally(() => (this.loadingIslands = false));
-    },
-  },
-};
+function loadIslands() {
+  islandsLoading.value = true;
+  client
+    .getIslandList(5)
+    .then((list) => {
+      islands.value = list.items;
+    })
+    .catch(() => {
+      errorMessage.value =
+        "Не удалось загрузить. Разработчики видят проблему и в скором времени починят.";
+    })
+    .finally(() => (islandsLoading.value = false));
+}
+
+function isActual(island) {
+  return island.eventEndAt > now;
+}
+
+function getIslandHint(island) {
+  let result = "";
+
+  if (island.eventEndAt < now) {
+    result =
+      "от " +
+      fromCurrentDate(island.eventStartAt) +
+      " до " +
+      fromCurrentDate(island.eventEndAt);
+  } else {
+    const days = Math.ceil((island.eventEndAt - now) / 1000 / 60 / 60 / 24);
+    result =
+      "до " + fromCurrentDate(island.eventEndAt) + ", осталось дней " + days;
+  }
+
+  return result;
+}
 </script>

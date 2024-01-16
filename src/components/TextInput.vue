@@ -2,6 +2,7 @@
   <div class="input-group">
     <input
       :value="modelValue"
+      :id="inputId"
       type="text"
       class="form-control"
       @input="onInput"
@@ -19,30 +20,27 @@
 </template>
 <script>
 const EVENT_UPDATE_VALUE = "update:model-value";
-
-export default {
-  name: "TextInput",
-  props: {
-    inputId: { type: String, required: true },
-    modelValue: { type: String, default: "" },
-    modelModifiers: {
-      default: () => ({}),
-    },
+</script>
+<script setup>
+const props = defineProps({
+  inputId: { type: String, required: true },
+  modelValue: { type: String, default: "" },
+  modelModifiers: {
+    default: () => ({}),
   },
-  emits: [EVENT_UPDATE_VALUE],
-  methods: {
-    onInput(event) {
-      let value = event.target.value;
+});
+const emit = defineEmits([EVENT_UPDATE_VALUE]);
 
-      if (this.modelModifiers.trim) {
-        value = value.trim();
-      }
+const onInput = (event) => {
+  let value = event.target.value;
 
-      this.$emit(EVENT_UPDATE_VALUE, value);
-    },
-    onClear() {
-      this.$emit(EVENT_UPDATE_VALUE, "");
-    },
-  },
+  if (props.modelModifiers.trim) {
+    value = value.trim();
+  }
+
+  emit(EVENT_UPDATE_VALUE, value);
+};
+const onClear = () => {
+  emit(EVENT_UPDATE_VALUE, "");
 };
 </script>

@@ -81,128 +81,116 @@
   </form>
 </template>
 <script>
+const EVENT_SUCCESS_SAVE = "success-save";
+const EVENT_SAVING = "saving";
+</script>
+<script setup>
 import HeroClient from "@/api/HeroClient";
 import { STATUS_CREATED, getStatusName } from "@/api/node";
 import UserError from "@/exceptions/UserError";
+import { computed, ref } from "vue";
 
-const EVENT_SUCCESS_SAVE = "success-save";
-const EVENT_SAVING = "saving";
+const client = new HeroClient();
+let lastInputTime = 0;
+let inputTimerId = 0;
 
-export default {
-  client: new HeroClient(),
-  lastInputTime: 0,
-  inputTimerId: 0,
+const props = defineProps({
+  formId: { type: String, required: true },
+  node: { type: Object, required: true },
+});
+const emit = defineEmits([EVENT_SUCCESS_SAVE, EVENT_SAVING]);
 
-  name: "NodeForm",
-  props: {
-    formId: { type: String, required: true },
-    node: { type: Object, required: true },
-  },
-  emits: [EVENT_SUCCESS_SAVE, EVENT_SAVING],
-  data: function () {
-    return {
-      saving: false,
-      errorMessage: "",
-      commentErrorMessage: "",
-      comment: "",
-      quantity: "",
-      itemId: null,
-      items: [],
-    };
-  },
-  computed: {
-    minCharsCount() {
-      return 3;
-    },
-    isShowStatus() {
-      return this.node.statusId !== STATUS_CREATED;
-    },
-    statusName() {
-      return getStatusName(this.node.statusId);
-    },
-    nodeItems() {
-      return this.node.items && this.node.items.length ? this.node.items : null;
-    },
-  },
-  created() {
-    this.comment = this.node.userComment;
-    this.quantity = this.node.userQuantity;
-  },
-  methods: {
-    onSubmit() {
-      if (this.saving) {
-        return;
+let itemId = null;
+const minCharsCount = 3;
+
+const saving = ref(false);
+const errorMessage = ref("");
+const commentErrorMessage = ref("");
+const comment = ref("");
+const quantity = ref("");
+const items = ref([]);
+
+const isShowStatus = computed(() => props.node.statusId !== STATUS_CREATED);
+const statusName = computed(() => getStatusName(props.node.statusId));
+const nodeItems = computed(() => {
+  return props.node.items && props.node.items.length ? props.node.items : null;
+});
+
+comment.value = props.node.userComment;
+quantity.value = props.node.userQuantity;
+
+const onSubmit = () => {
+  if (saving.value) {
+    return;
+  }
+
+  emit(EVENT_SAVING, true);
+  saving.value = true;
+  errorMessage.value = "";
+  client
+    .updateNode(props.node.id, getData())
+    .then((node) => {
+      emit(EVENT_SUCCESS_SAVE, node);
+    })
+    .catch((error) => {
+      if (error instanceof UserError) {
+        errorMessage.value = error.message;
+      } else {
+        errorMessage.value = "Возникла внутренняя ошибка.";
+        throw error;
       }
+    })
+    .finally(() => {
+      saving.value = false;
+      emit(EVENT_SAVING, false);
+    });
+};
+const onCommentInput = () => {
+  if (comment.value.length >= minCharsCount) {
+    // поиск включается спустя время, чтобы убрать множественные запросы на сервер
+    const diff = 400;
+    const now = new Date();
 
-      this.$emit(EVENT_SAVING, true);
-      this.saving = true;
-      this.errorMessage = "";
-      this.$options.client
-        .updateNode(this.node.id, this.getData())
-        .then((node) => {
-          this.$emit(EVENT_SUCCESS_SAVE, node);
-        })
-        .catch((error) => {
-          if (error instanceof UserError) {
-            this.errorMessage = error.message;
-          } else {
-            this.errorMessage = "Возникла внутренняя ошибка.";
-            throw error;
-          }
-        })
-        .finally(() => {
-          this.saving = false;
-          this.$emit(EVENT_SAVING, false);
-        });
-    },
-    onCommentInput() {
-      if (this.comment.length >= this.minCharsCount) {
-        // поиск включается спустя время, чтобы убрать множественные запросы на сервер
-        const diff = 400;
-        const now = new Date();
-
-        if (now - this.$options.lastInputTime < diff) {
-          if (this.$options.inputTimerId) {
-            clearTimeout(this.$options.inputTimerId);
-          }
-          this.$options.inputTimerId = 0;
-        }
-
-        this.$options.lastInputTime = now;
-        this.$options.inputTimerId = setTimeout(this.getItems, diff);
+    if (now - lastInputTime < diff) {
+      if (inputTimerId) {
+        clearTimeout(inputTimerId);
       }
-    },
-    getItems() {
-      this.$options.client
-        .getItems(10, { name: this.comment })
-        .catch((error) => {
-          if (error instanceof UserError) {
-            this.commentErrorMessage = error.message;
-          } else {
-            this.commentErrorMessage = "Возникла внутренняя ошибка.";
-          }
-          throw error;
-        })
-        .then((list) => {
-          this.items = list.items;
-          this.commentErrorMessage = "";
-        });
-    },
-    onCommentChange() {
-      this.items.forEach((item) => {
-        if (item.name === this.comment) {
-          this.itemId = item.id;
-        }
-      });
-    },
-    getData() {
-      return {
-        comment: this.comment,
-        quantity: this.quantity,
-        itemId: this.itemId,
-      };
-    },
-  },
+      inputTimerId = 0;
+    }
+
+    lastInputTime = now;
+    inputTimerId = setTimeout(getItems, diff);
+  }
+};
+const getItems = () => {
+  client
+    .getItems(10, { name: comment.value })
+    .then((list) => {
+      items.value = list.items;
+      commentErrorMessage.value = "";
+    })
+    .catch((error) => {
+      if (error instanceof UserError) {
+        commentErrorMessage.value = error.message;
+      } else {
+        commentErrorMessage.value = "Возникла внутренняя ошибка.";
+      }
+      throw error;
+    });
+};
+const onCommentChange = () => {
+  items.value.forEach((item) => {
+    if (item.name === comment.value) {
+      itemId = item.id;
+    }
+  });
+};
+const getData = () => {
+  return {
+    comment: comment.value,
+    quantity: quantity.value,
+    itemId,
+  };
 };
 </script>
 <style scoped>

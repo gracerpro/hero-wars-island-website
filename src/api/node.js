@@ -9,22 +9,12 @@ export const STATUS_ACCEPTED_SUCCESS = 2;
 export const STATUS_NOT_SURE = 3;
 
 export function getStatusName(statusId) {
-  let name = "";
+  const names = {
+    [STATUS_CREATED]: "Создано",
+    [STATUS_ON_MODERATION]: "На модерации",
+    [STATUS_NOT_SURE]: "Есть сомнение",
+    [STATUS_ACCEPTED_SUCCESS]: "Принято",
+  };
 
-  switch (statusId) {
-    case STATUS_CREATED:
-      name = "Создано";
-      break;
-    case STATUS_ON_MODERATION:
-      name = "На модерации";
-      break;
-    case STATUS_NOT_SURE:
-      name = "Есть сомнение";
-      break;
-    case STATUS_ACCEPTED_SUCCESS:
-      name = "Принято";
-      break;
-  }
-
-  return name;
+  return names[statusId] ? names[statusId] : "";
 }

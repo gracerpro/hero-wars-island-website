@@ -14,45 +14,30 @@
     />
   </modal-dialog>
 </template>
-<script>
+<script setup>
 import ModalDialog from "@/components/ModalDialog.vue";
 import NodeForm from "./NodeForm.vue";
+import { ref, computed } from "vue";
 
-const EVENT_MOUNTED = "mounted";
+const props = defineProps({
+  node: {
+    type: Object,
+    required: true,
+  },
+});
 
-export default {
-  name: "UpdateNodeDialog",
-  components: { ModalDialog, NodeForm },
-  props: {
-    node: { type: Object, required: true },
-  },
-  emits: [EVENT_MOUNTED],
-  data: function () {
-    return {
-      saving: false,
-    };
-  },
-  computed: {
-    dialogId() {
-      return "node-dialog__" + this.node.id;
-    },
-    formId() {
-      return this.dialogId + "__form";
-    },
-  },
-  mounted() {
-    this.$emit(EVENT_MOUNTED);
-  },
-  methods: {
-    show() {
-      return this.$refs.dialog.show();
-    },
-    onSaving(value) {
-      this.saving = value;
-    },
-    onSuccessSave(result) {
-      this.$refs.dialog.confirm(result);
-    },
-  },
-};
+const saving = ref(false);
+const dialog = ref(null);
+
+const dialogId = computed(() => "node-dialog__" + props.node.id);
+const formId = computed(() => dialogId.value + "__form");
+
+const onSaving = (value) => (saving.value = value);
+const onSuccessSave = (result) => dialog.value.confirm(result);
+
+const show = () => dialog.value.show();
+
+defineExpose({
+  show,
+});
 </script>

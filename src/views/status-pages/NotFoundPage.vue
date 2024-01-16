@@ -8,21 +8,17 @@
     </p>
   </div>
 </template>
-<script>
-export default {
-  name: "NotFoundPage",
-  inject: ["setMetaInfo"],
-  computed: {
-    returnUrl() {
-      return this.$route.query.returnUrl;
-    },
-  },
-  created() {
-    this.setMetaInfo({
-      title: "Страница не найдена",
-      description: "Страница не найдена",
-      keywords: "404, страница не найдена",
-    });
-  },
-};
+<script setup>
+import { setMetaInfo } from "@/services/page-meta";
+import { computed } from "vue";
+import { useRoute } from "vue-router";
+
+setMetaInfo({
+  title: "Страница не найдена",
+  description: "Страница не найдена",
+  keywords: "404, страница не найдена",
+});
+
+const route = useRoute();
+const returnUrl = computed(() => route.query.returnUrl);
 </script>

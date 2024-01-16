@@ -25,11 +25,6 @@
     </div>
   </div>
 </template>
-<script>
-export default {
-  name: "IslandMapLoading",
-};
-</script>
 <style scoped>
 .map {
   padding: 100px;
