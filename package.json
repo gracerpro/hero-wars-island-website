@@ -1,7 +1,8 @@
 {
   "name": "hero-wars-island-website",
   "version": "1.1.14",
-  "private": true,
+  "private": false,
+  "description": "The Hero wars islands.",
   "scripts": {
     "serve": "vue-cli-service serve",
     "lint": "vue-cli-service lint",
