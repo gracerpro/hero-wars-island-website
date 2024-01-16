@@ -121,7 +121,7 @@ import {
   EVENT_CHANGE_TRANSLATE,
   DELTA_SCALE,
   EVENT_CHANGE_SCALE,
-} from "./map";
+} from "@/services/island-map";
 
 defineProps({
   isOnlyImage: { type: Boolean, required: true },

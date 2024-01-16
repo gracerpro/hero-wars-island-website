@@ -125,7 +125,7 @@ import {
   DELTA_SCALE,
   canSelectNode,
   canSelectNextNode,
-} from "./map";
+} from "@/services/island-map";
 
 const SIDE = 50;
 const HALF_SIDE = SIDE / 2;

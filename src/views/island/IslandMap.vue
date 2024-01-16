@@ -72,7 +72,7 @@ import IslandMapToolbar from "./IslandMapToolbar.vue";
 import IslandMapContainer from "./IslandMapContainer.vue";
 import IslandMapFilter from "./IslandMapFilter.vue";
 import IslandMapTable from "./IslandMapTable.vue";
-import { canSelectNode } from "./map";
+import { canSelectNode } from "@/services/island-map";
 import { onMounted, onUnmounted, ref, computed, shallowReactive } from "vue";
 import { getHumanQunatity } from "@/helpers/formatter";
 

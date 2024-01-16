@@ -100,15 +100,16 @@ const props = defineProps({
 });
 const emit = defineEmits([EVENT_SUCCESS_SAVE, EVENT_SAVING]);
 
+let itemId = null;
+const minCharsCount = 3;
+
 const saving = ref(false);
 const errorMessage = ref("");
 const commentErrorMessage = ref("");
 const comment = ref("");
 const quantity = ref("");
-let itemId = null;
 const items = ref([]);
 
-const minCharsCount = 3;
 const isShowStatus = computed(() => props.node.statusId !== STATUS_CREATED);
 const statusName = computed(() => getStatusName(props.node.statusId));
 const nodeItems = computed(() => {
