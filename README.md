@@ -12,7 +12,6 @@ docker-compose up --detach --build --force-recreate
 Run a command, without log in to the container
 
 ```
-docker exec [container] [command]
 docker exec hero-wars-website__vue npm run build
 docker exec hero-wars-website__vue npm run lint --fix
 ```
