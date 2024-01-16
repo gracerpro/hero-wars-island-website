@@ -58,13 +58,13 @@ if (id) {
 }
 
 /**
- * @param {String} sourseId
+ * @param {String} sourceId
  * @returns {Number|null}
  */
-function queryId(sourseId) {
-  let intId = parseInt(sourseId);
+function queryId(sourceId) {
+  let intId = parseInt(sourceId);
 
-  if (intId != sourseId) {
+  if (intId != sourceId) {
     errorMessage.value = "Некорректный ID острова.";
     intId = null;
   }

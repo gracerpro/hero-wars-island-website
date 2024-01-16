@@ -1,6 +1,6 @@
 # Hero-wars island
 
-## Docker
+## Quick hints
 
 Up the containers
 
@@ -31,22 +31,39 @@ Add to `/etc/hosts` file on host computer this text
 127.0.0.1 hero-wars.vyacheslaff.local
 ```
 
-Install docker and docker-compose on host computer.
+[Install docker](https://docs.docker.com/engine/install/)
+and
+[docker-compose](https://docs.docker.com/compose/install/) on host computer.
 
-Download a sourse code.
+Download the source code
 
-Configure a docker-compose file...
+```
+git clone git@github.com:gracerpro/hero-wars-island-website.git
+```
 
-Up a docker containers.
+Copy `docker-compose.dist.yml` into `docker-compose.yml` and configure it. Change a port 8082 etc.
 
-Install dependencies
+Configre an environments by `.env` file.
+TODO: for variable VUE_APP_BACKEND_API_URL need backend server, mock all client methods.
+
+Up the docker containers
+
+```
+docker-compose up --detach --build --force-recreate
+```
+
+Install the dependencies
 
 ```bash
 docker exec hero-wars-website__vue npm install
 ```
 
-Build
+And build
 
 ```
 docker exec hero-wars-website__vue npm run build
 ```
+
+Go to `http://hero-wars.vyacheslaff.local:8082`
+
+The end.
