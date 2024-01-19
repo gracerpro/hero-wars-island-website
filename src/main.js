@@ -9,6 +9,7 @@ const app = createApp(App);
 
 if (process.env.VUE_APP_USE_SENTRY > 0) {
   Sentry.init({
+    app,
     dsn: "https://e6453d231e745bf943c79277ccdc8890@o514031.ingest.sentry.io/4506580248297472",
     integrations: [
       new Sentry.BrowserTracing({
