@@ -45,6 +45,7 @@
         <input
           v-model.trim="feedback.email"
           :disabled="submiting"
+          type="email"
           class="form-control"
           :id="formId + '__email'"
           :aria-describedby="formId + '__email__help'"
