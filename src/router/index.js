@@ -35,17 +35,17 @@ const routes = [
       import(/* webpackChunkName: "help" */ "../views/TheHelpView.vue"),
   },
   {
-    path: "/404",
-    name: "404",
+    path: "/page-not-found",
+    name: "page-not-found",
     component: () =>
       import(
-        /* webpackChunkName: "404" */ "../views/status-pages/NotFoundPage.vue"
+        /* webpackChunkName: "page-not-found" */ "../views/status-pages/NotFoundPage.vue"
       ),
   },
   {
     path: "/:catchAll(.*)",
     redirect: (to) => {
-      return { path: "/404", query: { returnUrl: to.path } };
+      return { path: "/page-not-found", query: { returnUrl: to.path } };
     },
   },
 ];

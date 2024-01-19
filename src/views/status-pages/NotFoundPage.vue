@@ -1,17 +1,12 @@
 <template>
   <div class="container">
-    <h1>Страница не найдена</h1>
-
-    <p v-if="returnUrl">
-      Была попытка перейти по адресу <code>{{ returnUrl }}</code
-      >.
-    </p>
+    <h1>404 Страница не найдена</h1>
+    <p>Возможно, страница была перемещена.</p>
+    <p><a href="/">Перейти на главную</a></p>
   </div>
 </template>
 <script setup>
 import { setMetaInfo } from "@/services/page-meta";
-import { computed } from "vue";
-import { useRoute } from "vue-router";
 
 setMetaInfo({
   title: "Страница не найдена",
@@ -19,6 +14,5 @@ setMetaInfo({
   keywords: "404, страница не найдена",
 });
 
-const route = useRoute();
-const returnUrl = computed(() => route.query.returnUrl);
+window.location.reload();
 </script>
