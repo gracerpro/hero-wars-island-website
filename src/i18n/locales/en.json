@@ -1,0 +1,54 @@
+{
+  "common": {
+    "edit": "Edit",
+    "haveErrosOrProposal": "Have an error or proposal?",
+    "heroWarsDominionEra ": "Hero Wars Dominion Era",
+    "quantity": "Quantity",
+    "island": "Island|Islands",
+    "help": "Help",
+    "needEnterAtLeastCharacters": "Need to enter at least {n} characters",
+    "reset": "Reset",
+    "resource": "Resource",
+    "send": "Send",
+    "status": "Status",
+    "type": "Type",
+    "version": "Version"
+  },
+  "page": {
+    "about": {
+      "coolHelpProject": "Если кто то желает помочь проекту будет круто.",
+      "feedbackQuestions": "Что можно улучшить? Что лишнее? Что переделать? Что не работает?",
+      "iWillAcceptAnyFeedback": "I will accept any feedback",
+      "projectAbout": "About",
+      "paragraph1": " Изначально было желание сделать функционал, где вводится доступное количетво ходов и есть кнопка \"Найти лучшие награды\". При нажатии на кнопку рассчитывается путь. Карта это набор узлов, похоже на графы. Но при рассчете нужно учесть человеческий фактор: кому то выгодней взять изумруды, а кому то камни облика. Поэтому от этого функционала отказался. Пусть человек сам строит путь и получает нужные награды.",
+      "reasons": "Reasons",
+      "reason1": "На первой карте острова, когда было набрано большое количество ходов, рассчитать ходы и награды было сложно. Лучшие награды лежат в башнях. Башни расположены далеко от центра. Хватит ли ходов до них?... Сложно рассчитать, очень. Проще разметить путь как на листе бумаги.",
+      "reason2": "При доступной открытой карте также сложно было искать награды. Например, нужны изумруды, на карте сотня точек с разными картинками, среди которых не просто разглядеть нужную. Так надо еще и запомнить... Проще отфильтровать иконки."
+    },
+    "contact": {
+      "canBeEmpty": "Can be empty",
+      "contacts": "Contacts",
+      "email": "Email",
+      "message": "Message",
+      "theme": "Theme",
+      "username": "Username",
+      "todo1": "todo1",
+      "todo2": "todo2"
+    },
+    "home": {
+      "firstParagraph": "In a game show new event - Adventure island. On this island need to spend the explorer's moves and to open the map`s node, get a gifts. First time all map is hidden and it is not known which way to move for get the best gift.",
+      "openIslandTogether": "Open an island together!"
+    },
+    "island": {
+      "showEditNodes": "Show edit an nodes?",
+      "showOnlyIconWithoutQuantity": "Show only icon without quantity?",
+      "myExplorersMoves": "My explorer's moves",
+      "zoomIn": "Zoom in",
+      "zoomOut": "Zoom out",
+      "todo1": "todo1",
+      "todo2": "todo2",
+      "todo3": "todo3",
+      "todo4": "todo4"
+    }
+  }
+}
