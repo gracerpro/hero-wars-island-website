@@ -1,18 +1,31 @@
 {
   "common": {
+    "cancel": "Cancel",
+    "chest": "Chest",
     "edit": "Edit",
     "haveErrosOrProposal": "Have an error or proposal?",
+    "help": "Help",
     "heroWarsDominionEra": "Hero Wars Dominion Era",
     "quantity": "Quantity",
-    "island": "Island|Islands",
-    "help": "Help",
+    "internalError": "An internal error has occurred.",
+    "island": "Island | Islands",
+    "islandMap": "Island's map",
+    "loadingFailDeveloperShow": "Loading failed. The developers see the problem and will fix it soon.",
+    "map": "Map",
     "needEnterAtLeastCharacters": "Need to enter at least {n} characters",
+    "node": "Node | Nodes",
+    "noData": "No data",
     "reset": "Reset",
-    "resource": "Resource",
+    "resource": "Resource | Resources",
+    "save": "Save",
     "send": "Send",
+    "startNode": "Start",
     "status": "Status",
+    "tower": "Tower",
     "type": "Type",
-    "version": "Version"
+    "version": "Version",
+    "zoomIn": "Zoom in",
+    "zoomOut": "Zoom out"
   },
   "locale": {
     "en": "English",
@@ -55,20 +68,31 @@
       "adventureIsland": "Adventures island | Adventures islands",
       "firstParagraph": "There is a new <b>Adventure</b> Island event in the game. Where you need to spend the researcher's moves and open the map nodes, receive gifts. Initially, the entire map is closed and it is unknown which way to move to get the best prize. Let's discover the island together!",
       "fromToDates": "от {dateFrom} до {dateTo}",
-      "loadingFailDeveloperShow": "Failed to upload. The developers see the problem and will fix it soon.",
       "notFound": "Not found",
       "toDateDaysCount": "to {toDate}, days left {daysCount}"
     },
     "island": {
+      "failNodesLoading": "Failed to load map nodes",
+      "islandNotAvailable": "The island is not available.",
+      "islandNotFound": "The island is not found.",
+      "quantityHint": "The default is 1. If there are several names, then the first number corresponds to the first name, etc.",
+      "myExplorersMoves": "My explorer's moves",
       "showEditNodes": "Show edit an nodes?",
       "showOnlyIconWithoutQuantity": "Show only icon without quantity?",
-      "myExplorersMoves": "My explorer's moves",
-      "zoomIn": "Zoom in",
-      "zoomOut": "Zoom out",
       "todo1": "todo1",
       "todo2": "todo2",
       "todo3": "todo3",
-      "todo4": "todo4"
+      "todo4": "todo4",
+      "helpOnQuestion": "On the cell with the question mark, you need to enter or correct the resource",
+      "helpParagraph1": "When moving the cursor, if you press the middle mouse button, the shift.",
+      "helpParagraph2": "Scroll with the middle mouse button - zoom in or out.",
+      "helpResource1": "The name of the resource, the main thing is clear. Several names are separated by a comma.",
+      "helpResource2": "The quantity, if greater than 1 (for example, 123, 300k, 5M). If there are several names, then the first number corresponds to the first name, etc.",
+      "oneResource": "One resource",
+      "namesByComma": "Several names are separated by a comma.",
+      "notFoundNodeAdmin": "The node was not found. Contact the administrators.",
+      "notLinkedImage": "image is not linked",
+      "notLinkedResource": "Resources are not linked"
     }
   }
 }

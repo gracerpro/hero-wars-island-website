@@ -11,7 +11,9 @@
         height="220"
         class="d-block mx-auto"
       />
-      <div class="text-center text-warning fw-bold">Карта не доступна</div>
+      <div class="text-center text-warning fw-bold">
+        {{ t("page.island.islandNotAvailable") }}
+      </div>
     </div>
     <div v-else>
       <h1>{{ island.name }}</h1>
@@ -27,6 +29,9 @@ import HttpError from "@/exceptions/HttpError";
 import { setMetaInfo } from "@/services/page-meta";
 import { ref, watch } from "vue";
 import { useRoute } from "vue-router";
+import { useI18n } from "vue-i18n";
+
+const { t } = useI18n();
 
 const pageId = "islandPage";
 const client = new HeroClient();
@@ -47,8 +52,8 @@ watch(
 );
 
 setMetaInfo({
-  title: "Карта острова",
-  description: "",
+  title: t("common.islandMap"),
+  description: t("common.islandMap"),
   keywords: "Хроники хаоса, Эра доминиона, карта острова, карта",
 });
 
@@ -65,7 +70,7 @@ function queryId(sourceId) {
   let intId = parseInt(sourceId);
 
   if (intId != sourceId) {
-    errorMessage.value = "Некорректный ID острова.";
+    errorMessage.value = t("page.island.islandNotFound");
     intId = null;
   }
 
@@ -84,16 +89,15 @@ function loadIsland(id) {
       island.value = responseIsland;
       if (responseIsland) {
         setMetaInfo({
-          title: responseIsland.name + " - Карта острова",
+          title: responseIsland.name + " - " + t("common.islandMap"),
         });
       }
     })
     .catch((error) => {
       if (error instanceof HttpError && error.statusCode === 404) {
-        errorMessage.value = "Карта не найдена.";
+        errorMessage.value = t("page.island.islandNotFound");
       } else {
-        errorMessage.value =
-          "Не удалось загрузить карту. Разработчики видят проблему и в скором времени починят.";
+        errorMessage.value = t("common.loadingFailDeveloperShow");
       }
     })
     .finally(() => (islandLoading.value = false));

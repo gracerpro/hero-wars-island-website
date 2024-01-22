@@ -3,13 +3,13 @@
     <thead>
       <tr>
         <th></th>
-        <th>Ресурс</th>
-        <th>Количество</th>
+        <th>{{ t("common.resource") }}</th>
+        <th>{{ t("common.quantity") }}</th>
       </tr>
     </thead>
     <tbody>
       <tr v-if="!items.length">
-        <td colspan="3">Нет данных.</td>
+        <td colspan="3">{{ t("common.noData") }}</td>
       </tr>
       <tr v-else v-for="item in items" :key="item.uniqueId">
         <td>
@@ -28,9 +28,12 @@
   </table>
 </template>
 <script setup>
+import { useI18n } from "vue-i18n";
+
 defineProps({
   items: { type: Array, required: true },
 });
+const { t } = useI18n();
 </script>
 <style scoped>
 .icon {

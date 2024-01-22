@@ -40,10 +40,10 @@
         </div>
         <div class="col-lg-6">
           <div class="mb-2">
-            <router-link to="/contact" class="float-end"
-              >Есть ошибка или предложение?</router-link
-            >
-            Мои ходы
+            <router-link to="/contact" class="float-end">{{
+              t("common.haveErrosOrProposal")
+            }}</router-link>
+            {{ t("page.island.myExplorersMoves") }}
           </div>
           <div>
             <b class="fs-4 me-2 align-middle">{{ userNodesCount }}</b>
@@ -55,7 +55,7 @@
               ]"
               @click="onResetUserNodes"
             >
-              Сбросить
+              {{ t("common.reset") }}
             </button>
           </div>
           <div class="form-text fw-normal">&nbsp;</div>
@@ -75,6 +75,9 @@ import IslandMapTable from "./IslandMapTable.vue";
 import { canSelectNode } from "@/services/island-map";
 import { onMounted, onUnmounted, ref, computed, shallowReactive } from "vue";
 import { getHumanQunatity } from "@/helpers/formatter";
+import { useI18n } from "vue-i18n";
+
+const { t } = useI18n();
 
 const MAX_SCALE = 3;
 const MIN_SCALE = 0.3;
@@ -152,7 +155,7 @@ async function loadNodes() {
       nodes[node.id] = node;
     });
   } catch (error) {
-    errorMessage.value = "Не удалось загрузить узлы карты.";
+    errorMessage.value = t("page.island.failNodesLoading");
   } finally {
     loadingNodes.value = false;
   }
@@ -242,7 +245,7 @@ const onChangeIsShowNoModerate = () => {
 };
 const onChangeNode = (node) => {
   if (!nodes.value[node.id]) {
-    throw new Error("Узел не найден. Обратитесь к администраторам.");
+    throw new Error(t("page.island.notFoundNodeAdmin"));
   }
   nodes.value[node.id] = node;
 };
@@ -251,7 +254,7 @@ const onSelectNode = (id, isRemove) => {
     delete userNodes.value[id];
   } else {
     if (!nodes.value[id]) {
-      throw new Error("Узел не найден. Обратитесь к администраторам.");
+      throw new Error(t("page.island.notFoundNodeAdmin"));
     }
     userNodes.value[id] = nodes.value[id];
   }

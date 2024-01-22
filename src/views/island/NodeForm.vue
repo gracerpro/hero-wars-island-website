@@ -2,7 +2,9 @@
   <form @submit.prevent="onSubmit" :id="formId">
     <div class="row">
       <div v-if="isShowStatus" class="col-md-4 mb-3">
-        <label :for="formId + '__status'" class="form-label">Статус</label>
+        <label :for="formId + '__status'" class="form-label">{{
+          t("common.status")
+        }}</label>
         <input
           class="form-control"
           :id="formId + '__status'"
@@ -12,7 +14,7 @@
         />
       </div>
       <div class="col-md-8" v-if="nodeItems">
-        <label class="form-label">Ресурсы</label>
+        <label class="form-label">{{ t("common.resource", 2) }}</label>
         <ul class="list-unstyled">
           <li v-for="item in nodeItems" :key="item.id" class="mb-1">
             <img
@@ -30,7 +32,9 @@
     </div>
 
     <div class="mb-3">
-      <label :for="formId + '__comment'" class="form-label">Ресурс</label>
+      <label :for="formId + '__comment'" class="form-label">{{
+        t("common.resource")
+      }}</label>
       <input
         v-model.trim="comment"
         required
@@ -50,8 +54,7 @@
         {{ commentErrorMessage }}
       </div>
       <div v-else class="form-text" :id="formId + '__commentHelp'">
-        При вводе от {{ minCharsCount }} символов можно выбрать из списка, нажав
-        клавишу "Вниз", затем "Ввод". Несколько названий разделяется запятой.
+        {{ t("page.island.namesByComma") }}
       </div>
       <datalist :id="formId + '__comment__datalist'">
         <option
@@ -62,7 +65,9 @@
       </datalist>
     </div>
     <div>
-      <label :for="formId + '__quantity'" class="form-label">Количество</label>
+      <label :for="formId + '__quantity'" class="form-label">{{
+        t("common.quantity")
+      }}</label>
       <input
         v-model.trim="quantity"
         class="form-control"
@@ -71,8 +76,7 @@
         :aria-describedby="formId + '__quantityHelp'"
       />
       <div class="form-text" :id="formId + '__quantityHelp'">
-        По-умолчанию 1. Если названий несколько, то первое количество
-        соответстветствует первому названию и т. д.
+        {{ t("page.island.quantityHint") }}
       </div>
     </div>
     <div v-show="errorMessage.length" class="alert alert-danger mb-0 mt-3">
@@ -89,6 +93,9 @@ import HeroClient from "@/api/HeroClient";
 import { STATUS_CREATED, getStatusName } from "@/api/node";
 import UserError from "@/exceptions/UserError";
 import { computed, ref } from "vue";
+import { useI18n } from "vue-i18n";
+
+const { t } = useI18n();
 
 const client = new HeroClient();
 let lastInputTime = 0;
@@ -136,7 +143,7 @@ const onSubmit = () => {
       if (error instanceof UserError) {
         errorMessage.value = error.message;
       } else {
-        errorMessage.value = "Возникла внутренняя ошибка.";
+        errorMessage.value = t("common.internalError");
         throw error;
       }
     })
@@ -147,7 +154,7 @@ const onSubmit = () => {
 };
 const onCommentInput = () => {
   if (comment.value.length >= minCharsCount) {
-    // поиск включается спустя время, чтобы убрать множественные запросы на сервер
+    // show a list after some time, to remove multiple queries to server
     const diff = 400;
     const now = new Date();
 
@@ -173,7 +180,7 @@ const getItems = () => {
       if (error instanceof UserError) {
         commentErrorMessage.value = error.message;
       } else {
-        commentErrorMessage.value = "Возникла внутренняя ошибка.";
+        commentErrorMessage.value = t("common.internalError");
       }
       throw error;
     });

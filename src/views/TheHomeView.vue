@@ -66,7 +66,7 @@ function loadIslands() {
       islands.value = list.items;
     })
     .catch(() => {
-      errorMessage.value = t("page.home.loadingFailDeveloperShow");
+      errorMessage.value = t("common.loadingFailDeveloperShow");
     })
     .finally(() => (islandsLoading.value = false));
 }
