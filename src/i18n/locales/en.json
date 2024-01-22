@@ -2,7 +2,7 @@
   "common": {
     "edit": "Edit",
     "haveErrosOrProposal": "Have an error or proposal?",
-    "heroWarsDominionEra ": "Hero Wars Dominion Era",
+    "heroWarsDominionEra": "Hero Wars Dominion Era",
     "quantity": "Quantity",
     "island": "Island|Islands",
     "help": "Help",
@@ -51,8 +51,13 @@
       "todo2": "Make a button \"show the whole island\"."
     },
     "home": {
-      "firstParagraph": "In a game show new event - Adventure island. On this island need to spend the explorer's moves and to open the map`s node, get a gifts. First time all map is hidden and it is not known which way to move for get the best gift.",
-      "openIslandTogether": "Open an island together!"
+      "actual": "Actual",
+      "adventureIsland": "Adventures island | Adventures islands",
+      "firstParagraph": "There is a new <b>Adventure</b> Island event in the game. Where you need to spend the researcher's moves and open the map nodes, receive gifts. Initially, the entire map is closed and it is unknown which way to move to get the best prize. Let's discover the island together!",
+      "fromToDates": "от {dateFrom} до {dateTo}",
+      "loadingFailDeveloperShow": "Failed to upload. The developers see the problem and will fix it soon.",
+      "notFound": "Not found",
+      "toDateDaysCount": "to {toDate}, days left {daysCount}"
     },
     "island": {
       "showEditNodes": "Show edit an nodes?",

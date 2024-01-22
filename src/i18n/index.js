@@ -8,4 +8,5 @@ export default setupI18n({
   legacy: false,
   globalInjection: true,
   messages: { ru, en },
+  warnHtmlMessage: false,
 });

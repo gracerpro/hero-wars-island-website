@@ -1,14 +1,12 @@
 <template>
   <div class="container">
-    <h1>Острова приключений - Хроники Хаоса Эра Доминиона</h1>
-    <p>
-      В игре появилось новое событие <b>Остров приключений</b>. На котором нужно
-      тратить ходы исследователя и открывать узлы карты, получать подарки.
-      Изначально вся карта закрыта и неизвестно в какую сторону двигаться чтобы
-      получить лучший приз. Откроем остров вместе!
-    </p>
+    <h1>
+      {{ t("page.home.adventureIsland", 2) }} -
+      {{ t("common.heroWarsDominionEra") }}
+    </h1>
+    <p v-html="t('page.home.firstParagraph')"></p>
 
-    <h3>Острова</h3>
+    <h3>{{ t("common.island", 2) }}</h3>
     <div v-if="islandsLoading">
       <span class="placeholder col-4"></span><br />
       <span class="placeholder col-4"></span><br />
@@ -18,7 +16,7 @@
       {{ errorMessage }}
     </div>
     <div v-else-if="!islands.length" class="alert alert-warning">
-      Не найдено доступных.
+      {{ t("page.home.notFound") }}
     </div>
     <ol v-else>
       <li v-for="island in islands" :key="island.id">
@@ -27,9 +25,9 @@
           :class="[isActual(island) ? '' : 'text-secondary']"
           >{{ island.name + " " + getIslandHint(island) }}</router-link
         >
-        <span v-if="isActual(island)" class="badge text-bg-primary ms-2"
-          >актуально</span
-        >
+        <span v-if="isActual(island)" class="badge text-bg-primary ms-2">{{
+          t("page.home.actual")
+        }}</span>
       </li>
     </ol>
   </div>
@@ -39,6 +37,9 @@ import HeroClient from "@/api/HeroClient";
 import { fromCurrentDate } from "@/helpers/formatter";
 import { setMetaInfo } from "@/services/page-meta";
 import { ref } from "vue";
+import { useI18n } from "vue-i18n";
+
+const { t } = useI18n();
 
 const client = new HeroClient();
 const now = new Date();
@@ -48,7 +49,8 @@ const islandsLoading = ref(false);
 const errorMessage = ref("");
 
 setMetaInfo({
-  title: "Хроники хаоса Эра доминиона карта острова",
+  title:
+    t("page.home.adventureIsland", 2) + " - " + t("common.heroWarsDominionEra"),
   description:
     "В игре Хроники Хаоса на карте острова открыты все узлы, соберем все призы вместе!",
   keywords: "Хроники хаоса, Эра доминиона, карта острова, карта, событие",
@@ -64,8 +66,7 @@ function loadIslands() {
       islands.value = list.items;
     })
     .catch(() => {
-      errorMessage.value =
-        "Не удалось загрузить. Разработчики видят проблему и в скором времени починят.";
+      errorMessage.value = t("page.home.loadingFailDeveloperShow");
     })
     .finally(() => (islandsLoading.value = false));
 }
@@ -78,15 +79,16 @@ function getIslandHint(island) {
   let result = "";
 
   if (island.eventEndAt < now) {
-    result =
-      "от " +
-      fromCurrentDate(island.eventStartAt) +
-      " до " +
-      fromCurrentDate(island.eventEndAt);
+    result = t("page.home.fromToDates", {
+      dateFrom: fromCurrentDate(island.eventStartAt),
+      dateTo: fromCurrentDate(island.eventEndAt),
+    });
   } else {
     const days = Math.ceil((island.eventEndAt - now) / 1000 / 60 / 60 / 24);
-    result =
-      "до " + fromCurrentDate(island.eventEndAt) + ", осталось дней " + days;
+    result = t("page.home.toDateDaysCount", {
+      toDate: fromCurrentDate(island.eventEndAt),
+      daysCount: days,
+    });
   }
 
   return result;
