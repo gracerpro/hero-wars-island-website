@@ -1,5 +1,11 @@
 import { createRouter, createWebHistory } from "vue-router";
 import TheHomeView from "../views/TheHomeView.vue";
+import {
+  isAvailableLocale,
+  isSupportLocale,
+  loadLocaleMessages,
+  setLanguage,
+} from "@/i18n/translation";
 
 const routes = [
   {
@@ -57,13 +63,24 @@ const router = createRouter({
   linkExactActiveClass: "",
 });
 
-router.beforeEach((to, from, next) => {
+router.beforeEach(async (to, from, next) => {
   if (to.path.length > 1 && to.path.endsWith("/")) {
     const newTo = { ...to };
     newTo.path = to.path.slice(0, -1);
 
     next(newTo);
     return;
+  }
+
+  const paramsLocale = to.params.locale;
+
+  console.log(paramsLocale, isSupportLocale(paramsLocale));
+
+  if (isSupportLocale(paramsLocale)) {
+    if (!isAvailableLocale(paramsLocale)) {
+      await loadLocaleMessages(paramsLocale);
+    }
+    setLanguage(paramsLocale);
   }
 
   callNext(next, to, from);

@@ -4,6 +4,7 @@ import router from "./router";
 import store from "./store";
 import "bootstrap/dist/css/bootstrap.min.css";
 import * as Sentry from "@sentry/vue";
+import i18n from "@/i18n";
 
 const app = createApp(App);
 
@@ -29,4 +30,4 @@ if (process.env.VUE_APP_USE_SENTRY > 0) {
   });
 }
 
-app.use(store).use(router).mount("#app");
+app.use(store).use(router).use(i18n).mount("#app");

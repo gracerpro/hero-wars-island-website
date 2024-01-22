@@ -32,8 +32,8 @@
       "message": "Message",
       "theme": "Theme",
       "username": "Username",
-      "todo1": "todo1",
-      "todo2": "todo2"
+      "fillFieldsForContact": "If you have any interesting ideas or questions, please fill in the following fields on the contact form. Thanks!",
+      "ctrlF5": "If something doesn't work, then maybe a magic page refresh will help, Ctrl+F5."
     },
     "help": {
       "helpToProject": "Project's help",

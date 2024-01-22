@@ -1,7 +1,9 @@
 <template>
   <form @submit.prevent="onSubmit">
     <div class="mb-3 mt-2">
-      <label class="form-label" :for="formId + '__subject'">Тема</label>
+      <label class="form-label" :for="formId + '__subject'">{{
+        t("page.contact.theme")
+      }}</label>
       <input
         v-model.trim="feedback.subject"
         :disabled="submiting"
@@ -12,7 +14,9 @@
       />
     </div>
     <div class="mb-3">
-      <label :for="formId + '__message'" class="form-label">Сообщение</label>
+      <label :for="formId + '__message'" class="form-label">{{
+        t("page.contact.message")
+      }}</label>
       <textarea
         v-model.trim="feedback.message"
         class="form-control"
@@ -24,9 +28,9 @@
     </div>
     <div class="row">
       <div class="col-lg-6 mb-3">
-        <label :for="formId + '__username'" class="form-label"
-          >Имя пользователя</label
-        >
+        <label :for="formId + '__username'" class="form-label">{{
+          t("page.contact.username")
+        }}</label>
         <input
           v-model.trim="feedback.username"
           :disabled="submiting"
@@ -35,13 +39,13 @@
           :aria-describedby="formId + '__username__help'"
         />
         <div :id="formId + '__username__help'" class="form-text">
-          Можно не заполнять
+          {{ t("page.contact.canBeEmpty") }}
         </div>
       </div>
       <div class="col-lg-6 mb-3">
-        <label :for="formId + '__email'" class="form-label"
-          >Электронная почта</label
-        >
+        <label :for="formId + '__email'" class="form-label">{{
+          t("page.contact.email")
+        }}</label>
         <input
           v-model.trim="feedback.email"
           :disabled="submiting"
@@ -51,7 +55,7 @@
           :aria-describedby="formId + '__email__help'"
         />
         <div :id="formId + '__email__help'" class="form-text">
-          Можно не заполнять
+          {{ t("page.contact.canBeEmpty") }}
         </div>
       </div>
     </div>
@@ -71,7 +75,7 @@
           class="spinner-border spinner-border-sm"
           aria-hidden="true"
         ></span>
-        Отправить
+        {{ t("common.send") }}
       </button>
     </div>
 
@@ -86,6 +90,9 @@ import ToastMessage, {
   TYPE_DANGER,
 } from "@/components/ToastMessage.vue";
 import { ref, shallowReactive, onMounted } from "vue";
+import { useI18n } from "vue-i18n";
+
+const { t } = useI18n();
 
 const client = new HeroClient();
 const createdDate = new Date();
