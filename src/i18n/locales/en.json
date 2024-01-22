@@ -14,16 +14,21 @@
     "type": "Type",
     "version": "Version"
   },
+  "locale": {
+    "en": "English",
+    "ru": "Russian"
+  },
   "page": {
     "about": {
-      "coolHelpProject": "Если кто то желает помочь проекту будет круто.",
-      "feedbackQuestions": "Что можно улучшить? Что лишнее? Что переделать? Что не работает?",
-      "iWillAcceptAnyFeedback": "I will accept any feedback",
+      "coolHelpProject": "If someone wants to help the project",
+      "coolHelpProjectLink": "it will be cool.",
+      "feedbackQuestions": "What can be improved? What is superfluous? What should I redo? What doesn't work?",
+      "iWillAcceptAnyFeedback": "I will accept any feedback.",
       "projectAbout": "About",
-      "paragraph1": " Изначально было желание сделать функционал, где вводится доступное количетво ходов и есть кнопка \"Найти лучшие награды\". При нажатии на кнопку рассчитывается путь. Карта это набор узлов, похоже на графы. Но при рассчете нужно учесть человеческий фактор: кому то выгодней взять изумруды, а кому то камни облика. Поэтому от этого функционала отказался. Пусть человек сам строит путь и получает нужные награды.",
+      "paragraph1": "Initially, there was a desire to make a functional where the available number of moves is entered and there is a button \"Find the best rewards\". When you click on the button, the path is calculated. A map is a set of nodes, similar to graphs. But when calculating, you need to take into account the human factor: it is more profitable for someone to take emeralds, and for someone to take stones of appearance. Therefore, I refused this functionality. Let the person build the path himself and receive the necessary rewards.",
       "reasons": "Reasons",
-      "reason1": "На первой карте острова, когда было набрано большое количество ходов, рассчитать ходы и награды было сложно. Лучшие награды лежат в башнях. Башни расположены далеко от центра. Хватит ли ходов до них?... Сложно рассчитать, очень. Проще разметить путь как на листе бумаги.",
-      "reason2": "При доступной открытой карте также сложно было искать награды. Например, нужны изумруды, на карте сотня точек с разными картинками, среди которых не просто разглядеть нужную. Так надо еще и запомнить... Проще отфильтровать иконки."
+      "reason1": "On the first map of the island, when a large number of moves were scored, it was difficult to calculate the moves and rewards. The best rewards are in the towers. The towers are located far from the center. Will there be enough moves before them?... It is difficult to calculate, very difficult. It is easier to mark the path as on a piece of paper.",
+      "reason2": "With an open card available, it was also difficult to look for rewards. For example, emeralds are needed, there are hundreds of dots on the map with different pictures, among which it is not easy to see the right one. So you also need to remember... It's easier to filter the icons."
     },
     "contact": {
       "canBeEmpty": "Can be empty",
