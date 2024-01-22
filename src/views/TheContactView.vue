@@ -21,7 +21,7 @@ import { setMetaInfo } from "@/services/page-meta";
 import ContactForm from "./ContactForm.vue";
 
 setMetaInfo({
-  title: "Контакты",
+  title: "Контакты и обратная связь",
   description: "Оставить обратную связь, связаться с администратором",
   keywords: "контакты, связаться с автором, связь, обратная связь",
 });

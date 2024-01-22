@@ -26,3 +26,13 @@
     </ul>
   </div>
 </template>
+<script setup>
+import { setMetaInfo } from "@/services/page-meta";
+
+setMetaInfo({
+  title: "Помощь проекту",
+  description:
+    "Исходный код открыт, кто желает улучшить проект присоединяйтесь!",
+  keywords: "исходный код открыт, помощь, todo, тестирование",
+});
+</script>
