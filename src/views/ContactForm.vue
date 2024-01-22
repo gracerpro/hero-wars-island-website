@@ -132,14 +132,14 @@ const onSubmit = () => {
       feedback.message = "";
       feedback.subject = "";
 
-      toast.value.show("Сообщение успешно создано.", TYPE_SUCCESS);
+      toast.value.show(t("page.contact.messageWasCreated"), TYPE_SUCCESS);
     })
     .catch((error) => {
       if (error instanceof UserError) {
         errorMessage.value = error.message;
         toast.value.show(error.message, TYPE_DANGER);
       } else {
-        errorMessage.value = "Возникла внутренняя ошибка.";
+        errorMessage.value = t("common.internalError");
         throw error;
       }
     })
