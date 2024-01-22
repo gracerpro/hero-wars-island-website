@@ -8,12 +8,12 @@ export const STATUS_ON_MODERATION = 1;
 export const STATUS_ACCEPTED_SUCCESS = 2;
 export const STATUS_NOT_SURE = 3;
 
-export function getStatusName(statusId) {
+export function getStatusName(t, statusId) {
   const names = {
-    [STATUS_CREATED]: "Создано",
-    [STATUS_ON_MODERATION]: "На модерации",
-    [STATUS_NOT_SURE]: "Есть сомнение",
-    [STATUS_ACCEPTED_SUCCESS]: "Принято",
+    [STATUS_CREATED]: t("common.created"),
+    [STATUS_ON_MODERATION]: t("common.onModeration"),
+    [STATUS_NOT_SURE]: t("common.haveDoubts"),
+    [STATUS_ACCEPTED_SUCCESS]: t("common.accepted"),
   };
 
   return names[statusId] ? names[statusId] : "";

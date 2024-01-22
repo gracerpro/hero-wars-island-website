@@ -21,7 +21,7 @@
       <clear-select
         :modelValue="typeId"
         :input-id="formId + '__typeId'"
-        :select-values="getLabelsByTypes()"
+        :select-values="getLabelsByTypes(t)"
         @update:model-value="onChangeType"
       />
     </div>

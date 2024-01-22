@@ -118,7 +118,7 @@ const quantity = ref("");
 const items = ref([]);
 
 const isShowStatus = computed(() => props.node.statusId !== STATUS_CREATED);
-const statusName = computed(() => getStatusName(props.node.statusId));
+const statusName = computed(() => getStatusName(t, props.node.statusId));
 const nodeItems = computed(() => {
   return props.node.items && props.node.items.length ? props.node.items : null;
 });

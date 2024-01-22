@@ -460,7 +460,7 @@ const getWarningTitle = (item) => {
     item.node.statusId === STATUS_ON_MODERATION ||
     item.node.statusId === STATUS_NOT_SURE
   ) {
-    return getStatusName(item.node.statusId);
+    return getStatusName(t, item.node.statusId);
   }
   if (!item.node.items || !item.node.items.length) {
     return t("page.island.notLinkedResource");
