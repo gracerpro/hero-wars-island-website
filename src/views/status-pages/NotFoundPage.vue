@@ -2,7 +2,9 @@
   <div class="container">
     <h1>404 {{ notFound }}</h1>
     <p>{{ t("common.movedPageMayBe") }}</p>
-    <p><a href="/">{{ t("common.goToHome") }}</a></p>
+    <p>
+      <a href="/">{{ t("common.goToHome") }}</a>
+    </p>
   </div>
 </template>
 <script setup>

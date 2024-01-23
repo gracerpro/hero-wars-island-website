@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <h1>{{ t("page.about.projectAbout") }}</h1>
+    <h1>{{ t("common.projectAbout") }}</h1>
     <p>{{ t("page.about.paragraph1") }}</p>
     <p>{{ t("page.about.reasons") }}</p>
     <ol>
@@ -28,7 +28,7 @@ import { useI18n } from "vue-i18n";
 const { t } = useI18n();
 
 setMetaInfo({
-  title: t("page.about.projectAbout"),
+  title: t("common.projectAbout"),
   description:
     "В игре Хроники Хаоса на карте острова находятся узлы, чтобы их открыть нужно потратить ход исследователя. Ходы можно получить от событий игры. Соберем все призы вместе!",
   keywords:
