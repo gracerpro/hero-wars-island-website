@@ -4,36 +4,49 @@ import { isSupportLocale, setLanguage } from "@/i18n/translation";
 
 const routes = [
   {
-    path: "/",
-    name: "home",
-    component: TheHomeView,
-  },
-  {
-    path: "/about",
-    name: "about",
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
-    component: () =>
-      import(/* webpackChunkName: "about" */ "../views/TheAboutView.vue"),
-  },
-  {
-    path: "/contact",
-    name: "contact",
-    component: () =>
-      import(/* webpackChunkName: "contact" */ "../views/TheContactView.vue"),
-  },
-  {
-    path: "/islands/:id",
-    name: "island",
-    component: () =>
-      import(/* webpackChunkName: "island" */ "../views/TheIslandView.vue"),
-  },
-  {
-    path: "/help",
-    name: "help",
-    component: () =>
-      import(/* webpackChunkName: "help" */ "../views/TheHelpView.vue"),
+    path: "/:locale?",
+    children: [
+      {
+        path: "",
+        name: "home",
+        component: TheHomeView,
+      },
+      {
+        path: "about",
+        name: "about",
+        // route level code-splitting
+        // this generates a separate chunk (about.[hash].js) for this route
+        // which is lazy-loaded when the route is visited.
+        component: () =>
+          import(/* webpackChunkName: "about" */ "../views/TheAboutView.vue"),
+      },
+      {
+        path: "contact",
+        name: "contact",
+        component: () =>
+          import(
+            /* webpackChunkName: "contact" */ "../views/TheContactView.vue"
+          ),
+      },
+      {
+        path: "islands/:id",
+        name: "island",
+        component: () =>
+          import(/* webpackChunkName: "island" */ "../views/TheIslandView.vue"),
+      },
+      {
+        path: "help",
+        name: "help",
+        component: () =>
+          import(/* webpackChunkName: "help" */ "../views/TheHelpView.vue"),
+      },
+      {
+        path: ":catchAll(.*)",
+        redirect: (to) => {
+          return { path: "/page-not-found", query: { returnUrl: to.path } };
+        },
+      },
+    ],
   },
   {
     path: "/page-not-found",

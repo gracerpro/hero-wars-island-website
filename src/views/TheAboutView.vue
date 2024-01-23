@@ -8,14 +8,14 @@
       <li>{{ t("page.about.reason2") }}</li>
     </ol>
     <p>
-      <router-link to="/contact">{{
+      <router-link :to="createI18nRouteTo({ name: 'contact' })">{{
         t("page.about.iWillAcceptAnyFeedback")
       }}</router-link>
       {{ t("page.about.feedbackQuestions") }}
     </p>
     <p>
       {{ t("page.about.coolHelpProject") }}
-      <router-link to="/help">{{
+      <router-link :to="createI18nRouteTo({ name: 'help' })">{{
         t("page.about.coolHelpProjectLink")
       }}</router-link>
     </p>
@@ -24,6 +24,7 @@
 <script setup>
 import { setMetaInfo } from "@/services/page-meta";
 import { useI18n } from "vue-i18n";
+import { createI18nRouteTo } from "@/i18n/translation";
 
 const { t } = useI18n();
 

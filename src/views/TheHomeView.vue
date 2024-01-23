@@ -21,7 +21,7 @@
     <ol v-else>
       <li v-for="island in islands" :key="island.id">
         <router-link
-          :to="{ name: 'island', params: { id: island.id } }"
+          :to="createI18nRouteTo({ name: 'island', params: { id: island.id } })"
           :class="[isActual(island) ? '' : 'text-secondary']"
           >{{ island.name + " " + getIslandHint(island) }}</router-link
         >
@@ -38,6 +38,7 @@ import { fromCurrentDate } from "@/helpers/formatter";
 import { setMetaInfo } from "@/services/page-meta";
 import { ref } from "vue";
 import { useI18n } from "vue-i18n";
+import { createI18nRouteTo } from "@/i18n/translation";
 
 const { t, locale } = useI18n();
 

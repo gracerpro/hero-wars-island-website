@@ -40,9 +40,11 @@
         </div>
         <div class="col-lg-6">
           <div class="mb-2">
-            <router-link to="/contact" class="float-end">{{
-              t("common.haveErrosOrProposal")
-            }}</router-link>
+            <router-link
+              :to="createI18nRouteTo({ name: 'contact' })"
+              class="float-end"
+              >{{ t("common.haveErrosOrProposal") }}</router-link
+            >
             {{ t("page.island.myExplorersMoves") }}
           </div>
           <div>
@@ -76,6 +78,7 @@ import { canSelectNode } from "@/services/island-map";
 import { onMounted, onUnmounted, ref, computed, shallowReactive } from "vue";
 import { getHumanQunatity } from "@/helpers/formatter";
 import { useI18n } from "vue-i18n";
+import { createI18nRouteTo } from "@/i18n/translation";
 
 const { t } = useI18n();
 

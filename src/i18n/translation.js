@@ -39,9 +39,6 @@ export function isLocaleLoaded(locale) {
   return i18n.global.availableLocales.includes(locale);
 }
 
-
-
-
 export async function setLanguage(locale) {
   console.log("setLanguage", locale);
 
@@ -59,6 +56,20 @@ export async function setLanguage(locale) {
    * axios.defaults.headers.common['Accept-Language'] = locale
    */
   document.querySelector("html").setAttribute("lang", locale);
+}
+
+/**
+ * @param {Object} to
+ * @returns {Object}
+ */
+export function createI18nRouteTo(to) {
+  return {
+    ...to,
+    params: {
+      locale: getCurrentLocale(),
+      ...to.params,
+    },
+  };
 }
 
 export async function loadLocaleMessages(locale) {
