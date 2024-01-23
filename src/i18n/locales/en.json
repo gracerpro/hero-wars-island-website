@@ -37,7 +37,7 @@
     "save": "Save",
     "send": "Send",
     "soulStones": "Soul stones",
-    "startNode": "Start",
+    "startNode": "Entry",
     "status": "Status",
     "tower": "Tower",
     "type": "Type",
@@ -89,6 +89,9 @@
       "toDateDaysCount": "to {toDate}, days left {daysCount}"
     },
     "island": {
+      "canNotSelectStartNode": "Невозможно выбрать стартовый узел.",
+      "canSelectNearStart": "You can select a node near the entry.",
+      "canSelectOnlySelect": "Выделить узел можно только около выделенного узла или входа.",
       "failNodesLoading": "Failed to load map nodes",
       "islandNotAvailable": "The island is not available.",
       "islandNotFound": "The island is not found.",
@@ -96,10 +99,6 @@
       "myExplorersMoves": "My explorer's moves",
       "showEditNodes": "Show edit an nodes?",
       "showOnlyIconWithoutQuantity": "Show only icon without quantity?",
-      "todo1": "todo1",
-      "todo2": "todo2",
-      "todo3": "todo3",
-      "todo4": "todo4",
       "helpOnQuestion": "On the cell with the question mark, you need to enter or correct the resource",
       "helpParagraph1": "When moving the cursor, if you press the middle mouse button, the shift.",
       "helpParagraph2": "Scroll with the middle mouse button - zoom in or out.",
@@ -108,6 +107,7 @@
       "oneResource": "One resource",
       "namesByComma": "Several names are separated by a comma.",
       "notFoundNodeAdmin": "The node was not found. Contact the administrators.",
+      "notFoundStartNodeAdmin": "The entry node was not found. Contact the administrators.",
       "notLinkedImage": "image is not linked",
       "notLinkedResource": "Resources are not linked"
     }
