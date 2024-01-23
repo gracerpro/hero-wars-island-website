@@ -21,6 +21,7 @@
           t("common.help")
         }}</router-link>
       </div>
+      <switch-language />
     </div>
   </nav>
   <router-view />
@@ -29,6 +30,7 @@
 import { useI18n } from "vue-i18n";
 import HeroClient from "./api/HeroClient";
 import { ref } from "vue";
+import SwitchLanguage from "./components/SwitchLanguage.vue";
 
 const { t } = useI18n();
 

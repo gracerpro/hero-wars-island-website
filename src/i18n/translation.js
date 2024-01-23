@@ -1,25 +1,25 @@
-import { createI18n } from "vue-i18n";
 import { nextTick } from "vue";
+import i18n from "@/i18n";
 
-const SUPPORT_LOCALES = ["ru", "en"];
+console.log("imported i18n", i18n);
+
+export const SUPPORT_LOCALES = ["ru", "en"];
 
 export function getDefaultLocale() {
   return process.env.VUE_APP_DEFAULT_LOCALE;
 }
 
-export function setupI18n(
-  options = { locale: process.env.VUE_APP_DEFAULT_LOCALE },
-) {
-  console.log(options);
-  const i18n = createI18n(options);
-
-  setLanguage(i18n, options.locale);
-
-  return i18n;
+export function getLocalesLabels() {
+  return SUPPORT_LOCALES.map((locale) => {
+    return {
+      locale,
+      label: i18n.global.te("locale." + locale) ? i18n.global.t("locale." + locale) : locale,
+    };
+  });
 }
 
-export function getCurrentLocale(i18n) {
-  return i18n.locale.value;
+export function getCurrentLocale() {
+  return i18n.global.locale.value;
 }
 
 /**
@@ -34,15 +34,20 @@ export function isSupportLocale(locale) {
  * @param {String} locale
  * @returns {Boolean}
  */
-export function isAvailableLocale(i18n, locale) {
+export function isLocaleLoaded(locale) {
   console.log("availableLocales", i18n.global.availableLocales);
   return i18n.global.availableLocales.includes(locale);
 }
 
-export function setLanguage(i18n, locale) {
+export async function setLanguage(locale) {
   console.log("setLanguage", locale);
-  i18n.global.locale.value = locale;
 
+  if (!isLocaleLoaded(locale)) {
+    await loadLocaleMessages(locale);
+  }
+
+  i18n.global.locale.value = locale;
+  
   /**
    * NOTE:
    * If you need to specify the language setting for headers, such as the `fetch` API, set it here.
@@ -53,8 +58,8 @@ export function setLanguage(i18n, locale) {
   document.querySelector("html").setAttribute("lang", locale);
 }
 
-export async function loadLocaleMessages(i18n, locale) {
-  if (!isAvailableLocale(locale)) {
+export async function loadLocaleMessages(locale) {
+  if (!isLocaleLoaded(locale)) {
     const messages = await import(
       /* webpackChunkName: "locale-[request]" */ `./locales/${locale}.json`
     );
@@ -76,5 +81,3 @@ export function getUserLocale() {
     localeNoRegion: locale.split("-")[0],
   };
 }
-
-export { SUPPORT_LOCALES };

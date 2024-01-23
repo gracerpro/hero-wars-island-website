@@ -1,7 +1,7 @@
 import { createRouter, createWebHistory } from "vue-router";
 import TheHomeView from "../views/TheHomeView.vue";
 import {
-  isAvailableLocale,
+  isLocaleLoaded,
   isSupportLocale,
   loadLocaleMessages,
   setLanguage,
@@ -76,10 +76,7 @@ router.beforeEach(async (to, from, next) => {
 
   console.log(paramsLocale, isSupportLocale(paramsLocale));
 
-  if (isSupportLocale(paramsLocale)) {
-    if (!isAvailableLocale(paramsLocale)) {
-      await loadLocaleMessages(paramsLocale);
-    }
+  if (paramsLocale && isSupportLocale(paramsLocale)) {
     setLanguage(paramsLocale);
   }
 
