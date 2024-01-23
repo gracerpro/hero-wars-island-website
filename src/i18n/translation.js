@@ -1,7 +1,7 @@
 import { nextTick } from "vue";
 import i18n from "@/i18n";
 
-console.log("imported i18n", i18n);
+const { t, te } = i18n.global;
 
 export const SUPPORT_LOCALES = ["ru", "en"];
 
@@ -13,7 +13,7 @@ export function getLocalesLabels() {
   return SUPPORT_LOCALES.map((locale) => {
     return {
       locale,
-      label: i18n.global.te("locale." + locale) ? i18n.global.t("locale." + locale) : locale,
+      label: te("locale." + locale) ? t("locale." + locale) : locale,
     };
   });
 }
@@ -39,6 +39,9 @@ export function isLocaleLoaded(locale) {
   return i18n.global.availableLocales.includes(locale);
 }
 
+
+
+
 export async function setLanguage(locale) {
   console.log("setLanguage", locale);
 
@@ -47,7 +50,7 @@ export async function setLanguage(locale) {
   }
 
   i18n.global.locale.value = locale;
-  
+
   /**
    * NOTE:
    * If you need to specify the language setting for headers, such as the `fetch` API, set it here.
