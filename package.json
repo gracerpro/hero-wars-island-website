@@ -6,7 +6,7 @@
   "scripts": {
     "serve": "vue-cli-service serve",
     "lint": "vue-cli-service lint",
-    "build": "vue-cli-service build --mode development",
+    "build": "vue-cli-service build --mode development --skip-plugins @vue/cli-plugin-eslint",
     "build-prod": "NODE_ENV=production vue-cli-service build --mode production"
   },
   "dependencies": {
