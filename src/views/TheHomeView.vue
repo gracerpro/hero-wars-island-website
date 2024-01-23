@@ -39,7 +39,7 @@ import { setMetaInfo } from "@/services/page-meta";
 import { ref } from "vue";
 import { useI18n } from "vue-i18n";
 
-const { t } = useI18n();
+const { t, locale } = useI18n();
 
 const client = new HeroClient();
 const now = new Date();
@@ -78,13 +78,13 @@ function getIslandHint(island) {
 
   if (island.eventEndAt < now) {
     result = t("page.home.fromToDates", {
-      dateFrom: fromCurrentDate(island.eventStartAt),
-      dateTo: fromCurrentDate(island.eventEndAt),
+      dateFrom: fromCurrentDate(island.eventStartAt, locale.value),
+      dateTo: fromCurrentDate(island.eventEndAt, locale.value),
     });
   } else {
     const days = Math.ceil((island.eventEndAt - now) / 1000 / 60 / 60 / 24);
     result = t("page.home.toDateDaysCount", {
-      toDate: fromCurrentDate(island.eventEndAt),
+      toDate: fromCurrentDate(island.eventEndAt, locale.value),
       daysCount: days,
     });
   }

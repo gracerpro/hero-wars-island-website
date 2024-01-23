@@ -18,6 +18,10 @@ export function setupI18n(
   return i18n;
 }
 
+export function getCurrentLocale(i18n) {
+  return i18n.locale.value;
+}
+
 /**
  * @param {String} locale
  * @returns {Boolean}
