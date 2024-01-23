@@ -53,8 +53,8 @@ watch(
 
 setMetaInfo({
   title: t("common.islandMap"),
-  description: t("common.islandMap"),
-  keywords: "Хроники хаоса, Эра доминиона, карта острова, карта",
+  description: t("seo.island.description"),
+  keywords: t("seo.island.keywords"),
 });
 
 const id = queryId(route.params.id);
@@ -89,7 +89,9 @@ function loadIsland(id) {
       island.value = responseIsland;
       if (responseIsland) {
         setMetaInfo({
-          title: responseIsland.name + " - " + t("common.islandMap"),
+          title: responseIsland.name + " - " + t("common.projectName"),
+          description: t("seo.island.description") + " " + responseIsland.name,
+          keywords: t("seo.island.keywords") + ", " + responseIsland.name,
         });
       }
     })

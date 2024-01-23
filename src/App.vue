@@ -15,7 +15,7 @@
           t("common.contacts")
         }}</router-link>
         <router-link to="/about" class="nav-link">{{
-          t("common.projectAbout")
+          t("common.about")
         }}</router-link>
         <router-link to="/help" class="nav-link">{{
           t("common.help")

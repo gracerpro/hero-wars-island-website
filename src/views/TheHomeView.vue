@@ -49,11 +49,9 @@ const islandsLoading = ref(false);
 const errorMessage = ref("");
 
 setMetaInfo({
-  title:
-    t("page.home.adventureIsland", 2) + " - " + t("common.heroWarsDominionEra"),
-  description:
-    "В игре Хроники Хаоса на карте острова открыты все узлы, соберем все призы вместе!",
-  keywords: "Хроники хаоса, Эра доминиона, карта острова, карта, событие",
+  title: t("common.projectName"),
+  description: t("seo.home.description"),
+  keywords: t("seo.home.keywords"),
 });
 
 loadIslands();

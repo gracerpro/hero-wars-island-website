@@ -1,5 +1,6 @@
 {
   "common": {
+    "about": "About",
     "actualIsland": "Actual island",
     "accepted": "Accepted",
     "cancel": "Cancel",
@@ -30,7 +31,7 @@
     "onModeration": "On moderation",
     "pattern": "Pattern | Patterns",
     "pageNotFound": "Page not found",
-    "projectAbout": "About",
+    "projectName": "Adventure island for Hero Wars Dominion Era",
     "recipes": "Recipes",
     "reset": "Reset",
     "resource": "Resource | Resources",
@@ -110,6 +111,31 @@
       "notFoundStartNodeAdmin": "The entry node was not found. Contact the administrators.",
       "notLinkedImage": "image is not linked",
       "notLinkedResource": "Resources are not linked"
+    }
+  },
+  "seo": {
+    "about": {
+      "title": "About the project",
+      "description": "The reasons for the creation of the project and the main problems of the island in the game. Links to feedback.",
+      "keywords": "about, island, purposes, problems, feedback link"
+    },
+    "contact": {
+      "title": "Contacts and feedback from the administration",
+      "description": "Give feedback on the project. Contact the administration.",
+      "keywords": "contacts, feedback, communication with the administration"
+    },
+    "help": {
+      "title": "Help for the project, the source code is open",
+      "description": "How can the project be improved? The project is open source. Todo list.",
+      "keywords": "help, source code, todo"
+    },
+    "home": {
+      "description": "Adventure Island in the Hero Wars Dominion Era game. Search for the necessary resources and moves on the map. Let's collect all the prizes together!",
+      "keywords": "island, map, adventure, hero wars, dominion era, new event, winter island"
+    },
+    "island": {
+      "description": "An open map of the island. Search for resources and moves on the adventure island map.",
+      "keywords": "island, map, adventure, hero wars, dominion era, new event"
     }
   }
 }

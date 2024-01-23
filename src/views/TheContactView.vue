@@ -18,8 +18,8 @@ import { useI18n } from "vue-i18n";
 const { t } = useI18n();
 
 setMetaInfo({
-  title: t("common.contacts"),
-  description: "Оставить обратную связь, связаться с администратором",
-  keywords: "контакты, связаться с автором, связь, обратная связь",
+  title: t("seo.contact.title") + " - " + t("common.projectName"),
+  description: t("seo.contact.description"),
+  keywords: t("seo.contact.keywords"),
 });
 </script>
