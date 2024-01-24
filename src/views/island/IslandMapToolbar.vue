@@ -114,7 +114,7 @@ const EVENT_CHANGE_IS_SHOW_NO_MODERATE = "update:is-show-no-moderate";
 </script>
 <script setup>
 import HelpDialog from "./HelpDialog.vue";
-import { ref } from "vue";
+import { ref, shallowRef } from "vue";
 import {
   TRANSLATE_X,
   TRANSLATE_Y,
@@ -141,7 +141,7 @@ const emit = defineEmits([
 ]);
 
 const helpDialog = ref(null);
-const helpDialogComponent = ref(null);
+const helpDialogComponent = shallowRef(null);
 
 const onResetTranslate = () => {
   emit(EVENT_RESET_TRANSLATE);
