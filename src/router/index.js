@@ -1,6 +1,6 @@
 import { createRouter, createWebHistory } from "vue-router";
 import TheHomeView from "../views/TheHomeView.vue";
-import { getCurrentLocale, guessDefaultLocale, isSupportLocale, setLanguage } from "@/i18n/translation";
+import { getCurrentLocale, guessDefaultLocale, isSupportLocale, saveCurrentLocale, setLanguage } from "@/i18n/translation";
 
 const routes = [
   {
@@ -83,6 +83,8 @@ router.beforeEach(async (to, from, next) => {
     } else if (paramsLocale !== getCurrentLocale()) {
       await setLanguage(paramsLocale);
     }
+  } else if (getCurrentLocale() !== guessDefaultLocale()) {
+    saveCurrentLocale();
   }
 
   callNext(next, to, from);

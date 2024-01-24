@@ -25,7 +25,7 @@ import {
 } from "@/i18n/translation";
 import { computed } from "vue";
 import { useRouter } from "vue-router";
-import { isShowLocaleInRoute } from "@/i18n/translation";
+import { isShowLocaleInRoute, getLoadedLocales, guessDefaultLocale } from "@/i18n/translation";
 
 const router = useRouter();
 

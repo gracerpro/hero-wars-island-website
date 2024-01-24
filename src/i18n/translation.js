@@ -3,14 +3,16 @@ import i18n from "@/i18n";
 
 const { t, te } = i18n.global;
 
-export const SUPPORT_LOCALES = ["ru", "en"];
-
-export function getDefaultLocale() {
+function getDefaultLocale() {
   return process.env.VUE_APP_DEFAULT_LOCALE;
 }
 
+function getSupportLocales() {
+  return process.env.VUE_APP_SUPPORT_LOCALES.split(",");
+}
+
 export function getLocalesLabels() {
-  return SUPPORT_LOCALES.map((locale) => {
+  return getSupportLocales().map((locale) => {
     return {
       locale,
       label: te("locale." + locale) ? t("locale." + locale) : locale,
@@ -27,26 +29,28 @@ export function getCurrentLocale() {
  * @returns {Boolean}
  */
 export function isSupportLocale(locale) {
-  return SUPPORT_LOCALES.includes(locale);
+  return getSupportLocales().includes(locale);
 }
 
 /**
  * @param {String} locale
  * @returns {Boolean}
  */
-export function isLocaleLoaded(locale) {
-  console.log("availableLocales", i18n.global.availableLocales);
+function isLocaleLoaded(locale) {
   return i18n.global.availableLocales.includes(locale);
 }
 
-export async function setLanguage(locale) {
-  console.log("setLanguage", locale);
+export function getLoadedLocales() {
+  return i18n.global.availableLocales;
+}
 
+export async function setLanguage(locale) {
   if (!isLocaleLoaded(locale)) {
     await loadLocaleMessages(locale);
   }
 
   i18n.global.locale.value = locale;
+  saveLocale(locale);
 
   /**
    * NOTE:
@@ -93,25 +97,45 @@ export async function loadLocaleMessages(locale) {
 }
 
 export function guessDefaultLocale() {
-  const userLocaleData = getUserLocaleData();
-  if (isSupportLocale(userLocaleData.locale)) {
-    return userLocaleData.locale;
+  const savedLocale = getSavedLocale();
+  if (savedLocale) {
+    return savedLocale;
   }
-  if (isSupportLocale(userLocaleData.localeNoRegion)) {
-    return userLocaleData.localeNoRegion;
+
+  const userLocale = getUserLocale();
+  if (isSupportLocale(userLocale)) {
+    return userLocale;
   }
 
   return getDefaultLocale();
 }
 
-export function getUserLocaleData() {
-  const locale =
+export function saveCurrentLocale() {
+  saveLocale(getCurrentLocale());
+}
+
+function saveLocale(locale) {
+  localStorage.setItem("locale", locale);
+}
+
+function getSavedLocale() {
+  let locale = localStorage.getItem("locale");
+  if (locale) {
+    locale = locale.toLowerCase();
+  }
+
+  return isSupportLocale(locale) ? locale : null;
+}
+
+export function getUserLocale() {
+  let locale =
     window.navigator.language ||
     window.navigator.userLanguage ||
     process.env.VUE_APP_DEFAULT_LOCALE;
 
-  return {
-    locale: locale,
-    localeNoRegion: locale.split("-")[0],
-  };
+  if (locale) {
+    locale = locale.toLowerCase();
+  }
+
+  return locale.split("-")[0];
 }
