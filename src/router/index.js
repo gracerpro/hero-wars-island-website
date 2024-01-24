@@ -29,14 +29,15 @@ router.beforeEach(async (to, from, next) => {
       if (paramsLocale !== "page-not-found") {
         return next({ path: "/page-not-found", query: { returnUrl: to.path } });
       }
-      // return next("/" + guessDefaultLocale()); // may be throw 404 error?
     } else if (paramsLocale !== getCurrentLocale()) {
       await setLanguage(paramsLocale);
     }
   } else {
     const guessLocale = guessDefaultLocale();
     if (isShowLocaleInRoute(guessLocale)) {
-      return next("/" + guessLocale);
+      if (to.name !== "page-not-found") {
+        return next("/" + guessLocale);
+      }
     }
   }
 

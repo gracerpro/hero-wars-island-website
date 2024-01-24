@@ -3,14 +3,6 @@ import i18n from "@/i18n";
 
 const { t, te } = i18n.global;
 
-function getDefaultLocale() {
-  return process.env.VUE_APP_DEFAULT_LOCALE;
-}
-
-function getSupportLocales() {
-  return process.env.VUE_APP_SUPPORT_LOCALES.split(",");
-}
-
 export function getLocalesLabels() {
   return getSupportLocales().map((locale) => {
     return {
@@ -30,18 +22,6 @@ export function getCurrentLocale() {
  */
 export function isSupportLocale(locale) {
   return getSupportLocales().includes(locale);
-}
-
-/**
- * @param {String} locale
- * @returns {Boolean}
- */
-function isLocaleLoaded(locale) {
-  return i18n.global.availableLocales.includes(locale);
-}
-
-export function getLoadedLocales() {
-  return i18n.global.availableLocales;
 }
 
 export async function setLanguage(locale) {
@@ -84,18 +64,6 @@ export function isShowLocaleInRoute(locale) {
   return locale !== getDefaultLocale();
 }
 
-export async function loadLocaleMessages(locale) {
-  if (!isLocaleLoaded(locale)) {
-    const messages = await import(
-      /* webpackChunkName: "locale-[request]" */ `./locales/${locale}.json`
-    );
-
-    i18n.global.setLocaleMessage(locale, messages.default);
-  }
-
-  return nextTick();
-}
-
 export function guessDefaultLocale() {
   const savedLocale = getSavedLocale();
   if (savedLocale) {
@@ -110,8 +78,37 @@ export function guessDefaultLocale() {
   return getDefaultLocale();
 }
 
-export function saveCurrentLocale() {
-  saveLocale(getCurrentLocale());
+async function loadLocaleMessages(locale) {
+  if (!isLocaleLoaded(locale)) {
+    const messages = await import(
+      /* webpackChunkName: "locale-[request]" */ `./locales/${locale}.json`
+    );
+
+    i18n.global.setLocaleMessage(locale, messages.default);
+  }
+
+  return nextTick();
+}
+
+function getUserLocale() {
+  let locale =
+    window.navigator.language ||
+    window.navigator.userLanguage ||
+    process.env.VUE_APP_DEFAULT_LOCALE;
+
+  if (locale) {
+    locale = locale.toLowerCase();
+  }
+
+  return locale.split("-")[0];
+}
+
+function getDefaultLocale() {
+  return process.env.VUE_APP_DEFAULT_LOCALE;
+}
+
+function getSupportLocales() {
+  return process.env.VUE_APP_SUPPORT_LOCALES.split(",");
 }
 
 function saveLocale(locale) {
@@ -127,15 +124,10 @@ function getSavedLocale() {
   return isSupportLocale(locale) ? locale : null;
 }
 
-export function getUserLocale() {
-  let locale =
-    window.navigator.language ||
-    window.navigator.userLanguage ||
-    process.env.VUE_APP_DEFAULT_LOCALE;
-
-  if (locale) {
-    locale = locale.toLowerCase();
-  }
-
-  return locale.split("-")[0];
+/**
+ * @param {String} locale
+ * @returns {Boolean}
+ */
+function isLocaleLoaded(locale) {
+  return i18n.global.availableLocales.includes(locale);
 }

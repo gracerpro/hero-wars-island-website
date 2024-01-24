@@ -55,5 +55,5 @@ onMounted(() => {
   client.getActualIsland().then((island) => {
     actualIsland.value = island;
   });
-})
+});
 </script>

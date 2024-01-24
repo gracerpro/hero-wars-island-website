@@ -1,4 +1,4 @@
-import en from "./locales/en.json";
+import ru from "./locales/ru.json";
 import { createI18n } from "vue-i18n";
 
 const locale = process.env.VUE_APP_DEFAULT_LOCALE;
@@ -8,7 +8,7 @@ const i18n = createI18n({
   fallbackLocale: locale,
   legacy: false,
   globalInjection: true,
-  messages: { en },
+  messages: { ru },
   warnHtmlMessage: false,
 });
 
