@@ -12,30 +12,21 @@ export function formatDate(date) {
 
 /**
  * @param {Date} date
+ * @param {String} locale
  * @returns {String}
  */
-export function fromCurrentDate(date) {
+export function fromCurrentDate(date, locale = null) {
   if (!date) {
     return "";
   }
 
-  const names = [
-    "янв",
-    "фев",
-    "март",
-    "апр",
-    "май",
-    "июн",
-    "июл",
-    "авг",
-    "сен",
-    "окт",
-    "ноя",
-    "дек",
-  ];
-  let result = date.getDate() + " " + names[date.getMonth()];
+  const now = new Date();
+  let result =
+    date.getDate() +
+    " " +
+    now.toLocaleString(locale ? locale : "default", { month: "short" });
 
-  if (date.getFullYear() !== new Date().getFullYear()) {
+  if (date.getFullYear() !== now.getFullYear()) {
     result += " " + date.getFullYear();
   }
 

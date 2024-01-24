@@ -1,0 +1,141 @@
+{
+  "common": {
+    "about": "About",
+    "actualIsland": "Actual island",
+    "accepted": "Accepted",
+    "cancel": "Cancel",
+    "chest": "Chest",
+    "coins": "Coins",
+    "consumable": "Consumable",
+    "contacts": "Contacts",
+    "created": "Created",
+    "goToHome": "Go to home",
+    "edit": "Edit",
+    "equipment": "Equipment",
+    "fragment": "Fragment | Fragments",
+    "haveErrosOrProposal": "Have an error or proposal?",
+    "haveDoubts": "Have doubts",
+    "help": "Help",
+    "heroWarsDominionEra": "Hero Wars Dominion Era",
+    "homePage": "Home",
+    "quantity": "Quantity",
+    "internalError": "An internal error has occurred.",
+    "island": "Island | Islands",
+    "islandMap": "Island's map",
+    "loadingFailDeveloperShow": "Loading failed. The developers see the problem and will fix it soon.",
+    "map": "Map",
+    "movedPageMayBe": "The page may have been moved.",
+    "needEnterAtLeastCharacters": "Need to enter at least {n} characters",
+    "node": "Node | Nodes",
+    "noData": "No data",
+    "onModeration": "On moderation",
+    "pattern": "Pattern | Patterns",
+    "pageNotFound": "Page not found",
+    "projectName": "Adventure island for Hero Wars Dominion Era",
+    "recipes": "Recipes",
+    "reset": "Reset",
+    "resource": "Resource | Resources",
+    "save": "Save",
+    "send": "Send",
+    "soulStones": "Soul stones",
+    "startNode": "Entry",
+    "status": "Status",
+    "tower": "Tower",
+    "type": "Type",
+    "version": "Version",
+    "zoomIn": "Zoom in",
+    "zoomOut": "Zoom out"
+  },
+  "locale": {
+    "en": "English",
+    "ru": "Russian"
+  },
+  "page": {
+    "about": {
+      "coolHelpProject": "If someone wants to help the project",
+      "coolHelpProjectLink": "it will be cool.",
+      "feedbackQuestions": "What can be improved? What is superfluous? What should I redo? What doesn't work?",
+      "iWillAcceptAnyFeedback": "I will accept any feedback.",
+      "paragraph1": "Initially, there was a desire to make a functional where the available number of moves is entered and there is a button \"Find the best rewards\". When you click on the button, the path is calculated. A map is a set of nodes, similar to graphs. But when calculating, you need to take into account the human factor: it is more profitable for someone to take emeralds, and for someone to take stones of appearance. Therefore, I refused this functionality. Let the person build the path himself and receive the necessary rewards.",
+      "reasons": "Reasons",
+      "reason1": "On the first map of the island, when a large number of moves were scored, it was difficult to calculate the moves and rewards. The best rewards are in the towers. The towers are located far from the center. Will there be enough moves before them?... It is difficult to calculate, very difficult. It is easier to mark the path as on a piece of paper.",
+      "reason2": "With an open card available, it was also difficult to look for rewards. For example, emeralds are needed, there are hundreds of dots on the map with different pictures, among which it is not easy to see the right one. So you also need to remember... It's easier to filter the icons."
+    },
+    "contact": {
+      "canBeEmpty": "Can be empty",
+      "email": "Email",
+      "message": "Message",
+      "messageWasCreated": "The message was successfully created.",
+      "theme": "Theme",
+      "username": "Username",
+      "fillFieldsForContact": "If you have any interesting ideas or questions, please fill in the following fields on the contact form. Thanks!",
+      "ctrlF5": "If something doesn't work, then maybe a magic page refresh will help, Ctrl+F5."
+    },
+    "help": {
+      "helpToProject": "Project's help",
+      "paragraph1": "Anyone who wants to help, I will be glad.",
+      "help1": "Frontend developers, the site code is open! {link}",
+      "help2": "Make normal resource icons, without artifacts.",
+      "help3": "Add autotest.",
+      "help4": "Suggest ideas.",
+      "todo1": "Add news, coordinate with the backend.",
+      "todo2": "Make a button \"show the whole island\"."
+    },
+    "home": {
+      "actual": "Actual",
+      "adventureIsland": "Adventures island | Adventures islands",
+      "firstParagraph": "There is a new <b>Adventure</b> Island event in the game. Where you need to spend the researcher's moves and open the map nodes, receive gifts. Initially, the entire map is closed and it is unknown which way to move to get the best prize. Let's discover the island together!",
+      "fromToDates": "from {dateFrom} to {dateTo}",
+      "notFound": "Not found",
+      "toDateDaysCount": "to {toDate}, days left {daysCount}"
+    },
+    "island": {
+      "canNotSelectStartNode": "Невозможно выбрать стартовый узел.",
+      "canSelectNearStart": "You can select a node near the entry.",
+      "canSelectOnlySelect": "Выделить узел можно только около выделенного узла или входа.",
+      "failNodesLoading": "Failed to load map nodes",
+      "islandNotAvailable": "The island is not available.",
+      "islandNotFound": "The island is not found.",
+      "quantityHint": "The default is 1. If there are several names, then the first number corresponds to the first name, etc.",
+      "myExplorersMoves": "My explorer's moves",
+      "showEditNodes": "Show edit an nodes?",
+      "showOnlyIconWithoutQuantity": "Show only icon without quantity?",
+      "helpOnQuestion": "On the cell with the question mark, you need to enter or correct the resource",
+      "helpParagraph1": "When moving the cursor, if you press the middle mouse button, the shift.",
+      "helpParagraph2": "Scroll with the middle mouse button - zoom in or out.",
+      "helpResource1": "The name of the resource, the main thing is clear. Several names are separated by a comma.",
+      "helpResource2": "The quantity, if greater than 1 (for example, 123, 300k, 5M). If there are several names, then the first number corresponds to the first name, etc.",
+      "oneResource": "One resource",
+      "namesByComma": "Several names are separated by a comma.",
+      "notFoundNodeAdmin": "The node was not found. Contact the administrators.",
+      "notFoundStartNodeAdmin": "The entry node was not found. Contact the administrators.",
+      "notLinkedImage": "image is not linked",
+      "notLinkedResource": "Resources are not linked"
+    }
+  },
+  "seo": {
+    "about": {
+      "title": "About the project",
+      "description": "The reasons for the creation of the project and the main problems of the island in the game. Links to feedback.",
+      "keywords": "about, island, purposes, problems, feedback link"
+    },
+    "contact": {
+      "title": "Contacts and feedback from the administration",
+      "description": "Give feedback on the project. Contact the administration.",
+      "keywords": "contacts, feedback, communication with the administration"
+    },
+    "help": {
+      "title": "Help for the project, the source code is open",
+      "description": "How can the project be improved? The project is open source. Todo list.",
+      "keywords": "help, source code, todo"
+    },
+    "home": {
+      "description": "Adventure Island in the Hero Wars Dominion Era game. Search for the necessary resources and moves on the map. Let's collect all the prizes together!",
+      "keywords": "island, map, adventure, hero wars, dominion era, new event, winter island"
+    },
+    "island": {
+      "description": "An open map of the island. Search for resources and moves on the adventure island map.",
+      "keywords": "island, map, adventure, hero wars, dominion era, new event"
+    }
+  }
+}

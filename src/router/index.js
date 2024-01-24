@@ -1,54 +1,12 @@
 import { createRouter, createWebHistory } from "vue-router";
-import TheHomeView from "../views/TheHomeView.vue";
-
-const routes = [
-  {
-    path: "/",
-    name: "home",
-    component: TheHomeView,
-  },
-  {
-    path: "/about",
-    name: "about",
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
-    component: () =>
-      import(/* webpackChunkName: "about" */ "../views/TheAboutView.vue"),
-  },
-  {
-    path: "/contact",
-    name: "contact",
-    component: () =>
-      import(/* webpackChunkName: "contact" */ "../views/TheContactView.vue"),
-  },
-  {
-    path: "/islands/:id",
-    name: "island",
-    component: () =>
-      import(/* webpackChunkName: "island" */ "../views/TheIslandView.vue"),
-  },
-  {
-    path: "/help",
-    name: "help",
-    component: () =>
-      import(/* webpackChunkName: "help" */ "../views/TheHelpView.vue"),
-  },
-  {
-    path: "/page-not-found",
-    name: "page-not-found",
-    component: () =>
-      import(
-        /* webpackChunkName: "page-not-found" */ "../views/status-pages/NotFoundPage.vue"
-      ),
-  },
-  {
-    path: "/:catchAll(.*)",
-    redirect: (to) => {
-      return { path: "/page-not-found", query: { returnUrl: to.path } };
-    },
-  },
-];
+import {
+  getCurrentLocale,
+  guessDefaultLocale,
+  isSupportLocale,
+  setLanguage,
+  isShowLocaleInRoute,
+} from "@/i18n/translation";
+import routes from "./routes";
 
 const router = createRouter({
   history: createWebHistory(process.env.BASE_URL),
@@ -57,13 +15,30 @@ const router = createRouter({
   linkExactActiveClass: "",
 });
 
-router.beforeEach((to, from, next) => {
+router.beforeEach(async (to, from, next) => {
   if (to.path.length > 1 && to.path.endsWith("/")) {
     const newTo = { ...to };
     newTo.path = to.path.slice(0, -1);
 
-    next(newTo);
-    return;
+    return next(newTo);
+  }
+
+  const paramsLocale = to.params.locale;
+  if (paramsLocale) {
+    if (!isSupportLocale(paramsLocale)) {
+      if (paramsLocale !== "page-not-found") {
+        return next({ path: "/page-not-found", query: { returnUrl: to.path } });
+      }
+    } else if (paramsLocale !== getCurrentLocale()) {
+      await setLanguage(paramsLocale);
+    }
+  } else {
+    const guessLocale = guessDefaultLocale();
+    if (isShowLocaleInRoute(guessLocale)) {
+      if (to.name !== "page-not-found") {
+        return next("/" + guessLocale);
+      }
+    }
   }
 
   callNext(next, to, from);

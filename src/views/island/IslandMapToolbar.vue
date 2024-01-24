@@ -4,7 +4,7 @@
       <button
         type="button"
         class="btn btn-secondary"
-        title="Уменьшить"
+        :title="t('common.zoomOut')"
         @click="onChangeScale(true)"
       >
         -
@@ -12,7 +12,7 @@
       <button
         type="button"
         class="btn btn-secondary"
-        title="Увеличить"
+        :title="t('common.zoomIn')"
         @click="onChangeScale(false)"
       >
         +
@@ -20,7 +20,7 @@
       <button
         type="button"
         class="btn btn-secondary"
-        title="Сбросить"
+        :title="t('common.reset')"
         @click="onResetScale()"
       >
         0
@@ -58,7 +58,7 @@
       <button
         type="button"
         class="btn btn-secondary"
-        title="Сбросить"
+        :title="t('common.reset')"
         @click="onResetTranslate()"
       >
         0
@@ -67,7 +67,7 @@
     <div class="btn-group-vertical w-100 mb-2" role="group">
       <button
         type="button"
-        title="Показывать только иконку? Без количества"
+        :title="t('page.island.showOnlyIconWithoutQuantity')"
         :class="[
           'btn',
           isOnlyImage ? 'btn-secondary' : 'btn-outline-secondary',
@@ -78,7 +78,7 @@
       </button>
       <button
         type="button"
-        title="Показывать не принятые узлы?"
+        :title="t('page.island.showEditNodes')"
         :class="[
           'btn',
           isShowNoModerate ? 'btn-secondary' : 'btn-outline-secondary',
@@ -93,7 +93,7 @@
         type="button"
         class="btn btn-secondary"
         @click="onHelpClick"
-        title="Помощь"
+        :title="t('common.help')"
       >
         h
       </button>
@@ -114,7 +114,7 @@ const EVENT_CHANGE_IS_SHOW_NO_MODERATE = "update:is-show-no-moderate";
 </script>
 <script setup>
 import HelpDialog from "./HelpDialog.vue";
-import { ref } from "vue";
+import { ref, shallowRef } from "vue";
 import {
   TRANSLATE_X,
   TRANSLATE_Y,
@@ -122,6 +122,9 @@ import {
   DELTA_SCALE,
   EVENT_CHANGE_SCALE,
 } from "@/services/island-map";
+import { useI18n } from "vue-i18n";
+
+const { t } = useI18n();
 
 defineProps({
   isOnlyImage: { type: Boolean, required: true },
@@ -138,7 +141,7 @@ const emit = defineEmits([
 ]);
 
 const helpDialog = ref(null);
-const helpDialogComponent = ref(null);
+const helpDialogComponent = shallowRef(null);
 
 const onResetTranslate = () => {
   emit(EVENT_RESET_TRANSLATE);

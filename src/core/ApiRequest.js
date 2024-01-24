@@ -3,19 +3,36 @@ import UserError from "@/exceptions/UserError";
 
 class ApiRequest {
   /**
+   * @private
+   */
+  _locale = null;
+
+  _beforeRequest = (/* request */) => {};
+
+  /**
+   * @param {String} locale
+   */
+  setLocale(locale) {
+    this._locale = locale;
+  }
+
+  /**
+   * @param {Function} callable
+   */
+  setBeforeRequest(callable) {
+    this._beforeRequest = callable;
+  }
+
+  /**
    * @return {Promise<Object|Array>}
    * @param {String} url
    * @param {Object} params
    */
   async get(url, params) {
-    const options = {
-      method: "GET",
-      redirect: "follow",
-      headers: {
-        "Content-Type": "application/json; charset=UTF-8",
-        Accept: "application/json",
-      },
-    };
+    if (this._beforeRequest) {
+      this._beforeRequest(this);
+    }
+
     let searchParams = null;
     if (params) {
       searchParams = new URLSearchParams(params);
@@ -24,7 +41,7 @@ class ApiRequest {
       process.env.VUE_APP_BACKEND_API_URL +
         url +
         (searchParams ? `?${searchParams}` : ""),
-      options,
+      this.getOptions("GET"),
     );
 
     if (!response.ok) {
@@ -51,13 +68,12 @@ class ApiRequest {
    * @returns {Promise<Object>}
    */
   async post(url, data) {
+    if (this._beforeRequest) {
+      this._beforeRequest(this);
+    }
+
     const options = {
-      method: "POST",
-      redirect: "follow",
-      headers: {
-        "Content-Type": "application/json; charset=UTF-8",
-        Accept: "application/json",
-      },
+      ...this.getOptions("POST"),
       body: JSON.stringify(data),
     };
     const response = await fetch(
@@ -81,6 +97,26 @@ class ApiRequest {
     }
 
     return await response.json();
+  }
+
+  /**
+   * @private
+   * @param {String} method
+   */
+  getOptions(method) {
+    const options = {
+      method,
+      redirect: "follow",
+      headers: {
+        "Content-Type": "application/json; charset=UTF-8",
+        Accept: "application/json",
+      },
+    };
+    if (this._locale) {
+      options.headers["Accept-Language"] = this._locale;
+    }
+
+    return options;
   }
 }
 

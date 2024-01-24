@@ -30,7 +30,7 @@
               aria-hidden="true"
             ></span>
             <span v-show="saving" class="visually-hidden">Loading...</span>
-            Сохранить
+            {{ t("common.save") }}
           </button>
           <button
             type="button"
@@ -38,7 +38,7 @@
             data-bs-dismiss="modal"
             :disabled="saving"
           >
-            Отмена
+            {{ t("common.cancel") }}
           </button>
         </div>
       </div>
@@ -48,6 +48,9 @@
 <script setup>
 import { Modal } from "bootstrap";
 import { computed } from "vue";
+import { useI18n } from "vue-i18n";
+
+const { t } = useI18n();
 
 let moduleResolve = null;
 let modal = null;

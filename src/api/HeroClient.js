@@ -1,8 +1,12 @@
+import { getCurrentLocale } from "@/i18n/translation";
 import ApiRequest from "../core/ApiRequest";
 
 export default class HeroClient {
   constructor() {
     this._apiRequest = new ApiRequest();
+    this._apiRequest.setBeforeRequest((request) => {
+      request.setLocale(getCurrentLocale());
+    });
   }
 
   /**

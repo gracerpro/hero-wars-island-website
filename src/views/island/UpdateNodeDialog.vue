@@ -3,7 +3,7 @@
     :saving="saving"
     :element-id="dialogId"
     :form-id="formId"
-    header="Редактирование"
+    :header="t('common.edit')"
     ref="dialog"
   >
     <node-form
@@ -18,6 +18,9 @@
 import ModalDialog from "@/components/ModalDialog.vue";
 import NodeForm from "./NodeForm.vue";
 import { ref, computed } from "vue";
+import { useI18n } from "vue-i18n";
+
+const { t } = useI18n();
 
 const props = defineProps({
   node: {

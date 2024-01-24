@@ -4,6 +4,7 @@ import router from "./router";
 import store from "./store";
 import "bootstrap/dist/css/bootstrap.min.css";
 import * as Sentry from "@sentry/vue";
+import i18n from "@/i18n";
 
 const app = createApp(App);
 
@@ -29,4 +30,12 @@ if (process.env.VUE_APP_USE_SENTRY > 0) {
   });
 }
 
-app.use(store).use(router).mount("#app");
+/* TODO:
+For example default locale is "en", route is "/ru", problem:
+1. The English menu is displayed for a short time
+1. Send request with "en" locale in Nav-component, before setLanguage in router
+
+Make a messages loading before setup component
+*/
+
+app.use(store).use(router).use(i18n).mount("#app");

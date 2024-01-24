@@ -1,4 +1,5 @@
 import { TYPE_START } from "@/api/node";
+import i18n from "@/i18n";
 
 export const TRANSLATE_X = 6;
 export const TRANSLATE_Y = 6;
@@ -6,6 +7,8 @@ export const EVENT_CHANGE_TRANSLATE = "change-translate";
 
 export const DELTA_SCALE = 0.1;
 export const EVENT_CHANGE_SCALE = "change-scale";
+
+const { t } = i18n;
 
 export function canSelectNode(node) {
   return node.typeId !== TYPE_START;
@@ -21,11 +24,11 @@ export function canSelectNextNode(nodes, selectedNodes, nextNode) {
   let result = null;
 
   if (nextNode.typeId === TYPE_START) {
-    return "Невозможно выбрать стартовый узел.";
+    return t("page.island.canSelectNextNode");
   }
 
-  // если нет связи следующего узла с выделенным ранее или входным
-  // то запрет
+  // if no link to selected or start node
+  // then cancel
 
   if (Object.keys(selectedNodes).length === 0) {
     let isFound = false;
@@ -35,13 +38,13 @@ export function canSelectNextNode(nodes, selectedNodes, nextNode) {
         isFound = true;
 
         if (!isNearNode(nextNode, node)) {
-          result = "Выделить узел можно около входа.";
+          result = t("page.island.canSelectNearStart");
           break;
         }
       }
     }
     if (!isFound) {
-      result = "Не найден узел входа. Обратитесь к администраторам.";
+      result = t("page.island.notFoundStartNodeAdmin");
     }
   } else {
     let isFound = false;
@@ -63,7 +66,7 @@ export function canSelectNextNode(nodes, selectedNodes, nextNode) {
       }
     }
     if (!isFound) {
-      result = "Выделить узел можно только около выделенного узла или входа.";
+      result = t("page.island.canSelectOnlySelect");
     }
   }
 

@@ -1,7 +1,9 @@
 <template>
   <div class="row">
     <div class="col-md-6">
-      <label :for="formId + '__itemName'" class="form-label">Ресурс</label>
+      <label :for="formId + '__itemName'" class="form-label">{{
+        t("common.resource")
+      }}</label>
       <text-input
         :modelValue="itemName"
         :modelModifiers="{ trim: true }"
@@ -9,15 +11,17 @@
         @update:model-value="onUpdateName"
       />
       <div class="form-text fw-normal">
-        Нужно ввести от {{ minCharsCount }} символов
+        {{ t("common.needEnterAtLeastCharacters", { n: minCharsCount }) }}
       </div>
     </div>
     <div class="col-md-6">
-      <label :for="formId + '__typeId'" class="form-label">Тип</label>
+      <label :for="formId + '__typeId'" class="form-label">{{
+        t("common.type")
+      }}</label>
       <clear-select
         :modelValue="typeId"
         :input-id="formId + '__typeId'"
-        :select-values="getLabelsByTypes()"
+        :select-values="getLabelsByTypes(t)"
         @update:model-value="onChangeType"
       />
     </div>
@@ -31,6 +35,9 @@ const EVENT_UPDATE_TYPE = "update:type-id";
 import TextInput from "@/components/TextInput.vue";
 import ClearSelect from "@/components/ClearSelect.vue";
 import { getLabelsByTypes } from "@/api/item";
+import { useI18n } from "vue-i18n";
+
+const { t } = useI18n();
 
 const formId = "nodesForm";
 

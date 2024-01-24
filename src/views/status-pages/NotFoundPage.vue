@@ -1,17 +1,23 @@
 <template>
   <div class="container">
-    <h1>404 Страница не найдена</h1>
-    <p>Возможно, страница была перемещена.</p>
-    <p><a href="/">Перейти на главную</a></p>
+    <h1>404 {{ notFound }}</h1>
+    <p>{{ t("common.movedPageMayBe") }}</p>
+    <p>
+      <a href="/">{{ t("common.goToHome") }}</a>
+    </p>
   </div>
 </template>
 <script setup>
 import { setMetaInfo } from "@/services/page-meta";
+import { useI18n } from "vue-i18n";
+
+const { t } = useI18n();
+const notFound = t("common.pageNotFound");
 
 setMetaInfo({
-  title: "Страница не найдена",
-  description: "Страница не найдена",
-  keywords: "404, страница не найдена",
+  title: notFound,
+  description: notFound,
+  keywords: "404, " + notFound,
 });
 
 window.location.reload();

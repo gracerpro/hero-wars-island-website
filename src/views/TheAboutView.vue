@@ -1,47 +1,36 @@
 <template>
   <div class="container">
-    <h1>О проекте</h1>
-    <p>
-      Изначально было желание сделать функционал, где вводится доступное
-      количетво ходов и есть кнопка "Найти лучшие награды". При нажатии на
-      кнопку рассчитывается путь. Карта это набор узлов, похоже на графы. Но при
-      рассчете нужно учесть человеческий фактор: кому то выгодней взять
-      изумруды, а кому то камни облика. Поэтому от этого функционала отказался.
-      Пусть человек сам строит путь и получает нужные награды.
-    </p>
-    <p>Причины:</p>
+    <h1>{{ t("common.about") }}</h1>
+    <p>{{ t("page.about.paragraph1") }}</p>
+    <p>{{ t("page.about.reasons") }}</p>
     <ol>
-      <li>
-        На первой карте острова, когда было набрано большое количество ходов,
-        рассчитать ходы и награды было сложно. Лучшие награды лежат в башнях.
-        Башни расположены далеко от центра. Хватит ли ходов до них?... Сложно
-        рассчитать, очень. Проще разметить путь как на листе бумаги.
-      </li>
-      <li>
-        При доступной открытой карте также сложно было искать награды. Например,
-        нужны изумруды, на карте сотня точек с разными картинками, среди которых
-        не просто разглядеть нужную. Так надо еще и запомнить... Проще
-        отфильтровать иконки.
-      </li>
+      <li>{{ t("page.about.reason1") }}</li>
+      <li>{{ t("page.about.reason2") }}</li>
     </ol>
     <p>
-      <router-link to="/contact">Приму любую обратную связь.</router-link>
-      Что можно улучшить? Что лишнее? Что переделать? Что не работает?
+      <router-link :to="createI18nRouteTo({ name: 'contact' })">{{
+        t("page.about.iWillAcceptAnyFeedback")
+      }}</router-link>
+      {{ t("page.about.feedbackQuestions") }}
     </p>
     <p>
-      Если кто то
-      <router-link to="/help">желает помочь проекту</router-link> будет круто.
+      {{ t("page.about.coolHelpProject") }}
+      <router-link :to="createI18nRouteTo({ name: 'help' })">{{
+        t("page.about.coolHelpProjectLink")
+      }}</router-link>
     </p>
   </div>
 </template>
 <script setup>
 import { setMetaInfo } from "@/services/page-meta";
+import { useI18n } from "vue-i18n";
+import { createI18nRouteTo } from "@/i18n/translation";
+
+const { t } = useI18n();
 
 setMetaInfo({
-  title: "О проекте",
-  description:
-    "В игре Хроники Хаоса на карте острова находятся узлы, чтобы их открыть нужно потратить ход исследователя. Ходы можно получить от событий игры. Соберем все призы вместе!",
-  keywords:
-    "Хроники хаоса, Эра доминиона, карта острова, карта, узлы, ресурсы, ходы исследователя, открытая карта",
+  title: t("seo.about.title") + " - " + t("common.projectName"),
+  description: t("seo.about.description"),
+  keywords: t("seo.about.keywords"),
 });
 </script>

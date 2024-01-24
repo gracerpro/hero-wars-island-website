@@ -2,40 +2,38 @@
   <modal-dialog
     :element-id="dialogId"
     :is-show-submit="false"
-    header="Карта"
+    :header="t('common.map')"
     ref="dialog"
   >
     <p>
-      При перемещении курсора если нажать среднюю кнопку мышки - сдвиг.<br />
-      Прокручивать средней кнопкой мышки - увеличение или уменьшение.
+      {{ t("page.island.helpParagraph1") }}<br />
+      {{ t("page.island.helpParagraph2") }}
     </p>
-    <h4>Узлы</h4>
+    <h4>{{ t("common.node", 2) }}</h4>
     <ul class="list-unstyled">
-      <li><span class="node-box node-start"></span>Начало, вход</li>
-      <li><span class="node-box node"></span>Один ресурс</li>
-      <li><span class="node-box node-town"></span>Башня</li>
-      <li><span class="node-box node-chest"></span>Сундук</li>
+      <li>
+        <span class="node-box node-start"></span>{{ t("common.startNode") }}
+      </li>
+      <li>
+        <span class="node-box node"></span>{{ t("page.island.oneResource") }}
+      </li>
+      <li><span class="node-box node-town"></span>{{ t("common.tower") }}</li>
+      <li><span class="node-box node-chest"></span>{{ t("common.chest") }}</li>
     </ul>
-    <h4>Помощь</h4>
-    <p class="mb-0">
-      На ячейке со знаком вопроса нужно вписать или поправить ресурс.
-    </p>
+    <h4>{{ t("common.help") }}</h4>
+    <p class="mb-0">{{ t("page.island.helpOnQuestion") }}</p>
     <ul class="mb-0">
-      <li>
-        Название ресурса, главное понятное. Несколько названий разделяется
-        запятой.
-      </li>
-      <li>
-        Количество, если больше 1 (например, 123, 300к, 5М). Если названий
-        несколько, то первое количество соответстветствует первому названию и т.
-        д.
-      </li>
+      <li>{{ t("page.island.helpResource1") }}</li>
+      <li>{{ t("page.island.helpResource2") }}</li>
     </ul>
   </modal-dialog>
 </template>
 <script setup>
 import ModalDialog from "@/components/ModalDialog.vue";
 import { ref } from "vue";
+import { useI18n } from "vue-i18n";
+
+const { t } = useI18n();
 
 const dialogId = "node-help-dialog";
 

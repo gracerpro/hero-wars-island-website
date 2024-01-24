@@ -1,6 +1,6 @@
 const { defineConfig } = require("@vue/cli-service");
 
-const isDebug = process.env.NODE_ENV !== "production" ? 'true' : 'false';
+const isDebug = process.env.NODE_ENV !== "production" ? "true" : "false";
 
 module.exports = defineConfig({
   chainWebpack: (config) => {
