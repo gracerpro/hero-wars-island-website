@@ -63,7 +63,7 @@ export async function setLanguage(locale) {
  * @returns {Object}
  */
 export function createI18nRouteTo(to) {
-  if (getCurrentLocale() === getDefaultLocale()) {
+  if (!isShowLocaleInRoute(getCurrentLocale())) {
     return to;
   }
 
@@ -74,6 +74,10 @@ export function createI18nRouteTo(to) {
       ...to.params,
     },
   };
+}
+
+export function isShowLocaleInRoute(locale) {
+  return locale !== getDefaultLocale();
 }
 
 export async function loadLocaleMessages(locale) {

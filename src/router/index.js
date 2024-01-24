@@ -66,8 +66,6 @@ const router = createRouter({
 });
 
 router.beforeEach(async (to, from, next) => {
-  console.log("from", from.path, "to", to.path);
-
   if (to.path.length > 1 && to.path.endsWith("/")) {
     const newTo = { ...to };
     newTo.path = to.path.slice(0, -1);
@@ -77,7 +75,6 @@ router.beforeEach(async (to, from, next) => {
 
   const paramsLocale = to.params.locale;
   if (paramsLocale) {
-    console.log("paramsLocale", paramsLocale, "isSupport", isSupportLocale(paramsLocale));
     if (!isSupportLocale(paramsLocale)) {
       if (paramsLocale !== "page-not-found") {
         return next({ path: "/page-not-found", query: { returnUrl: to.path } });
