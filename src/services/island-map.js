@@ -8,7 +8,7 @@ export const EVENT_CHANGE_TRANSLATE = "change-translate";
 export const DELTA_SCALE = 0.1;
 export const EVENT_CHANGE_SCALE = "change-scale";
 
-const { t } = i18n;
+const { t } = i18n.global;
 
 export function canSelectNode(node) {
   return node.typeId !== TYPE_START;

@@ -92,7 +92,7 @@
     "island": {
       "canNotSelectStartNode": "Невозможно выбрать стартовый узел.",
       "canSelectNearStart": "You can select a node near the entry.",
-      "canSelectOnlySelect": "Выделить узел можно только около выделенного узла или входа.",
+      "canSelectOnlySelect": "You can select a node only near the selected node or entry.",
       "failNodesLoading": "Failed to load map nodes",
       "islandNotAvailable": "The island is not available.",
       "islandNotFound": "The island is not found.",
