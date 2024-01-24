@@ -25,7 +25,7 @@ import {
 } from "@/i18n/translation";
 import { computed } from "vue";
 import { useRouter } from "vue-router";
-import { isShowLocaleInRoute, getLoadedLocales, guessDefaultLocale } from "@/i18n/translation";
+import { isShowLocaleInRoute } from "@/i18n/translation";
 
 const router = useRouter();
 
@@ -43,6 +43,6 @@ const onChangeLanguage = async (locale) => {
   if (!isShowLocaleInRoute(locale)) {
     routeLocale = "";
   }
-  await router.replace({ params: { locale: routeLocale } })
+  await router.replace({ params: { locale: routeLocale } });
 };
 </script>

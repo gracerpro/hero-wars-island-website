@@ -47,8 +47,6 @@ import { createI18nRouteTo } from "@/i18n/translation";
 
 const { t } = useI18n();
 
-console.log("setup nav");
-
 const actualIsland = ref(null);
 
 onMounted(() => {

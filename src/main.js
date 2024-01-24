@@ -30,4 +30,12 @@ if (process.env.VUE_APP_USE_SENTRY > 0) {
   });
 }
 
+/* TODO:
+For example default locale is "en", route is "/ru", problem:
+1. The English menu is displayed for a short time
+1. Send request with "en" locale in Nav-component, before setLanguage in router
+
+Make a messages loading before setup component
+*/
+
 app.use(store).use(router).use(i18n).mount("#app");
