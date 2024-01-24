@@ -63,6 +63,10 @@ export async function setLanguage(locale) {
  * @returns {Object}
  */
 export function createI18nRouteTo(to) {
+  if (getCurrentLocale() === getDefaultLocale()) {
+    return to;
+  }
+
   return {
     ...to,
     params: {
@@ -84,7 +88,19 @@ export async function loadLocaleMessages(locale) {
   return nextTick();
 }
 
-export function getUserLocale() {
+export function guessDefaultLocale() {
+  const userLocaleData = getUserLocaleData();
+  if (isSupportLocale(userLocaleData.locale)) {
+    return userLocaleData.locale;
+  }
+  if (isSupportLocale(userLocaleData.localeNoRegion)) {
+    return userLocaleData.localeNoRegion;
+  }
+
+  return getDefaultLocale();
+}
+
+export function getUserLocaleData() {
   const locale =
     window.navigator.language ||
     window.navigator.userLanguage ||

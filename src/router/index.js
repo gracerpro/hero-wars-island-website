@@ -1,6 +1,6 @@
 import { createRouter, createWebHistory } from "vue-router";
 import TheHomeView from "../views/TheHomeView.vue";
-import { isSupportLocale, setLanguage } from "@/i18n/translation";
+import { getCurrentLocale, guessDefaultLocale, isSupportLocale, setLanguage } from "@/i18n/translation";
 
 const routes = [
   {
@@ -40,12 +40,6 @@ const routes = [
         component: () =>
           import(/* webpackChunkName: "help" */ "../views/TheHelpView.vue"),
       },
-      {
-        path: ":catchAll(.*)",
-        redirect: (to) => {
-          return { path: "/page-not-found", query: { returnUrl: to.path } };
-        },
-      },
     ],
   },
   {
@@ -72,20 +66,26 @@ const router = createRouter({
 });
 
 router.beforeEach(async (to, from, next) => {
+  console.log("from", from.path, "to", to.path);
+
   if (to.path.length > 1 && to.path.endsWith("/")) {
     const newTo = { ...to };
     newTo.path = to.path.slice(0, -1);
 
-    next(newTo);
-    return;
+    return next(newTo);
   }
 
   const paramsLocale = to.params.locale;
-
-  console.log(paramsLocale, "is upport", isSupportLocale(paramsLocale));
-
-  if (paramsLocale && isSupportLocale(paramsLocale)) {
-    setLanguage(paramsLocale);
+  if (paramsLocale) {
+    console.log("paramsLocale", paramsLocale, "isSupport", isSupportLocale(paramsLocale));
+    if (!isSupportLocale(paramsLocale)) {
+      if (paramsLocale !== "page-not-found") {
+        return next({ path: "/page-not-found", query: { returnUrl: to.path } });
+      }
+      // return next("/" + guessDefaultLocale()); // may be throw 404 error?
+    } else if (paramsLocale !== getCurrentLocale()) {
+      await setLanguage(paramsLocale);
+    }
   }
 
   callNext(next, to, from);

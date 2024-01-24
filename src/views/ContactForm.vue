@@ -110,7 +110,11 @@ const formSubject = ref(null);
 const formId = "contactForm";
 
 onMounted(() => {
-  setTimeout(() => formSubject.value.focus(), 300);
+  setTimeout(() => {
+    if (formSubject.value) {
+      formSubject.value.focus();
+    }
+  }, 300);
 });
 
 const onSubmit = () => {
