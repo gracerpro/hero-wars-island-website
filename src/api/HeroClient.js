@@ -1,5 +1,6 @@
 import { getCurrentLocale } from "@/i18n/translation";
 import ApiRequest from "../core/ApiRequest";
+import { STATUS_ACCEPTED_SUCCESS, TYPE_NODE } from "./node";
 
 export default class HeroClient {
   constructor() {
@@ -42,13 +43,13 @@ export default class HeroClient {
    * @returns {Promise<Object|null>}
    */
   async getIslandList(pageSize, pageNumber = 1) {
-    let params = { pageSize };
+    const params = { pageSize };
 
     if (pageNumber > 1) {
       params.pageNumber = pageNumber;
     }
 
-    let list = await this._apiRequest.get("/islands", params);
+    const list = await this._apiRequest.get("/islands", params);
 
     if (list.items) {
       list.items.forEach((island) => this.modifyIsland(island));
@@ -62,7 +63,48 @@ export default class HeroClient {
    * @returns {Promise<Object>}
    */
   async getNodes(islandId) {
-    return this._apiRequest.get(`/islands/${islandId}/nodes`);
+    const list = await this._apiRequest.get(`/islands/${islandId}/nodes`);
+
+    if (list.items) {
+      list.items.forEach((node) => this.modifyNode(node));
+    }
+
+    return list;
+  }
+
+  /**
+   * @private
+   * @param {Object} node
+   */
+  modifyNode(node) {
+    if (!node.userComment) {
+      node.userComment = "";
+    }
+    if (!node.userQuantity) {
+      node.userQuantity = "";
+    }
+    if (!node.typeId) {
+      node.typeId = TYPE_NODE;
+    }
+    if (!node.statusId) {
+      node.statusId = STATUS_ACCEPTED_SUCCESS;
+    }
+    if (node.items) {
+      node.items.forEach((item) => {
+        if (!item.emeraldCost) {
+          item.emeraldCost = null;
+        }
+        if (!item.quantity) {
+          item.quantity = 1;
+        }
+        if (!item.description) {
+          item.description = "";
+        }
+      });
+      // emeraldCost
+    } else {
+      node.items = [];
+    }
   }
 
   /**
@@ -84,7 +126,16 @@ export default class HeroClient {
    * @returns {Promise<Object>}
    */
   async updateNode(nodeId, data) {
-    return this._apiRequest.post(`/island-nodes/${nodeId}/update`, data);
+    const node = await this._apiRequest.post(
+      `/island-nodes/${nodeId}/update`,
+      data,
+    );
+
+    if (node) {
+      this.modifyNode(node);
+    }
+
+    return node;
   }
 
   /**
