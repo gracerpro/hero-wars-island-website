@@ -83,15 +83,15 @@ export default class HeroClient {
     if (!node.userQuantity) {
       node.userQuantity = "";
     }
-    if (!node.typeId) {
+    if (node.typeId === undefined) {
       node.typeId = TYPE_NODE;
     }
-    if (!node.statusId) {
+    if (node.statusId === undefined) {
       node.statusId = STATUS_ACCEPTED_SUCCESS;
     }
     if (node.items) {
       node.items.forEach((item) => {
-        if (!item.emeraldCost) {
+        if (item.emeraldCost === undefined) {
           item.emeraldCost = null;
         }
         if (!item.quantity) {
@@ -101,7 +101,6 @@ export default class HeroClient {
           item.description = "";
         }
       });
-      // emeraldCost
     } else {
       node.items = [];
     }
