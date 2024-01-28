@@ -12,5 +12,19 @@ module.exports = defineConfig({
       return definitions;
     });
   },
+  pages: {
+    app: {
+      entry: "src/main.js",
+      template: "public/index.html",
+      filename: "index.html",
+      chunks: ["chunk-vendors", "chunk-common", "app"],
+    },
+    swagger: {
+      entry: "src/swagger.js",
+      template: "public/backend-api/index.html",
+      filename: "backend-api/index.html",
+      chunks: ["chunk-vendors", "chunk-common", "swagger"],
+    },
+  },
   transpileDependencies: true,
 });

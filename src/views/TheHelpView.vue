@@ -5,13 +5,20 @@
     <p>{{ t("page.help.paragraph1") }}</p>
     <ul>
       <li>
-        {{ t("page.help.help1") }}
-        <a
-          href="https://github.com/gracerpro/hero-wars-island-website"
-          target="_blank"
-        >
-          https://github.com/gracerpro/hero-wars-island-website
-        </a>
+        {{ t("page.help.help1") }}<br>
+        <ul>
+          <li>
+          <a
+            href="https://github.com/gracerpro/hero-wars-island-website"
+            target="_blank"
+          >
+            https://github.com/gracerpro/hero-wars-island-website
+            </a><br>
+          </li>
+          <li>
+            <a href="/backend-api/">API</a>
+          </li>
+        </ul>
       </li>
       <li>{{ t("page.help.help2") }}</li>
       <li>{{ t("page.help.help3") }}</li>
