@@ -23,3 +23,5 @@ pnpm-debug.log*
 *.code-workspace
 
 docker-compose.yml
+
+public/backend-api/swagger.json
