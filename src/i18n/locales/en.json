@@ -78,8 +78,9 @@
       "help2": "Make normal resource icons, without artifacts.",
       "help3": "Add autotest.",
       "help4": "Suggest ideas.",
-      "todo1": "Add news, coordinate with the backend.",
-      "todo2": "Make a button \"show the whole island\"."
+      "todo1": "Add news.",
+      "todo2": "Make a button \"show the whole island\".",
+      "todo3": "Make a button \"Fullscreen mode\"."
     },
     "home": {
       "actual": "Actual",

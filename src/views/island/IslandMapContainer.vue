@@ -504,7 +504,7 @@ const getQuantity = (item) => {
 }
 .text {
   font-size: 20px;
-  fill: #ebdd60;
+  fill: #000;
   font-weight: bold;
 }
 .text-2 {

@@ -29,6 +29,7 @@
     <ul>
       <li>{{ t("page.help.todo1") }}</li>
       <li>{{ t("page.help.todo2") }}</li>
+      <li>{{ t("page.help.todo3") }}</li>
     </ul>
   </div>
 </template>
