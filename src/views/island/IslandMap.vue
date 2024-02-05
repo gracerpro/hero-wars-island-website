@@ -116,9 +116,12 @@ const visibleItems = computed(() => {
   let resultItems = items.value;
 
   if (filter.itemName.length >= minCharsCount) {
-    resultItems = resultItems.filter((item) =>
-      item.item.name.toLowerCase().includes(filter.itemName.toLowerCase()),
-    );
+    resultItems = resultItems.filter((item) => {
+      if (!item.item.name) {
+        return false;
+      }
+      return item.item.name.toLowerCase().includes(filter.itemName.toLowerCase());
+    });
   }
   if (filter.typeId > 0) {
     resultItems = resultItems.filter(
