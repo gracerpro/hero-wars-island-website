@@ -82,7 +82,7 @@ import { createI18nRouteTo } from "@/i18n/translation";
 
 const { t } = useI18n();
 
-const MAX_SCALE = 3;
+const MAX_SCALE = 4;
 const MIN_SCALE = 0.3;
 
 const client = new HeroClient();
