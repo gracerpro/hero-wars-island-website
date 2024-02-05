@@ -21,7 +21,7 @@
             class="icon"
           />
         </td>
-        <td>{{ item.item.name }}</td>
+        <td>{{ getItemName(item) }}</td>
         <td class="text-end">{{ item.humanQuantity }}</td>
       </tr>
     </tbody>
@@ -34,6 +34,10 @@ defineProps({
   items: { type: Array, required: true },
 });
 const { t } = useI18n();
+
+const getItemName = (item) => {
+  return item.item.name ? item.item.name : t("common.noName");
+};
 </script>
 <style scoped>
 .icon {

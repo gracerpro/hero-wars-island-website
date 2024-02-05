@@ -50,6 +50,13 @@ watch(
     }
   },
 );
+watch(
+  () => route.params.locale,
+  () => {
+    loadIsland(island.value.id);
+    // todo: loading_start >change< loading_end
+  }
+);
 
 setMetaInfo({
   title: t("common.islandMap"),

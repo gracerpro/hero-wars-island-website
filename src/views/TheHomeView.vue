@@ -36,11 +36,13 @@
 import HeroClient from "@/api/HeroClient";
 import { fromCurrentDate } from "@/helpers/formatter";
 import { setMetaInfo } from "@/services/page-meta";
-import { ref } from "vue";
+import { ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import { createI18nRouteTo } from "@/i18n/translation";
+import { useRoute } from "vue-router";
 
 const { t, locale } = useI18n();
+const route = useRoute();
 
 const client = new HeroClient();
 const now = new Date();
@@ -54,6 +56,11 @@ setMetaInfo({
   description: t("seo.home.description"),
   keywords: t("seo.home.keywords"),
 });
+
+watch(
+  () => route.params.locale,
+  () => loadIslands()
+);
 
 loadIslands();
 
