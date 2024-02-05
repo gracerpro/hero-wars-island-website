@@ -28,6 +28,7 @@
     "needEnterAtLeastCharacters": "Need to enter at least {n} characters",
     "node": "Node | Nodes",
     "noData": "No data",
+    "noName": "<No name>",
     "onModeration": "On moderation",
     "pattern": "Pattern | Patterns",
     "pageNotFound": "Page not found",

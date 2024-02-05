@@ -28,6 +28,7 @@
     "needEnterAtLeastCharacters": "Нужно ввести от {n} символов",
     "node": "Узел | Узлы",
     "noData": "Нет данных.",
+    "noName": "<Нет названия>",
     "onModeration": "На модерации",
     "pattern": "Узор | Узоры",
     "pageNotFound": "Страница не найдена",

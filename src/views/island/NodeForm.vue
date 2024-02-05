@@ -25,7 +25,7 @@
               :height="item.iconHeight"
             />
             {{ item.quantity }}
-            {{ item.name }}
+            {{ getItemName(item) }}
           </li>
         </ul>
       </div>
@@ -173,7 +173,7 @@ const getItems = () => {
   client
     .getItems(10, { name: comment.value })
     .then((list) => {
-      items.value = list.items;
+      items.value = list.items.map((item) => item.name && item.name.length);
       commentErrorMessage.value = "";
     })
     .catch((error) => {
@@ -198,6 +198,9 @@ const getData = () => {
     quantity: quantity.value,
     itemId,
   };
+};
+const getItemName = (item) => {
+  return item.name ? item.name : t("common.noName");
 };
 </script>
 <style scoped>

@@ -44,7 +44,7 @@
             :href="item.item.iconUrl"
             @click="onNodeClick(item.node)"
           >
-            <title>{{ item.item.name + getQuantity(item) }}</title>
+            <title>{{ getItemName(item) + getQuantity(item) }}</title>
           </image>
           <rect
             v-else
@@ -56,7 +56,7 @@
             @click="onNodeClick(item.node)"
           >
             <title>
-              {{ item.item.name + getQuantity(item) }},
+              {{ getItemName(item) + getQuantity(item) }},
               {{ t("page.island.notLinkedImage") }}
             </title>
           </rect>
@@ -470,6 +470,9 @@ const getWarningTitle = (item) => {
 };
 const getQuantity = (item) => {
   return item.item.quantity > 1 ? ", " + item.item.quantity : "";
+};
+const getItemName = (item) => {
+  return item.item.name ? item.item.name : t("common.noName");
 };
 </script>
 <style>
