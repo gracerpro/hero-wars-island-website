@@ -59,7 +59,7 @@ setMetaInfo({
 
 watch(
   () => route.params.locale,
-  () => loadIslands()
+  () => loadIslands(),
 );
 
 loadIslands();

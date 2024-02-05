@@ -55,7 +55,7 @@ watch(
   () => {
     loadIsland(island.value.id);
     // todo: loading_start >change< loading_end
-  }
+  },
 );
 
 setMetaInfo({
