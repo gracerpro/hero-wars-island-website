@@ -24,7 +24,7 @@ export function fromCurrentDate(date, locale = null) {
   let result =
     date.getDate() +
     " " +
-    now.toLocaleString(locale ? locale : "default", { month: "short" });
+    date.toLocaleString(locale ? locale : "default", { month: "short" });
 
   if (date.getFullYear() !== now.getFullYear()) {
     result += " " + date.getFullYear();

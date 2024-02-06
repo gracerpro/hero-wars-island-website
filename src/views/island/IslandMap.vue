@@ -120,7 +120,9 @@ const visibleItems = computed(() => {
       if (!item.item.name) {
         return false;
       }
-      return item.item.name.toLowerCase().includes(filter.itemName.toLowerCase());
+      return item.item.name
+        .toLowerCase()
+        .includes(filter.itemName.toLowerCase());
     });
   }
   if (filter.typeId > 0) {
