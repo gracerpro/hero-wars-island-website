@@ -1,3 +1,3 @@
 User-agent: *
 
-sitemap: http://backend-hero-wars.vyacheslaff.ru/sitemap.xml
+Sitemap: http://backend-hero-wars.vyacheslaff.ru/sitemap.xml

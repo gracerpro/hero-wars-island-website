@@ -92,7 +92,7 @@
       "toDateDaysCount": "to {toDate}, days left {daysCount}"
     },
     "island": {
-      "canNotSelectStartNode": "Невозможно выбрать стартовый узел.",
+      "canNotSelectStartNode": "It is not possible to select an entry.",
       "canSelectNearStart": "You can select a node near the entry.",
       "canSelectOnlySelect": "You can select a node only near the selected node or entry.",
       "failNodesLoading": "Failed to load map nodes",

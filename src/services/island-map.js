@@ -24,7 +24,7 @@ export function canSelectNextNode(nodes, selectedNodes, nextNode) {
   let result = null;
 
   if (nextNode.typeId === TYPE_START) {
-    return t("page.island.canSelectNextNode");
+    return t("page.island.canNotSelectStartNode");
   }
 
   // if no link to selected or start node
