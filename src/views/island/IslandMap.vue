@@ -14,6 +14,7 @@
         @reset-translate="onResetTranslate"
         @change-scale="onChangeScale"
         @change-translate="onChangeTranslate"
+        @fullscreen-on="onFullscreen"
       />
       <island-map-container
         :scale="scale"
@@ -28,6 +29,7 @@
         @change-scale="onChangeScale"
         @change-node="onChangeNode"
         @select-node="onSelectNode"
+        ref="mapContainer"
       />
       <div class="row mt-3">
         <div class="col-lg-6">
@@ -65,6 +67,7 @@
         </div>
       </div>
     </div>
+    <div ref="aaa1">123</div>
   </div>
 </template>
 <script setup>
@@ -79,6 +82,7 @@ import { onMounted, onUnmounted, ref, computed, shallowReactive } from "vue";
 import { getHumanQunatity } from "@/helpers/formatter";
 import { useI18n } from "vue-i18n";
 import { createI18nRouteTo } from "@/i18n/translation";
+import { fullscreenElement } from "@/core/fullscreen";
 
 const { t } = useI18n();
 
@@ -108,6 +112,8 @@ const filter = shallowReactive({
   itemName: "",
   typeId: null,
 });
+const mapContainer = ref(null);
+const aaa1 = ref(null);
 
 const minCharsCount = 3;
 const componentId = props.parentPageId + "__map";
@@ -189,7 +195,7 @@ function initUserNodes(nodes) {
   return resultNodes;
 }
 /**
- * @param {Object} nodes
+ * @param {Array} nodes
  */
 function calculateItems(nodes) {
   calculatingItems.value = true;
@@ -268,6 +274,10 @@ const onSelectNode = (id, isRemove) => {
   }
 };
 const onResetUserNodes = () => (userNodes.value = {});
+
+const onFullscreen = () => {
+  fullscreenElement(mapContainer.value.canvas);
+};
 
 function loadState() {
   let state;

@@ -2,6 +2,7 @@
   <div class="map">
     <svg
       height="600"
+      class="canvas"
       width="100%"
       :viewBox="viewBox"
       xmlns="http://www.w3.org/2000/svg"
@@ -9,6 +10,7 @@
       @mouseup="onMouseUp"
       @mousemove="onMouseMove"
       @wheel="onMouseWheel"
+      ref="canvas"
     >
       <line
         x1="0"
@@ -144,6 +146,8 @@ const mouse = {
   preventY: null,
 };
 
+const canvas = ref(null);
+
 const emit = defineEmits([
   EVENT_CHANGE_TRANSLATE,
   EVENT_CHANGE_SCALE,
@@ -159,6 +163,9 @@ const props = defineProps({
   items: { type: Array, required: true },
   inputNodes: { type: Object, required: true },
   userNodes: { type: Object, required: true },
+});
+defineExpose({
+  canvas,
 });
 
 const toast = ref(null);
@@ -532,6 +539,9 @@ const getItemName = (item) => {
 }
 </style>
 <style scoped>
+.canvas:fullscreen {
+  background-color: #fff;
+}
 .active-frame {
   fill: none;
   stroke: red;

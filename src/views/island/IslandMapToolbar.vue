@@ -1,6 +1,6 @@
 <template>
   <div class="btn-toolbar -left-toolbar" role="toolbar">
-    <div class="btn-group-vertical w-100 mb-2" role="group">
+    <div class="btn-group-vertical w-100" role="group">
       <button
         type="button"
         class="btn btn-secondary"
@@ -26,7 +26,7 @@
         0
       </button>
     </div>
-    <div class="btn-group-vertical w-100 mb-2" role="group">
+    <div class="btn-group-vertical w-100 mt-2" role="group">
       <button
         type="button"
         class="btn btn-secondary"
@@ -64,7 +64,7 @@
         0
       </button>
     </div>
-    <div class="btn-group-vertical w-100 mb-2" role="group">
+    <div class="btn-group-vertical w-100 mt-2" role="group">
       <button
         type="button"
         :title="t('page.island.showOnlyIconWithoutQuantity')"
@@ -88,7 +88,7 @@
         ?
       </button>
     </div>
-    <div class="btn-group-vertical w-100" role="group">
+    <div class="btn-group-vertical w-100 mt-2" role="group">
       <button
         type="button"
         class="btn btn-secondary"
@@ -96,6 +96,16 @@
         :title="t('common.help')"
       >
         h
+      </button>
+    </div>
+    <div class="btn-group-vertical w-100 mt-2" role="group">
+      <button
+        type="button"
+        class="btn btn-secondary fullscreen-btn"
+        :title="t('common.fullscreenMode')"
+        @click="emit(EVENT_FULLSCREEN_ON)"
+      >
+        <span class="fullscreen-icon"></span>
       </button>
     </div>
 
@@ -111,6 +121,7 @@ const EVENT_RESET_TRANSLATE = "reset-translate";
 const EVENT_RESET_SCALE = "reset-scale";
 const EVENT_CHANGE_ONLY_IMAGE = "update:is-only-image";
 const EVENT_CHANGE_IS_SHOW_NO_MODERATE = "update:is-show-no-moderate";
+const EVENT_FULLSCREEN_ON = "fullscreen-on";
 </script>
 <script setup>
 import HelpDialog from "./HelpDialog.vue";
@@ -138,6 +149,7 @@ const emit = defineEmits([
   EVENT_CHANGE_SCALE,
   EVENT_CHANGE_ONLY_IMAGE,
   EVENT_CHANGE_IS_SHOW_NO_MODERATE,
+  EVENT_FULLSCREEN_ON,
 ]);
 
 const helpDialog = ref(null);
@@ -180,3 +192,15 @@ const onMountedHelpDialog = () => {
   });
 };
 </script>
+<style>
+.fullscreen-btn {
+  padding: 5px;
+  line-height: 10px;
+}
+.fullscreen-icon {
+  border: 3px solid #fff;
+  display: inline-block;
+  width: 100%;
+  height: 20px;
+}
+</style>
