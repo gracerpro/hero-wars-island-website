@@ -67,7 +67,6 @@
         </div>
       </div>
     </div>
-    <div ref="aaa1">123</div>
   </div>
 </template>
 <script setup>
@@ -113,7 +112,6 @@ const filter = shallowReactive({
   typeId: null,
 });
 const mapContainer = ref(null);
-const aaa1 = ref(null);
 
 const minCharsCount = 3;
 const componentId = props.parentPageId + "__map";
