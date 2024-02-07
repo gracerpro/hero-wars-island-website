@@ -66,3 +66,12 @@ docker exec hero-wars-website__vue npm run build
 Go to `http://hero-wars.vyacheslaff.local:8082`
 
 The end.
+
+
+## Build the release
+
+Get commits history
+
+```bash
+git log --since=2022-10-16 --pretty=format:"%cD %s"
+```
