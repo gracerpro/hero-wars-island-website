@@ -3,6 +3,7 @@
   "version": "1.2.5",
   "private": false,
   "description": "The Hero wars islands.",
+  "type": "module",
   "scripts": {
     "serve": "vue-cli-service serve",
     "lint": "vue-cli-service lint",
@@ -13,6 +14,7 @@
     "@sentry/vue": "^7.93.0",
     "bootstrap": "^5.3.2",
     "core-js": "^3.8.3",
+    "express": "^4.18.2",
     "swagger-ui": "^5.11.1",
     "vue": "^3.2.13",
     "vue-i18n": "^9.9.0",
