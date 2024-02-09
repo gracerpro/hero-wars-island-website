@@ -1,3 +1,11 @@
-import { createApp } from './app.js'
+import createApp from "./main";
 
-createApp().mount('#app')
+console.log("client");
+
+const { app, router } = createApp();
+
+router.onReady(() => {
+  console.log("client. router on Ready");
+  
+  app.mount("#app");
+});

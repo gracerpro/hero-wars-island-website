@@ -13,7 +13,12 @@ module.exports = defineConfig({
     });
   },
   pages: {
-    app: {
+    ssr: {
+      entry: "src/app.js",
+      template: "public/ssr_index.html",
+      filename: "ssr_index.html",
+    },
+    /*app: {
       entry: "src/main.js",
       template: "public/index.html",
       filename: "index.html",
@@ -24,7 +29,7 @@ module.exports = defineConfig({
       template: "public/backend-api/index.html",
       filename: "backend-api/index.html",
       chunks: ["chunk-vendors", "chunk-common", "swagger"],
-    },
+    },*/
   },
   transpileDependencies: true,
 });

@@ -1,30 +1,25 @@
-import express from 'express'
-import { renderToString } from 'vue/server-renderer'
-import { createApp } from './app.js'
+import createApp from './main';
 
-const server = express()
+console.log("server");
 
-server.get('/', (req, res) => {
-  const app = createApp()
+export default (context) => {
+  return new Promise((resolve, reject) => {
+    console.log("server. router on ready");
+    console.log(context);
 
-  renderToString(app).then((html) => {
-    res.send(`
-    <!DOCTYPE html>
-    <html>
-      <head>
-        <title>Vue SSR Example</title>
-        <script type="module" src="/client.js"></script>
-      </head>
-      <body>
-        <div id="app">${html}</div>
-      </body>
-    </html>
-    `)
+    // на каждый запрос создается экземпляр Vue
+    const { app, router } = createApp();
+    
+    router.push(context.url);
+
+    router.onReady(() => {
+      const matchedComponents = router.getMatchedComponents();
+
+      if (!matchedComponents.length) {
+        return reject(new Error(404));
+      }
+
+      return resolve(app);
+    }, reject);
   })
-})
-
-server.use(express.static('../public'));
-
-server.listen(3000, () => {
-  console.log('ready')
-})
+};

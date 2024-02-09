@@ -1,4 +1,4 @@
-import { createApp } from "vue";
+import { createApp as _createApp} from "vue";
 import App from "./App.vue";
 import router from "./router";
 import store from "./store";
@@ -6,9 +6,22 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import * as Sentry from "@sentry/vue";
 import i18n from "@/i18n";
 
-const app = createApp(App);
+export default function createApp() {
+  const app = _createApp(App);
 
-if (process.env.VUE_APP_USE_SENTRY > 0) {
+  if (process.env.VUE_APP_USE_SENTRY > 0) {
+    initSentry(app);
+  }
+
+  app.use(store).use(router).use(i18n);
+
+  return {
+    app,
+    router
+  }
+}
+
+function initSentry(app) {
   Sentry.init({
     app,
     dsn: "https://e6453d231e745bf943c79277ccdc8890@o514031.ingest.sentry.io/4506580248297472",
@@ -37,5 +50,3 @@ For example default locale is "en", route is "/ru", problem:
 
 Make a messages loading before setup component
 */
-
-app.use(store).use(router).use(i18n).mount("#app");
