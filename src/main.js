@@ -1,10 +1,10 @@
 import { createApp as _createApp} from "vue";
 import App from "./App.vue";
-import router from "./router";
-import store from "./store";
+import router from "./router/index.js";
+import store from "./store/index.js";
 import "bootstrap/dist/css/bootstrap.min.css";
 import * as Sentry from "@sentry/vue";
-import i18n from "@/i18n";
+import i18n from "@/i18n/index.js";
 
 export default function createApp() {
   const app = _createApp(App);

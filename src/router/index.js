@@ -8,8 +8,6 @@ import {
 } from "@/i18n/translation";
 import routes from "./routes";
 
-
-
 const router = createRouter({
   history: process.env.SSR
     ? createMemoryHistory(process.env.BASE_URL)

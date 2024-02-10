@@ -1,6 +1,9 @@
 const { defineConfig } = require("@vue/cli-service");
 
 const isDebug = process.env.NODE_ENV !== "production" ? "true" : "false";
+const entry = process.env.SSR > 0 ? "client" : "server";
+
+console.log("SSR =", process.env.SSR);
 
 module.exports = defineConfig({
   chainWebpack: (config) => {
@@ -13,18 +16,13 @@ module.exports = defineConfig({
     });
   },
   pages: {
-    ssr: {
-      entry: "src/app.js",
-      template: "public/ssr_index.html",
-      filename: "ssr_index.html",
-    },
-    /*app: {
-      entry: "src/main.js",
+    app: {
+      entry: "src/entry-" + entry + ".js",
       template: "public/index.html",
       filename: "index.html",
       chunks: ["chunk-vendors", "chunk-common", "app"],
     },
-    swagger: {
+    /* swagger: {
       entry: "src/swagger.js",
       template: "public/backend-api/index.html",
       filename: "backend-api/index.html",
