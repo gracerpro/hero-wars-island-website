@@ -1,7 +1,7 @@
 const { defineConfig } = require("@vue/cli-service");
 
 const isDebug = process.env.NODE_ENV !== "production" ? "true" : "false";
-const entry = process.env.SSR > 0 ? "client" : "server";
+//const entry = process.env.SSR > 0 ? "client" : "server";
 
 console.log("SSR =", process.env.SSR);
 
@@ -17,9 +17,9 @@ module.exports = defineConfig({
   },
   pages: {
     app: {
-      entry: "src/entry-" + entry + ".js",
-      template: "public/index.html",
-      filename: "index.html",
+      entry: "src/entry-client.js",
+      template: "public/ssr_index.html",
+      filename: "ssr_index.html",
       chunks: ["chunk-vendors", "chunk-common", "app"],
     },
     /* swagger: {

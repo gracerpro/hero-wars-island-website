@@ -1,4 +1,4 @@
-import createApp from "./main";
+import createApp from "./main2.js";
 
 console.log("client");
 

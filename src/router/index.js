@@ -9,7 +9,7 @@ import {
 import routes from "./routes";
 
 const router = createRouter({
-  history: process.env.SSR
+  history: process.env.SSR > 0
     ? createMemoryHistory(process.env.BASE_URL)
     : createWebHistory(process.env.BASE_URL),
   routes,
