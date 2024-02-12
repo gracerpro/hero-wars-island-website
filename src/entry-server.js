@@ -5,15 +5,14 @@ import { renderToString } from 'vue/server-renderer'
 import createApp from './main2.js';
 import HttpError from './exceptions/HttpError.js';
 
-const __dirname = process.cwd();
-
+const rootDirectory = process.cwd();
 const server = express();
 
 server.get('/', (request, response) => {
   handleRequest(request)
   .then((html) => {
     const template = fs.readFileSync(
-      path.join(__dirname, '/public/ssr_index.html'),
+      path.join(rootDirectory, '/dist/client/index.html'),
       "utf-8"
     );
     console.log("1", html);
@@ -36,9 +35,7 @@ server.get('/', (request, response) => {
   })
 });
 
-const a = path.join(__dirname, "/dist/client");
-console.log(a);
-server.use(express.static(a));
+server.use(express.static(path.join(rootDirectory, "/dist/client")));
 
 server.listen(3000, () => {
   console.log("ready")

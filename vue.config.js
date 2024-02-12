@@ -1,25 +1,28 @@
-const { defineConfig } = require("@vue/cli-service");
+import { defineConfig } from "@vue/cli-service";
 
 const isDebug = process.env.NODE_ENV !== "production" ? "true" : "false";
 //const entry = process.env.SSR > 0 ? "client" : "server";
 
 console.log("SSR =", process.env.SSR);
 
-module.exports = defineConfig({
+export default defineConfig({
+  runtimeCompiler: true,
   chainWebpack: (config) => {
     config.plugin("define").tap((definitions) => {
       Object.assign(definitions[0], {
-        //__VUE_PROD_DEVTOOLS__: isDebug, // Conflicting values for '__VUE_PROD_DEVTOOLS__'
-        __VUE_PROD_HYDRATION_MISMATCH_DETAILS__: isDebug,
+        __VUE_OPTIONS_API__: "true",
+        __VUE_PROD_DEVTOOLS__: "true",
+        __VUE_PROD_HYDRATION_MISMATCH_DETAILS__: "true",
       });
+      console.log(definitions);
       return definitions;
     });
   },
   pages: {
     app: {
       entry: "src/entry-client.js",
-      template: "public/ssr_index.html",
-      filename: "ssr_index.html",
+      template: "public/index.html",
+      filename: "index.html",
       chunks: ["chunk-vendors", "chunk-common", "app"],
     },
     /* swagger: {
