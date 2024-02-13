@@ -1,11 +1,12 @@
 import express from 'express'
-import path from 'path';
-import fs from 'fs'
+import fs from "fs";
+import path from "path";
 import { renderToString } from 'vue/server-renderer'
 import createApp from './main2.js';
 import HttpError from './exceptions/HttpError.js';
 
 const rootDirectory = process.cwd();
+const port = 3000;
 const server = express();
 
 server.get('/', (request, response) => {
@@ -37,8 +38,8 @@ server.get('/', (request, response) => {
 
 server.use(express.static(path.join(rootDirectory, "/dist/client")));
 
-server.listen(3000, () => {
-  console.log("ready")
+server.listen(port, () => {
+  console.log(`Server started at localhost:${port}. Press Ctrl+C to quit.`)
 });
 
 
