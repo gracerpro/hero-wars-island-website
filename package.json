@@ -5,19 +5,19 @@
   "type": "module",
   "description": "The Hero wars islands.",
   "scripts": {
+    "inspect": "vue-cli-service inspect",
     "serve": "vue-cli-service serve",
     "lint": "vue-cli-service lint",
-    "build": "npm run build:client && npm run build:server",
     "build-prod": "NODE_ENV=production vue-cli-service build --mode production",
-    "build:client": "SSR=0 vue-cli-service build --mode development --dest dist/client --skip-plugins @vue/cli-plugin-eslint",
-    "build:server": "SSR=1 vue-cli-service build --mode development --dest dist/server --skip-plugins @vue/cli-plugin-eslint"
+    "build:client": "SSR=0 vue-cli-service build --mode development --skip-plugins @vue/cli-plugin-eslint",
+    "build:server": "SSR=1 vue-cli-service build --mode development --skip-plugins @vue/cli-plugin-eslint"
   },
   "dependencies": {
     "@sentry/vue": "^7.100.1",
+    "@vue/server-renderer": "^3.4.19",
     "bootstrap": "^5.3.2",
     "core-js": "^3.35.1",
     "express": "^4.18.2",
-    "fs": "^0.0.1-security",
     "node-fetch": "^3.3.2",
     "swagger-ui": "^5.11.3",
     "vue": "^3.4.19",

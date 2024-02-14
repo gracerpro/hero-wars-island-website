@@ -1,10 +1,9 @@
 import { defineConfig } from "@vue/cli-service";
 
 const isDebug = process.env.NODE_ENV !== "production" ? "true" : "false";
-const isServer = process.env.SSR > 0;
-const entry = isServer ? "server" : "client";
+const isSrr = process.env.SSR > 0;
 
-console.log("SSR =", process.env.SSR, process.env.SSR > 0, entry);
+console.log("SSR =", process.env.SSR > 0);
 
 /*
 If you just have to deacivate the commonschunks plugins
@@ -20,17 +19,10 @@ module.exports = {
 }
 */
 
-export default defineConfig({
+const clientConfig = {
   runtimeCompiler: true,
+  transpileDependencies: true,
   chainWebpack: (config) => {
-    // console.log(config);
-
-    if (isServer) {
-      // SSR-only config
-    } else {
-      // Client-only config
-    }
-
     config.plugin("define").tap((definitions) => {
       Object.assign(definitions[0], {
         __VUE_OPTIONS_API__: "true",
@@ -38,10 +30,12 @@ export default defineConfig({
       });
       return definitions;
     });
+
+    //console.log(config.toConfig())
   },
   pages: {
     app: {
-      entry: "src/entry-" + entry + ".js",
+      entry: "src/entry-client.js",
       template: "public/index.html",
       filename: "index.html",
       chunks: ["chunk-vendors", "chunk-common", "app"],
@@ -53,5 +47,40 @@ export default defineConfig({
       chunks: ["chunk-vendors", "chunk-common", "swagger"],
     },*/
   },
-  transpileDependencies: true,
-});
+}
+
+const serverConfig = {
+  chainWebpack: (config) => {
+    config
+    .entry("app")
+    .clear()
+    .add("./src/entry-server.js");
+
+    config.target = "node";
+
+    // webpack-node-externals
+    // Note: For Webpack 5, replace target: 'node' with the externalsPreset object:
+    //config.externalsPresets = { node: true }; // in order to ignore built-in modules like path, fs, etc.
+
+    config.output.library.type = "module";
+
+    config.optimization.splitChunks(false).minimize(false);
+
+    config.plugins
+      .delete("hmr")
+      .delete("preload")
+      .delete("prefetch")
+      .delete("progress")
+      .delete("friendly-errors")
+     // .delete('split-vendor')
+     // .delete('split-vendor-async')
+     // .delete('split-manifest')
+      .delete('inline-manifest')
+
+    //console.log(config.toConfig())
+  }
+}
+
+export default defineConfig(
+  isSrr ? serverConfig : clientConfig
+);

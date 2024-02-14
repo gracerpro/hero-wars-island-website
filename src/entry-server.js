@@ -9,6 +9,9 @@ const rootDirectory = process.cwd();
 const port = 3000;
 const server = express();
 
+console.log(__dirname);
+console.log(__filename);
+
 server.get('/', (request, response) => {
   handleRequest(request)
   .then((html) => {
