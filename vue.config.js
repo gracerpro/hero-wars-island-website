@@ -62,6 +62,7 @@ const serverConfig = {
     // Note: For Webpack 5, replace target: 'node' with the externalsPreset object:
     //config.externalsPresets = { node: true }; // in order to ignore built-in modules like path, fs, etc.
 
+    //config.output.libraryTarget("module"); // depricated
     config.output.library.type = "module";
 
     config.optimization.splitChunks(false).minimize(false);
@@ -75,9 +76,9 @@ const serverConfig = {
      // .delete('split-vendor')
      // .delete('split-vendor-async')
      // .delete('split-manifest')
-      .delete('inline-manifest')
+     // .delete('inline-manifest')
 
-    //console.log(config.toConfig())
+     //console.log(config.toConfig())
   }
 }
 
