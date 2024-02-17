@@ -1,3 +1,4 @@
+import { WebpackManifestPlugin } from "webpack-manifest-plugin";
 import { defineConfig } from "@vue/cli-service";
 
 const isDebug = process.env.NODE_ENV !== "production" ? "true" : "false";
@@ -66,6 +67,10 @@ const serverConfig = {
     config.output.library.type = "module";
 
     config.optimization.splitChunks(false).minimize(false);
+
+    config
+     .plugin("manifest")
+     .use(new WebpackManifestPlugin({ fileName: "ssr-manifest.json" }));
 
     config.plugins
       .delete("hmr")
