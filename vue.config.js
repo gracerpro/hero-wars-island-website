@@ -57,14 +57,11 @@ const serverConfig = {
     .clear()
     .add("./src/entry-server.js");
 
-    config.target = "node";
+    config.target("node");
+    config.output.libraryTarget("commonjs2");
 
-    // webpack-node-externals
-    // Note: For Webpack 5, replace target: 'node' with the externalsPreset object:
-    //config.externalsPresets = { node: true }; // in order to ignore built-in modules like path, fs, etc.
-
-    //config.output.libraryTarget("module"); // depricated
-    config.output.library.type = "module";
+    //config.output.libraryTarget("commonjs2"); // depricated
+    //config.output.library.type = "commonjs2";
 
     config.optimization.splitChunks(false).minimize(false);
 
@@ -83,7 +80,7 @@ const serverConfig = {
      // .delete('split-manifest')
      // .delete('inline-manifest')
 
-     //console.log(config.toConfig())
+     //console.log(config.toConfig());
   }
 }
 
