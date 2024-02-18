@@ -2,7 +2,6 @@
   "name": "hero-wars-island-website",
   "version": "1.2.5",
   "private": true,
-  "type": "module",
   "description": "The Hero wars islands.",
   "scripts": {
     "inspect": "vue-cli-service inspect",
@@ -40,5 +39,10 @@
     "eslint-plugin-vue": "^9.21.1",
     "npm-check-updates": "^16.14.15",
     "prettier": "^3.2.5"
-  }
+  },
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "not dead"
+  ]
 }

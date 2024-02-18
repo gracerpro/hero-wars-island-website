@@ -1,5 +1,5 @@
-import { WebpackManifestPlugin } from "webpack-manifest-plugin";
-import { defineConfig } from "@vue/cli-service";
+const { WebpackManifestPlugin } = require("webpack-manifest-plugin");
+const { defineConfig } = require("@vue/cli-service");
 
 const isDebug = process.env.NODE_ENV !== "production" ? "true" : "false";
 const isSrr = process.env.SSR > 0;
@@ -87,6 +87,6 @@ const serverConfig = {
   }
 }
 
-export default defineConfig(
+module.exports = defineConfig(
   isSrr ? serverConfig : clientConfig
 );
