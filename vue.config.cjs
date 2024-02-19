@@ -1,5 +1,6 @@
 const { WebpackManifestPlugin } = require("webpack-manifest-plugin");
 const { defineConfig } = require("@vue/cli-service");
+const nodeExternals = require("webpack-node-externals");
 
 const isDebug = process.env.NODE_ENV !== "production" ? "true" : "false";
 const isSrr = process.env.SSR > 0;
@@ -62,6 +63,9 @@ const serverConfig = {
 
     //config.output.libraryTarget("commonjs2"); // depricated
     //config.output.library.type = "commonjs2";
+
+    config.externalsPresets = { node: true }; // in order to ignore built-in modules like path, fs, etc.
+    config.externals(nodeExternals({ allowlist: /\.(css|vue)$/ }));
 
     config.optimization.splitChunks(false).minimize(false);
 
