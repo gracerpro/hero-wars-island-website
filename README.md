@@ -20,6 +20,7 @@ Log in to the container
 
 ```bash
 docker exec -it --user "$(id -u):$(id -g)" hero-wars-website__vue bash
+docker exec -it hero-wars-website__vue bash
 ```
 
 ## Project setup

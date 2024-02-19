@@ -9,14 +9,13 @@ const rootDirectory = process.cwd();
 const port = 3000;
 const server = express();
 
-console.log(__dirname);
-console.log(__filename);
+console.log(rootDirectory);
 
 server.get('/', (request, response) => {
   handleRequest(request)
   .then((html) => {
     const template = fs.readFileSync(
-      path.join(rootDirectory, '/dist/client/index.html'),
+      path.join(rootDirectory, '/dist/index.html'),
       "utf-8"
     );
     console.log("1", html);
@@ -39,7 +38,7 @@ server.get('/', (request, response) => {
   })
 });
 
-server.use(express.static(path.join(rootDirectory, "/dist/client")));
+server.use(express.static(path.join(rootDirectory, "/dist")));
 
 server.listen(port, () => {
   console.log(`Server started at localhost:${port}. Press Ctrl+C to quit.`)
