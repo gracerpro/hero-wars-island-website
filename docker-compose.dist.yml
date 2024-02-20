@@ -18,6 +18,8 @@ services:
     container_name: hero-wars-website__vue
     image: hero-wars-website__vue
     tty: true
+    ports:
+      - "3000:3000"
     working_dir: /app
     volumes:
       - .:/app

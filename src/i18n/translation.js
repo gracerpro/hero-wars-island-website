@@ -80,9 +80,7 @@ export function guessDefaultLocale() {
 
 async function loadLocaleMessages(locale) {
   if (!isLocaleLoaded(locale)) {
-    const messages = await import(
-      /* webpackChunkName: "locale-[request]" */ `./locales/${locale}.json`
-    );
+    const messages = await import(`./locales/${locale}.json`);
 
     i18n.global.setLocaleMessage(locale, messages.default);
   }
@@ -94,7 +92,7 @@ function getUserLocale() {
   let locale =
     window.navigator.language ||
     window.navigator.userLanguage ||
-    process.env.VUE_APP_DEFAULT_LOCALE;
+    import.meta.env.VITE_DEFAULT_LOCALE;
 
   if (locale) {
     locale = locale.toLowerCase();
@@ -104,11 +102,11 @@ function getUserLocale() {
 }
 
 function getDefaultLocale() {
-  return process.env.VUE_APP_DEFAULT_LOCALE;
+  return import.meta.env.VITE_DEFAULT_LOCALE;
 }
 
 function getSupportLocales() {
-  return process.env.VUE_APP_SUPPORT_LOCALES.split(",");
+  return import.meta.env.VITE_SUPPORT_LOCALES.split(",");
 }
 
 function saveLocale(locale) {

@@ -8,14 +8,14 @@ import i18n from "@/i18n";
 
 const app = createApp(App);
 
-if (process.env.VUE_APP_USE_SENTRY > 0) {
+if (import.meta.env.VITE_USE_SENTRY > 0) {
   Sentry.init({
     app,
     dsn: "https://e6453d231e745bf943c79277ccdc8890@o514031.ingest.sentry.io/4506580248297472",
     integrations: [
       new Sentry.BrowserTracing({
         // Set 'tracePropagationTargets' to control for which URLs distributed tracing should be enabled
-        tracePropagationTargets: [process.env.VUE_APP_BACKEND_API_URL],
+        tracePropagationTargets: [import.meta.env.VITE_BACKEND_API_URL],
       }),
       new Sentry.Replay({
         maskAllText: false,
