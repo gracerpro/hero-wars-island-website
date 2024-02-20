@@ -7,7 +7,7 @@ services:
     image: hero-wars-website__vite
     tty: true
     ports:
-      - "3000:3000"
+      - "8082:8082"
     working_dir: /app
     volumes:
       - .:/app
