@@ -2,6 +2,7 @@
   "name": "hero-wars-island-website",
   "version": "1.2.5",
   "private": false,
+  "type": "module",
   "description": "The Hero wars islands.",
   "scripts": {
     "dev": "vite",
