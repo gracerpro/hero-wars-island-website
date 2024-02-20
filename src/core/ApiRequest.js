@@ -39,7 +39,7 @@ class ApiRequest {
       searchParams = new URLSearchParams(params);
     }
     const response = await fetch(
-      process.env.VUE_APP_BACKEND_API_URL +
+      import.meta.env.VITE_BACKEND_API_URL +
         url +
         (searchParams ? `?${searchParams}` : ""),
       this.getOptions("GET"),
@@ -78,7 +78,7 @@ class ApiRequest {
       body: JSON.stringify(data),
     };
     const response = await fetch(
-      process.env.VUE_APP_BACKEND_API_URL + url,
+      import.meta.env.VITE_BACKEND_API_URL + url,
       options,
     );
 

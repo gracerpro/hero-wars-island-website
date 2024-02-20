@@ -1,7 +1,7 @@
 import ru from "./locales/ru.json";
 import { createI18n } from "vue-i18n";
 
-const locale = process.env.VUE_APP_DEFAULT_LOCALE;
+const locale = import.meta.env.VITE_DEFAULT_LOCALE;
 
 const i18n = createI18n({
   locale,

@@ -9,7 +9,7 @@ import i18n from "@/i18n/index.js";
 export default function createApp() {
   const app = createSSRApp(App);
 
-  if (process.env.VUE_APP_USE_SENTRY > 0) {
+  if (import.meta.env.VITE_USE_SENTRY > 0) {
     initSentry(app);
   }
 
@@ -28,7 +28,7 @@ function initSentry(app) {
     integrations: [
       new Sentry.BrowserTracing({
         // Set 'tracePropagationTargets' to control for which URLs distributed tracing should be enabled
-        tracePropagationTargets: [process.env.VUE_APP_BACKEND_API_URL],
+        tracePropagationTargets: [import.meta.env.VITE_BACKEND_API_URL],
       }),
       new Sentry.Replay({
         maskAllText: false,

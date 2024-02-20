@@ -52,8 +52,8 @@ router.beforeEach(async (to, from, next) => {
  * @param {Object} to
  */
 function callNext(next, to, from) {
-  if (process.env.VUE_APP_YANDEX_METRIC_ID > 0) {
-    window.ym(parseInt(process.env.VUE_APP_YANDEX_METRIC_ID), "hit", to.path, {
+  if (import.meta.env.VITE_YANDEX_METRIC_ID > 0) {
+    window.ym(parseInt(import.meta.env.VITE_YANDEX_METRIC_ID), "hit", to.path, {
       params: {
         referer: from.path,
       },
