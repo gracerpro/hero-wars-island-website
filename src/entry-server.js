@@ -62,20 +62,20 @@ async function handleRequest(request) {
     renderToString(app, context)
         .then((html) => resolve(html));
 
-    return;
+    if (router) {
+      router.push(context.url);
 
-    router.push(context.url);
+      router.onReady(() => {
+        const matchedComponents = router.getMatchedComponents();
+        console.log("matchedComponents", matchedComponents);
 
-    router.onReady(() => {
-      const matchedComponents = router.getMatchedComponents();
-      console.log("matchedComponents", matchedComponents);
+        if (!matchedComponents.length) {
+          return reject(new HttpError(404, "Page not found"));
+        }
 
-      if (!matchedComponents.length) {
-        return reject(new HttpError(404, "Page not found"));
-      }
-
-      renderToString(app, context)
-        .then((html) => resolve(html));
-    });
+        renderToString(app, context)
+          .then((html) => resolve(html));
+      });
+    }
   });
 }
