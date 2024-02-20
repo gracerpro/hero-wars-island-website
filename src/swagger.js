@@ -1,10 +1,8 @@
-import(/* webpackChunkName: "swagger-ui" */ "swagger-ui").then(
+import("swagger-ui").then(
   async (module) => {
     const SwaggerUI = module.default;
 
-    await import(
-      /* webpackChunkName: "swagger-ui.css" */ "swagger-ui/dist/swagger-ui.css"
-    );
+    await import("swagger-ui/dist/swagger-ui.css");
 
     const DisableTryItOutPlugin = function () {
       return {

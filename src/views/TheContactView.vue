@@ -12,7 +12,7 @@
 </template>
 <script setup>
 import { setMetaInfo } from "@/services/page-meta";
-import ContactForm from "./ContactForm.vue";
+import ContactForm from "./contact/ContactForm.vue";
 import { useI18n } from "vue-i18n";
 
 const { t } = useI18n();
