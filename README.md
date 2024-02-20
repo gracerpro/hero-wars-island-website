@@ -12,14 +12,14 @@ docker-compose up --detach --build --force-recreate
 Run a command, without log in to the container
 
 ```
-docker exec hero-wars-website__vue npm run build
-docker exec hero-wars-website__vue npm run lint --fix
+docker exec hero-wars-website__vite npm run build
+docker exec hero-wars-website__vite npm run lint --fix
 ```
 
 Log in to the container
 
 ```bash
-docker exec -it --user "$(id -u):$(id -g)" hero-wars-website__vue bash
+docker exec -it --user "$(id -u):$(id -g)" hero-wars-website__vite bash
 ```
 
 ## Project setup
@@ -54,13 +54,13 @@ docker-compose up --detach --build --force-recreate
 Install the dependencies
 
 ```bash
-docker exec hero-wars-website__vue npm install
+docker exec hero-wars-website__vite npm install
 ```
 
-And build
+And run the dev server
 
 ```
-docker exec hero-wars-website__vue npm run build
+docker exec hero-wars-website__vite npm run dev
 ```
 
 Go to `http://hero-wars.vyacheslaff.local:8082`
