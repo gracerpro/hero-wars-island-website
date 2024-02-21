@@ -80,9 +80,7 @@
     </div>
 
     <client-only>
-      <suspense>
-        <toast-message ref="toast" element-id="contactToast" />
-      </suspense>
+      <toast-message ref="toast" element-id="contactToast" />
     </client-only>
   </form>
 </template>

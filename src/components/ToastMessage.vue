@@ -30,14 +30,10 @@ export const TYPE_DANGER = "danger";
 <script setup>
 import { ref, computed } from "vue";
 
-defineExpose({
-  show,
-});
-
 let Toast;
 
 if (!import.meta.env.SSR) {
-  Toast = (await import("bootstrap")).Toast;
+  import("bootstrap").then((module) => Toast = module.Toast);
 }
 
 const props = defineProps({
@@ -73,6 +69,7 @@ function show(message, type) {
     once: true,
   });
 
+  // TODO: when Toast is undefined?
   const toast = new Toast(element, {
     delay: 2000,
     autohide: true,
@@ -80,4 +77,8 @@ function show(message, type) {
   toast.show();
   isShow.value = true;
 };
+
+defineExpose({
+  show,
+});
 </script>
