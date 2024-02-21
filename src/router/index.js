@@ -8,8 +8,6 @@ import {
 } from "@/i18n/translation";
 import routes from "./routes";
 
-console.log("route SSR", import.meta.env.SSR ? 1 : 0);
-
 export function createRouter() {
   console.log("createRouter CALL");
 

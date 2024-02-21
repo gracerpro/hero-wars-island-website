@@ -46,7 +46,6 @@
   </div>
 </template>
 <script setup>
-import { Modal } from "bootstrap";
 import { computed } from "vue";
 import { useI18n } from "vue-i18n";
 
@@ -55,6 +54,12 @@ const { t } = useI18n();
 let moduleResolve = null;
 let modal = null;
 let dialogResult = null;
+
+let Modal;
+
+if (import.meta.env.SSR) {
+  import("bootstrap").then((module) => Modal = module.Modal);
+}
 
 const props = defineProps({
   elementId: { type: String, required: true },

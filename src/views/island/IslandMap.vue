@@ -322,6 +322,7 @@ function loadState() {
 
   userNodesIds = state.userNodesIds;
 }
+
 function saveState() {
   let savedUserNodesIds = userNodesIds;
 

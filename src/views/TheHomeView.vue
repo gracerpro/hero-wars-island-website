@@ -48,7 +48,7 @@ const client = new HeroClient();
 const now = new Date();
 
 const islands = ref([]);
-const islandsLoading = ref(false);
+const islandsLoading = ref(true);
 const errorMessage = ref("");
 
 setMetaInfo({
@@ -57,12 +57,14 @@ setMetaInfo({
   keywords: t("seo.home.keywords"),
 });
 
-watch(
-  () => route.params.locale,
-  () => loadIslands(),
-);
+if (!import.meta.env.SSR) {
+  watch(
+    () => route.params.locale,
+    () => loadIslands(),
+  );
 
-loadIslands();
+  loadIslands();
+}
 
 function loadIslands() {
   islandsLoading.value = true;

@@ -69,7 +69,6 @@ function show(message, type) {
     once: true,
   });
 
-  // TODO: when Toast is undefined?
   const toast = new Toast(element, {
     delay: 2000,
     autohide: true,

@@ -38,25 +38,8 @@ const client = new HeroClient();
 const route = useRoute();
 
 const island = ref(null);
-const islandLoading = ref(false);
+const islandLoading = ref(true);
 const errorMessage = ref("");
-
-watch(
-  () => route.params.id,
-  (newId) => {
-    const id = queryId(newId);
-    if (id) {
-      loadIsland(id);
-    }
-  },
-);
-watch(
-  () => route.params.locale,
-  () => {
-    loadIsland(island.value.id);
-    // todo: loading_start >change< loading_end
-  },
-);
 
 setMetaInfo({
   title: t("common.islandMap"),
@@ -64,9 +47,28 @@ setMetaInfo({
   keywords: t("seo.island.keywords"),
 });
 
-const id = queryId(route.params.id);
-if (id) {
-  loadIsland(id);
+if (!import.meta.env.SSR) {
+  watch(
+    () => route.params.id,
+    (newId) => {
+      const id = queryId(newId);
+      if (id) {
+        loadIsland(id);
+      }
+    },
+  );
+  watch(
+    () => route.params.locale,
+    () => {
+      loadIsland(island.value.id);
+      // todo: loading_start >change< loading_end
+    },
+  );
+
+  const id = queryId(route.params.id);
+  if (id) {
+    loadIsland(id);
+  }
 }
 
 /**

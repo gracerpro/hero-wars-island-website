@@ -39,7 +39,9 @@ export async function setLanguage(locale) {
    *
    * axios.defaults.headers.common['Accept-Language'] = locale
    */
-  document.querySelector("html").setAttribute("lang", locale);
+  if (!import.meta.env.SSR) {
+    document.querySelector("html").setAttribute("lang", locale);
+  }
 }
 
 /**
