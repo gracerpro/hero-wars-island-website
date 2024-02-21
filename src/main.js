@@ -2,7 +2,10 @@ import { createSSRApp } from "vue";
 import App from "./App.vue";
 import { createRouter } from "./router";
 import store from "./store/index.js";
+
+// TODO: only client?
 import "bootstrap/dist/css/bootstrap.min.css";
+
 import * as Sentry from "@sentry/vue";
 import i18n from "@/i18n/index.js";
 

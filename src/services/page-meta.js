@@ -2,6 +2,10 @@
  * @param {Object} info
  */
 export function setMetaInfo(info) {
+  if (import.meta.env.SSR) {
+    return;
+  }
+
   if (info.title !== undefined) {
     document.title = info.title;
   }

@@ -89,13 +89,16 @@ async function loadLocaleMessages(locale) {
 }
 
 function getUserLocale() {
-  let locale =
-    window.navigator.language ||
-    window.navigator.userLanguage ||
-    import.meta.env.VITE_DEFAULT_LOCALE;
+  let locale;
 
+  if (!import.meta.env.SSR) {
+    locale = window.navigator.language ||
+      window.navigator.userLanguage;
+  }
   if (locale) {
     locale = locale.toLowerCase();
+  } else {
+    locale = import.meta.env.VITE_DEFAULT_LOCALE
   }
 
   return locale.split("-")[0];
@@ -110,10 +113,17 @@ function getSupportLocales() {
 }
 
 function saveLocale(locale) {
+  if (import.meta.env.SSR) {
+    return;
+  }
   localStorage.setItem("locale", locale);
 }
 
 function getSavedLocale() {
+  if (import.meta.env.SSR) {
+    return null;
+  }
+
   let locale = localStorage.getItem("locale");
   if (locale) {
     locale = locale.toLowerCase();
