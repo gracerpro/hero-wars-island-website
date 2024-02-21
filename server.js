@@ -3,7 +3,7 @@ import express from 'express'
 
 // Constants
 const isProduction = process.env.NODE_ENV === 'production'
-const port = process.env.PORT || 5173
+const port = process.env.PORT || 8082
 const base = process.env.BASE || '/'
 
 // Cached production assets
@@ -67,7 +67,7 @@ app.use('*', async (request, response) => {
       .replace(`<!--app-head-->`, rendered.head ?? '')
       .replace(`<!--app-html-->`, rendered.html ?? '')
 
-      response.status(200).set({ 'Content-Type': 'text/html' }).send(html)
+      response.status(200).set({ 'Content-Type': 'text/html; charset=UTF-8' }).send(html)
   } catch (e) {
     vite?.ssrFixStacktrace(e)
     console.log(e.stack)

@@ -5,6 +5,7 @@ services:
     build: ./docker/images/vue
     container_name: hero-wars-website__vite
     image: hero-wars-website__vite
+    entrypoint: /bin/bash
     tty: true
     ports:
       - "8082:8082"

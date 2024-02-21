@@ -1,11 +1,9 @@
 // app.js (shared between server and client)
-import { createSSRApp } from 'vue'
+import { createSSRApp } from 'vue';
+import AppTwo from "./AppTwo.vue";
 
 export default function createApp() {
-  const app = createSSRApp({
-    data: () => ({ count: 1 }),
-    template: `<button @click="count++">{{ count }}</button>`
-  });
+  const app = createSSRApp(AppTwo);
 
   return {
     app,
