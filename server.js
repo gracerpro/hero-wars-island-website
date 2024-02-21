@@ -2,9 +2,9 @@ import fs from 'node:fs/promises'
 import express from 'express'
 
 // Constants
-const isProduction = process.env.NODE_ENV === 'production'
-const port = process.env.PORT || 8082
-const base = process.env.BASE || '/'
+const isProduction = process.env.NODE_ENV === 'production';
+const port = 8082;
+const base = '/';
 
 // Cached production assets
 const templateHtml = isProduction
@@ -28,9 +28,9 @@ if (!isProduction) {
   })
   app.use(vite.middlewares)
 } else {
-  const compression = (await import('compression')).default
+ // const compression = (await import('compression')).default
   const sirv = (await import('sirv')).default
-  app.use(compression())
+ // app.use(compression())
   app.use(base, sirv('./dist/client', { extensions: [] }))
 }
 
@@ -38,6 +38,8 @@ if (!isProduction) {
 app.use('*', async (request, response) => {
   try {
     const url = request.originalUrl.replace(base, '')
+
+    console.log("---\n", url);
 
     let template
     let render

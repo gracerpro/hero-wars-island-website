@@ -1,6 +1,6 @@
 import { createSSRApp } from "vue";
 import App from "./App.vue";
-import router from "./router/index.js";
+import { createRouter } from "./router";
 import store from "./store/index.js";
 import "bootstrap/dist/css/bootstrap.min.css";
 import * as Sentry from "@sentry/vue";
@@ -8,6 +8,9 @@ import i18n from "@/i18n/index.js";
 
 export default function createApp() {
   const app = createSSRApp(App);
+  const router = createRouter();
+
+  console.log("createApp CALL");
 
   if (import.meta.env.VITE_USE_SENTRY > 0) {
     initSentry(app);

@@ -1,6 +1,5 @@
 import HttpError from "@/exceptions/HttpError";
 import UserError from "@/exceptions/UserError";
-import fetch from "node-fetch";
 
 class ApiRequest {
   /**

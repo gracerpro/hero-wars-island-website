@@ -1,12 +1,9 @@
-import createApp from "./main2.js";
+import createApp from "./main.js";
 
 const { app, router } = createApp();
 
 if (router) {
-  console.log("client. before router");
-  router.onReady(() => {
-    console.log("client. router on Ready");
-
+  router.isReady().then(() => {
     app.mount("#app");
   });
 } else {
