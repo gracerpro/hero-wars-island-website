@@ -7,13 +7,12 @@ import store from "./store/index.js";
 import "bootstrap/dist/css/bootstrap.min.css";
 
 import * as Sentry from "@sentry/vue";
-import i18n from "@/i18n/index.js";
+import { createI18n } from "@/i18n";
 
 export default function createApp() {
   const app = createSSRApp(App);
   const router = createRouter();
-
-  console.log("createApp CALL");
+  const i18n = createI18n();
 
   if (import.meta.env.VITE_USE_SENTRY > 0) {
     initSentry(app);

@@ -19,6 +19,7 @@ docker exec hero-wars-website__vite npm run lint --fix
 Log in to the container
 
 ```bash
+docker exec -it hero-wars-website__vite bash
 docker exec -it --user "$(id -u):$(id -g)" hero-wars-website__vite bash
 ```
 

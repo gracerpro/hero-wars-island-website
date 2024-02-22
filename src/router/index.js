@@ -9,8 +9,6 @@ import {
 import routes from "./routes";
 
 export function createRouter() {
-  console.log("createRouter CALL");
-
   const router = _createRouter({
     history: import.meta.env.SSR > 0
       ? createMemoryHistory(import.meta.env.BASE_URL)
@@ -27,8 +25,6 @@ export function createRouter() {
 
 function addBeforeEach(router) {
   router.beforeEach(async (to, from, next) => {
-    console.log(from?.path, to.path);
-
     if (to.path.length > 1 && to.path.endsWith("/")) {
       const newTo = { ...to };
       newTo.path = to.path.slice(0, -1);
@@ -64,7 +60,7 @@ function addBeforeEach(router) {
  * @param {Object} to
  */
 function callNext(next, to, from) {
-  if (import.meta.env.VITE_YANDEX_METRIC_ID > 0) {
+  if (!import.meta.env.SSR && import.meta.env.VITE_YANDEX_METRIC_ID > 0) {
     window.ym(parseInt(import.meta.env.VITE_YANDEX_METRIC_ID), "hit", to.path, {
       params: {
         referer: from.path,

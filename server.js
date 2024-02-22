@@ -39,8 +39,6 @@ app.use('*', async (request, response) => {
   try {
     const url = request.originalUrl.replace(base, '')
 
-    console.log("---\n", url);
-
     let template
     let render
     if (!isProduction) {
