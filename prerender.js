@@ -23,8 +23,6 @@ fs.readdirSync("./src/views", { withFileTypes: true, recursive: false })
     urls.push(name === "home" ? "/" : `/${name}`);
   })
 
-console.log(urls);
-
 ;(async () => {
   for (const url of urls) {
     const { html: templateHtml, preloadLinks } = await render(url, manifest)
