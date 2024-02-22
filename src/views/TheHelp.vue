@@ -16,7 +16,7 @@
             ><br />
           </li>
           <li>
-            <a href="/backend-api/">API</a>
+            <a href="/backend-api/index.html">API</a>
           </li>
         </ul>
       </li>
