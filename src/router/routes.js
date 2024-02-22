@@ -8,31 +8,26 @@ export default [
         // route level code-splitting
         // this generates a separate chunk (about.[hash].js) for this route
         // which is lazy-loaded when the route is visited.
-        component: () =>
-          import(/* webpackChunkName: "home" */ "../views/TheHomeView.vue"),
-      },
+        component: () => import("../views/TheHome.vue")},
       {
         path: "about",
         name: "about",
-        // route level code-splitting
-        // this generates a separate chunk (about.[hash].js) for this route
-        // which is lazy-loaded when the route is visited.
-        component: () => import("../views/TheAboutView.vue"),
+        component: () => import("../views/TheAbout.vue"),
       },
       {
         path: "contact",
         name: "contact",
-        component: () => import("../views/TheContactView.vue"),
+        component: () => import("../views/TheContact.vue"),
       },
       {
         path: "islands/:id",
         name: "island",
-        component: () => import("../views/TheIslandView.vue"),
+        component: () => import("../views/TheIsland.vue"),
       },
       {
         path: "help",
         name: "help",
-        component: () => import("../views/TheHelpView.vue"),
+        component: () => import("../views/TheHelp.vue"),
       },
     ],
   },
