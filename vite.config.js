@@ -12,6 +12,11 @@ export default defineConfig(({mode}) => {
       port: 8082,
       strictPort: true,
     },
+    preview: {
+      host: true,
+      port: 4082,
+      strictPort: true,
+    },
     plugins: [
       vue(),
       ViteEjsPlugin(env),

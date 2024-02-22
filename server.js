@@ -28,9 +28,9 @@ if (!isProduction) {
   })
   app.use(vite.middlewares)
 } else {
- // const compression = (await import('compression')).default
+  const compression = (await import('compression')).default
   const sirv = (await import('sirv')).default
- // app.use(compression())
+  app.use(compression())
   app.use(base, sirv('./dist/client', { extensions: [] }))
 }
 
@@ -46,7 +46,6 @@ app.use('*', async (request, response) => {
       template = await fs.readFile('./index.html', 'utf-8')
       template = await vite.transformIndexHtml(url, template)
       render = (await vite.ssrLoadModule('/src/entry-server.js')).render
-
 
       // 3b. Since Vite 5.1, you can use the experimental createViteRuntime API
       //    instead.
@@ -64,7 +63,7 @@ app.use('*', async (request, response) => {
     const rendered = await render(url, ssrManifest)
 
     const html = template
-      .replace(`<!--app-head-->`, rendered.head ?? '')
+      .replace(`<!--preload-links-->`, rendered.preloadLinks ?? '')
       .replace(`<!--app-html-->`, rendered.html ?? '')
 
       response.status(200).set({ 'Content-Type': 'text/html; charset=UTF-8' }).send(html)

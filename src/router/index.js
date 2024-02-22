@@ -32,6 +32,7 @@ function addBeforeEach(router) {
       return next(newTo);
     }
 
+    // TODO: add locale to NotFoundPage
     const paramsLocale = to.params.locale;
     if (paramsLocale) {
       if (!isSupportLocale(paramsLocale)) {
