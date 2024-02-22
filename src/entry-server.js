@@ -25,10 +25,14 @@ export async function render(url, ssrManifest) {
     preloadLinks = renderPreloadLinks(context.modules, ssrManifest)
   }
 
-  const page = {
-    title: "",
-    description: "",
-    keywords: "",
+  let page = null;
+
+  if (context.page) {
+    page = {
+      title: context.page.title,
+      description: context.page.description,
+      keywords: context.page.keywords,
+    }
   }
 
   return { html, preloadLinks, page }

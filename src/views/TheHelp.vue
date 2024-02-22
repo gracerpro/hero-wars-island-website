@@ -12,7 +12,7 @@
               href="https://github.com/gracerpro/hero-wars-island-website"
               target="_blank"
             >
-              https://github.com/gracerpro/hero-wars-island-website </a
+              https://github.com/gracerpro/hero-wars-island-website</a
             ><br />
           </li>
           <li>

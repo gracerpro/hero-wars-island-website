@@ -79,9 +79,24 @@ async function getAppHtml(url) {
 
     const rendered = await render(url, ssrManifest)
 
-    const html = template
+    let html = template
       .replace(`<!--preload-links-->`, rendered.preloadLinks ?? '')
-      .replace(`<!--app-html-->`, rendered.html ?? '')
+      .replace(`<!--app-html-->`, rendered.html ?? '');
+
+    const title = rendered.page.title
+      ? rendered.page.title
+      : "Хроники хаоса Эра доминиона карта острова";
+    html = html.replace("<!--page-title-->", title);
+
+    const description = rendered?.page.description
+      ? rendered?.page.description
+      : "Игра Хроники Хаоса, карта острова, соберем все призы вместе!";
+    html = html.replace("<!--page-description-->", description);
+
+    const keywords = rendered?.page.keywords
+      ? rendered?.page.keywords
+      : "Хроники хаоса, Эра доминиона, карта острова, карта, открытая карта, призы, ресурсы";
+    html = html.replace("<!--page-keywords-->", keywords);
 
     return html;
 }
