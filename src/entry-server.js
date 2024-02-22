@@ -25,7 +25,13 @@ export async function render(url, ssrManifest) {
     preloadLinks = renderPreloadLinks(context.modules, ssrManifest)
   }
 
-  return { html, preloadLinks }
+  const page = {
+    title: "",
+    description: "",
+    keywords: "",
+  }
+
+  return { html, preloadLinks, page }
 }
 
 function renderPreloadLinks(modules, manifest) {

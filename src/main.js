@@ -14,7 +14,7 @@ export default function createApp() {
   const router = createRouter();
   const i18n = createI18n();
 
-  if (import.meta.env.VITE_USE_SENTRY > 0) {
+  if (!import.meta.env.SSR && import.meta.env.VITE_USE_SENTRY > 0) {
     initSentry(app);
   }
 

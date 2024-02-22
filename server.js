@@ -45,7 +45,7 @@ app.use('*', async (request, response) => {
       // Always read fresh template in development
       template = await fs.readFile('./index.html', 'utf-8')
       template = await vite.transformIndexHtml(url, template)
-      render = (await vite.ssrLoadModule('/src/entry-server.js')).render
+      render = (await vite.ssrLoadModule('./src/entry-server.js')).render
 
       // 3b. Since Vite 5.1, you can use the experimental createViteRuntime API
       //    instead.
