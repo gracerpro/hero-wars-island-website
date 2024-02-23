@@ -34,7 +34,7 @@ export default [
   {
     path: "/page-not-found",
     name: "page-not-found",
-    component: () => import("../views/status-pages/TheNotFoundPage.vue"),
+    component: () => import("../views/status-pages/ThePageNotFound.vue"),
   },
   {
     path: "/:catchAll(.*)",

@@ -1,5 +1,6 @@
 import fs from 'node:fs/promises'
 import express from 'express'
+import { getHtml } from "./common.js";
 
 // Constants
 const isProduction = process.env.NODE_ENV === 'production';
@@ -37,9 +38,11 @@ if (!isProduction) {
 // Serve HTML
 app.use('*', async (request, response) => {
   try {
-    const url = request.originalUrl.replace(base, '')
+    const url = request.originalUrl.replace(base, '');
 
-    let html = await getAppHtml(url);
+    console.log("recieve url:", url);
+
+    let html = await getAppHtml(url, ssrManifest);
 
     response.status(200).set({ 'Content-Type': 'text/html; charset=UTF-8' }).send(html)
   } catch (e) {
@@ -54,51 +57,37 @@ app.listen(port, () => {
   console.log(`Server started at http://localhost:${port}`)
 });
 
-async function getAppHtml(url) {
-    let template
-    let render
+async function getAppHtml(url, manifest) {
+  let template;
+  let render;
 
-    if (!isProduction) {
-      // Always read fresh template in development
-      template = await fs.readFile('./index.html', 'utf-8')
-      template = await vite.transformIndexHtml(url, template)
-      render = (await vite.ssrLoadModule('./src/entry-server.js')).render
+  if (!isProduction) {
+    // Always read fresh template in development
+    template = await fs.readFile('./index.html', 'utf-8')
 
-      // 3b. Since Vite 5.1, you can use the experimental createViteRuntime API
-      //    instead.
-      //    It fully supports HMR and works in a simillar way to ssrLoadModule
-      //    More advanced use case would be creating a runtime in a separate
-      //    thread or even a different machine using ViteRuntime class
-      //const runtime = await vite.createViteRuntime(server)
-      //const { render } = await runtime.executeEntrypoint('/src/entry-server.js')
+    // 2. Apply Vite HTML transforms. This injects the Vite HMR client,
+    //    and also applies HTML transforms from Vite plugins, e.g. global
+    //    preambles from @vitejs/plugin-react
+    template = await vite.transformIndexHtml(url, template)
 
-    } else {
-      template = templateHtml
-      render = (await import('./dist/server/entry-server.js')).render
-    }
+    // 3a. Load the server entry. ssrLoadModule automatically transforms
+    //    ESM source code to be usable in Node.js! There is no bundling
+    //    required, and provides efficient invalidation similar to HMR.
+    render = (await vite.ssrLoadModule('./src/entry-server.js')).render
 
-    const rendered = await render(url, ssrManifest)
+    // 3b. Since Vite 5.1, you can use the experimental createViteRuntime API
+    //    instead.
+    //    It fully supports HMR and works in a simillar way to ssrLoadModule
+    //    More advanced use case would be creating a runtime in a separate
+    //    thread or even a different machine using ViteRuntime class
+    //const runtime = await vite.createViteRuntime(server)
+    //const { render } = await runtime.executeEntrypoint('/src/entry-server.js')
+  } else {
+    template = templateHtml;
+    render = (await import('./dist/server/entry-server.js')).render
+  }
 
-    let html = template
-      .replace(`<!--preload-links-->`, rendered.preloadLinks ?? '')
-      .replace(`<!--app-html-->`, rendered.html ?? '');
-
-    const title = rendered.page.title
-      ? rendered.page.title
-      : "Хроники хаоса Эра доминиона карта острова";
-    html = html.replace("<!--page-title-->", title);
-
-    const description = rendered?.page.description
-      ? rendered?.page.description
-      : "Игра Хроники Хаоса, карта острова, соберем все призы вместе!";
-    html = html.replace("<!--page-description-->", description);
-
-    const keywords = rendered?.page.keywords
-      ? rendered?.page.keywords
-      : "Хроники хаоса, Эра доминиона, карта острова, карта, открытая карта, призы, ресурсы";
-    html = html.replace("<!--page-keywords-->", keywords);
-
-    return html;
+  return getHtml(url, manifest, template, render);
 }
 
 /*

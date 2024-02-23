@@ -19,7 +19,4 @@ setMetaInfo({
   description: notFound,
   keywords: "404, " + notFound,
 });
-
-// only prod?
-//window.location.reload();
 </script>
