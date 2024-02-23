@@ -65,10 +65,7 @@ if (!import.meta.env.SSR) {
     },
   );
 
-  const id = queryId(route.params.id);
-  if (id) {
-    loadIsland(id);
-  }
+  loadIsland(parseInt(route.params.id));
 }
 
 /**

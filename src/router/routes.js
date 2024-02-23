@@ -20,7 +20,7 @@ export default [
         component: () => import("../views/TheContact.vue"),
       },
       {
-        path: "islands/:id",
+        path: "islands/:id(\\d+)",
         name: "island",
         component: () => import("../views/TheIsland.vue"),
       },

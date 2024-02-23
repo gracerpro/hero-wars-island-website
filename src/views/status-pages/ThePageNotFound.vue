@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <h1>404 {{ notFound }}</h1>
+    <h1>404 {{ t("common.pageNotFound") }}</h1>
     <p>{{ t("common.movedPageMayBe") }}</p>
     <p>
       <a href="/">{{ t("common.goToHome") }}</a>
