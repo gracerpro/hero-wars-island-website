@@ -9,6 +9,10 @@ const manifest = JSON.parse(
 const template = fs.readFileSync('./dist/static/index.html', 'utf-8')
 const { render } = await import('./dist/server/entry-server.js')
 
+const dynamicNames = {
+  "island": true
+};
+
 let urls = [];
 fs.readdirSync("./src/views", { withFileTypes: true, recursive: false })
   .forEach((file) => {
@@ -20,9 +24,16 @@ fs.readdirSync("./src/views", { withFileTypes: true, recursive: false })
     name = name.substring(3); // remove "the"
     name = name.substring(0, name.length - 4); // remove ".vue"
     name = camelToKebab(name);
-    console.log(name);
 
-    urls.push(name === "home" ? "/" : `/${name}`);
+    if (dynamicNames[name]) {
+      getDynamicUrls(name).forEach((url) => {
+        console.log(url);
+        urls.push(url);
+      })
+    } else {
+      console.log(name);
+      urls.push(name === "home" ? "/" : `/${name}`);
+    }
   })
 
 fs.readdirSync("./src/views/status-pages", { withFileTypes: true, recursive: false })
@@ -60,4 +71,15 @@ function camelToKebab(text) {
      ? `${i !== 0 ? '-' : ''}${letter.toLowerCase()}`
      : letter;
   }).join('');
+}
+
+function getDynamicUrls(name) {
+  if (name === "island") {
+    fs.mkdirSync("./dist/static/islands");
+
+    // TOOD: this is HACH, get data from production server
+    return [1, 2].map((id) => `/islands/${id}`);
+  }
+
+  throw new Error(`Unknown dynamic name ${name}!`);
 }
