@@ -178,7 +178,6 @@ const onChangeScale = (inc) => {
   emit(EVENT_CHANGE_SCALE, 2 * (inc ? DELTA_SCALE : -DELTA_SCALE));
 };
 const onHelpClick = () => {
-  console.log("set class");
   helpDialogComponent.value = HelpDialog;
 };
 const onChangeOnlyImage = () => {
@@ -188,9 +187,7 @@ const onChangeIsShowNoModerate = () => {
   emit(EVENT_CHANGE_IS_SHOW_NO_MODERATE);
 };
 const onMountedHelpDialog = () => {
-  console.log("on mounted");
   helpDialog.value.show().finally(() => {
-    console.log("helpDialog.finally");
     helpDialogComponent.value = null;
   });
 };

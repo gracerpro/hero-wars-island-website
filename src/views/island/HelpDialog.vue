@@ -5,7 +5,7 @@
       :is-show-submit="false"
       :header="t('common.map')"
       ref="dialog"
-      @vue:mounted="onMounted"
+      @vue:mounted="onMountedDialog"
     >
       <p>
         {{ t("page.island.helpParagraph1") }}<br />
@@ -36,30 +36,13 @@
 import ModalDialog from "@/components/ModalDialog.vue";
 import { ref } from "vue";
 import { useI18n } from "vue-i18n";
+import { useShow } from "@/components/modal-dialog";
 
 const { t } = useI18n();
 
-console.log("HelpDialog.setup")
-
 const dialog = ref(null);
 
-
-
-let moduleResolve;
-
-const show = () => {
-  return new Promise((resolve) => {
-    moduleResolve = resolve;
-  })
-}
-
-const onMounted = () => {
-  console.log("on mounted modal-dialog");
-
-  moduleResolve(dialog.value.show());
-}
-
-
+const { show, onMountedDialog } = useShow(dialog);
 
 defineExpose({
   show,

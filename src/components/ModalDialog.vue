@@ -49,8 +49,6 @@
 import { computed } from "vue";
 import { useI18n } from "vue-i18n";
 
-console.log("ModalDialog.setup")
-
 const { t } = useI18n();
 
 defineExpose({
@@ -63,16 +61,12 @@ let moduleResolve = null;
 let modal = null;
 let dialogResult = null;
 
-console.log("before import bootstrap");
-
 if (!import.meta.env.SSR) {
   // Load bootstrap module asynchronously else get an error on SSR
   // ReferenceError: document is not defined
   //  at enableDismissTrigger (/app/node_modules/bootstrap/dist/js/bootstrap.js:826:21)
   Modal = (await import("bootstrap")).Modal;
 }
-
-console.log("after import");
 
 const props = defineProps({
   elementId: { type: String, required: true },
