@@ -49,17 +49,30 @@
 import { computed } from "vue";
 import { useI18n } from "vue-i18n";
 
+console.log("ModalDialog.setup")
+
 const { t } = useI18n();
 
+defineExpose({
+  show,
+  hide,
+});
+
+let Modal;
 let moduleResolve = null;
 let modal = null;
 let dialogResult = null;
 
-let Modal;
+console.log("before import bootstrap");
 
-if (import.meta.env.SSR) {
-  import("bootstrap").then((module) => Modal = module.Modal);
+if (!import.meta.env.SSR) {
+  // Load bootstrap module asynchronously else get an error on SSR
+  // ReferenceError: document is not defined
+  //  at enableDismissTrigger (/app/node_modules/bootstrap/dist/js/bootstrap.js:826:21)
+  Modal = (await import("bootstrap")).Modal;
 }
+
+console.log("after import");
 
 const props = defineProps({
   elementId: { type: String, required: true },
@@ -72,7 +85,7 @@ const props = defineProps({
     type: [Object, Number, String, null, undefined],
     default: null,
   },
-});
+})
 
 const sizeClass = computed(() => {
   const sizes = {
@@ -82,9 +95,16 @@ const sizeClass = computed(() => {
   };
 
   return sizes[props.size] ? sizes[props.size] : "";
-});
+})
 
-const show = () => {
+const hideDialog = () => {
+  modal.dispose();
+  modal = null;
+
+  moduleResolve(dialogResult);
+}
+
+function show() {
   if (modal) {
     throw new Error("The modal dialog is already open.");
   }
@@ -97,31 +117,21 @@ const show = () => {
   modalElement.addEventListener(
     "hidden.bs.modal",
     () => {
-      hide();
+      hideDialog();
     },
     { once: true },
   );
 
   dialogResult = props.initResult;
+
   modal = new Modal(modalElement, {});
   modal.show();
 
   return promise;
-};
-const confirm = (confirmResult) => {
-  dialogResult = confirmResult;
+}
+
+function hide(result) {
+  dialogResult = result;
   modal.hide();
-};
-const hide = () => {
-  modal.dispose();
-  modal = null;
-
-  moduleResolve(dialogResult);
-};
-
-defineExpose({
-  show,
-  confirm,
-  hide,
-});
+}
 </script>

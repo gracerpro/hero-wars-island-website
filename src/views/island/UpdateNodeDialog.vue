@@ -36,7 +36,7 @@ const dialogId = computed(() => "node-dialog__" + props.node.id);
 const formId = computed(() => dialogId.value + "__form");
 
 const onSaving = (value) => (saving.value = value);
-const onSuccessSave = (result) => dialog.value.confirm(result);
+const onSuccessSave = (result) => dialog.value.hide(result);
 
 const show = () => dialog.value.show();
 
