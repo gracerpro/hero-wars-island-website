@@ -32,6 +32,11 @@ export default [
     ],
   },
   {
+    path: "/internal-server-error",
+    name: "internal-server-error",
+    component: () => import("../views/status-pages/TheInternalServerError.vue"),
+  },
+  {
     path: "/page-not-found",
     name: "page-not-found",
     component: () => import("../views/status-pages/ThePageNotFound.vue"),

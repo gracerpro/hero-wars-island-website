@@ -1,7 +1,6 @@
 <template>
   <div class="container">
-    <h1>404 {{ t("common.pageNotFound") }}</h1>
-    <p>{{ t("common.movedPageMayBe") }}</p>
+    <h1>500 {{ t("common.internalServerError") }}</h1>
     <p>
       <a href="/">{{ t("common.goToHome") }}</a>
     </p>
@@ -12,11 +11,11 @@ import { setMetaInfo } from "@/services/page-meta";
 import { useI18n } from "vue-i18n";
 
 const { t } = useI18n();
-const title = t("common.pageNotFound");
+const title = t("common.internalServerError");
 
 setMetaInfo({
   title,
   description: title,
-  keywords: `404, ${title}`,
+  keywords: `500, ${title}`,
 });
 </script>
