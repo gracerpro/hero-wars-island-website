@@ -20,10 +20,7 @@ fs.readdirSync("./src/views", { withFileTypes: true, recursive: false })
       return;
     }
 
-    let name = file.name;
-    name = name.substring(3); // remove "the"
-    name = name.substring(0, name.length - 4); // remove ".vue"
-    name = camelToKebab(name);
+    let name = getUrlName(file.name);
 
     if (dynamicNames[name]) {
       getDynamicUrls(name).forEach((url) => {
@@ -42,10 +39,7 @@ fs.readdirSync("./src/views/status-pages", { withFileTypes: true, recursive: fal
       return;
     }
 
-    let name = file.name;
-    name = name.substring(3); // remove "the"
-    name = name.substring(0, name.length - 4); // remove ".vue"
-    name = camelToKebab(name);
+    let name = getUrlName(file.name);
     console.log(name);
 
     urls.push(`/${name}`);
@@ -62,8 +56,17 @@ fs.readdirSync("./src/views/status-pages", { withFileTypes: true, recursive: fal
   }
 
   // done, delete .vite directory including ssr manifest
-  fs.rmSync('./dist/static/.vite', { recursive: true })
+  //fs.rmSync('./dist/static/.vite', { recursive: true })
 })()
+
+function getUrlName(fileName) {
+  let name = fileName;
+  name = name.substring(3); // remove "the"
+  name = name.substring(0, name.length - 4); // remove ".vue"
+  name = camelToKebab(name);
+  
+  return name;
+}
 
 function camelToKebab(text) {
   return text.split('').map((letter, i) => {
@@ -75,9 +78,13 @@ function camelToKebab(text) {
 
 function getDynamicUrls(name) {
   if (name === "island") {
-    fs.mkdirSync("./dist/static/islands");
+    const directory = "./dist/static/islands";
+    if (!fs.existsSync(directory)) {
+      console.log("NOT EXISTS", directory);
+      fs.mkdirSync(directory);
+    }
 
-    // TOOD: this is HACH, get data from production server
+    // TOOD: this is HACK, get data from production server
     return [1, 2].map((id) => `/islands/${id}`);
   }
 

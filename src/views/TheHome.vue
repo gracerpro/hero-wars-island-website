@@ -36,7 +36,7 @@
 import HeroClient from "@/api/HeroClient";
 import { fromCurrentDate } from "@/helpers/formatter";
 import { setMetaInfo } from "@/services/page-meta";
-import { ref, watch } from "vue";
+import { ref, watch, onMounted } from "vue";
 import { useI18n } from "vue-i18n";
 import { createI18nRouteTo } from "@/i18n/translation";
 import { useRoute } from "vue-router";
@@ -57,14 +57,14 @@ setMetaInfo({
   keywords: t("seo.home.keywords"),
 });
 
-if (!import.meta.env.SSR) {
+onMounted(() => {
   watch(
     () => route.params.locale,
     () => loadIslands(),
   );
 
   loadIslands();
-}
+})
 
 function loadIslands() {
   islandsLoading.value = true;

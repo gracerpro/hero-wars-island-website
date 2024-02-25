@@ -1,6 +1,14 @@
 import HttpError from "@/exceptions/HttpError";
 import UserError from "@/exceptions/UserError";
 
+let fetch;
+
+if (import.meta.env.SSR) {
+  fetch = (...args) => import("node-fetch").then(({ default: _fetch }) => _fetch(...args));
+} else {
+  fetch = window.fetch;
+}
+
 class ApiRequest {
   /**
    * @private
@@ -29,6 +37,10 @@ class ApiRequest {
    * @param {Object} params
    */
   async get(url, params) {
+    console.log("api request GET", url, params);
+    console.log(fetch);
+    console.log("base url", import.meta.env.VITE_BACKEND_API_URL);
+
     if (this._beforeRequest) {
       this._beforeRequest(this);
     }

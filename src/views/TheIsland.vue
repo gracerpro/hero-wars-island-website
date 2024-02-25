@@ -4,7 +4,7 @@
     <div v-else-if="errorMessage" class="alert alert-danger mt-3">
       {{ errorMessage }}
     </div>
-    <div v-else-if="!island" class="position-relative">
+    <div v-else-if="!currentIsland" class="position-relative">
       <img
         src="/images/map-not-found.svg"
         width="440"
@@ -16,8 +16,8 @@
       </div>
     </div>
     <div v-else>
-      <h1>{{ island.name }}</h1>
-      <island-map :island="island" :parent-page-id="pageId" />
+      <h1>{{ currentIsland.name }}</h1>
+      <island-map :island="currentIsland" parent-page-id="islandPage" />
     </div>
   </div>
 </template>
@@ -27,19 +27,18 @@ import IslandMap from "./island/IslandMap.vue";
 import IslandMapLoading from "./island/IslandMapLoading.vue";
 import HttpError from "@/exceptions/HttpError";
 import { setMetaInfo } from "@/services/page-meta";
-import { ref, watch } from "vue";
+import { ref, watch, onMounted, onServerPrefetch } from "vue";
 import { useRoute } from "vue-router";
 import { useI18n } from "vue-i18n";
 
 const { t } = useI18n();
 
-const pageId = "islandPage";
-const client = new HeroClient();
 const route = useRoute();
-
-const island = ref(null);
+const currentIsland = ref(null);
 const islandLoading = ref(true);
 const errorMessage = ref("");
+
+const islandId = parseInt(route.params.id);
 
 setMetaInfo({
   title: t("common.islandMap"),
@@ -47,7 +46,15 @@ setMetaInfo({
   keywords: t("seo.island.keywords"),
 });
 
-if (!import.meta.env.SSR) {
+console.log("load island page");
+
+onServerPrefetch(() => {
+  return loadIsland(islandId);
+});
+
+onMounted(() => {
+  console.log("island page. on mounted");
+
   watch(
     () => route.params.id,
     (newId) => {
@@ -60,13 +67,15 @@ if (!import.meta.env.SSR) {
   watch(
     () => route.params.locale,
     () => {
-      loadIsland(island.value.id);
-      // todo: loading_start >change< loading_end
+      loadIsland(currentIsland.value.id);
+      // TODO: loading_start >change< loading_end
     },
   );
 
-  loadIsland(parseInt(route.params.id));
-}
+  if (!currentIsland.value) {
+    loadIsland(islandId);
+  }
+})
 
 /**
  * @param {String} sourceId
@@ -86,28 +95,36 @@ function queryId(sourceId) {
 /**
  * @param {Number} id
  */
-function loadIsland(id) {
-  island.value = null;
+async function loadIsland(id) {
+  console.log("load island by", id);
+  const client = new HeroClient();
+  let island = null;
+
+  currentIsland.value = null;
   islandLoading.value = true;
-  client
-    .getIsland(id)
-    .then((responseIsland) => {
-      island.value = responseIsland;
-      if (responseIsland) {
-        setMetaInfo({
-          title: responseIsland.name + " - " + t("common.projectName"),
-          description: t("seo.island.description") + " " + responseIsland.name,
-          keywords: t("seo.island.keywords") + ", " + responseIsland.name,
-        });
-      }
-    })
-    .catch((error) => {
-      if (error instanceof HttpError && error.statusCode === 404) {
-        errorMessage.value = t("page.island.islandNotFound");
-      } else {
-        errorMessage.value = t("common.loadingFailDeveloperShow");
-      }
-    })
-    .finally(() => (islandLoading.value = false));
+  try {
+    island = await client.getIsland(id);
+    console.log(island);
+
+    currentIsland.value = island;
+    if (island) {
+      setMetaInfo({
+        title: island.name + " - " + t("common.projectName"),
+        description: t("seo.island.description") + " " + island.name,
+        keywords: t("seo.island.keywords") + ", " + island.name,
+      });
+    }
+  } catch (error) {
+    console.log(error);
+    if (error instanceof HttpError && error.statusCode === 404) {
+      errorMessage.value = t("page.island.islandNotFound");
+    } else {
+      errorMessage.value = t("common.loadingFailDeveloperShow");
+    }
+  } finally {
+    islandLoading.value = false;
+  }
+
+  return island;
 }
 </script>

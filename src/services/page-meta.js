@@ -4,6 +4,8 @@ import { useSSRContext } from "vue";
  * @param {Object} info
  */
 export function setMetaInfo(info) {
+  console.log("setMetaInfo");
+
   if (import.meta.env.SSR) {
     const context = useSSRContext();
 
