@@ -2,8 +2,10 @@
 
 import fs from 'node:fs'
 import { getHtml } from './common.js'
+import fetch from "node-fetch";
+import { loadEnv } from 'vite';
 
-//testBack();
+const env = loadEnv("production", process.cwd());
 
 const manifest = JSON.parse(
   fs.readFileSync('./dist/static/.vite/ssr-manifest.json', 'utf-8'),
@@ -16,24 +18,30 @@ const dynamicNames = {
 };
 let urls = [];
 
-fs.readdirSync("./src/views", { withFileTypes: true, recursive: false })
-  .forEach((file) => {
-    if (!file.isFile()) {
-      return;
-    }
+const files = fs.readdirSync("./src/views", { withFileTypes: true, recursive: false });
 
-    let name = getUrlName(file.name);
+for (let i = 0; i < files.length; ++i) {
+  const file = files[i];
 
-    if (dynamicNames[name]) {
-      getDynamicUrls(name).forEach((url) => {
-        console.log(url);
-        urls.push(url);
-      })
-    } else {
-      console.log(name);
-      urls.push(name === "home" ? "/" : `/${name}`);
-    }
-  })
+  if (!file.isFile()) {
+    continue;
+  }
+
+  let name = getUrlName(file.name);
+
+  if (dynamicNames[name]) {
+    console.log("1");
+    const names = await getDynamicUrls(name);
+    console.log("2");
+    names.forEach((url) => {
+      console.log(url);
+      urls.push(url);
+    })
+  } else {
+    console.log(name);
+    urls.push(name === "home" ? "/" : `/${name}`);
+  }
+}
 
 fs.readdirSync("./src/views/status-pages", { withFileTypes: true, recursive: false })
   .forEach((file) => {
@@ -46,7 +54,6 @@ fs.readdirSync("./src/views/status-pages", { withFileTypes: true, recursive: fal
 
     urls.push(`/${name}`);
   })
-
 
 ;(async () => {
   for (const url of urls) {
@@ -80,23 +87,29 @@ function camelToKebab(text) {
   }).join('');
 }
 
-function getDynamicUrls(name) {
+async function getDynamicUrls(name) {
+  console.log("name", name);
   if (name === "island") {
     const directory = "./dist/static/islands";
     if (!fs.existsSync(directory)) {
       fs.mkdirSync(directory);
     }
 
-    // TOOD: this is HACK, get data from production server
-    return [1].map((id) => `/islands/${id}`);
+    const pageSize = 100;
+    const response = await fetch(`${env.VITE_BACKEND_API_URL}/islands/?pageSize=${pageSize}`);
+    const list = await response.json();
+
+    if (list.totalCount > pageSize) {
+      throw new Error("The total page size more than limit.");
+    }
+
+    return list.items.map((island) => `/islands/${island.id}`);
   }
 
   throw new Error(`Unknown dynamic name ${name}!`);
 }
 
 async function testBack() {
-  const fetch = (await import("node-fetch")).default;
-
   try {
     const response = await fetch('http://backend-hero-wars.vyacheslaff.local:8080/islands/actual');
     const body = await response.text();

@@ -38,7 +38,6 @@ class ApiRequest {
    */
   async get(url, params) {
     console.log("api request GET", url, params);
-    console.log("base url", import.meta.env.VITE_BACKEND_API_URL);
 
     if (this._beforeRequest) {
       this._beforeRequest(this);
