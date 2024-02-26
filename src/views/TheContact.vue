@@ -14,12 +14,19 @@
 import { setMetaInfo } from "@/services/page-meta";
 import ContactForm from "./contact/ContactForm.vue";
 import { useI18n } from "vue-i18n";
+import { useSSRContext } from "vue";
 
 const { t } = useI18n();
+
+let ssrContext;
+
+if (import.meta.env.SSR) {
+  ssrContext = useSSRContext();
+}
 
 setMetaInfo({
   title: t("seo.contact.title") + " - " + t("common.projectName"),
   description: t("seo.contact.description"),
   keywords: t("seo.contact.keywords"),
-});
+}, ssrContext);
 </script>

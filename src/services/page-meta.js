@@ -1,18 +1,15 @@
-import { useSSRContext } from "vue";
-
 /**
  * @param {Object} info
+ * @param {Object|null} ssrContext
  */
-export function setMetaInfo(info) {
-  console.log("setMetaInfo");
-
+export function setMetaInfo(info, ssrContext) {
   if (import.meta.env.SSR) {
-    const context = useSSRContext();
-
-    context.page = {
-      title: info.title !== undefined ? info.title : null,
-      description: info.description !== undefined ? info.description : null,
-      keywords: info.keywords !== undefined ? info.keywords : null,
+    if (ssrContext) {
+      ssrContext.page = {
+        title: info.title !== undefined ? info.title : null,
+        description: info.description !== undefined ? info.description : null,
+        keywords: info.keywords !== undefined ? info.keywords : null,
+      }
     }
   } else {
     if (info.title !== undefined) {

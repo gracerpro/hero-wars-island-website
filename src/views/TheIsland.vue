@@ -30,8 +30,16 @@ import { setMetaInfo } from "@/services/page-meta";
 import { ref, watch, onMounted, onServerPrefetch } from "vue";
 import { useRoute } from "vue-router";
 import { useI18n } from "vue-i18n";
+import { useSSRContext } from "vue";
+
+console.log("begin island page");
 
 const { t } = useI18n();
+let ssrContext;
+
+if (import.meta.env.SSR) {
+  ssrContext = useSSRContext();
+}
 
 const route = useRoute();
 const currentIsland = ref(null);
@@ -39,22 +47,19 @@ const islandLoading = ref(true);
 const errorMessage = ref("");
 
 const islandId = parseInt(route.params.id);
-
-setMetaInfo({
+const defaultPage = {
   title: t("common.islandMap"),
   description: t("seo.island.description"),
   keywords: t("seo.island.keywords"),
-});
+}
 
-console.log("load island page");
+setMetaInfo(defaultPage, ssrContext);
 
 onServerPrefetch(() => {
   return loadIsland(islandId);
 });
 
 onMounted(() => {
-  console.log("island page. on mounted");
-
   watch(
     () => route.params.id,
     (newId) => {
@@ -76,6 +81,8 @@ onMounted(() => {
     loadIsland(islandId);
   }
 })
+
+console.log("end island setup");
 
 /**
  * @param {String} sourceId
@@ -112,7 +119,9 @@ async function loadIsland(id) {
         title: island.name + " - " + t("common.projectName"),
         description: t("seo.island.description") + " " + island.name,
         keywords: t("seo.island.keywords") + ", " + island.name,
-      });
+      }, ssrContext);
+    } else {
+      setMetaInfo(defaultPage, ssrContext);
     }
   } catch (error) {
     console.log(error);
@@ -122,7 +131,9 @@ async function loadIsland(id) {
       errorMessage.value = t("common.loadingFailDeveloperShow");
     }
   } finally {
-    islandLoading.value = false;
+    if (!import.meta.env.SSR) {
+      islandLoading.value = false;
+    }
   }
 
   return island;

@@ -35,13 +35,20 @@
 </template>
 <script setup>
 import { setMetaInfo } from "@/services/page-meta";
+import { useSSRContext } from "vue";
 import { useI18n } from "vue-i18n";
 
 const { t } = useI18n();
+
+let ssrContext;
+
+if (import.meta.env.SSR) {
+  ssrContext = useSSRContext();
+}
 
 setMetaInfo({
   title: t("seo.help.title") + " - " + t("common.projectName"),
   description: t("seo.help.description"),
   keywords: t("seo.help.keywords"),
-});
+}, ssrContext);
 </script>

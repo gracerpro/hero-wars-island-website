@@ -40,9 +40,16 @@ import { ref, watch, onMounted } from "vue";
 import { useI18n } from "vue-i18n";
 import { createI18nRouteTo } from "@/i18n/translation";
 import { useRoute } from "vue-router";
+import { useSSRContext } from "vue";
 
 const { t, locale } = useI18n();
 const route = useRoute();
+
+let ssrContext;
+
+if (import.meta.env.SSR) {
+  ssrContext = useSSRContext();
+}
 
 const client = new HeroClient();
 const now = new Date();
@@ -55,7 +62,7 @@ setMetaInfo({
   title: t("common.projectName"),
   description: t("seo.home.description"),
   keywords: t("seo.home.keywords"),
-});
+}, ssrContext);
 
 onMounted(() => {
   watch(

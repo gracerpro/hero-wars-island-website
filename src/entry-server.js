@@ -10,7 +10,6 @@ export async function render(url, ssrManifest) {
   // itself on ctx.modules. After the render, ctx.modules would contain all the
   // components that have been instantiated during this render call.
   const context = {};
-  console.log("set context");
 
   await router.push(url);
   await router.isReady();

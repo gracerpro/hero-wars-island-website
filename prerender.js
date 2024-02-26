@@ -3,6 +3,8 @@
 import fs from 'node:fs'
 import { getHtml } from './common.js'
 
+//testBack();
+
 const manifest = JSON.parse(
   fs.readFileSync('./dist/static/.vite/ssr-manifest.json', 'utf-8'),
 )
@@ -12,8 +14,8 @@ const { render } = await import('./dist/server/entry-server.js')
 const dynamicNames = {
   "island": true
 };
-
 let urls = [];
+
 fs.readdirSync("./src/views", { withFileTypes: true, recursive: false })
   .forEach((file) => {
     if (!file.isFile()) {
@@ -45,6 +47,7 @@ fs.readdirSync("./src/views/status-pages", { withFileTypes: true, recursive: fal
     urls.push(`/${name}`);
   })
 
+
 ;(async () => {
   for (const url of urls) {
     const resultHtml = await getHtml(url, manifest, template, render);
@@ -58,6 +61,7 @@ fs.readdirSync("./src/views/status-pages", { withFileTypes: true, recursive: fal
   // done, delete .vite directory including ssr manifest
   //fs.rmSync('./dist/static/.vite', { recursive: true })
 })()
+
 
 function getUrlName(fileName) {
   let name = fileName;
@@ -80,13 +84,24 @@ function getDynamicUrls(name) {
   if (name === "island") {
     const directory = "./dist/static/islands";
     if (!fs.existsSync(directory)) {
-      console.log("NOT EXISTS", directory);
       fs.mkdirSync(directory);
     }
 
     // TOOD: this is HACK, get data from production server
-    return [1, 2].map((id) => `/islands/${id}`);
+    return [1].map((id) => `/islands/${id}`);
   }
 
   throw new Error(`Unknown dynamic name ${name}!`);
+}
+
+async function testBack() {
+  const fetch = (await import("node-fetch")).default;
+
+  try {
+    const response = await fetch('http://backend-hero-wars.vyacheslaff.local:8080/islands/actual');
+    const body = await response.text();
+    console.log(body);
+  } catch (error) {
+    console.error(error);
+  }
 }
