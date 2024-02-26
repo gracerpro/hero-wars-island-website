@@ -15,6 +15,11 @@ class ApiRequest {
    */
   _locale = null;
 
+  /**
+   * @private
+   */
+  _backendUrl = import.meta.env.VITE_BACKEND_API_URL;
+
   _beforeRequest = (/* request */) => {};
 
   /**
@@ -37,20 +42,16 @@ class ApiRequest {
    * @param {Object} params
    */
   async get(url, params) {
-    console.log("api request GET", url, params);
-
     if (this._beforeRequest) {
       this._beforeRequest(this);
     }
 
-    let searchParams = null;
+    let searchParams = '';
     if (params) {
-      searchParams = new URLSearchParams(params);
+      searchParams = "?" + (new URLSearchParams(params)).toString();
     }
     const response = await fetch(
-      import.meta.env.VITE_BACKEND_API_URL +
-        url +
-        (searchParams ? `?${searchParams}` : ""),
+      this._backendUrl + url + searchParams,
       this.getOptions("GET"),
     );
 
@@ -87,7 +88,7 @@ class ApiRequest {
       body: JSON.stringify(data),
     };
     const response = await fetch(
-      import.meta.env.VITE_BACKEND_API_URL + url,
+      this._backendUrl + url,
       options,
     );
 

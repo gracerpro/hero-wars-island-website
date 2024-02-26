@@ -30,10 +30,8 @@ for (let i = 0; i < files.length; ++i) {
   let name = getUrlName(file.name);
 
   if (dynamicNames[name]) {
-    console.log("1");
-    const names = await getDynamicUrls(name);
-    console.log("2");
-    names.forEach((url) => {
+    const dynamicUrls = await getDynamicUrls(name);
+    dynamicUrls.forEach((url) => {
       console.log(url);
       urls.push(url);
     })
@@ -88,7 +86,6 @@ function camelToKebab(text) {
 }
 
 async function getDynamicUrls(name) {
-  console.log("name", name);
   if (name === "island") {
     const directory = "./dist/static/islands";
     if (!fs.existsSync(directory)) {
@@ -96,8 +93,11 @@ async function getDynamicUrls(name) {
     }
 
     const pageSize = 100;
-    const response = await fetch(`${env.VITE_BACKEND_API_URL}/islands/?pageSize=${pageSize}`);
+    const url = `${env.VITE_BACKEND_API_URL}/islands/?pageSize=${pageSize}`;
+    console.log(`fetch ${url}`)
+    const response = await fetch(url);
     const list = await response.json();
+    console.log(`ok, ${list.totalCount}`)
 
     if (list.totalCount > pageSize) {
       throw new Error("The total page size more than limit.");
@@ -107,14 +107,4 @@ async function getDynamicUrls(name) {
   }
 
   throw new Error(`Unknown dynamic name ${name}!`);
-}
-
-async function testBack() {
-  try {
-    const response = await fetch('http://backend-hero-wars.vyacheslaff.local:8080/islands/actual');
-    const body = await response.text();
-    console.log(body);
-  } catch (error) {
-    console.error(error);
-  }
 }

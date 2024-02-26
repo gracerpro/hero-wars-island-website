@@ -57,7 +57,6 @@ app.listen(port, () => {
   console.log(`Server started at http://localhost:${port}`)
 });
 
-//console.log(await testBack());
 
 async function getAppHtml(url, manifest) {
   let template;
@@ -90,18 +89,6 @@ async function getAppHtml(url, manifest) {
   }
 
   return getHtml(url, manifest, template, render);
-}
-
-async function testBack() {
-  const fetch = (await import("node-fetch")).default;
-
-  try {
-    const response = await fetch('http://backend-hero-wars.vyacheslaff.local:8080');
-    const body = await response.text();
-    console.log(body);
-  } catch (error) {
-    console.error(error);
-  }
 }
 
 /*

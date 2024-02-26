@@ -32,8 +32,6 @@ import { useRoute } from "vue-router";
 import { useI18n } from "vue-i18n";
 import { useSSRContext } from "vue";
 
-console.log("begin island page");
-
 const { t } = useI18n();
 let ssrContext;
 
@@ -82,8 +80,6 @@ onMounted(() => {
   }
 })
 
-console.log("end island setup");
-
 /**
  * @param {String} sourceId
  * @returns {Number|null}
@@ -103,7 +99,6 @@ function queryId(sourceId) {
  * @param {Number} id
  */
 async function loadIsland(id) {
-  console.log("load island by", id);
   const client = new HeroClient();
   let island = null;
 
@@ -111,7 +106,6 @@ async function loadIsland(id) {
   islandLoading.value = true;
   try {
     island = await client.getIsland(id);
-    console.log(island);
 
     currentIsland.value = island;
     if (island) {
