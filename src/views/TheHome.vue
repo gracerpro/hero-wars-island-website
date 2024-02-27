@@ -44,12 +44,7 @@ import { useSSRContext } from "vue";
 
 const { t, locale } = useI18n();
 const route = useRoute();
-
-let ssrContext;
-
-if (import.meta.env.SSR) {
-  ssrContext = useSSRContext();
-}
+const ssrContext = import.meta.env.SSR ? useSSRContext() : null;
 
 const client = new HeroClient();
 const now = new Date();

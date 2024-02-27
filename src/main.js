@@ -3,7 +3,6 @@ import App from "./App.vue";
 import { createRouter } from "./router";
 import store from "./store/index.js";
 import "bootstrap/dist/css/bootstrap.min.css";
-import * as Sentry from "@sentry/vue";
 import { createI18n } from "@/i18n";
 
 export default function createApp() {
@@ -11,7 +10,7 @@ export default function createApp() {
   const router = createRouter();
   const i18n = createI18n();
 
-  if (import.meta.env.VITE_USE_SENTRY > 0) {
+  if (!import.meta.env.SSR && import.meta.env.VITE_USE_SENTRY > 0) {
     initSentry(app, router);
   }
 
@@ -23,26 +22,19 @@ export default function createApp() {
   }
 }
 
-console.log("SSR", import.meta.env.SSR, Sentry.replayIntegration, Sentry.browserTracingIntegration);
-
-function initSentry(app, router) {
-  let integrations = [];
-
-  if (!import.meta.env.SSR) {
-    integrations.push(Sentry.browserTracingIntegration({router}));
-
-    integrations.push(
-      Sentry.replayIntegration({
-        maskAllText: true,
-        blockAllMedia: true,
-      }),
-    );
-  }
+async function initSentry(app, router) {
+  const Sentry = await import("@sentry/vue");
 
   Sentry.init({
     app,
     dsn: "https://e6453d231e745bf943c79277ccdc8890@o514031.ingest.sentry.io/4506580248297472",
-    integrations,
+    integrations: [
+      Sentry.browserTracingIntegration({router}),
+      Sentry.replayIntegration({
+        maskAllText: true,
+        blockAllMedia: true,
+      }),
+    ],
     // Set 'tracePropagationTargets' to control for which URLs distributed tracing should be enabled
     tracePropagationTargets: ["localhost", import.meta.env.VITE_BACKEND_API_URL],
 
@@ -52,6 +44,11 @@ function initSentry(app, router) {
     replaysSessionSampleRate: 0.1, // This sets the sample rate at 10%. You may want to change it to 100% while in development and then sample at a lower rate in production.
     replaysOnErrorSampleRate: 1.0, // If you're not already sampling the entire session, change the sample rate to 100% when sampling sessions where errors occur.
   });
+
+  // Sometime later
+  const { browserTracingIntegration } = await import("@sentry/browser");
+  console.log("browserTracingIntegration", browserTracingIntegration);
+  Sentry.addIntegration(browserTracingIntegration());
 }
 
 /* TODO:

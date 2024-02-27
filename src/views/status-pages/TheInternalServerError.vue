@@ -13,12 +13,7 @@ import { useI18n } from "vue-i18n";
 
 const { t } = useI18n();
 const title = t("common.internalServerError");
-
-let ssrContext;
-
-if (import.meta.env.SSR) {
-  ssrContext = useSSRContext();
-}
+const ssrContext = import.meta.env.SSR ? useSSRContext() : null;
 
 setMetaInfo({
   title,

@@ -28,12 +28,7 @@ import { createI18nRouteTo } from "@/i18n/translation";
 import { useSSRContext } from "vue";
 
 const { t } = useI18n();
-
-let ssrContext;
-
-if (import.meta.env.SSR) {
-  ssrContext = useSSRContext();
-}
+const ssrContext = import.meta.env.SSR ? useSSRContext() : null;
 
 setMetaInfo({
   title: t("seo.about.title") + " - " + t("common.projectName"),
