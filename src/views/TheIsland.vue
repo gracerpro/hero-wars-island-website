@@ -41,16 +41,30 @@ const islandLoading = ref(true);
 const errorMessage = ref("");
 
 const islandId = parseInt(route.params.id);
-const defaultPage = {
-  title: t("common.islandMap"),
-  description: t("seo.island.description"),
-  keywords: t("seo.island.keywords"),
-}
 
-setMetaInfo(defaultPage, ssrContext);
+// TODO: h1 => island.name
+// __INITIAL_STATE__
 
-onServerPrefetch(() => {
-  return loadIsland(islandId);
+onServerPrefetch(async () => {
+  const island = await loadIsland(islandId);
+
+  if (island) {
+    setMetaInfo({
+        title: island.name + " - " + t("common.projectName"),
+        description: t("seo.island.description") + " " + island.name,
+        keywords: t("seo.island.keywords") + ", " + island.name,
+      },
+      ssrContext
+    );
+  } else {
+    setMetaInfo({
+        title: t("common.islandMap"),
+        description: t("seo.island.description"),
+        keywords: t("seo.island.keywords"),
+      },
+      ssrContext
+    );
+  }
 });
 
 onMounted(() => {
@@ -71,9 +85,7 @@ onMounted(() => {
     },
   );
 
-  if (!currentIsland.value) {
-    loadIsland(islandId);
-  }
+  loadIsland(islandId);
 })
 
 /**
@@ -96,23 +108,11 @@ function queryId(sourceId) {
  */
 async function loadIsland(id) {
   const client = new HeroClient();
-  let island = null;
 
   currentIsland.value = null;
   islandLoading.value = true;
   try {
-    island = await client.getIsland(id);
-
-    currentIsland.value = island;
-    if (island) {
-      setMetaInfo({
-        title: island.name + " - " + t("common.projectName"),
-        description: t("seo.island.description") + " " + island.name,
-        keywords: t("seo.island.keywords") + ", " + island.name,
-      }, ssrContext);
-    } else {
-      setMetaInfo(defaultPage, ssrContext);
-    }
+    currentIsland.value = await client.getIsland(id);
   } catch (error) {
     console.log(error);
     if (error instanceof HttpError && error.statusCode === 404) {
@@ -126,6 +126,6 @@ async function loadIsland(id) {
     }
   }
 
-  return island;
+  return currentIsland.value;
 }
 </script>
