@@ -31,5 +31,8 @@ export async function getHtml(url, manifest, template, render) {
     : "Хроники хаоса, Эра доминиона, карта острова, карта, открытая карта, призы, ресурсы";
   html = html.replace("<!--page-keywords-->", keywords);
 
-  return html;
+  return {
+    html,
+    statusCode: rendered.statusCode,
+  };
 }

@@ -1,6 +1,7 @@
 import fs from 'node:fs/promises'
 import express from 'express'
 import { getHtml } from "./common.js";
+import HttpError from './src/exceptions/HttpError.js';
 
 // Constants
 const isProduction = process.env.NODE_ENV === 'production';
@@ -42,13 +43,23 @@ app.use('*', async (request, response) => {
 
     console.log("recieve url:", url);
 
-    let html = await getAppHtml(url, ssrManifest);
+    let { html, statusCode } = await getAppHtml(url, ssrManifest);
 
-    response.status(200).set({ 'Content-Type': 'text/html; charset=UTF-8' }).send(html)
+    if (!statusCode) {
+      statusCode = 200;
+    }
+
+    response.status(statusCode).set({ 'Content-Type': 'text/html; charset=UTF-8' }).send(html)
   } catch (e) {
     vite?.ssrFixStacktrace(e)
     console.log(e.stack)
-    response.status(500).end(e.stack)
+
+    if (e instanceof HttpError) {
+      response.status(e.statusCode)
+    } else {
+      response.status(500)
+    }
+    response.end(e.stack)
   }
 })
 
@@ -90,39 +101,3 @@ async function getAppHtml(url, manifest) {
 
   return getHtml(url, manifest, template, render);
 }
-
-/*
-async function handleRequest(request) {
-  const context = {
-    url: request.url,
-  }
-
-  return new Promise((resolve, reject) => {
-    // Each request - new instance
-    const { app, router } = createApp();
-
-    if (!app) {
-      reject();
-    }
-
-    renderToString(app, context)
-        .then((html) => resolve(html));
-
-    if (router) {
-      router.push(context.url);
-
-      router.onReady(() => {
-        const matchedComponents = router.getMatchedComponents();
-        console.log("matchedComponents", matchedComponents);
-
-        if (!matchedComponents.length) {
-          return reject(new HttpError(404, "Page not found"));
-        }
-
-        renderToString(app, context)
-          .then((html) => resolve(html));
-      });
-    }
-  });
-}
-*/

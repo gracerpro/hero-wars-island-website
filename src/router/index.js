@@ -10,7 +10,7 @@ import routes from "./routes";
 
 export function createRouter() {
   const router = _createRouter({
-    history: import.meta.env.SSR > 0
+    history: import.meta.env.SSR
       ? createMemoryHistory(import.meta.env.BASE_URL)
       : createWebHistory(import.meta.env.BASE_URL),
     routes,

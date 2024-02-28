@@ -9,10 +9,18 @@ export async function render(url, ssrManifest) {
   // @vitejs/plugin-vue injects code into a component's setup() that registers
   // itself on ctx.modules. After the render, ctx.modules would contain all the
   // components that have been instantiated during this render call.
-  const context = {};
+  const context = {
+    url
+  };
 
   await router.push(url);
   await router.isReady();
+
+  let statusCode = 200;
+
+  if (!router.currentRoute || router.currentRoute.value.name === "page-not-found") {
+    statusCode = 404;
+  }
 
   const html = await renderToString(app, context);
 
@@ -35,7 +43,7 @@ export async function render(url, ssrManifest) {
     }
   }
 
-  return { html, preloadLinks, page }
+  return { html, preloadLinks, page, statusCode }
 }
 
 function renderPreloadLinks(modules, manifest) {

@@ -55,16 +55,16 @@ fs.readdirSync("./src/views/status-pages", { withFileTypes: true, recursive: fal
 
 ;(async () => {
   for (const url of urls) {
-    const resultHtml = await getHtml(url, manifest, template, render);
+    const { html } = await getHtml(url, manifest, template, render);
 
     const filePath = `./dist/static${url === '/' ? '/index' : url}.html`
-    fs.writeFileSync(filePath, resultHtml)
+    fs.writeFileSync(filePath, html)
 
-    console.log('pre-rendered:', filePath, "size", resultHtml.length);
+    console.log('pre-rendered:', filePath, "size", html.length);
   }
 
   // done, delete .vite directory including ssr manifest
-  //fs.rmSync('./dist/static/.vite', { recursive: true })
+  fs.rmSync('./dist/static/.vite', { recursive: true })
 })()
 
 
