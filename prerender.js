@@ -28,17 +28,35 @@ fs.rmSync('./dist/static/.vite', { recursive: true })
 
 /////////////////////////////////////////////////////
 
+/**
+ * @param {String[]} urls
+ */
 async function createFiles(urls) {
+  const enUrl = `/${enLocale}`;
+
   for (const url of urls) {
     const { html } = await getHtml(url, manifest, template, render);
 
-    const filePath = `./dist/static${url === '/' ? '/index' : url}.html`
+    let path;
+
+    if (url === "/") {
+      path = "/index";
+    } else if (url === enUrl) {
+      path = `${enUrl}/index`;
+    } else {
+      path = url;
+    }
+    const filePath = `./dist/static${path}.html`
     fs.writeFileSync(filePath, html)
 
     console.log('pre-rendered:', filePath, "size", html.length);
   }
 }
 
+/**
+ * @param {Object} dynamicNamesMap
+ * @returns {String[]}
+ */
 async function getUrls(dynamicNamesMap) {
   let urls = [];
 
