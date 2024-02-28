@@ -6,54 +6,29 @@ import fetch from "node-fetch";
 import { loadEnv } from 'vite';
 
 const env = loadEnv("production", process.cwd());
-
 const manifest = JSON.parse(
   fs.readFileSync('./dist/static/.vite/ssr-manifest.json', 'utf-8'),
 )
 const template = fs.readFileSync('./dist/static/index.html', 'utf-8')
 const { render } = await import('./dist/server/entry-server.js')
 
-const dynamicNames = {
+const enLocale = "en";
+const dynamicNamesMap = {
   "island": true
 };
-let urls = [];
+const urls = await getUrls(dynamicNamesMap);
 
-const files = fs.readdirSync("./src/views", { withFileTypes: true, recursive: false });
+initDirectories();
 
-for (let i = 0; i < files.length; ++i) {
-  const file = files[i];
+await createFiles(urls);
 
-  if (!file.isFile()) {
-    continue;
-  }
+// done, delete .vite directory including ssr manifest
+fs.rmSync('./dist/static/.vite', { recursive: true })
 
-  let name = getUrlName(file.name);
 
-  if (dynamicNames[name]) {
-    const dynamicUrls = await getDynamicUrls(name);
-    dynamicUrls.forEach((url) => {
-      console.log(url);
-      urls.push(url);
-    })
-  } else {
-    console.log(name);
-    urls.push(name === "home" ? "/" : `/${name}`);
-  }
-}
+/////////////////////////////////////////////////////
 
-fs.readdirSync("./src/views/status-pages", { withFileTypes: true, recursive: false })
-  .forEach((file) => {
-    if (!file.isFile()) {
-      return;
-    }
-
-    let name = getUrlName(file.name);
-    console.log(name);
-
-    urls.push(`/${name}`);
-  })
-
-;(async () => {
+async function createFiles(urls) {
   for (const url of urls) {
     const { html } = await getHtml(url, manifest, template, render);
 
@@ -62,11 +37,70 @@ fs.readdirSync("./src/views/status-pages", { withFileTypes: true, recursive: fal
 
     console.log('pre-rendered:', filePath, "size", html.length);
   }
+}
 
-  // done, delete .vite directory including ssr manifest
-  fs.rmSync('./dist/static/.vite', { recursive: true })
-})()
+async function getUrls(dynamicNamesMap) {
+  let urls = [];
 
+  const files = fs.readdirSync("./src/views", { withFileTypes: true, recursive: false });
+
+  for (let i = 0; i < files.length; ++i) {
+    const file = files[i];
+
+    if (!file.isFile()) {
+      continue;
+    }
+
+    let name = getUrlName(file.name);
+
+    if (dynamicNamesMap[name]) {
+      const list = await getDynamicNames(name);
+      list.forEach((dynamicName) => {
+        console.log(dynamicName);
+        urls.push(`/${dynamicName}`);
+        urls.push(`/${enLocale}/${dynamicName}`);
+      })
+    } else {
+      console.log(name);
+      if (name === "home") {
+        urls.push("/");
+        urls.push(`/${enLocale}`);
+      } else {
+        urls.push(`/${name}`);
+        urls.push(`/${enLocale}/${name}`);
+      }
+    }
+  }
+
+  fs.readdirSync("./src/views/status-pages", { withFileTypes: true, recursive: false })
+    .forEach((file) => {
+      if (!file.isFile()) {
+        return;
+      }
+
+      let name = getUrlName(file.name);
+      console.log(name);
+
+      urls.push(`/${name}`);
+    })
+
+  return urls;
+}
+
+function initDirectories() {
+  const enDirectory = `./dist/static/${enLocale}`;
+  if (!fs.existsSync(enDirectory)) {
+    fs.mkdirSync(enDirectory);
+  }
+  const islandsDirectory = "./dist/static/islands";
+  if (!fs.existsSync(islandsDirectory)) {
+    fs.mkdirSync(islandsDirectory);
+  }
+  const enIslandsDirectory = `./dist/static/${enLocale}/islands`;
+  if (!fs.existsSync(enIslandsDirectory)) {
+    fs.mkdirSync(enIslandsDirectory);
+  }
+}
 
 function getUrlName(fileName) {
   let name = fileName;
@@ -85,13 +119,8 @@ function camelToKebab(text) {
   }).join('');
 }
 
-async function getDynamicUrls(name) {
+async function getDynamicNames(name) {
   if (name === "island") {
-    const directory = "./dist/static/islands";
-    if (!fs.existsSync(directory)) {
-      fs.mkdirSync(directory);
-    }
-
     const pageSize = 100;
     const url = `${env.VITE_BACKEND_API_URL}/islands/?pageSize=${pageSize}`;
     console.log(`fetch ${url}`)
@@ -103,7 +132,7 @@ async function getDynamicUrls(name) {
       throw new Error("The total page size more than limit.");
     }
 
-    return list.items.map((island) => `/islands/${island.id}`);
+    return list.items.map((island) => `islands/${island.id}`);
   }
 
   throw new Error(`Unknown dynamic name ${name}!`);
