@@ -79,25 +79,34 @@
       </button>
     </div>
 
-    <toast-message ref="toast" element-id="contactToast" />
+    <client-only>
+      <toast-message ref="toast" element-id="contactToast" />
+    </client-only>
   </form>
 </template>
 <script setup>
+import ClientOnly from "@/components/ClientOnly.vue";
 import UserError from "@/exceptions/UserError";
 import HeroClient from "@/api/HeroClient";
-import ToastMessage, {
-  TYPE_SUCCESS,
-  TYPE_DANGER,
-} from "@/components/ToastMessage.vue";
 import { ref, shallowReactive, onMounted } from "vue";
 import { useI18n } from "vue-i18n";
+import {
+    TYPE_SUCCESS,
+    TYPE_DANGER,
+  } from "@/components/ToastMessage.vue";
+import { defineAsyncComponent } from "vue";
 
 const { t } = useI18n();
+
+const submiting = ref(false);
 
 const client = new HeroClient();
 const createdDate = new Date();
 
-const submiting = ref(false);
+const ToastMessage = import.meta.env.SSR
+  ? null
+  : defineAsyncComponent(() => import("@/components/ToastMessage.vue"));
+
 const errorMessage = ref("");
 const feedback = shallowReactive({
   username: "",

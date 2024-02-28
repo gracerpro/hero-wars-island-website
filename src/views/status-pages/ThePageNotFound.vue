@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <h1>404 {{ notFound }}</h1>
+    <h1>404 {{ t("common.pageNotFound") }}</h1>
     <p>{{ t("common.movedPageMayBe") }}</p>
     <p>
       <a href="/">{{ t("common.goToHome") }}</a>
@@ -9,17 +9,16 @@
 </template>
 <script setup>
 import { setMetaInfo } from "@/services/page-meta";
+import { useSSRContext } from "vue";
 import { useI18n } from "vue-i18n";
 
 const { t } = useI18n();
-const notFound = t("common.pageNotFound");
+const title = t("common.pageNotFound");
+const ssrContext = import.meta.env.SSR ? useSSRContext() : null;
 
 setMetaInfo({
-  title: notFound,
-  description: notFound,
-  keywords: "404, " + notFound,
-});
-
-// only prod?
-//window.location.reload();
+  title,
+  description: title,
+  keywords: `404, ${title}`,
+}, ssrContext);
 </script>

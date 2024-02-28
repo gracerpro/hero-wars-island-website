@@ -1,5 +1,5 @@
 import { TYPE_START } from "@/api/node";
-import i18n from "@/i18n";
+import { useI18n } from "@/i18n";
 
 export const TRANSLATE_X = 6;
 export const TRANSLATE_Y = 6;
@@ -7,8 +7,6 @@ export const EVENT_CHANGE_TRANSLATE = "change-translate";
 
 export const DELTA_SCALE = 0.1;
 export const EVENT_CHANGE_SCALE = "change-scale";
-
-const { t } = i18n.global;
 
 export function canSelectNode(node) {
   return node.typeId !== TYPE_START;
@@ -21,13 +19,14 @@ export function canSelectNode(node) {
  * @returns {String|null}
  */
 export function canSelectNextNode(nodes, selectedNodes, nextNode) {
+  const { t } = useI18n();
   let result = null;
 
   if (nextNode.typeId === TYPE_START) {
     return t("page.island.canNotSelectStartNode");
   }
 
-  // if no link to selected or start node
+  // if no link to selected or started node
   // then cancel
 
   if (Object.keys(selectedNodes).length === 0) {

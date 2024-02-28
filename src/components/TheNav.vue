@@ -34,7 +34,6 @@
           >{{ t("common.help") }}</router-link
         >
       </div>
-      <switch-language />
     </div>
   </nav>
 </template>
@@ -42,7 +41,7 @@
 import { useI18n } from "vue-i18n";
 import { ref, onMounted } from "vue";
 import HeroClient from "@/api/HeroClient";
-import SwitchLanguage from "./SwitchLanguage.vue";
+//import SwitchLanguage from "./SwitchLanguage.vue"; // TODO: add "en" to static pages
 import { createI18nRouteTo } from "@/i18n/translation";
 
 const { t } = useI18n();

@@ -25,12 +25,14 @@
 import { setMetaInfo } from "@/services/page-meta";
 import { useI18n } from "vue-i18n";
 import { createI18nRouteTo } from "@/i18n/translation";
+import { useSSRContext } from "vue";
 
 const { t } = useI18n();
+const ssrContext = import.meta.env.SSR ? useSSRContext() : null;
 
 setMetaInfo({
   title: t("seo.about.title") + " - " + t("common.projectName"),
   description: t("seo.about.description"),
   keywords: t("seo.about.keywords"),
-});
+}, ssrContext);
 </script>

@@ -1,19 +1,25 @@
 import { nextTick } from "vue";
-import i18n from "@/i18n";
+import { useI18n } from "@/i18n";
 
-const { t, te } = i18n.global;
+/**
+ * @returns {String}
+ */
+function getDefaultLocale() {
+  return import.meta.env.VITE_DEFAULT_LOCALE;
+}
 
+/**
+ * @returns {Array<Object>}
+ */
 export function getLocalesLabels() {
+  const { t, te } = useI18n();
+
   return getSupportLocales().map((locale) => {
     return {
       locale,
       label: te("locale." + locale) ? t("locale." + locale) : locale,
     };
   });
-}
-
-export function getCurrentLocale() {
-  return i18n.global.locale.value;
 }
 
 /**
@@ -24,22 +30,24 @@ export function isSupportLocale(locale) {
   return getSupportLocales().includes(locale);
 }
 
-export async function setLanguage(locale) {
-  if (!isLocaleLoaded(locale)) {
-    await loadLocaleMessages(locale);
-  }
+/**
+ * @returns {Array<String>}
+ */
+function getSupportLocales() {
+  return import.meta.env.VITE_SUPPORT_LOCALES.split(",");
+}
 
-  i18n.global.locale.value = locale;
-  saveLocale(locale);
 
-  /**
-   * NOTE:
-   * If you need to specify the language setting for headers, such as the `fetch` API, set it here.
-   * The following is an example for axios.
-   *
-   * axios.defaults.headers.common['Accept-Language'] = locale
-   */
-  document.querySelector("html").setAttribute("lang", locale);
+
+
+
+/**
+ * @returns {String}
+ */
+export function getCurrentLocale() {
+  const i18n = useI18n();
+
+  return i18n.locale.value;
 }
 
 /**
@@ -47,21 +55,104 @@ export async function setLanguage(locale) {
  * @returns {Object}
  */
 export function createI18nRouteTo(to) {
-  if (!isShowLocaleInRoute(getCurrentLocale())) {
+  const locale = getCurrentLocale();
+
+  if (!isShowLocaleInRoute(locale)) {
     return to;
   }
 
   return {
     ...to,
     params: {
-      locale: getCurrentLocale(),
+      locale,
       ...to.params,
     },
   };
 }
 
+/**
+ * @param {String} locale
+ * @returns {Boolean}
+ */
 export function isShowLocaleInRoute(locale) {
   return locale !== getDefaultLocale();
+}
+
+/**
+ * @param {String} locale
+ * @returns {Promise}
+ */
+async function loadLocaleMessages(locale) {
+  if (!isLocaleLoaded(locale)) {
+    const messages = await import(`./locales/${locale}.json`);
+    const i18n = useI18n();
+
+    i18n.setLocaleMessage(locale, messages.default);
+  }
+
+  return nextTick();
+}
+
+/**
+ * @param {String} locale
+ * @returns {Boolean}
+ */
+function isLocaleLoaded(locale) {
+  const i18n = useI18n();
+
+  return i18n.availableLocales.includes(locale);
+}
+
+/**
+ * @param {String} locale 
+ */
+function saveLocale(locale) {
+  if (import.meta.env.SSR) {
+    return;
+  }
+  localStorage.setItem("locale", locale);
+}
+
+/**
+ * @returns {String|null}
+ */
+function getSavedLocale() {
+  if (import.meta.env.SSR) {
+    return null;
+  }
+
+  let locale = localStorage.getItem("locale");
+  if (locale) {
+    locale = locale.toLowerCase();
+  }
+
+  return isSupportLocale(locale) ? locale : null;
+}
+
+
+
+
+
+
+export async function setLanguage(locale) {
+  if (!isLocaleLoaded(locale)) {
+    await loadLocaleMessages(locale);
+  }
+
+  const i18n = useI18n();
+  i18n.locale.value = locale;
+  saveLocale(locale);
+
+  if (!import.meta.env.SSR) {
+    /**
+     * NOTE:
+     * If you need to specify the language setting for headers, such as the `fetch` API, set it here.
+     * The following is an example for axios.
+     *
+     * axios.defaults.headers.common['Accept-Language'] = locale
+     */
+    document.querySelector("html").setAttribute("lang", locale);
+  }
 }
 
 export function guessDefaultLocale() {
@@ -78,54 +169,18 @@ export function guessDefaultLocale() {
   return getDefaultLocale();
 }
 
-async function loadLocaleMessages(locale) {
-  if (!isLocaleLoaded(locale)) {
-    const messages = await import(`./locales/${locale}.json`);
-
-    i18n.global.setLocaleMessage(locale, messages.default);
-  }
-
-  return nextTick();
-}
-
 function getUserLocale() {
-  let locale =
-    window.navigator.language ||
-    window.navigator.userLanguage ||
-    import.meta.env.VITE_DEFAULT_LOCALE;
+  let locale;
 
+  if (!import.meta.env.SSR) {
+    locale = window.navigator.language ||
+      window.navigator.userLanguage;
+  }
   if (locale) {
     locale = locale.toLowerCase();
+  } else {
+    locale = import.meta.env.VITE_DEFAULT_LOCALE
   }
 
   return locale.split("-")[0];
-}
-
-function getDefaultLocale() {
-  return import.meta.env.VITE_DEFAULT_LOCALE;
-}
-
-function getSupportLocales() {
-  return import.meta.env.VITE_SUPPORT_LOCALES.split(",");
-}
-
-function saveLocale(locale) {
-  localStorage.setItem("locale", locale);
-}
-
-function getSavedLocale() {
-  let locale = localStorage.getItem("locale");
-  if (locale) {
-    locale = locale.toLowerCase();
-  }
-
-  return isSupportLocale(locale) ? locale : null;
-}
-
-/**
- * @param {String} locale
- * @returns {Boolean}
- */
-function isLocaleLoaded(locale) {
-  return i18n.global.availableLocales.includes(locale);
 }

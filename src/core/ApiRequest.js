@@ -1,11 +1,24 @@
 import HttpError from "@/exceptions/HttpError";
 import UserError from "@/exceptions/UserError";
 
+let fetch;
+
+if (import.meta.env.SSR) {
+  fetch = (...args) => import("node-fetch").then(({ default: _fetch }) => _fetch(...args));
+} else {
+  fetch = window.fetch;
+}
+
 class ApiRequest {
   /**
    * @private
    */
   _locale = null;
+
+  /**
+   * @private
+   */
+  _backendUrl = import.meta.env.VITE_BACKEND_API_URL;
 
   _beforeRequest = (/* request */) => {};
 
@@ -33,14 +46,12 @@ class ApiRequest {
       this._beforeRequest(this);
     }
 
-    let searchParams = null;
+    let searchParams = '';
     if (params) {
-      searchParams = new URLSearchParams(params);
+      searchParams = "?" + (new URLSearchParams(params)).toString();
     }
     const response = await fetch(
-      import.meta.env.VITE_BACKEND_API_URL +
-        url +
-        (searchParams ? `?${searchParams}` : ""),
+      this._backendUrl + url + searchParams,
       this.getOptions("GET"),
     );
 
@@ -77,7 +88,7 @@ class ApiRequest {
       body: JSON.stringify(data),
     };
     const response = await fetch(
-      import.meta.env.VITE_BACKEND_API_URL + url,
+      this._backendUrl + url,
       options,
     );
 

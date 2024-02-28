@@ -9,7 +9,13 @@ export default defineConfig(({mode}) => {
   return {
     server: {
       host: true,
-      port: 8082
+      port: 8082,
+      strictPort: true,
+    },
+    preview: {
+      host: true,
+      port: 4082,
+      strictPort: true,
     },
     plugins: [
       vue(),

@@ -1,5 +1,3 @@
-import TheHomeView from "../views/TheHomeView.vue";
-
 export default [
   {
     path: "/:locale?",
@@ -7,37 +5,41 @@ export default [
       {
         path: "",
         name: "home",
-        component: TheHomeView,
-      },
-      {
-        path: "about",
-        name: "about",
         // route level code-splitting
         // this generates a separate chunk (about.[hash].js) for this route
         // which is lazy-loaded when the route is visited.
-        component: () => import("../views/TheAboutView.vue"),
+        component: () => import("../views/TheHome.vue")},
+      {
+        path: "about",
+        name: "about",
+        component: () => import("../views/TheAbout.vue"),
       },
       {
         path: "contact",
         name: "contact",
-        component: () => import("../views/TheContactView.vue"),
+        component: () => import("../views/TheContact.vue"),
       },
       {
-        path: "islands/:id",
+        path: "islands/:id(\\d+)",
         name: "island",
-        component: () => import("../views/TheIslandView.vue"),
+        component: () => import("../views/TheIsland.vue"),
       },
       {
         path: "help",
         name: "help",
-        component: () => import("../views/TheHelpView.vue"),
+        component: () => import("../views/TheHelp.vue"),
       },
     ],
   },
   {
+    path: "/internal-server-error",
+    name: "internal-server-error",
+    component: () => import("../views/status-pages/TheInternalServerError.vue"),
+  },
+  {
     path: "/page-not-found",
     name: "page-not-found",
-    component: () => import("../views/status-pages/NotFoundPage.vue"),
+    component: () => import("../views/status-pages/ThePageNotFound.vue"),
   },
   {
     path: "/:catchAll(.*)",

@@ -28,8 +28,13 @@ export const TYPE_SUCCESS = "success";
 export const TYPE_DANGER = "danger";
 </script>
 <script setup>
-import { Toast } from "bootstrap";
 import { ref, computed } from "vue";
+
+let Toast;
+
+if (!import.meta.env.SSR) {
+  import("bootstrap").then((module) => Toast = module.Toast);
+}
 
 const props = defineProps({
   elementId: { type: String, required: true },
@@ -53,7 +58,7 @@ const classType = computed(() => {
  * @param {String} message
  * @param {String|null} type
  */
-const show = (message, type) => {
+function show(message, type) {
   toastMessage.value = message;
   if (type) {
     toastType.value = type;

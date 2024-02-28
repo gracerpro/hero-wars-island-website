@@ -1,15 +1,24 @@
 import ru from "./locales/ru.json";
-import { createI18n } from "vue-i18n";
+import { createI18n as _createI18n } from "vue-i18n";
 
-const locale = import.meta.env.VITE_DEFAULT_LOCALE;
+// TODO: this is global state, then Application creating this variable must be sets
+let i18n = null;
 
-const i18n = createI18n({
-  locale,
-  fallbackLocale: locale,
-  legacy: false,
-  globalInjection: true,
-  messages: { ru },
-  warnHtmlMessage: false,
-});
+export function createI18n() {
+  const locale = import.meta.env.VITE_DEFAULT_LOCALE;
 
-export default i18n;
+  i18n = _createI18n({
+    locale,
+    fallbackLocale: locale,
+    legacy: false,
+    globalInjection: true,
+    messages: { ru },
+    warnHtmlMessage: false,
+  });
+
+  return i18n;
+}
+
+export function useI18n() {
+  return i18n.global;
+}

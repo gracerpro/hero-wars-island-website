@@ -19,6 +19,7 @@ docker exec hero-wars-website__vite npm run lint --fix
 Log in to the container
 
 ```bash
+docker exec -it hero-wars-website__vite bash
 docker exec -it --user "$(id -u):$(id -g)" hero-wars-website__vite bash
 ```
 
@@ -28,6 +29,7 @@ Add to `/etc/hosts` file on host computer this text
 
 ```
 127.0.0.1 hero-wars.vyacheslaff.local
+127.0.0.1 prod-hero-wars.vyacheslaff.local
 ```
 
 [Install docker](https://docs.docker.com/engine/install/)

@@ -1,14 +1,10 @@
 <!DOCTYPE html>
-<html lang="">
+<html lang="%VITE_DEFAULT_LOCALE%">
   <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <title><!--page-title--></title>
+    <meta name="description" content="<!--page-description-->">
+    <meta name="keywords" content="<!--page-keywords-->">
     <link rel="icon" href="/favicon.svg" type="image/svg+xml">
-    <title>Хроники хаоса Эра доминиона карта острова</title>
-    <meta name="description" content="Игра Хроники Хаоса, карта острова, соберем все призы вместе!">
-    <meta name="keywords" content="Хроники хаоса, Эра доминиона, карта острова, карта, открытая карта, призы, ресурсы">
-    <link rel="stylesheet" href="/style.css">
 
     <%if (VITE_YANDEX_METRIC_ID > 0) { %>
       <!-- Yandex.Metrika counter -->
@@ -28,6 +24,8 @@
       </script>
       <!-- /Yandex.Metrika counter -->
     <% } %>
+
+    <!--preload-links-->
   </head>
   <body>
     <%if (VITE_YANDEX_METRIC_ID > 0) { %>
@@ -39,15 +37,13 @@
     <noscript>
       <strong>We're sorry but website doesn't work properly without JavaScript enabled. Please enable it to continue.</strong>
     </noscript>
-    <div id="app">
-      <div class="loading">Loading...</div>
-    </div>
+    <div id="app"><!--app-html--></div>
     <footer>
       <div class="container">
         %VITE_VERSION%
       </div>
     </footer>
 
-    <script type="module" src="/src/main.js"></script>
+    <script type="module" src="/src/entry-client.js"></script>
   </body>
 </html>

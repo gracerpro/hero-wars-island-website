@@ -12,11 +12,11 @@
               href="https://github.com/gracerpro/hero-wars-island-website"
               target="_blank"
             >
-              https://github.com/gracerpro/hero-wars-island-website </a
+              https://github.com/gracerpro/hero-wars-island-website</a
             ><br />
           </li>
           <li>
-            <a href="/backend-api/">API</a>
+            <a href="/backend-api/index.html">API</a>
           </li>
         </ul>
       </li>
@@ -35,13 +35,15 @@
 </template>
 <script setup>
 import { setMetaInfo } from "@/services/page-meta";
+import { useSSRContext } from "vue";
 import { useI18n } from "vue-i18n";
 
 const { t } = useI18n();
+const ssrContext = import.meta.env.SSR ? useSSRContext() : null;
 
 setMetaInfo({
   title: t("seo.help.title") + " - " + t("common.projectName"),
   description: t("seo.help.description"),
   keywords: t("seo.help.keywords"),
-});
+}, ssrContext);
 </script>

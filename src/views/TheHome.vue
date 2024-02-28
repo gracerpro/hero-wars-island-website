@@ -36,33 +36,37 @@
 import HeroClient from "@/api/HeroClient";
 import { fromCurrentDate } from "@/helpers/formatter";
 import { setMetaInfo } from "@/services/page-meta";
-import { ref, watch } from "vue";
+import { ref, watch, onMounted } from "vue";
 import { useI18n } from "vue-i18n";
 import { createI18nRouteTo } from "@/i18n/translation";
 import { useRoute } from "vue-router";
+import { useSSRContext } from "vue";
 
 const { t, locale } = useI18n();
 const route = useRoute();
+const ssrContext = import.meta.env.SSR ? useSSRContext() : null;
 
 const client = new HeroClient();
 const now = new Date();
 
 const islands = ref([]);
-const islandsLoading = ref(false);
+const islandsLoading = ref(true);
 const errorMessage = ref("");
 
 setMetaInfo({
   title: t("common.projectName"),
   description: t("seo.home.description"),
   keywords: t("seo.home.keywords"),
-});
+}, ssrContext);
 
-watch(
-  () => route.params.locale,
-  () => loadIslands(),
-);
+onMounted(() => {
+  watch(
+    () => route.params.locale,
+    () => loadIslands(),
+  );
 
-loadIslands();
+  loadIslands();
+})
 
 function loadIslands() {
   islandsLoading.value = true;

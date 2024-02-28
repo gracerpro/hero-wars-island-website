@@ -109,7 +109,7 @@ const EVENT_SELECT_NODE = "select-node";
 </script>
 <script setup>
 import UpdateNodeDialog from "./UpdateNodeDialog.vue";
-import ToastMessage, { TYPE_DANGER } from "@/components/ToastMessage.vue";
+import { TYPE_DANGER } from "@/components/ToastMessage.vue";
 import {
   TYPE_START,
   TYPE_TOWN,
@@ -119,7 +119,7 @@ import {
   STATUS_NOT_SURE,
   getStatusName,
 } from "@/api/node";
-import { ref, shallowReactive, computed } from "vue";
+import { ref, shallowReactive, computed, defineAsyncComponent } from "vue";
 import {
   TRANSLATE_X,
   TRANSLATE_Y,
@@ -132,6 +132,10 @@ import {
 import { useI18n } from "vue-i18n";
 
 const { t } = useI18n();
+
+const ToastMessage = import.meta.env.SSR
+  ? null
+  : defineAsyncComponent(() => import("@/components/ToastMessage.vue"));
 
 const SIDE = 50;
 const HALF_SIDE = SIDE / 2;

@@ -6,8 +6,9 @@
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
     <link rel="icon" href="/favicon.svg" type="image/svg+xml">
     <title>Backend API for Adventure Island - Hero Wars Dominion Era</title>
-    <meta name="description" content="This API help to upgrade the Adventure Island - Hero Wars Dominion Era"></meta>
-    <meta name="keywords" content="backend, api, adventure, island, hero wars dominion era"></meta>
+    <meta name="description" content="This API help to upgrade the Adventure Island - Hero Wars Dominion Era">
+    <meta name="keywords" content="backend, api, adventure, island, hero wars dominion era">
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/5.11.7/swagger-ui.min.css">
   </head>
   <body>
     <noscript>
@@ -19,5 +20,33 @@
     <div id="swagger-ui">
       <div class="loading">Loading...</div>
     </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/5.11.7/swagger-ui-bundle.min.js"></script>
+    <script>
+      // TODO: 5.11.7 => @latest
+
+      window.onload = function () {
+        const DisableTryItOutPlugin = function () {
+          return {
+            statePlugins: {
+              spec: {
+                wrapSelectors: {
+                  allowTryItOutFor: () => () => false,
+                },
+              },
+            },
+          };
+        }
+
+        const ui = SwaggerUIBundle({
+          url: "/backend-api/swagger.json",
+          dom_id: "#swagger-ui",
+          deepLinking: true,
+          tryItOutEnabled: false, // this is not hide "Try it out" button
+          supportedSubmitMethods: [], // but this hide "Try it out" button
+          plugins: [DisableTryItOutPlugin],
+        });
+      }
+    </script>
   </body>
 </html>

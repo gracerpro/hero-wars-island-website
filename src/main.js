@@ -1,27 +1,43 @@
-import { createApp } from "vue";
+import { createSSRApp } from "vue";
 import App from "./App.vue";
-import router from "./router";
-import store from "./store";
+import { createRouter } from "./router";
+import store from "./store/index.js";
 import "bootstrap/dist/css/bootstrap.min.css";
-import * as Sentry from "@sentry/vue";
-import i18n from "@/i18n";
+import { createI18n } from "@/i18n";
 
-const app = createApp(App);
+export default function createApp() {
+  const app = createSSRApp(App);
+  const router = createRouter();
+  const i18n = createI18n();
 
-if (import.meta.env.VITE_USE_SENTRY > 0) {
+  if (!import.meta.env.SSR && import.meta.env.VITE_USE_SENTRY > 0) {
+    initSentry(app, router);
+  }
+
+  app.use(store).use(router).use(i18n);
+
+  return {
+    app,
+    router
+  }
+}
+
+async function initSentry(app, router) {
+  const Sentry = await import("@sentry/vue");
+
   Sentry.init({
     app,
     dsn: "https://e6453d231e745bf943c79277ccdc8890@o514031.ingest.sentry.io/4506580248297472",
     integrations: [
-      new Sentry.BrowserTracing({
-        // Set 'tracePropagationTargets' to control for which URLs distributed tracing should be enabled
-        tracePropagationTargets: [import.meta.env.VITE_BACKEND_API_URL],
-      }),
-      new Sentry.Replay({
-        maskAllText: false,
-        blockAllMedia: false,
+      Sentry.browserTracingIntegration({router}),
+      Sentry.replayIntegration({
+        maskAllText: true,
+        blockAllMedia: true,
       }),
     ],
+    // Set 'tracePropagationTargets' to control for which URLs distributed tracing should be enabled
+    tracePropagationTargets: ["localhost", import.meta.env.VITE_BACKEND_API_URL],
+
     // Performance Monitoring
     tracesSampleRate: 1.0, //  Capture 100% of the transactions
     // Session Replay
@@ -37,5 +53,3 @@ For example default locale is "en", route is "/ru", problem:
 
 Make a messages loading before setup component
 */
-
-app.use(store).use(router).use(i18n).mount("#app");
