@@ -5,6 +5,10 @@ import createApp from './main'
 export async function render(url, ssrManifest) {
   const { app, router } = createApp()
 
+  await router.push(url);
+  await router.isReady();
+
+  let statusCode = 200;
   // passing SSR context object which will be available via useSSRContext()
   // @vitejs/plugin-vue injects code into a component's setup() that registers
   // itself on ctx.modules. After the render, ctx.modules would contain all the
@@ -12,11 +16,6 @@ export async function render(url, ssrManifest) {
   const context = {
     url
   };
-
-  await router.push(url);
-  await router.isReady();
-
-  let statusCode = 200;
 
   if (!router.currentRoute || router.currentRoute.value.name === "page-not-found") {
     statusCode = 404;
@@ -49,6 +48,7 @@ export async function render(url, ssrManifest) {
 function renderPreloadLinks(modules, manifest) {
   let links = ''
   const seen = new Set()
+
   modules.forEach((id) => {
     const files = manifest[id]
     if (files) {
@@ -67,6 +67,7 @@ function renderPreloadLinks(modules, manifest) {
       })
     }
   })
+
   return links
 }
 

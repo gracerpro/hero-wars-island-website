@@ -11,8 +11,8 @@ import routes from "./routes";
 export function createRouter() {
   const router = _createRouter({
     history: import.meta.env.SSR
-      ? createMemoryHistory(import.meta.env.BASE_URL)
-      : createWebHistory(import.meta.env.BASE_URL),
+      ? createMemoryHistory(import.meta.env.VITE_BASE_URL)
+      : createWebHistory(import.meta.env.VITE_BASE_URL),
     routes,
     linkActiveClass: "active",
     linkExactActiveClass: "",

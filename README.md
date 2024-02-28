@@ -29,6 +29,7 @@ Add to `/etc/hosts` file on host computer this text
 
 ```
 127.0.0.1 hero-wars.vyacheslaff.local
+127.0.0.1 prod-hero-wars.vyacheslaff.local
 ```
 
 [Install docker](https://docs.docker.com/engine/install/)
