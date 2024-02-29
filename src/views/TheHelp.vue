@@ -16,7 +16,7 @@
             ><br />
           </li>
           <li>
-            <a href="/backend-api/index.html">API</a>
+            <a :href="'/backend-api/index.html' + (currentLocale ? `?locale=${currentLocale}` : '')">API</a>
           </li>
         </ul>
       </li>
@@ -34,12 +34,19 @@
   </div>
 </template>
 <script setup>
+import { getCurrentLocale, isShowLocaleInRoute } from "@/i18n/translation";
 import { setMetaInfo } from "@/services/page-meta";
+import { computed } from "vue";
 import { useSSRContext } from "vue";
 import { useI18n } from "vue-i18n";
 
 const { t } = useI18n();
 const ssrContext = import.meta.env.SSR ? useSSRContext() : null;
+const currentLocale = computed(() => {
+  const locale = getCurrentLocale();
+
+  return isShowLocaleInRoute(locale) ? locale : '';
+});
 
 setMetaInfo({
   title: t("seo.help.title") + " - " + t("common.projectName"),
