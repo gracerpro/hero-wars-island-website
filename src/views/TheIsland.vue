@@ -19,6 +19,7 @@
     </div>
     <div v-else>
       <island-map :island="currentIsland" parent-page-id="islandPage" />
+      <div>{{ islandDescription }}</div>
     </div>
   </div>
 </template>
@@ -42,6 +43,7 @@ const islandLoading = ref(true);
 const errorMessage = ref("");
 
 const islandName = computed(() => currentIsland.value?.name);
+const islandDescription = computed(() => currentIsland.value?.description);
 
 const islandId = parseInt(route.params.id);
 
