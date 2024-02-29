@@ -42,7 +42,13 @@ export async function render(url, ssrManifest) {
     }
   }
 
-  return { html, preloadLinks, page, statusCode }
+  return {
+    html,
+    preloadLinks,
+    page,
+    statusCode,
+    state: context.state
+  }
 }
 
 function renderPreloadLinks(modules, manifest) {

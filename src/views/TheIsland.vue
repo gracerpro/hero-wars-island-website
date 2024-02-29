@@ -1,5 +1,7 @@
 <template>
   <div class="container">
+    <h1>{{ islandName }}</h1>
+
     <island-map-loading v-if="islandLoading" />
     <div v-else-if="errorMessage" class="alert alert-danger mt-3">
       {{ errorMessage }}
@@ -16,7 +18,6 @@
       </div>
     </div>
     <div v-else>
-      <h1>{{ currentIsland.name }}</h1>
       <island-map :island="currentIsland" parent-page-id="islandPage" />
     </div>
   </div>
@@ -27,27 +28,32 @@ import IslandMap from "./island/IslandMap.vue";
 import IslandMapLoading from "./island/IslandMapLoading.vue";
 import HttpError from "@/exceptions/HttpError";
 import { setMetaInfo } from "@/services/page-meta";
-import { ref, watch, onMounted, onServerPrefetch } from "vue";
+import { ref, watch, onMounted, onServerPrefetch, computed } from "vue";
 import { useRoute } from "vue-router";
 import { useI18n } from "vue-i18n";
 import { useSSRContext } from "vue";
 
 const { t } = useI18n();
+const route = useRoute();
 const ssrContext = import.meta.env.SSR ? useSSRContext() : null;
 
-const route = useRoute();
 const currentIsland = ref(null);
 const islandLoading = ref(true);
 const errorMessage = ref("");
 
-const islandId = parseInt(route.params.id);
+const islandName = computed(() => currentIsland.value?.name);
 
-// TODO: h1 => island.name
-// __INITIAL_STATE__
+const islandId = parseInt(route.params.id);
 
 onServerPrefetch(async () => {
   const island = await loadIsland(islandId);
   setPageInfo(island);
+
+  ssrContext.state = {
+    island: {
+      name: island?.name,
+    }
+  }
 });
 
 onMounted(() => {
