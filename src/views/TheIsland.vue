@@ -47,24 +47,7 @@ const islandId = parseInt(route.params.id);
 
 onServerPrefetch(async () => {
   const island = await loadIsland(islandId);
-
-  if (island) {
-    setMetaInfo({
-        title: island.name + " - " + t("common.projectName"),
-        description: t("seo.island.description") + " " + island.name,
-        keywords: t("seo.island.keywords") + ", " + island.name,
-      },
-      ssrContext
-    );
-  } else {
-    setMetaInfo({
-        title: t("common.islandMap"),
-        description: t("seo.island.description"),
-        keywords: t("seo.island.keywords"),
-      },
-      ssrContext
-    );
-  }
+  setPageInfo(island);
 });
 
 onMounted(() => {
@@ -85,8 +68,28 @@ onMounted(() => {
     },
   );
 
-  loadIsland(islandId);
+  loadIsland(islandId).then((island) => setPageInfo(island));
 })
+
+function setPageInfo(island) {
+  if (island) {
+    setMetaInfo({
+        title: island.name + " - " + t("common.projectName"),
+        description: t("seo.island.description") + " " + island.name,
+        keywords: t("seo.island.keywords") + ", " + island.name,
+      },
+      ssrContext
+    );
+  } else {
+    setMetaInfo({
+        title: t("common.islandMap"),
+        description: t("seo.island.description"),
+        keywords: t("seo.island.keywords"),
+      },
+      ssrContext
+    );
+  }
+}
 
 /**
  * @param {String} sourceId
