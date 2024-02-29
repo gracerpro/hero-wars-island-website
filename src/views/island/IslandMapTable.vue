@@ -1,31 +1,33 @@
 <template>
-  <table class="table table-striped table-hover table-sm mt-3">
-    <thead>
-      <tr>
-        <th></th>
-        <th>{{ t("common.resource") }}</th>
-        <th>{{ t("common.quantity") }}</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr v-if="!items.length">
-        <td colspan="3">{{ t("common.noData") }}</td>
-      </tr>
-      <tr v-else v-for="item in items" :key="item.uniqueId">
-        <td>
-          <img
-            v-if="item.item.iconUrl"
-            :src="item.item.iconUrl"
-            :width="item.item.iconWidth"
-            :height="item.item.iconHeight"
-            class="icon"
-          />
-        </td>
-        <td>{{ getItemName(item) }}</td>
-        <td class="text-end">{{ item.humanQuantity }}</td>
-      </tr>
-    </tbody>
-  </table>
+  <div class="heightable">
+    <table class="table table-striped table-hover table-sm mt-3">
+      <thead>
+        <tr>
+          <th></th>
+          <th>{{ t("common.resource") }}</th>
+          <th>{{ t("common.quantity") }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-if="!items.length">
+          <td colspan="3">{{ t("common.noData") }}</td>
+        </tr>
+        <tr v-else v-for="item in items" :key="item.uniqueId">
+          <td>
+            <img
+              v-if="item.item.iconUrl"
+              :src="item.item.iconUrl"
+              :width="item.item.iconWidth"
+              :height="item.item.iconHeight"
+              class="icon"
+            />
+          </td>
+          <td>{{ getItemName(item) }}</td>
+          <td class="text-end">{{ item.humanQuantity }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
 </template>
 <script setup>
 import { useI18n } from "vue-i18n";
@@ -43,5 +45,9 @@ const getItemName = (item) => {
 .icon {
   width: 24px;
   height: 24px;
+}
+.heightable {
+  max-height: 90vh;
+  overflow: auto;
 }
 </style>

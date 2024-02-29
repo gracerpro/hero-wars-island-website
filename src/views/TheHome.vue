@@ -6,7 +6,6 @@
     </h1>
     <p v-html="t('page.home.firstParagraph')"></p>
 
-    <h3>{{ t("common.island", 2) }}</h3>
     <div v-if="islandsLoading">
       <span class="placeholder col-4"></span><br />
       <span class="placeholder col-4"></span><br />

@@ -22,7 +22,6 @@
     "quantity": "Quantity",
     "internalError": "An internal error has occurred.",
     "internalServerError": "An internal server error has occurred",
-    "island": "Island | Islands",
     "islandMap": "Island's map",
     "loadingFailDeveloperShow": "Loading failed. The developers see the problem and will fix it soon.",
     "map": "Map",
