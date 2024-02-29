@@ -1,3 +1,5 @@
+import { createI18nRouteTo, guessDefaultLocale } from "@/i18n/translation";
+
 export default [
   {
     path: "/:locale?",
@@ -29,6 +31,11 @@ export default [
         name: "help",
         component: () => import("../views/TheHelp.vue"),
       },
+      {
+        path: "page-not-found",
+        name: "page-not-found",
+        component: () => import("../views/status-pages/ThePageNotFound.vue"),
+      },
     ],
   },
   {
@@ -37,14 +44,12 @@ export default [
     component: () => import("../views/status-pages/TheInternalServerError.vue"),
   },
   {
-    path: "/page-not-found",
-    name: "page-not-found",
-    component: () => import("../views/status-pages/ThePageNotFound.vue"),
-  },
-  {
     path: "/:catchAll(.*)",
     redirect: (to) => {
-      return { path: "/page-not-found", query: { returnUrl: to.path } };
+      return createI18nRouteTo(
+        { name: "page-not-found", query: { returnUrl: to.path } },
+        guessDefaultLocale()
+      )
     },
   },
 ];

@@ -52,10 +52,11 @@ export function getCurrentLocale() {
 
 /**
  * @param {Object} to
+ * @param {String} locale
  * @returns {Object}
  */
-export function createI18nRouteTo(to) {
-  const locale = getCurrentLocale();
+export function createI18nRouteTo(to, locale = null) {
+  locale = locale ? locale : getCurrentLocale();
 
   if (!isShowLocaleInRoute(locale)) {
     return to;

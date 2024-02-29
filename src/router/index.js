@@ -5,6 +5,7 @@ import {
   isSupportLocale,
   setLanguage,
   isShowLocaleInRoute,
+  createI18nRouteTo,
 } from "@/i18n/translation";
 import routes from "./routes";
 
@@ -32,12 +33,14 @@ function addBeforeEach(router) {
       return next(newTo);
     }
 
-    // TODO: add locale to NotFoundPage
     const paramsLocale = to.params.locale;
     if (paramsLocale) {
       if (!isSupportLocale(paramsLocale)) {
         if (paramsLocale !== "page-not-found") {
-          return next({ path: "/page-not-found", query: { returnUrl: to.path } });
+          return next(createI18nRouteTo(
+            { name: "page-not-found", query: { returnUrl: to.path } },
+            guessDefaultLocale()
+          ));
         }
       } else if (paramsLocale !== getCurrentLocale()) {
         await setLanguage(paramsLocale);

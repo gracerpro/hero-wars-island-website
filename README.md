@@ -45,7 +45,7 @@ git clone git@github.com:gracerpro/hero-wars-island-website.git
 Copy `docker-compose.dist.yml` into `docker-compose.yml` and configure it. Change a port 8082 etc.
 
 Configre an environments by `.env` file.
-TODO: for variable VITE_BACKEND_API_URL need backend server, mock all client methods.
+For variable VITE_BACKEND_API_URL need backend server, mock all client methods.
 
 Up the docker containers
 
