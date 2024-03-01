@@ -36,9 +36,10 @@
           <island-map-filter
             v-model:item-name="filter.itemName"
             v-model:type-id="filter.typeId"
+            v-model:is-node-type-tower="filter.isNodeTypeTower"
+            v-model:is-node-type-chest="filter.isNodeTypeChest"
             :min-chars-count="minCharsCount"
           />
-          <island-map-table :items="visibleItems" />
         </div>
         <div class="col-lg-6">
           <div class="mb-2">
@@ -62,7 +63,13 @@
               {{ t("common.reset") }}
             </button>
           </div>
-          <div class="form-text fw-normal">&nbsp;</div>
+        </div>
+      </div>
+      <div class="row mt-3">
+        <div class="col-lg-6">
+          <island-map-table :items="visibleItems" />
+        </div>
+        <div class="col-lg-6">
           <island-map-table :items="userItems" />
         </div>
       </div>
@@ -82,6 +89,7 @@ import { getHumanQunatity } from "@/helpers/formatter";
 import { useI18n } from "vue-i18n";
 import { createI18nRouteTo } from "@/i18n/translation";
 import { fullscreenElement } from "@/core/fullscreen";
+import { TYPE_CHEST, TYPE_TOWN } from "@/api/node";
 
 const { t } = useI18n();
 
@@ -110,6 +118,8 @@ const isShowNoModerate = ref(true);
 const filter = shallowReactive({
   itemName: "",
   typeId: null,
+  isNodeTypeTower: false,
+  isNodeTypeChest: false,
 });
 const mapContainer = ref(null);
 
@@ -134,14 +144,23 @@ const visibleItems = computed(() => {
       (item) => item.item.typeId === filter.typeId,
     );
   }
+  if (filter.isNodeTypeChest && filter.isNodeTypeTower) {
+    resultItems = resultItems.filter((item) => {
+      return item.node.typeId === TYPE_CHEST || item.node.typeId === TYPE_TOWN
+    });
+  } else if (filter.isNodeTypeChest) {
+    resultItems = resultItems.filter((item) => item.node.typeId === TYPE_CHEST);
+  } else if (filter.isNodeTypeTower) {
+    resultItems = resultItems.filter((item) => item.node.typeId === TYPE_TOWN);
+  }
 
   return resultItems;
-});
+})
 const userItems = computed(() => {
   return items.value.filter((item) => {
     return userNodes.value[item.node.id] !== undefined;
   });
-});
+})
 const userNodesCount = computed(() => Object.keys(userNodes.value).length);
 
 onMounted(() => {
@@ -302,6 +321,12 @@ function loadState() {
   if (!state.filter.typeId) {
     state.filter.typeId = null;
   }
+  if (typeof state.filter.isNodeTypeChest !== "boolean") {
+    state.filter.isNodeTypeChest = false;
+  }
+  if (typeof state.filter.isNodeTypeTower !== "boolean") {
+    state.filter.isNodeTypeTower = false;
+  }
   if (!state.userNodesIds || typeof state.userNodesIds !== "object") {
     state.userNodesIds = {};
   }
@@ -317,6 +342,8 @@ function loadState() {
   translateY.value = state.translateY;
   filter.itemName = state.filter.itemName;
   filter.typeId = state.filter.typeId;
+  filter.isNodeTypeChest = state.filter.isNodeTypeChest;
+  filter.isNodeTypeTower = state.filter.isNodeTypeTower;
   isOnlyImage.value = state.isOnlyImage;
   isShowNoModerate.value = state.isShowNoModerate;
 

@@ -1,6 +1,6 @@
 <template>
   <div class="heightable">
-    <table class="table table-striped table-hover table-sm mt-3">
+    <table class="table table-striped table-hover table-sm">
       <thead>
         <tr>
           <th></th>
