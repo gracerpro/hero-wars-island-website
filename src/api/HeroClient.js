@@ -12,10 +12,16 @@ export default class HeroClient {
 
   /**
    * @param {Number} id
+   * @param {Boolean} isWithDescription
    * @returns {Promise<Object|null>}
    */
-  async getIsland(id) {
-    let island = await this._apiRequest.get("/islands/" + id);
+  async getIsland(id, isWithDescription) {
+    let params = undefined;
+
+    if (isWithDescription) {
+      params = {isWithDescription: isWithDescription ? 1 : 0};
+    }
+    const island = await this._apiRequest.get("/islands/" + id, params);
 
     if (island) {
       this.modifyIsland(island);
@@ -25,10 +31,16 @@ export default class HeroClient {
   }
 
   /**
+   * @param {Boolean} isWithDescription 
    * @returns {Promise<Object|null>}
    */
-  async getActualIsland() {
-    let island = await this._apiRequest.get("/islands/actual");
+  async getActualIsland(isWithDescription) {
+    let params = undefined;
+
+    if (isWithDescription) {
+      params = {isWithDescription: isWithDescription ? 1 : 0};
+    }
+    let island = await this._apiRequest.get("/islands/actual", params);
 
     if (island) {
       this.modifyIsland(island);

@@ -19,8 +19,10 @@
     </div>
     <div v-else>
       <island-map :island="currentIsland" parent-page-id="islandPage" />
-      <div>{{ islandDescription }}</div>
     </div>
+
+    <hr>
+    <div v-html="islandDescription"></div>
   </div>
 </template>
 <script setup>
@@ -54,6 +56,7 @@ onServerPrefetch(async () => {
   ssrContext.state = {
     island: {
       name: island?.name,
+      description: island?.description
     }
   }
 });
@@ -123,7 +126,8 @@ async function loadIsland(id) {
   currentIsland.value = null;
   islandLoading.value = true;
   try {
-    currentIsland.value = await client.getIsland(id);
+    const isWithDescription = true;
+    currentIsland.value = await client.getIsland(id, isWithDescription);
   } catch (error) {
     console.log(error);
     if (error instanceof HttpError && error.statusCode === 404) {
