@@ -54,13 +54,6 @@ const islandId = parseInt(route.params.id);
 onServerPrefetch(async () => {
   const island = await loadIsland(islandId);
   setPageInfo(island);
-
-  ssrContext.state = {
-    island: {
-      name: island?.name,
-      description: island?.description
-    }
-  }
 });
 
 onMounted(() => {
