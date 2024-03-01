@@ -14,15 +14,15 @@
     >
       <line
         x1="0"
-        y1="-9999"
+        :y1="-SIDE"
         x2="0"
-        y2="9999"
+        :y2="SIDE"
         style="stroke: black; stroke-width: 1"
       />
       <line
-        x1="-9999"
+        :x1="-SIDE"
         y1="0"
-        x2="9999"
+        :x2="SIDE"
         y2="0"
         style="stroke: black; stroke-width: 1"
       />

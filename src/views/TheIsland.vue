@@ -76,7 +76,9 @@ onMounted(() => {
   watch(
     () => route.params.locale,
     () => {
-      loadIsland(currentIsland.value.id);
+      if (currentIsland.value) {
+        loadIsland(currentIsland.value.id);
+      }
       // TODO: loading_start >change< loading_end
     },
   );
