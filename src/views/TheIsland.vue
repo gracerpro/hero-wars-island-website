@@ -21,8 +21,10 @@
       <island-map :island="currentIsland" parent-page-id="islandPage" />
     </div>
 
-    <hr>
-    <div v-html="islandDescription"></div>
+    <div v-if="islandDescription">
+      <hr>
+      <div v-html="islandDescription"></div>
+    </div>
   </div>
 </template>
 <script setup>
