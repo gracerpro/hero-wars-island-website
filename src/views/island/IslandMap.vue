@@ -24,7 +24,7 @@
         :is-show-no-moderate="isShowNoModerate"
         :items="visibleItems"
         :input-nodes="nodes"
-        :user-nodes="userNodes"
+        :user-nodes-map="userNodesMap"
         @change-translate="onChangeTranslate"
         @change-scale="onChangeScale"
         @change-node="onChangeNode"
@@ -90,6 +90,7 @@ import { useI18n } from "vue-i18n";
 import { createI18nRouteTo } from "@/i18n/translation";
 import { fullscreenElement } from "@/core/fullscreen";
 import { TYPE_CHEST, TYPE_TOWN } from "@/api/node";
+import { isObject } from "@/helpers/core";
 
 const { t } = useI18n();
 
@@ -97,7 +98,7 @@ const MAX_SCALE = 4;
 const MIN_SCALE = 0.3;
 
 const client = new HeroClient();
-let userNodesIds = {};
+let userNodesIdsByIslandId = {};
 
 const props = defineProps({
   island: { type: Object, required: true },
@@ -109,7 +110,7 @@ const calculatingItems = ref(false);
 const errorMessage = ref("");
 const nodes = ref([]);
 const items = ref([]);
-const userNodes = ref({});
+const userNodesMap = ref({});
 const scale = ref(1);
 const translateX = ref(0);
 const translateY = ref(0);
@@ -158,16 +159,17 @@ const visibleItems = computed(() => {
 })
 const userItems = computed(() => {
   return items.value.filter((item) => {
-    return userNodes.value[item.node.id] !== undefined;
+    return userNodesMap.value[item.node.id] !== undefined;
   });
 })
-const userNodesCount = computed(() => Object.keys(userNodes.value).length);
+const userNodesCount = computed(() => Object.keys(userNodesMap.value).length);
 
 onMounted(() => {
   loadNodes().then((responseNodes) => {
     nodes.value = responseNodes;
     items.value = calculateItems(responseNodes);
-    userNodes.value = initUserNodes(responseNodes);
+    userNodesMap.value = initUserNodes(responseNodes);
+    console.log(userNodesMap.value);
   });
 });
 onUnmounted(() => {
@@ -193,24 +195,26 @@ async function loadNodes() {
 
   return nodes;
 }
+
 /**
  * @param {Object} nodes
  */
 function initUserNodes(nodes) {
-  let resultNodes = {};
-  const ids = userNodesIds[props.island.id]
-    ? userNodesIds[props.island.id]
+  let resultNodesMap = {};
+  const ids = userNodesIdsByIslandId[props.island.id]
+    ? userNodesIdsByIslandId[props.island.id]
     : [];
 
   ids.forEach((id) => {
     const node = nodes[id];
     if (node && canSelectNode(node)) {
-      resultNodes[id] = node;
+      resultNodesMap[id] = node;
     }
   });
 
-  return resultNodes;
+  return resultNodesMap;
 }
+
 /**
  * @param {Array} nodes
  */
@@ -282,15 +286,15 @@ const onChangeNode = (node) => {
 };
 const onSelectNode = (id, isRemove) => {
   if (isRemove) {
-    delete userNodes.value[id];
+    delete userNodesMap.value[id];
   } else {
     if (!nodes.value[id]) {
       throw new Error(t("page.island.notFoundNodeAdmin"));
     }
-    userNodes.value[id] = nodes.value[id];
+    userNodesMap.value[id] = nodes.value[id];
   }
 };
-const onResetUserNodes = () => (userNodes.value = {});
+const onResetUserNodes = () => (userNodesMap.value = {});
 
 const onFullscreen = () => {
   fullscreenElement(mapContainer.value.canvas);
@@ -327,8 +331,8 @@ function loadState() {
   if (typeof state.filter.isNodeTypeTower !== "boolean") {
     state.filter.isNodeTypeTower = false;
   }
-  if (!state.userNodesIds || typeof state.userNodesIds !== "object") {
-    state.userNodesIds = {};
+  if (!state.userNodesIdsByIslandId || !isObject(state.userNodesIdsByIslandId)) {
+    state.userNodesIdsByIslandId = {};
   }
   if (!state.isOnlyImage) {
     state.isOnlyImage = false;
@@ -347,13 +351,12 @@ function loadState() {
   isOnlyImage.value = state.isOnlyImage;
   isShowNoModerate.value = state.isShowNoModerate;
 
-  userNodesIds = state.userNodesIds;
+  userNodesIdsByIslandId = state.userNodesIdsByIslandId;
 }
 
 function saveState() {
-  let savedUserNodesIds = userNodesIds;
-
-  savedUserNodesIds[props.island.id] = Object.keys(userNodes.value);
+  const userNodeIds = Object.keys(userNodesMap.value).map((id) => parseInt(id));
+  console.log(props.island.id, userNodeIds);
 
   const state = {
     scale: scale.value,
@@ -362,8 +365,15 @@ function saveState() {
     filter: filter,
     isOnlyImage: isOnlyImage.value,
     isShowNoModerate: isShowNoModerate.value,
-    userNodesIds: savedUserNodesIds,
   };
+  if (userNodeIds.length) {
+    userNodesIdsByIslandId[props.island.id] = userNodeIds;
+  } else if (userNodesIdsByIslandId[props.island.id]) {
+    delete userNodesIdsByIslandId[props.island.id];
+  }
+  state.userNodesIdsByIslandId = userNodesIdsByIslandId;
+  console.log(userNodesIdsByIslandId);
+
   localStorage.setItem(componentId, JSON.stringify(state));
 }
 </script>

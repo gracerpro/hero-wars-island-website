@@ -166,7 +166,7 @@ const props = defineProps({
   isShowNoModerate: { type: Boolean, required: true },
   items: { type: Array, required: true },
   inputNodes: { type: Object, required: true },
-  userNodes: { type: Object, required: true },
+  userNodesMap: { type: Object, required: true },
 });
 defineExpose({
   canvas,
@@ -376,7 +376,7 @@ const onNodeClick = (node) => {
       return;
     }
   } else {
-    const message = canSelectNextNode(nodes.value, props.userNodes, node);
+    const message = canSelectNextNode(nodes.value, props.userNodesMap, node);
     if (message) {
       toast.value.show(message, TYPE_DANGER);
       return;
@@ -464,7 +464,7 @@ const onMountedNodeDialog = () => {
     });
 };
 const isUserNode = (node) => {
-  return props.userNodes[node.id] !== undefined;
+  return props.userNodesMap[node.id] !== undefined;
 };
 const getWarningTitle = (item) => {
   if (
