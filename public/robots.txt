@@ -1,3 +1,6 @@
 User-agent: *
 
+Disallow: /page-not-found
+Disallow: /internal-server-error
+
 Sitemap: http://backend-hero-wars.vyacheslaff.ru/sitemap.xml

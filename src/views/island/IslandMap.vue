@@ -169,7 +169,6 @@ onMounted(() => {
     nodes.value = responseNodes;
     items.value = calculateItems(responseNodes);
     userNodesMap.value = initUserNodes(responseNodes);
-    console.log(userNodesMap.value);
   });
 });
 onUnmounted(() => {
@@ -356,8 +355,6 @@ function loadState() {
 
 function saveState() {
   const userNodeIds = Object.keys(userNodesMap.value).map((id) => parseInt(id));
-  console.log(props.island.id, userNodeIds);
-
   const state = {
     scale: scale.value,
     translateX: translateX.value,
@@ -372,7 +369,6 @@ function saveState() {
     delete userNodesIdsByIslandId[props.island.id];
   }
   state.userNodesIdsByIslandId = userNodesIdsByIslandId;
-  console.log(userNodesIdsByIslandId);
 
   localStorage.setItem(componentId, JSON.stringify(state));
 }
