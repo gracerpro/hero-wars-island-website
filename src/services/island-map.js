@@ -1,4 +1,4 @@
-import { TYPE_START } from "@/api/node";
+import { STATUS_ACCEPTED_SUCCESS, TYPE_START } from "@/api/node";
 import { useI18n } from "@/i18n";
 
 export const TRANSLATE_X = 6;
@@ -70,6 +70,16 @@ export function canSelectNextNode(nodes, selectedNodes, nextNode) {
   }
 
   return result;
+}
+
+/**
+ * @param {Object} node
+ * @returns {Boolean}
+ */
+export function canEditNode(node) {
+  return node.typeId !== TYPE_START &&
+    node.statusId !== STATUS_ACCEPTED_SUCCESS &&
+    (!node?.items.length);
 }
 
 function isNearNode(nextNode, node) {

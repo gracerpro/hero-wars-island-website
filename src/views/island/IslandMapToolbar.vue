@@ -77,6 +77,7 @@
         Im
       </button>
       <button
+        v-if="canEditNodes"
         type="button"
         :title="t('page.island.showEditNodes')"
         :class="[
@@ -111,6 +112,7 @@
 
     <component
       :is="helpDialogComponent"
+      :can-edit-nodes="canEditNodes"
       ref="helpDialog"
       @vue:mounted="onMountedHelpDialog"
     />
@@ -140,6 +142,7 @@ const { t } = useI18n();
 defineProps({
   isOnlyImage: { type: Boolean, required: true },
   isShowNoModerate: { type: Boolean, required: true },
+  canEditNodes: { type: Boolean, default: true },
 });
 
 const emit = defineEmits([

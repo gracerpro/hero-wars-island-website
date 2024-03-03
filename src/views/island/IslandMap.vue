@@ -8,6 +8,7 @@
       <island-map-toolbar
         :is-only-image="isOnlyImage"
         :is-show-no-moderate="isShowNoModerate"
+        :can-edit-nodes="canEditNodes"
         @update:is-only-image="onChangeOnlyImage"
         @update:is-show-no-moderate="onChangeIsShowNoModerate"
         @reset-scale="onResetScale"
@@ -83,7 +84,7 @@ import IslandMapToolbar from "./IslandMapToolbar.vue";
 import IslandMapContainer from "./IslandMapContainer.vue";
 import IslandMapFilter from "./IslandMapFilter.vue";
 import IslandMapTable from "./IslandMapTable.vue";
-import { canSelectNode } from "@/services/island-map";
+import { canEditNode, canSelectNode } from "@/services/island-map";
 import { onMounted, onUnmounted, ref, computed, shallowReactive } from "vue";
 import { getHumanQunatity } from "@/helpers/formatter";
 import { useI18n } from "vue-i18n";
@@ -108,7 +109,7 @@ const props = defineProps({
 const loadingNodes = ref(true);
 const calculatingItems = ref(false);
 const errorMessage = ref("");
-const nodes = ref([]);
+const nodes = ref({});
 const items = ref([]);
 const userNodesMap = ref({});
 const scale = ref(1);
@@ -163,6 +164,16 @@ const userItems = computed(() => {
   });
 })
 const userNodesCount = computed(() => Object.keys(userNodesMap.value).length);
+const canEditNodes = computed(() => {
+  for (const id in nodes.value) {
+    const node = nodes.value[id];
+    if (canEditNode(node)) {
+      return true;
+    }
+  }
+
+  return false;
+});
 
 onMounted(() => {
   loadNodes().then((responseNodes) => {

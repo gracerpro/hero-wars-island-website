@@ -115,7 +115,6 @@ import {
   TYPE_TOWN,
   TYPE_CHEST,
   STATUS_ON_MODERATION,
-  STATUS_ACCEPTED_SUCCESS,
   STATUS_NOT_SURE,
   getStatusName,
 } from "@/api/node";
@@ -128,6 +127,7 @@ import {
   DELTA_SCALE,
   canSelectNode,
   canSelectNextNode,
+  canEditNode,
 } from "@/services/island-map";
 import { useI18n } from "vue-i18n";
 
@@ -205,10 +205,7 @@ const warningNodes = computed(() => {
   for (let id in nodes.value) {
     const node = nodes.value[id];
 
-    if (
-      node.typeId !== TYPE_START &&
-      (!node?.items.length || node.statusId !== STATUS_ACCEPTED_SUCCESS)
-    ) {
+    if (canEditNode(node)) {
       items.push({
         node,
         x: node.x - 0.2 * SIDE,
