@@ -95,7 +95,6 @@
   </div>
 </template>
 <script setup>
-import HeroClient from "@/api/HeroClient";
 import IslandMapLoading from "./IslandMapLoading.vue";
 import IslandMapToolbar from "./IslandMapToolbar.vue";
 import IslandMapContainer from "./IslandMapContainer.vue";
@@ -110,6 +109,7 @@ import { createI18nRouteTo } from "@/i18n/translation";
 import { fullscreenElement } from "@/core/fullscreen";
 import { TYPE_CHEST, TYPE_TOWN } from "@/api/node";
 import { isObject } from "@/helpers/core";
+import { getNodes } from "@/services/api/island-node";
 
 const { t } = useI18n();
 
@@ -118,7 +118,6 @@ const props = defineProps({
   parentPageId: { type: String, required: true },
 });
 
-const client = new HeroClient();
 let userNodesIds = [];
 let byIslandState = {};
 const minCharsCount = 3;
@@ -207,10 +206,7 @@ async function loadNodes() {
 
   loadingNodes.value = true;
   try {
-    const list = await client.getNodes(props.island.id);
-    list.items.forEach((node) => {
-      nodes[node.id] = node;
-    });
+    nodes = await getNodes(props.island);
   } catch (error) {
     errorMessage.value = t("page.island.failNodesLoading");
   } finally {
@@ -224,16 +220,16 @@ async function loadNodes() {
  * @param {Object} nodes
  */
 function initUserNodes(nodes) {
-  let resultNodesMap = {};
+  let nodesMap = {};
 
   userNodesIds.forEach((id) => {
     const node = nodes[id];
     if (node && canSelectNode(node)) {
-      resultNodesMap[id] = node;
+      nodesMap[id] = node;
     }
   });
 
-  return resultNodesMap;
+  return nodesMap;
 }
 
 /**
