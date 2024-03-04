@@ -52,7 +52,9 @@
             {{ t("page.island.myExplorersMoves") }}
           </div>
           <div>
-            <b class="fs-4 me-2 align-middle">{{ userNodesCount }}</b>
+            <span class="fs-4 me-2 align-middle">
+              <b >{{ userNodesCount }}</b> / {{ totalNodesCount }}
+            </span>
             <button
               type="button"
               :class="[
@@ -176,6 +178,7 @@ const userItems = computed(() => {
   });
 })
 const userNodesCount = computed(() => Object.keys(userNodesMap.value).length);
+const totalNodesCount = computed(() => Object.keys(nodes.value).length - 1); // "-1" it means subtract an entry node
 const canEditNodes = computed(() => {
   for (const id in nodes.value) {
     const node = nodes.value[id];
