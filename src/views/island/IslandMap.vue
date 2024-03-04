@@ -99,7 +99,8 @@ const MAX_SCALE = 4;
 const MIN_SCALE = 0.3;
 
 const client = new HeroClient();
-let userNodesIdsByIslandId = {};
+let userNodesIds = [];
+let byIslandState = {};
 
 const props = defineProps({
   island: { type: Object, required: true },
@@ -211,11 +212,8 @@ async function loadNodes() {
  */
 function initUserNodes(nodes) {
   let resultNodesMap = {};
-  const ids = userNodesIdsByIslandId[props.island.id]
-    ? userNodesIdsByIslandId[props.island.id]
-    : [];
 
-  ids.forEach((id) => {
+  userNodesIds.forEach((id) => {
     const node = nodes[id];
     if (node && canSelectNode(node)) {
       resultNodesMap[id] = node;
@@ -321,9 +319,10 @@ function loadState() {
 
   if (!state) {
     state = {
-      scale: 1,
-      translateX: 0,
-      translateY: 0,
+      isOnlyImage: false,
+      isShowNoModerate: true,
+      byIsland: {},
+      filter: {},
     };
   }
   if (!state.filter) {
@@ -341,9 +340,7 @@ function loadState() {
   if (typeof state.filter.isNodeTypeTower !== "boolean") {
     state.filter.isNodeTypeTower = false;
   }
-  if (!state.userNodesIdsByIslandId || !isObject(state.userNodesIdsByIslandId)) {
-    state.userNodesIdsByIslandId = {};
-  }
+
   if (!state.isOnlyImage) {
     state.isOnlyImage = false;
   }
@@ -351,35 +348,35 @@ function loadState() {
     state.isShowNoModerate = true;
   }
 
-  scale.value = state.scale;
-  translateX.value = state.translateX;
-  translateY.value = state.translateY;
-  filter.itemName = state.filter.itemName;
-  filter.typeId = state.filter.typeId;
-  filter.isNodeTypeChest = state.filter.isNodeTypeChest;
-  filter.isNodeTypeTower = state.filter.isNodeTypeTower;
+  if (!state.byIsland || !isObject(state.byIsland)) {
+    state.byIsland = {};
+  }
+  byIslandState = state.byIsland;
+
+  const byIsland = byIslandState[props.island.id] ? byIslandState[props.island.id] : {};
+  scale.value = byIsland.scale !== undefined ? byIsland.scale : 1;
+  translateX.value = byIsland.translateX !== undefined ? byIsland.translateX : 0;
+  translateY.value = byIsland.translateY !== undefined ? byIsland.translateY : 0;
+  userNodesIds = byIsland.userNodesIds ? byIsland.userNodesIds : [];
+
+  filter.value = state.filter;
   isOnlyImage.value = state.isOnlyImage;
   isShowNoModerate.value = state.isShowNoModerate;
-
-  userNodesIdsByIslandId = state.userNodesIdsByIslandId;
 }
 
 function saveState() {
-  const userNodeIds = Object.keys(userNodesMap.value).map((id) => parseInt(id));
   const state = {
-    scale: scale.value,
-    translateX: translateX.value,
-    translateY: translateY.value,
-    filter: filter,
+    filter: filter.value,
     isOnlyImage: isOnlyImage.value,
     isShowNoModerate: isShowNoModerate.value,
   };
-  if (userNodeIds.length) {
-    userNodesIdsByIslandId[props.island.id] = userNodeIds;
-  } else if (userNodesIdsByIslandId[props.island.id]) {
-    delete userNodesIdsByIslandId[props.island.id];
-  }
-  state.userNodesIdsByIslandId = userNodesIdsByIslandId;
+  byIslandState[props.island.id] = {
+    userNodesIds: Object.keys(userNodesMap.value).map((id) => parseInt(id)),
+    scale: scale.value,
+    translateX: translateX.value,
+    translateY: translateY.value,
+  };
+  state.byIsland = byIslandState;
 
   localStorage.setItem(componentId, JSON.stringify(state));
 }
