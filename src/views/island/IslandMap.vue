@@ -74,6 +74,15 @@
           <island-map-table :items="userItems" />
         </div>
       </div>
+      <div class="row">
+        <div class="col-lg-6">
+          <h3>{{ t("common.groupData") }}</h3>
+          <a href="#" @click.prevent="isShowGroupItems = !isShowGroupItems">
+            {{ t(isShowGroupItems ? 'common.hide' : 'common.show') }}
+          </a>
+          <island-map-group-items v-if="isShowGroupItems" :items="items" />
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -84,6 +93,7 @@ import IslandMapToolbar from "./IslandMapToolbar.vue";
 import IslandMapContainer from "./IslandMapContainer.vue";
 import IslandMapFilter from "./IslandMapFilter.vue";
 import IslandMapTable from "./IslandMapTable.vue";
+import IslandMapGroupItems from "./IslandMapGroupItems.vue";
 import { canEditNode, canSelectNode } from "@/services/island-map";
 import { onMounted, onUnmounted, ref, computed, shallowReactive } from "vue";
 import { getHumanQunatity } from "@/helpers/formatter";
@@ -118,6 +128,7 @@ const translateX = ref(0);
 const translateY = ref(0);
 const isOnlyImage = ref(false);
 const isShowNoModerate = ref(true);
+const isShowGroupItems = ref(false);
 const filter = shallowReactive({
   itemName: "",
   typeId: null,
@@ -174,7 +185,7 @@ const canEditNodes = computed(() => {
   }
 
   return false;
-});
+})
 
 onMounted(() => {
   loadNodes().then((responseNodes) => {
