@@ -20,8 +20,8 @@ export default function createApp() {
   return {
     app,
     router,
-    store
-  }
+    store,
+  };
 }
 
 async function initSentry(app, router) {
@@ -31,7 +31,7 @@ async function initSentry(app, router) {
     app,
     dsn: "https://e6453d231e745bf943c79277ccdc8890@o514031.ingest.sentry.io/4506580248297472",
     integrations: [
-      Sentry.browserTracingIntegration({router}),
+      Sentry.browserTracingIntegration({ router }),
       Sentry.replayIntegration({
         maskAllText: true,
         blockAllMedia: true,

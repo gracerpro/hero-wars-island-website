@@ -19,7 +19,9 @@
         t("page.about.coolHelpProjectLink")
       }}</router-link>
     </p>
-    <p :title="t('common.version')"><span class="badge text-bg-info">{{ version }}</span></p>
+    <p :title="t('common.version')">
+      <span class="badge text-bg-info">{{ version }}</span>
+    </p>
   </div>
 </template>
 <script setup>
@@ -32,9 +34,12 @@ const { t } = useI18n();
 const ssrContext = import.meta.env.SSR ? useSSRContext() : null;
 const version = import.meta.env.VITE_VERSION;
 
-setMetaInfo({
-  title: t("seo.about.title") + " - " + t("common.projectName"),
-  description: t("seo.about.description"),
-  keywords: t("seo.about.keywords"),
-}, ssrContext);
+setMetaInfo(
+  {
+    title: t("seo.about.title") + " - " + t("common.projectName"),
+    description: t("seo.about.description"),
+    keywords: t("seo.about.keywords"),
+  },
+  ssrContext
+);
 </script>

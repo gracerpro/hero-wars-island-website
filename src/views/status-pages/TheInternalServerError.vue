@@ -15,9 +15,12 @@ const { t } = useI18n();
 const title = t("common.internalServerError");
 const ssrContext = import.meta.env.SSR ? useSSRContext() : null;
 
-setMetaInfo({
-  title,
-  description: title,
-  keywords: `500, ${title}`,
-}, ssrContext);
+setMetaInfo(
+  {
+    title,
+    description: title,
+    keywords: `500, ${title}`,
+  },
+  ssrContext
+);
 </script>

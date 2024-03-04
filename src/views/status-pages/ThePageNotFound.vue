@@ -16,9 +16,12 @@ const { t } = useI18n();
 const title = t("common.pageNotFound");
 const ssrContext = import.meta.env.SSR ? useSSRContext() : null;
 
-setMetaInfo({
-  title,
-  description: title,
-  keywords: `404, ${title}`,
-}, ssrContext);
+setMetaInfo(
+  {
+    title,
+    description: title,
+    keywords: `404, ${title}`,
+  },
+  ssrContext
+);
 </script>

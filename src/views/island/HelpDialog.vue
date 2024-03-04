@@ -14,12 +14,8 @@
       </p>
       <h4>{{ t("common.node", 2) }}</h4>
       <ul class="list-unstyled">
-        <li>
-          <span class="node-box node-start"></span>{{ t("common.startNode") }}
-        </li>
-        <li>
-          <span class="node-box node"></span>{{ t("page.island.oneResource") }}
-        </li>
+        <li><span class="node-box node-start"></span>{{ t("common.startNode") }}</li>
+        <li><span class="node-box node"></span>{{ t("page.island.oneResource") }}</li>
         <li><span class="node-box node-town"></span>{{ t("common.tower") }}</li>
         <li><span class="node-box node-chest"></span>{{ t("common.chest") }}</li>
       </ul>

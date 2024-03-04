@@ -1,7 +1,10 @@
 <template>
   <div>
     <island-map-loading v-if="loading" />
-    <div v-else-if="errorMessage" class="alert alert-danger">
+    <div
+      v-else-if="errorMessage"
+      class="alert alert-danger"
+    >
       {{ errorMessage }}
     </div>
     <div v-else>
@@ -53,14 +56,11 @@
           </div>
           <div>
             <span class="fs-4 me-2 align-middle">
-              <b >{{ userNodesCount }}</b> / {{ totalNodesCount }}
+              <b>{{ userNodesCount }}</b> / {{ totalNodesCount }}
             </span>
             <button
               type="button"
-              :class="[
-                'btn btn-secondary align-middle',
-                userNodesCount > 0 ? '' : 'disabled',
-              ]"
+              :class="['btn btn-secondary align-middle', userNodesCount > 0 ? '' : 'disabled']"
               @click="onResetUserNodes"
             >
               {{ t("common.reset") }}
@@ -78,11 +78,17 @@
       </div>
       <div class="row">
         <div class="col-lg-6">
-          <h3>{{ t("common.groupData") }}</h3>
-          <a href="#" @click.prevent="isShowGroupItems = !isShowGroupItems">
-            {{ t(isShowGroupItems ? 'common.hide' : 'common.show') }}
+          <h3 class="mt-2">{{ t("common.groupData") }}</h3>
+          <a
+            href="#"
+            @click.prevent="isShowGroupItems = !isShowGroupItems"
+          >
+            {{ t(isShowGroupItems ? "common.hide" : "common.show") }}
           </a>
-          <island-map-group-items v-if="isShowGroupItems" :items="items" />
+          <island-map-group-items
+            v-if="isShowGroupItems"
+            :items="items"
+          />
         </div>
       </div>
     </div>
@@ -107,17 +113,16 @@ import { isObject } from "@/helpers/core";
 
 const { t } = useI18n();
 
-const MAX_SCALE = 4;
-const MIN_SCALE = 0.3;
-
-const client = new HeroClient();
-let userNodesIds = [];
-let byIslandState = {};
-
 const props = defineProps({
   island: { type: Object, required: true },
   parentPageId: { type: String, required: true },
 });
+
+const client = new HeroClient();
+let userNodesIds = [];
+let byIslandState = {};
+const minCharsCount = 3;
+const componentId = props.parentPageId + "__map";
 
 const loadingNodes = ref(true);
 const calculatingItems = ref(false);
@@ -139,8 +144,6 @@ const filter = shallowReactive({
 });
 const mapContainer = ref(null);
 
-const minCharsCount = 3;
-const componentId = props.parentPageId + "__map";
 const loading = computed(() => loadingNodes.value || calculatingItems.value);
 const visibleItems = computed(() => {
   let resultItems = items.value;
@@ -150,19 +153,15 @@ const visibleItems = computed(() => {
       if (!item.item.name) {
         return false;
       }
-      return item.item.name
-        .toLowerCase()
-        .includes(filter.itemName.toLowerCase());
+      return item.item.name.toLowerCase().includes(filter.itemName.toLowerCase());
     });
   }
   if (filter.typeId > 0) {
-    resultItems = resultItems.filter(
-      (item) => item.item.typeId === filter.typeId,
-    );
+    resultItems = resultItems.filter((item) => item.item.typeId === filter.typeId);
   }
   if (filter.isNodeTypeChest && filter.isNodeTypeTower) {
     resultItems = resultItems.filter((item) => {
-      return item.node.typeId === TYPE_CHEST || item.node.typeId === TYPE_TOWN
+      return item.node.typeId === TYPE_CHEST || item.node.typeId === TYPE_TOWN;
     });
   } else if (filter.isNodeTypeChest) {
     resultItems = resultItems.filter((item) => item.node.typeId === TYPE_CHEST);
@@ -171,12 +170,12 @@ const visibleItems = computed(() => {
   }
 
   return resultItems;
-})
+});
 const userItems = computed(() => {
   return items.value.filter((item) => {
     return userNodesMap.value[item.node.id] !== undefined;
   });
-})
+});
 const userNodesCount = computed(() => Object.keys(userNodesMap.value).length);
 const totalNodesCount = computed(() => Object.keys(nodes.value).length - 1); // "-1" it means subtract an entry node
 const canEditNodes = computed(() => {
@@ -188,7 +187,7 @@ const canEditNodes = computed(() => {
   }
 
   return false;
-})
+});
 
 onMounted(() => {
   loadNodes().then((responseNodes) => {
@@ -257,8 +256,7 @@ function calculateItems(nodes) {
         uniqueId: node.mx + "_" + node.my + "_" + item.id,
         iconUrl: item.iconUrl,
         humanQuantity: getHumanQunatity(item.quantity),
-        emeraldCost:
-          item.emeraldCost !== null ? item.emeraldCost * item.quantity : null,
+        emeraldCost: item.emeraldCost !== null ? item.emeraldCost * item.quantity : null,
         node,
         item,
       });
@@ -274,6 +272,9 @@ function calculateItems(nodes) {
  */
 const onChangeScale = (value) => {
   scale.value += value;
+
+  const MAX_SCALE = 4;
+  const MIN_SCALE = 0.3;
 
   if (scale.value > MAX_SCALE) {
     scale.value = MAX_SCALE;

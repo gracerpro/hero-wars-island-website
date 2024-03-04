@@ -19,9 +19,12 @@ import { useSSRContext } from "vue";
 const { t } = useI18n();
 const ssrContext = import.meta.env.SSR ? useSSRContext() : null;
 
-setMetaInfo({
-  title: t("seo.contact.title") + " - " + t("common.projectName"),
-  description: t("seo.contact.description"),
-  keywords: t("seo.contact.keywords"),
-}, ssrContext);
+setMetaInfo(
+  {
+    title: t("seo.contact.title") + " - " + t("common.projectName"),
+    description: t("seo.contact.description"),
+    keywords: t("seo.contact.keywords"),
+  },
+  ssrContext
+);
 </script>

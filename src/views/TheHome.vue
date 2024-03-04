@@ -11,22 +11,33 @@
       <span class="placeholder col-4"></span><br />
       <span class="placeholder col-4"></span>
     </div>
-    <div v-else-if="errorMessage" class="alert alert-danger">
+    <div
+      v-else-if="errorMessage"
+      class="alert alert-danger"
+    >
       {{ errorMessage }}
     </div>
-    <div v-else-if="!islands.length" class="alert alert-warning">
+    <div
+      v-else-if="!islands.length"
+      class="alert alert-warning"
+    >
       {{ t("page.home.notFound") }}
     </div>
     <ol v-else>
-      <li v-for="island in islands" :key="island.id">
+      <li
+        v-for="island in islands"
+        :key="island.id"
+      >
         <router-link
           :to="createI18nRouteTo({ name: 'island', params: { id: island.id } })"
           :class="[isActual(island) ? '' : 'text-secondary']"
           >{{ island.name + " " + getIslandHint(island) }}</router-link
         >
-        <span v-if="isActual(island)" class="badge text-bg-primary ms-2">{{
-          t("page.home.actual")
-        }}</span>
+        <span
+          v-if="isActual(island)"
+          class="badge text-bg-primary ms-2"
+          >{{ t("page.home.actual") }}</span
+        >
       </li>
     </ol>
   </div>
@@ -52,20 +63,23 @@ const islands = ref([]);
 const islandsLoading = ref(true);
 const errorMessage = ref("");
 
-setMetaInfo({
-  title: t("common.projectName"),
-  description: t("seo.home.description"),
-  keywords: t("seo.home.keywords"),
-}, ssrContext);
+setMetaInfo(
+  {
+    title: t("common.projectName"),
+    description: t("seo.home.description"),
+    keywords: t("seo.home.keywords"),
+  },
+  ssrContext
+);
 
 onMounted(() => {
   watch(
     () => route.params.locale,
-    () => loadIslands(),
+    () => loadIslands()
   );
 
   loadIslands();
-})
+});
 
 function loadIslands() {
   islandsLoading.value = true;

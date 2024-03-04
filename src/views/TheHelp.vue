@@ -16,7 +16,9 @@
             ><br />
           </li>
           <li>
-            <a :href="'/backend-api/index.html' + (currentLocale ? `?locale=${currentLocale}` : '')">API</a>
+            <a :href="'/backend-api/index.html' + (currentLocale ? `?locale=${currentLocale}` : '')"
+              >API</a
+            >
           </li>
         </ul>
       </li>
@@ -45,12 +47,15 @@ const ssrContext = import.meta.env.SSR ? useSSRContext() : null;
 const currentLocale = computed(() => {
   const locale = getCurrentLocale();
 
-  return isShowLocaleInRoute(locale) ? locale : '';
+  return isShowLocaleInRoute(locale) ? locale : "";
 });
 
-setMetaInfo({
-  title: t("seo.help.title") + " - " + t("common.projectName"),
-  description: t("seo.help.description"),
-  keywords: t("seo.help.keywords"),
-}, ssrContext);
+setMetaInfo(
+  {
+    title: t("seo.help.title") + " - " + t("common.projectName"),
+    description: t("seo.help.description"),
+    keywords: t("seo.help.keywords"),
+  },
+  ssrContext
+);
 </script>

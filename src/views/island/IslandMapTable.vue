@@ -12,7 +12,11 @@
         <tr v-if="!items.length">
           <td colspan="3">{{ t("common.noData") }}</td>
         </tr>
-        <tr v-else v-for="item in items" :key="item.uniqueId">
+        <tr
+          v-else
+          v-for="item in items"
+          :key="item.uniqueId"
+        >
           <td>
             <img
               v-if="item.item.iconUrl"

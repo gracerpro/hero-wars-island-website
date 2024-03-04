@@ -1,6 +1,12 @@
 <template>
-  <div class="btn-toolbar -left-toolbar" role="toolbar">
-    <div class="btn-group-vertical w-100" role="group">
+  <div
+    class="btn-toolbar -left-toolbar"
+    role="toolbar"
+  >
+    <div
+      class="btn-group-vertical w-100"
+      role="group"
+    >
       <button
         type="button"
         class="btn btn-secondary"
@@ -26,7 +32,10 @@
         0
       </button>
     </div>
-    <div class="btn-group-vertical w-100 mt-2" role="group">
+    <div
+      class="btn-group-vertical w-100 mt-2"
+      role="group"
+    >
       <button
         type="button"
         class="btn btn-secondary"
@@ -64,14 +73,14 @@
         0
       </button>
     </div>
-    <div class="btn-group-vertical w-100 mt-2" role="group">
+    <div
+      class="btn-group-vertical w-100 mt-2"
+      role="group"
+    >
       <button
         type="button"
         :title="t('page.island.showOnlyIconWithoutQuantity')"
-        :class="[
-          'btn',
-          isOnlyImage ? 'btn-secondary' : 'btn-outline-secondary',
-        ]"
+        :class="['btn', isOnlyImage ? 'btn-secondary' : 'btn-outline-secondary']"
         @click="onChangeOnlyImage"
       >
         Im
@@ -80,16 +89,16 @@
         v-if="canEditNodes"
         type="button"
         :title="t('page.island.showEditNodes')"
-        :class="[
-          'btn',
-          isShowNoModerate ? 'btn-secondary' : 'btn-outline-secondary',
-        ]"
+        :class="['btn', isShowNoModerate ? 'btn-secondary' : 'btn-outline-secondary']"
         @click="onChangeIsShowNoModerate"
       >
         ?
       </button>
     </div>
-    <div class="btn-group-vertical w-100 mt-2" role="group">
+    <div
+      class="btn-group-vertical w-100 mt-2"
+      role="group"
+    >
       <button
         type="button"
         class="btn btn-secondary"
@@ -99,7 +108,10 @@
         h
       </button>
     </div>
-    <div class="btn-group-vertical w-100 mt-2" role="group">
+    <div
+      class="btn-group-vertical w-100 mt-2"
+      role="group"
+    >
       <button
         type="button"
         class="btn btn-secondary fullscreen-btn"

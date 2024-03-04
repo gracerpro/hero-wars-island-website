@@ -3,10 +3,16 @@
     <h1>{{ islandName }}</h1>
 
     <island-map-loading v-if="islandLoading" />
-    <div v-else-if="errorMessage" class="alert alert-danger mt-3">
+    <div
+      v-else-if="errorMessage"
+      class="alert alert-danger mt-3"
+    >
       {{ errorMessage }}
     </div>
-    <div v-else-if="!currentIsland" class="position-relative">
+    <div
+      v-else-if="!currentIsland"
+      class="position-relative"
+    >
       <img
         src="/images/map-not-found.svg"
         width="440"
@@ -18,11 +24,14 @@
       </div>
     </div>
     <div v-else>
-      <island-map :island="currentIsland" parent-page-id="islandPage" />
+      <island-map
+        :island="currentIsland"
+        parent-page-id="islandPage"
+      />
     </div>
 
     <div v-if="islandDescription">
-      <hr>
+      <hr />
       <div v-html="islandDescription"></div>
     </div>
   </div>
@@ -64,7 +73,7 @@ onMounted(() => {
       if (id) {
         loadIsland(id);
       }
-    },
+    }
   );
   watch(
     () => route.params.locale,
@@ -73,15 +82,16 @@ onMounted(() => {
         loadIsland(currentIsland.value.id);
       }
       // TODO: loading_start >change< loading_end
-    },
+    }
   );
 
   loadIsland(islandId).then((island) => setPageInfo(island));
-})
+});
 
 function setPageInfo(island) {
   if (island) {
-    setMetaInfo({
+    setMetaInfo(
+      {
         title: island.name + " - " + t("common.projectName"),
         description: t("seo.island.description") + " " + island.name,
         keywords: t("seo.island.keywords") + ", " + island.name,
@@ -89,7 +99,8 @@ function setPageInfo(island) {
       ssrContext
     );
   } else {
-    setMetaInfo({
+    setMetaInfo(
+      {
         title: t("common.islandMap"),
         description: t("seo.island.description"),
         keywords: t("seo.island.keywords"),

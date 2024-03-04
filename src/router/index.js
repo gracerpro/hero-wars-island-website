@@ -17,12 +17,12 @@ export function createRouter() {
     routes,
     linkActiveClass: "active",
     linkExactActiveClass: "",
-  })
+  });
 
   addBeforeEach(router);
 
   return router;
-};
+}
 
 function addBeforeEach(router) {
   router.beforeEach(async (to, from, next) => {
@@ -37,10 +37,12 @@ function addBeforeEach(router) {
     if (paramsLocale) {
       if (!isSupportLocale(paramsLocale)) {
         if (paramsLocale !== "page-not-found") {
-          return next(createI18nRouteTo(
-            { name: "page-not-found", query: { returnUrl: to.path } },
-            guessDefaultLocale()
-          ));
+          return next(
+            createI18nRouteTo(
+              { name: "page-not-found", query: { returnUrl: to.path } },
+              guessDefaultLocale()
+            )
+          );
         }
       } else if (paramsLocale !== getCurrentLocale()) {
         await setLanguage(paramsLocale);

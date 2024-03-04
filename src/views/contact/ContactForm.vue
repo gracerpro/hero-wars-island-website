@@ -1,9 +1,11 @@
 <template>
   <form @submit.prevent="onSubmit">
     <div class="mb-3 mt-2">
-      <label class="form-label" :for="formId + '__subject'">{{
-        t("page.contact.theme")
-      }}</label>
+      <label
+        class="form-label"
+        :for="formId + '__subject'"
+        >{{ t("page.contact.theme") }}</label
+      >
       <input
         v-model.trim="feedback.subject"
         :disabled="submiting"
@@ -14,9 +16,11 @@
       />
     </div>
     <div class="mb-3">
-      <label :for="formId + '__message'" class="form-label">{{
-        t("page.contact.message")
-      }}</label>
+      <label
+        :for="formId + '__message'"
+        class="form-label"
+        >{{ t("page.contact.message") }}</label
+      >
       <textarea
         v-model.trim="feedback.message"
         class="form-control"
@@ -28,9 +32,11 @@
     </div>
     <div class="row">
       <div class="col-lg-6 mb-3">
-        <label :for="formId + '__username'" class="form-label">{{
-          t("page.contact.username")
-        }}</label>
+        <label
+          :for="formId + '__username'"
+          class="form-label"
+          >{{ t("page.contact.username") }}</label
+        >
         <input
           v-model.trim="feedback.username"
           :disabled="submiting"
@@ -38,14 +44,19 @@
           :id="formId + '__username'"
           :aria-describedby="formId + '__username__help'"
         />
-        <div :id="formId + '__username__help'" class="form-text">
+        <div
+          :id="formId + '__username__help'"
+          class="form-text"
+        >
           {{ t("page.contact.canBeEmpty") }}
         </div>
       </div>
       <div class="col-lg-6 mb-3">
-        <label :for="formId + '__email'" class="form-label">{{
-          t("page.contact.email")
-        }}</label>
+        <label
+          :for="formId + '__email'"
+          class="form-label"
+          >{{ t("page.contact.email") }}</label
+        >
         <input
           v-model.trim="feedback.email"
           :disabled="submiting"
@@ -54,13 +65,22 @@
           :id="formId + '__email'"
           :aria-describedby="formId + '__email__help'"
         />
-        <div :id="formId + '__email__help'" class="form-text">
+        <div
+          :id="formId + '__email__help'"
+          class="form-text"
+        >
           {{ t("page.contact.canBeEmpty") }}
         </div>
       </div>
     </div>
-    <div class="mb-3" v-show="errorMessage.length">
-      <div class="alert alert-danger mb-0" role="alert">
+    <div
+      class="mb-3"
+      v-show="errorMessage.length"
+    >
+      <div
+        class="alert alert-danger mb-0"
+        role="alert"
+      >
         {{ errorMessage }}
       </div>
     </div>
@@ -80,7 +100,10 @@
     </div>
 
     <client-only>
-      <toast-message ref="toast" element-id="contactToast" />
+      <toast-message
+        ref="toast"
+        element-id="contactToast"
+      />
     </client-only>
   </form>
 </template>
@@ -90,10 +113,7 @@ import UserError from "@/exceptions/UserError";
 import HeroClient from "@/api/HeroClient";
 import { ref, shallowReactive, onMounted } from "vue";
 import { useI18n } from "vue-i18n";
-import {
-    TYPE_SUCCESS,
-    TYPE_DANGER,
-  } from "@/components/ToastMessage.vue";
+import { TYPE_SUCCESS, TYPE_DANGER } from "@/components/ToastMessage.vue";
 import { defineAsyncComponent } from "vue";
 
 const { t } = useI18n();

@@ -6,9 +6,7 @@
       :title="language.label"
       :class="[
         'btn ms-2',
-        language.locale === currentLocale
-          ? 'btn-success fw-bold'
-          : 'btn-outline-success',
+        language.locale === currentLocale ? 'btn-success fw-bold' : 'btn-outline-success',
       ]"
       @click="onChangeLanguage(language.locale)"
       type="button"
@@ -18,11 +16,7 @@
   </form>
 </template>
 <script setup>
-import {
-  setLanguage,
-  getLocalesLabels,
-  getCurrentLocale,
-} from "@/i18n/translation";
+import { setLanguage, getLocalesLabels, getCurrentLocale } from "@/i18n/translation";
 import { computed } from "vue";
 import { useRouter } from "vue-router";
 import { isShowLocaleInRoute } from "@/i18n/translation";

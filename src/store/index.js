@@ -7,5 +7,5 @@ export function createStore() {
     mutations: {},
     actions: {},
     modules: {},
-  })
+  });
 }

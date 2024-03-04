@@ -37,10 +37,6 @@ function getSupportLocales() {
   return import.meta.env.VITE_SUPPORT_LOCALES.split(",");
 }
 
-
-
-
-
 /**
  * @returns {String}
  */
@@ -105,7 +101,7 @@ function isLocaleLoaded(locale) {
 }
 
 /**
- * @param {String} locale 
+ * @param {String} locale
  */
 function saveLocale(locale) {
   if (import.meta.env.SSR) {
@@ -129,11 +125,6 @@ function getSavedLocale() {
 
   return isSupportLocale(locale) ? locale : null;
 }
-
-
-
-
-
 
 export async function setLanguage(locale) {
   if (!isLocaleLoaded(locale)) {
@@ -174,13 +165,12 @@ function getUserLocale() {
   let locale;
 
   if (!import.meta.env.SSR) {
-    locale = window.navigator.language ||
-      window.navigator.userLanguage;
+    locale = window.navigator.language || window.navigator.userLanguage;
   }
   if (locale) {
     locale = locale.toLowerCase();
   } else {
-    locale = import.meta.env.VITE_DEFAULT_LOCALE
+    locale = import.meta.env.VITE_DEFAULT_LOCALE;
   }
 
   return locale.split("-")[0];

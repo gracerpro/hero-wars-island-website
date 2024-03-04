@@ -1,6 +1,10 @@
 <template>
   <div class="input-group">
-    <select :id="inputId" @change="onChange" class="form-select">
+    <select
+      :id="inputId"
+      @change="onChange"
+      class="form-select"
+    >
       <option value=""></option>
       <option
         v-for="(name, id) in selectValues"
@@ -35,15 +39,10 @@ const props = defineProps({
 });
 const emit = defineEmits([EVENT_UPDATE_VALUE]);
 
-const isDisabled = computed(
-  () => (props.modelValue === null) | (props.modelValue === 0),
-);
+const isDisabled = computed(() => props.modelValue === null || props.modelValue === 0);
 
 const onChange = (event) => {
-  emit(
-    EVENT_UPDATE_VALUE,
-    event.target.value === "" ? null : parseInt(event.target.value),
-  );
+  emit(EVENT_UPDATE_VALUE, event.target.value === "" ? null : parseInt(event.target.value));
 };
 const onClear = () => {
   emit(EVENT_UPDATE_VALUE, null);

@@ -1,10 +1,18 @@
 <template>
-  <form @submit.prevent="onSubmit" :id="formId">
+  <form
+    @submit.prevent="onSubmit"
+    :id="formId"
+  >
     <div class="row">
-      <div v-if="isShowStatus" class="col-md-4 mb-3">
-        <label :for="formId + '__status'" class="form-label">{{
-          t("common.status")
-        }}</label>
+      <div
+        v-if="isShowStatus"
+        class="col-md-4 mb-3"
+      >
+        <label
+          :for="formId + '__status'"
+          class="form-label"
+          >{{ t("common.status") }}</label
+        >
         <input
           class="form-control"
           :id="formId + '__status'"
@@ -13,10 +21,17 @@
           readonly
         />
       </div>
-      <div class="col-md-8" v-if="nodeItems">
+      <div
+        class="col-md-8"
+        v-if="nodeItems"
+      >
         <label class="form-label">{{ t("common.resource", 2) }}</label>
         <ul class="list-unstyled">
-          <li v-for="item in nodeItems" :key="item.id" class="mb-1">
+          <li
+            v-for="item in nodeItems"
+            :key="item.id"
+            class="mb-1"
+          >
             <img
               v-if="item.iconUrl"
               class="icon"
@@ -32,9 +47,11 @@
     </div>
 
     <div class="mb-3">
-      <label :for="formId + '__comment'" class="form-label">{{
-        t("common.resource")
-      }}</label>
+      <label
+        :for="formId + '__comment'"
+        class="form-label"
+        >{{ t("common.resource") }}</label
+      >
       <input
         v-model.trim="comment"
         required
@@ -53,7 +70,11 @@
       >
         {{ commentErrorMessage }}
       </div>
-      <div v-else class="form-text" :id="formId + '__commentHelp'">
+      <div
+        v-else
+        class="form-text"
+        :id="formId + '__commentHelp'"
+      >
         {{ t("page.island.namesByComma") }}
       </div>
       <datalist :id="formId + '__comment__datalist'">
@@ -65,9 +86,11 @@
       </datalist>
     </div>
     <div>
-      <label :for="formId + '__quantity'" class="form-label">{{
-        t("common.quantity")
-      }}</label>
+      <label
+        :for="formId + '__quantity'"
+        class="form-label"
+        >{{ t("common.quantity") }}</label
+      >
       <input
         v-model.trim="quantity"
         class="form-control"
@@ -75,11 +98,17 @@
         autocomplete="off"
         :aria-describedby="formId + '__quantityHelp'"
       />
-      <div class="form-text" :id="formId + '__quantityHelp'">
+      <div
+        class="form-text"
+        :id="formId + '__quantityHelp'"
+      >
         {{ t("page.island.quantityHint") }}
       </div>
     </div>
-    <div v-show="errorMessage.length" class="alert alert-danger mb-0 mt-3">
+    <div
+      v-show="errorMessage.length"
+      class="alert alert-danger mb-0 mt-3"
+    >
       {{ errorMessage }}
     </div>
   </form>

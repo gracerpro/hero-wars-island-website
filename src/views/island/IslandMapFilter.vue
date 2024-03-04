@@ -1,9 +1,11 @@
 <template>
   <div class="row">
     <div class="col-md-6">
-      <label :for="formId + '__itemName'" class="form-label">{{
-        t("common.resource")
-      }}</label>
+      <label
+        :for="formId + '__itemName'"
+        class="form-label"
+        >{{ t("common.resource") }}</label
+      >
       <text-input
         :modelValue="itemName"
         :modelModifiers="{ trim: true }"
@@ -15,9 +17,11 @@
       </div>
     </div>
     <div class="col-md-6">
-      <label :for="formId + '__typeId'" class="form-label">{{
-        t("common.type")
-      }}</label>
+      <label
+        :for="formId + '__typeId'"
+        class="form-label"
+        >{{ t("common.type") }}</label
+      >
       <clear-select
         :modelValue="typeId"
         :input-id="formId + '__typeId'"
@@ -27,24 +31,34 @@
     </div>
     <div class="col-md-6 mt-3">
       <div class="form-check form-check-inline">
-        <input class="form-check-input"
-        type="checkbox"
-        :id="formId + '__nodeTypeTower'"
-        :value="TYPE_TOWN"
-        :checked="isNodeTypeTower"
-        @change="onChangeNodeType"
+        <input
+          class="form-check-input"
+          type="checkbox"
+          :id="formId + '__nodeTypeTower'"
+          :value="TYPE_TOWN"
+          :checked="isNodeTypeTower"
+          @change="onChangeNodeType"
+        />
+        <label
+          class="form-check-label"
+          :for="formId + '__nodeTypeTower'"
+          >{{ t("common.tower") }}</label
         >
-        <label class="form-check-label" :for="formId + '__nodeTypeTower'">{{ t("common.tower") }}</label>
       </div>
       <div class="form-check form-check-inline">
-        <input class="form-check-input"
-        type="checkbox"
-        :id="formId + '__nodeTypeChest'"
-        :value="TYPE_CHEST"
-        :checked="isNodeTypeChest"
-        @change="onChangeNodeType"
+        <input
+          class="form-check-input"
+          type="checkbox"
+          :id="formId + '__nodeTypeChest'"
+          :value="TYPE_CHEST"
+          :checked="isNodeTypeChest"
+          @change="onChangeNodeType"
+        />
+        <label
+          class="form-check-label"
+          :for="formId + '__nodeTypeChest'"
+          >{{ t("common.chest") }}</label
         >
-        <label class="form-check-label" :for="formId + '__nodeTypeChest'">{{ t("common.chest") }}</label>
       </div>
     </div>
   </div>
@@ -77,7 +91,7 @@ const emit = defineEmits([
   EVENT_UPDATE_ITEM_NAME,
   EVENT_UPDATE_TYPE,
   EVENT_UPDATE_IS_NODE_TYPE_TOWER,
-  EVENT_UPDATE_IS_NODE_TYPE_CHEST
+  EVENT_UPDATE_IS_NODE_TYPE_CHEST,
 ]);
 
 const onUpdateName = (name) => {

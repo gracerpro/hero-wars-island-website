@@ -9,7 +9,7 @@ export function setMetaInfo(info, ssrContext) {
         title: info.title !== undefined ? info.title : null,
         description: info.description !== undefined ? info.description : null,
         keywords: info.keywords !== undefined ? info.keywords : null,
-      }
+      };
     }
   } else {
     if (info.title !== undefined) {
@@ -17,9 +17,7 @@ export function setMetaInfo(info, ssrContext) {
     }
 
     if (info.description !== undefined) {
-      const descriptionEl = document.querySelector(
-        "head meta[name='description']",
-      );
+      const descriptionEl = document.querySelector("head meta[name='description']");
       if (!descriptionEl) {
         createMeta("description", info.description);
       } else {

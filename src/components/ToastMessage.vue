@@ -2,11 +2,7 @@
   <div class="toast-container position-fixed bottom-0 end-0 p-3">
     <div
       :id="elementId"
-      :class="[
-        'toast align-items-center border-0',
-        classType,
-        isShow ? 'show' : '',
-      ]"
+      :class="['toast align-items-center border-0', classType, isShow ? 'show' : '']"
       role="alert"
       aria-live="assertive"
       aria-atomic="true"
@@ -33,7 +29,7 @@ import { ref, computed } from "vue";
 let Toast;
 
 if (!import.meta.env.SSR) {
-  import("bootstrap").then((module) => Toast = module.Toast);
+  import("bootstrap").then((module) => (Toast = module.Toast));
 }
 
 const props = defineProps({
@@ -75,7 +71,7 @@ function show(message, type) {
   });
   toast.show();
   isShow.value = true;
-};
+}
 
 defineExpose({
   show,

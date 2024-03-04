@@ -77,9 +77,9 @@ export function canSelectNextNode(nodes, selectedNodes, nextNode) {
  * @returns {Boolean}
  */
 export function canEditNode(node) {
-  return node.typeId !== TYPE_START &&
-    node.statusId !== STATUS_ACCEPTED_SUCCESS &&
-    (!node?.items.length);
+  return (
+    node.typeId !== TYPE_START && node.statusId !== STATUS_ACCEPTED_SUCCESS && !node?.items.length
+  );
 }
 
 function isNearNode(nextNode, node) {

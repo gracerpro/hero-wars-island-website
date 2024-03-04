@@ -36,7 +36,10 @@
           @mouseenter="nodeMouseEnter(node)"
           @click="onNodeClick(node)"
         />
-        <template v-for="item in iconsItems" :key="item.uniqueId">
+        <template
+          v-for="item in iconsItems"
+          :key="item.uniqueId"
+        >
           <image
             v-if="item.item.iconUrl"
             :x="item.iconX"
@@ -100,7 +103,10 @@
       ref="editNodeDialog"
       @vue:mounted="onMountedNodeDialog"
     />
-    <toast-message ref="toast" element-id="mapContainerToast" />
+    <toast-message
+      ref="toast"
+      element-id="mapContainerToast"
+    />
   </div>
 </template>
 <script>
@@ -236,8 +242,7 @@ const iconsItems = computed(() => {
       item.iconWidth = IMAGE_SIDE * (isShowText ? 1.9 : 2.2);
       item.iconHeight = IMAGE_SIDE * (isShowText ? 1.9 : 2.2);
       item.iconX = node.x - item.iconWidth / 2;
-      item.iconY =
-        node.y - item.iconHeight / 2 - (isShowText ? fontSize / 2 : 0);
+      item.iconY = node.y - item.iconHeight / 2 - (isShowText ? fontSize / 2 : 0);
       if (isShowText) {
         item.textX = item.iconX + item.iconWidth * 0.05;
         item.textY = node.y + HEIGHT - 3;
@@ -256,8 +261,7 @@ const iconsItems = computed(() => {
         const cx = item.iconWidth + borderWidth;
         const srartX = node.x - cx + borderWidth / 2;
         item.iconX = srartX + cx * index;
-        item.iconY =
-          node.y - item.iconHeight / 2 - (isShowText ? fontSize / 2 : 0);
+        item.iconY = node.y - item.iconHeight / 2 - (isShowText ? fontSize / 2 : 0);
 
         if (isShowText) {
           item.textX = srartX + cx * index;
@@ -464,10 +468,7 @@ const isUserNode = (node) => {
   return props.userNodesMap[node.id] !== undefined;
 };
 const getWarningTitle = (item) => {
-  if (
-    item.node.statusId === STATUS_ON_MODERATION ||
-    item.node.statusId === STATUS_NOT_SURE
-  ) {
+  if (item.node.statusId === STATUS_ON_MODERATION || item.node.statusId === STATUS_NOT_SURE) {
     return getStatusName(t, item.node.statusId);
   }
   if (!item.node.items || !item.node.items.length) {

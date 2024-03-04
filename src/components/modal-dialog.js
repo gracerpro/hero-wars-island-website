@@ -8,15 +8,15 @@ export function useShow(refDialog) {
   const show = () => {
     return new Promise((resolve) => {
       moduleResolve = resolve;
-    })
-  }
+    });
+  };
 
   const onMountedDialog = () => {
     moduleResolve(refDialog.value.show());
-  }
+  };
 
   return {
     show,
-    onMountedDialog
-  }
+    onMountedDialog,
+  };
 }

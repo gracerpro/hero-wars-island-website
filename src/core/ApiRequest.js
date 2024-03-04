@@ -46,14 +46,11 @@ class ApiRequest {
       this._beforeRequest(this);
     }
 
-    let searchParams = '';
+    let searchParams = "";
     if (params) {
-      searchParams = "?" + (new URLSearchParams(params)).toString();
+      searchParams = "?" + new URLSearchParams(params).toString();
     }
-    const response = await fetch(
-      this._backendUrl + url + searchParams,
-      this.getOptions("GET"),
-    );
+    const response = await fetch(this._backendUrl + url + searchParams, this.getOptions("GET"));
 
     if (!response.ok) {
       if (response.status >= 400) {
@@ -87,10 +84,7 @@ class ApiRequest {
       ...this.getOptions("POST"),
       body: JSON.stringify(data),
     };
-    const response = await fetch(
-      this._backendUrl + url,
-      options,
-    );
+    const response = await fetch(this._backendUrl + url, options);
 
     if (!response.ok) {
       if (response.status >= 400) {

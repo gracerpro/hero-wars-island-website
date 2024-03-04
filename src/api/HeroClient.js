@@ -19,7 +19,7 @@ export default class HeroClient {
     let params = undefined;
 
     if (isWithDescription) {
-      params = {isWithDescription: isWithDescription ? 1 : 0};
+      params = { isWithDescription: isWithDescription ? 1 : 0 };
     }
     const island = await this._apiRequest.get("/islands/" + id, params);
 
@@ -31,14 +31,14 @@ export default class HeroClient {
   }
 
   /**
-   * @param {Boolean} isWithDescription 
+   * @param {Boolean} isWithDescription
    * @returns {Promise<Object|null>}
    */
   async getActualIsland(isWithDescription) {
     let params = undefined;
 
     if (isWithDescription) {
-      params = {isWithDescription: isWithDescription ? 1 : 0};
+      params = { isWithDescription: isWithDescription ? 1 : 0 };
     }
     let island = await this._apiRequest.get("/islands/actual", params);
 
@@ -137,10 +137,7 @@ export default class HeroClient {
    * @returns {Promise<Object>}
    */
   async updateNode(nodeId, data) {
-    const node = await this._apiRequest.post(
-      `/island-nodes/${nodeId}/update`,
-      data,
-    );
+    const node = await this._apiRequest.post(`/island-nodes/${nodeId}/update`, data);
 
     if (node) {
       this.modifyNode(node);

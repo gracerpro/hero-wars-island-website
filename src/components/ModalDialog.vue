@@ -1,6 +1,14 @@
 <template>
-  <div class="modal fade" tabindex="-1" :id="elementId" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered" :class="sizeClass">
+  <div
+    class="modal fade"
+    tabindex="-1"
+    :id="elementId"
+    aria-hidden="true"
+  >
+    <div
+      class="modal-dialog modal-dialog-centered"
+      :class="sizeClass"
+    >
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title">{{ header }}</h5>
@@ -29,7 +37,11 @@
               role="status"
               aria-hidden="true"
             ></span>
-            <span v-show="saving" class="visually-hidden">Loading...</span>
+            <span
+              v-show="saving"
+              class="visually-hidden"
+              >Loading...</span
+            >
             {{ t("common.save") }}
           </button>
           <button
@@ -79,7 +91,7 @@ const props = defineProps({
     type: [Object, Number, String, null, undefined],
     default: null,
   },
-})
+});
 
 const sizeClass = computed(() => {
   const sizes = {
@@ -89,14 +101,14 @@ const sizeClass = computed(() => {
   };
 
   return sizes[props.size] ? sizes[props.size] : "";
-})
+});
 
 const hideDialog = () => {
   modal.dispose();
   modal = null;
 
   moduleResolve(dialogResult);
-}
+};
 
 function show() {
   if (modal) {
@@ -113,7 +125,7 @@ function show() {
     () => {
       hideDialog();
     },
-    { once: true },
+    { once: true }
   );
 
   dialogResult = props.initResult;

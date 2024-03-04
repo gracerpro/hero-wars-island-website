@@ -9,7 +9,10 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="item in groupItems" :key="item.id">
+        <tr
+          v-for="item in groupItems"
+          :key="item.id"
+        >
           <td>
             <img
               v-if="item.item.iconUrl"
@@ -39,7 +42,7 @@ const props = defineProps({
 const groupItems = computed(() => {
   let map = {};
 
-  props.items.forEach(({item}) => {
+  props.items.forEach(({ item }) => {
     if (!map[item.id]) {
       map[item.id] = {
         id: item.id,
@@ -48,7 +51,7 @@ const groupItems = computed(() => {
       };
     }
     map[item.id].quantity += item.quantity;
-  })
+  });
 
   let arr = Object.values(map);
 
@@ -63,7 +66,7 @@ const groupItems = computed(() => {
   });
 
   return arr;
-})
+});
 
 function getItemName(item) {
   return item.item.name ? item.item.name : t("common.noName");
