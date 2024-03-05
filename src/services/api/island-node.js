@@ -1,4 +1,5 @@
 import HeroClient from "@/api/HeroClient";
+import { isObject } from "@/helpers/core";
 
 const client = new HeroClient();
 
@@ -6,52 +7,109 @@ const client = new HeroClient();
  * @param {Object} island
  * @returns {Promise<Object>}
  */
-export async function getNodes(island) {
-  let nodes = await getNodesFromCache(island);
+export async function getNodesMap(island) {
+  let nodesMap;
 
-  console.log("from cache", nodes);
+  try {
+    let previosUpdatedAt = loadPreviousUpdatedAt(island);
 
-  if (nodes === null || nodes === undefined) {
-    nodes = {};
-    const list = await client.getNodes(island.id);
-    list.items.forEach((node) => {
-      nodes[node.id] = node;
-    });
-
-    writeNodesToCache(island, nodes);
+    if (!previosUpdatedAt || previosUpdatedAt < island.nodesLastUpdatedAt) {
+      nodesMap = null;
+    } else {
+      nodesMap = await getNodesFromCache(island);
+    }
+  } catch (error) {
+    console.error(error);
+    nodesMap = null;
   }
 
-  return nodes;
+  if (nodesMap === null || nodesMap === undefined) {
+    nodesMap = {};
+    const list = await client.getNodes(island.id);
+    list.items.forEach((node) => {
+      nodesMap[node.id] = node;
+    });
+
+    writeNodesToCache(island, nodesMap);
+    savePreviousUpdatedAt(island);
+  }
+
+  return nodesMap;
 }
 
-async function writeNodesToCache(island, nodes) {
+const PREVIOUS_DATES_NAME = "island.previosUpdateDates";
+
+/**
+ * @param {Object} island
+ * @returns Date|null
+ */
+function loadPreviousUpdatedAt(island) {
+  let datesByIsland;
+
+  try {
+    datesByIsland = JSON.parse(localStorage.getItem(PREVIOUS_DATES_NAME));
+    if (!isObject(datesByIsland)) {
+      datesByIsland = {};
+    }
+  } catch {
+    datesByIsland = {};
+  }
+
+  const date = datesByIsland[island.id];
+  if (date) {
+    return new Date(date);
+  }
+
+  return null;
+}
+
+/**
+ * @param {Object} island
+ */
+function savePreviousUpdatedAt(island) {
+  let datesByIsland;
+
+  try {
+    datesByIsland = JSON.parse(localStorage.getItem(PREVIOUS_DATES_NAME));
+    if (!isObject(datesByIsland)) {
+      datesByIsland = {};
+    }
+  } catch {
+    datesByIsland = {};
+  }
+
+  datesByIsland[island.id] = new Date().toISOString();
+
+  localStorage.setItem(PREVIOUS_DATES_NAME, JSON.stringify(datesByIsland));
+}
+
+/**
+ * @param {Object} island
+ * @param {Object} nodesMap
+ * @returns {Promise}
+ */
+async function writeNodesToCache(island, nodesMap) {
   const db = await openDb();
 
   return new Promise((resolve, reject) => {
     let transaction = db.transaction("islandNodes", "readwrite");
     let nodeStore = transaction.objectStore("islandNodes");
-    let request = nodeStore.put({islandId: island.id, nodes});
+    let request = nodeStore.put({ islandId: island.id, nodesMap });
 
-    request.onsuccess = function() {
+    request.onsuccess = function () {
       resolve(request.result);
-    }
-    request.onerror = function() {
+    };
+    request.onerror = function () {
       reject(request.error);
-    }
+    };
   });
 }
 
+/**
+ * @param {Object} island
+ * @returns {Promise|null}
+ */
 async function getNodesFromCache(island) {
-  let previosUpdatedAt = null;
-
-  previosUpdatedAt = new Date();
-
-  if (!previosUpdatedAt || previosUpdatedAt < island.nodesLastUpdatedAt) {
-    return null;
-  }
-
-  console.log(island.nodesLastUpdatedAt, previosUpdatedAt, previosUpdatedAt < island.nodesLastUpdatedAt);
-
   const db = await openDb();
 
   return new Promise((resolve, reject) => {
@@ -59,13 +117,13 @@ async function getNodesFromCache(island) {
     let nodeStore = transaction.objectStore("islandNodes");
     let request = nodeStore.get(island.id);
 
-    request.onsuccess = function() {
-      const nodes = request.result ? request.result.nodes : null;
-      resolve(nodes);
-    }
-    request.onerror = function() {
+    request.onsuccess = () => {
+      const nodesMap = request.result ? request.result.nodesMap : null;
+      resolve(nodesMap);
+    };
+    request.onerror = () => {
       reject(request.error);
-    }
+    };
   });
 }
 
@@ -73,26 +131,23 @@ async function openDb() {
   return new Promise((resolve, reject) => {
     const openRequest = window.indexedDB.open("app");
 
-    openRequest.onerror = function() {
+    openRequest.onerror = () => {
       reject(openRequest.error);
     };
-    openRequest.onsuccess = function() {
-      resolve(openRequest.result);
+    openRequest.onsuccess = () => {
+      const db = openRequest.result;
+
+      db.onversionchange = () => {
+        db.close();
+      };
+
+      resolve(db);
     };
-    openRequest.onupgradeneeded = function(event) {
-      console.log("onupgradeneeded", event);
+    openRequest.onupgradeneeded = (event) => {
       let db = event.target.result;
-      console.log(db, event.oldVersion);
-  
-      switch(event.oldVersion) { // существующая (старая) версия базы данных
-        case 0:
-          // версия 0 означает, что на клиенте нет базы данных
-          // выполнить инициализацию
-          db.createObjectStore("islandNodes", {keyPath: "islandId", autoIncrement: false});
-          // fall through
-        case 1:
-          // на клиенте версия базы данных 1
-          // обновить
+
+      if (!db.objectStoreNames.contains("islandNodes")) {
+        db.createObjectStore("islandNodes", { keyPath: "islandId", autoIncrement: false });
       }
     };
   });

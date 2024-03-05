@@ -109,7 +109,7 @@ import { createI18nRouteTo } from "@/i18n/translation";
 import { fullscreenElement } from "@/core/fullscreen";
 import { TYPE_CHEST, TYPE_TOWN } from "@/api/node";
 import { isObject } from "@/helpers/core";
-import { getNodes } from "@/services/api/island-node";
+import { getNodesMap } from "@/services/api/island-node";
 
 const { t } = useI18n();
 
@@ -176,6 +176,7 @@ const userItems = computed(() => {
   });
 });
 const userNodesCount = computed(() => Object.keys(userNodesMap.value).length);
+// TODO: if 0?
 const totalNodesCount = computed(() => Object.keys(nodes.value).length - 1); // "-1" it means subtract an entry node
 const canEditNodes = computed(() => {
   for (const id in nodes.value) {
@@ -206,7 +207,7 @@ async function loadNodes() {
 
   loadingNodes.value = true;
   try {
-    nodes = await getNodes(props.island);
+    nodes = await getNodesMap(props.island);
   } catch (error) {
     errorMessage.value = t("page.island.failNodesLoading");
   } finally {
