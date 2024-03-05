@@ -20,6 +20,7 @@ import { setLanguage, getLocalesLabels, getCurrentLocale } from "@/i18n/translat
 import { computed } from "vue";
 import { useRouter } from "vue-router";
 import { isShowLocaleInRoute } from "@/i18n/translation";
+import { resetCache } from "@/services/api/island-node";
 
 const router = useRouter();
 
@@ -32,6 +33,8 @@ const onChangeLanguage = async (locale) => {
   }
 
   await setLanguage(locale);
+
+  resetCache();
 
   let routeLocale = locale;
   if (!isShowLocaleInRoute(locale)) {

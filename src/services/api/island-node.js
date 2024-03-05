@@ -39,6 +39,10 @@ export async function getNodesMap(island) {
 
 const PREVIOUS_DATES_NAME = "island.previosUpdateDates";
 
+export function resetCache() {
+  localStorage.setItem(PREVIOUS_DATES_NAME, JSON.stringify({}));
+}
+
 /**
  * @param {Object} island
  * @returns Date|null
