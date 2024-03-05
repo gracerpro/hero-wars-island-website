@@ -159,8 +159,8 @@ const onSubmit = () => {
   data.submitTimeInMs = new Date().getTime() - createdDate.getTime();
   errorMessage.value = "";
 
-  client
-    .createFeedback(data)
+  client.feedback
+    .create(data)
     .then(() => {
       feedback.message = "";
       feedback.subject = "";

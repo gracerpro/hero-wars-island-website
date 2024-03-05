@@ -119,7 +119,7 @@ const EVENT_SAVING = "saving";
 </script>
 <script setup>
 import HeroClient from "@/api/HeroClient";
-import { STATUS_CREATED, getStatusName } from "@/api/node";
+import { STATUS_CREATED, getStatusName } from "@/api/Node";
 import UserError from "@/exceptions/UserError";
 import { computed, ref } from "vue";
 import { useI18n } from "vue-i18n";
@@ -163,8 +163,8 @@ const onSubmit = () => {
   emit(EVENT_SAVING, true);
   saving.value = true;
   errorMessage.value = "";
-  client
-    .updateNode(props.node.id, getData())
+  client.node
+    .update(props.node.id, getData())
     .then((node) => {
       emit(EVENT_SUCCESS_SAVE, node);
     })
@@ -199,8 +199,8 @@ const onCommentInput = () => {
   }
 };
 const getItems = () => {
-  client
-    .getItems(10, { name: comment.value })
+  client.item
+    .getList(10, { name: comment.value })
     .then((list) => {
       items.value = list.items.map((item) => item.name && item.name.length);
       commentErrorMessage.value = "";

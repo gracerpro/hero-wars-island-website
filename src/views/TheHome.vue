@@ -83,8 +83,8 @@ onMounted(() => {
 
 function loadIslands() {
   islandsLoading.value = true;
-  client
-    .getIslandList(5)
+  client.island
+    .getList(5)
     .then((list) => {
       islands.value = list.items;
     })

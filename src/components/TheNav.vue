@@ -52,7 +52,7 @@ const actualIsland = ref(null);
 onMounted(() => {
   const client = new HeroClient();
 
-  client.getActualIsland().then((island) => {
+  client.island.getActual().then((island) => {
     actualIsland.value = island;
   });
 });

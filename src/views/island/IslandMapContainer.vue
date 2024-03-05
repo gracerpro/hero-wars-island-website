@@ -123,7 +123,7 @@ import {
   STATUS_ON_MODERATION,
   STATUS_NOT_SURE,
   getStatusName,
-} from "@/api/node";
+} from "@/api/Node";
 import { ref, shallowReactive, computed, defineAsyncComponent } from "vue";
 import {
   TRANSLATE_X,

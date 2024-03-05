@@ -135,7 +135,7 @@ async function loadIsland(id) {
   islandLoading.value = true;
   try {
     const isWithDescription = true;
-    currentIsland.value = await client.getIsland(id, isWithDescription);
+    currentIsland.value = await client.island.get(id, isWithDescription);
   } catch (error) {
     console.log(error);
     if (error instanceof HttpError && error.statusCode === 404) {

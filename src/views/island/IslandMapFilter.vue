@@ -72,9 +72,9 @@ const EVENT_UPDATE_IS_NODE_TYPE_CHEST = "update:is-node-type-chest";
 <script setup>
 import TextInput from "@/components/TextInput.vue";
 import ClearSelect from "@/components/ClearSelect.vue";
-import { getLabelsByTypes } from "@/api/item";
+import { getLabelsByTypes } from "@/api/Item";
 import { useI18n } from "vue-i18n";
-import { TYPE_CHEST, TYPE_TOWN } from "@/api/node";
+import { TYPE_CHEST, TYPE_TOWN } from "@/api/Node";
 
 const { t } = useI18n();
 

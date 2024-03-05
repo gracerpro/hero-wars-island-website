@@ -107,7 +107,7 @@ import { getHumanQunatity } from "@/helpers/formatter";
 import { useI18n } from "vue-i18n";
 import { createI18nRouteTo } from "@/i18n/translation";
 import { fullscreenElement } from "@/core/fullscreen";
-import { TYPE_CHEST, TYPE_TOWN } from "@/api/node";
+import { TYPE_CHEST, TYPE_TOWN } from "@/api/Node";
 import { isObject } from "@/helpers/core";
 import { getNodesMap } from "@/services/api/island-node";
 

@@ -1,4 +1,4 @@
-import { STATUS_ACCEPTED_SUCCESS, TYPE_START } from "@/api/node";
+import { STATUS_ACCEPTED_SUCCESS, TYPE_START } from "@/api/Node";
 import { useI18n } from "@/i18n";
 
 export const TRANSLATE_X = 6;
