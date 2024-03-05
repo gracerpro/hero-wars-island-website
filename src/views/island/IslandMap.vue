@@ -176,8 +176,10 @@ const userItems = computed(() => {
   });
 });
 const userNodesCount = computed(() => Object.keys(userNodesMap.value).length);
-// TODO: if 0?
-const totalNodesCount = computed(() => Object.keys(nodes.value).length - 1); // "-1" it means subtract an entry node
+const totalNodesCount = computed(() => {
+  const length = Object.keys(nodes.value).length;
+  return length > 0 ? length - 1 : 0; // "-1" it means subtract an entry node
+});
 const canEditNodes = computed(() => {
   for (const id in nodes.value) {
     const node = nodes.value[id];
