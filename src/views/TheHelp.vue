@@ -23,7 +23,6 @@
         </ul>
       </li>
       <li>{{ t("page.help.help2") }}</li>
-      <li>{{ t("page.help.help3") }}</li>
       <li>{{ t("page.help.help4") }}</li>
     </ul>
 
@@ -31,7 +30,6 @@
     <ul>
       <li>{{ t("page.help.todo1") }}</li>
       <li>{{ t("page.help.todo2") }}</li>
-      <li>{{ t("page.help.todo3") }}</li>
     </ul>
   </div>
 </template>

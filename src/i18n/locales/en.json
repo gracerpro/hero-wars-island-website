@@ -81,11 +81,10 @@
       "paragraph1": "Anyone who wants to help, I will be glad.",
       "help1": "Frontend developers, the site code is open! {link}",
       "help2": "Make normal resource icons, without artifacts.",
-      "help3": "Add autotest.",
       "help4": "Suggest ideas.",
       "todo1": "Add news.",
       "todo2": "Make a button \"show the whole island\".",
-      "todo3": "Make a button \"Fullscreen mode\"."
+      "todo4": "Add autotests."
     },
     "home": {
       "actual": "Actual",
