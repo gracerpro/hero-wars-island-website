@@ -5,16 +5,16 @@ import Feedback from "./Feedback";
 
 export default class HeroClient {
   /** @var {Feedback} */
-  feedback
+  feedback;
 
   /** @var {Island} */
-  island
+  island;
 
   /** @var {Item} */
-  item
+  item;
 
   /** @var {Node} */
-  node
+  node;
 
   constructor() {
     this.feedback = new Feedback();

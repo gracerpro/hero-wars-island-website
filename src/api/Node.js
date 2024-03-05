@@ -20,11 +20,11 @@ export default class Node {
   }
 
   /**
-     * @param {Number} islandId
-     * @returns {Promise<Object>}
-     */
+   * @param {Number} islandId
+   * @returns {Promise<Object>}
+   */
   async getList(islandId) {
-    const list = await this._apiRequest.get(`/islands/${islandId}/nodes`);
+    const list = await this._apiRequest.get(`/island-nodes?islandId=${islandId}`);
 
     if (list.items) {
       list.items.forEach((node) => this.modifyNode(node));
