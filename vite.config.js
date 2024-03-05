@@ -30,6 +30,10 @@ export default defineConfig(({mode}) => {
     test: {
       /* for example, use global to avoid globals imports (describe, test, expect): */
       // globals: true,
+      coverage: {
+        provider: 'v8',
+        reporter: ['text'],
+      },
     }
   }
 })
