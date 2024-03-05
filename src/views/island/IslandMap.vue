@@ -103,7 +103,7 @@ import IslandMapTable from "./IslandMapTable.vue";
 import IslandMapGroupItems from "./IslandMapGroupItems.vue";
 import { canEditNode, canSelectNode } from "@/services/island-map";
 import { onMounted, onUnmounted, ref, computed, shallowReactive } from "vue";
-import { getHumanQunatity } from "@/helpers/formatter";
+import { getHumanQuantity } from "@/helpers/formatter";
 import { useI18n } from "vue-i18n";
 import { createI18nRouteTo } from "@/i18n/translation";
 import { fullscreenElement } from "@/core/fullscreen";
@@ -254,7 +254,7 @@ function calculateItems(nodes) {
       items.push({
         uniqueId: node.mx + "_" + node.my + "_" + item.id,
         iconUrl: item.iconUrl,
-        humanQuantity: getHumanQunatity(item.quantity),
+        humanQuantity: getHumanQuantity(item.quantity),
         emeraldCost: item.emeraldCost !== null ? item.emeraldCost * item.quantity : null,
         node,
         item,

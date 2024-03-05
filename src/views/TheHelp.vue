@@ -30,6 +30,7 @@
     <ul>
       <li>{{ t("page.help.todo1") }}</li>
       <li>{{ t("page.help.todo2") }}</li>
+      <li>TypeScript</li>
     </ul>
   </div>
 </template>
