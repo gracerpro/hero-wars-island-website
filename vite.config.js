@@ -1,3 +1,4 @@
+/// <reference types="vitest" />
 import { fileURLToPath, URL } from 'node:url'
 import { defineConfig, loadEnv } from 'vite';
 import vue from '@vitejs/plugin-vue';
@@ -25,6 +26,10 @@ export default defineConfig(({mode}) => {
       alias: {
         '@': fileURLToPath(new URL('./src', import.meta.url)),
       }
+    },
+    test: {
+      /* for example, use global to avoid globals imports (describe, test, expect): */
+      // globals: true,
     }
   }
 })
