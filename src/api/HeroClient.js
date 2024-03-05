@@ -129,6 +129,9 @@ export default class HeroClient {
     if (island.eventEndAt) {
       island.eventEndAt = new Date(island.eventEndAt);
     }
+    if (island.nodesLastUpdatedAt) {
+      island.nodesLastUpdatedAt = new Date(island.nodesLastUpdatedAt);
+    }
   }
 
   /**
