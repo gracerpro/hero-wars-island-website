@@ -31,7 +31,7 @@ export function fromCurrentDate(date, locale = null) {
   return result;
 }
 
-export function getHumanQunatity(quantity) {
+export function getHumanQuantity(quantity) {
   // max 4 chars
 
   if (quantity >= 1000000) {
@@ -47,5 +47,5 @@ export function getHumanQunatity(quantity) {
     return Math.floor(quantity / 1000) + "K";
   }
 
-  return quantity;
+  return "" + quantity;
 }
