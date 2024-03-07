@@ -28,12 +28,12 @@ export default defineConfig(({mode}) => {
       }
     },
     test: {
-      setupFiles: 'vitest.setup.js',
-    //  environment: 'jsdom',
+      environment: 'jsdom',
       coverage: {
         provider: 'v8',
         reporter: ['text'],
       },
+      setupFiles: 'vitest.setup.js',
     }
   }
 })

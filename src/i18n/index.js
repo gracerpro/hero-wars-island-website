@@ -11,7 +11,8 @@ export function createI18n() {
     locale,
     fallbackLocale: locale,
     legacy: false,
-    globalInjection: true,
+    allowComposition: true,
+    globalInjection: false,
     messages: { ru },
     warnHtmlMessage: false,
   });

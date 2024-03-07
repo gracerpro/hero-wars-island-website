@@ -1,43 +1,24 @@
-//import { config } from '@vue/test-utils'
-//import { vi } from "vitest"
-//import { createI18n, useI18n } from 'vue-i18n'
-//import { useRouter } from 'vue-router'
+import { config } from '@vue/test-utils'
+import { createI18n } from "vue-i18n";
+import en from "@/i18n/locales/en.json";
+import { createRouter, createWebHistory } from 'vue-router';
+import routes from '@/router/routes';
 
-/*
-vi.mock('vue-router', () => ({
-  useRoute: vi.fn(),
-  useRouter: vi.fn(() => ({
-    push: () => {}
-  }))
-}))
-
-OR
-
-useRouter.mockReturnValue({
-  push: vi.fn(),
-})*/
-
-
-
-/*
-const i18n = createI18n({
-  legacy: false,
-  allowComposition: true
+const router = createRouter({
+  history: createWebHistory(),
+  routes: routes,
+  linkActiveClass: "active",
+  linkExactActiveClass: "",
 })
-config.global.plugins = [i18n]
 
-vi.mock("vue-i18n", () => ({
-  useI18n: () => ({
-    t: (key) => key,
-    d: (key) => key,
-  }),
-}));
-
-useI18n.mockReturnValue({
-  t: (tKey) => tKey,
+const i18n = createI18n({
+  locale: "en",
+  fallbackLocale: "en",
+  legacy: false,
+  allowComposition: true,
+  globalInjection: false,
+  messages: { en },
+  warnHtmlMessage: false,
 });
 
-config.global.mocks = {
-  $t: (tKey) => tKey,
-};
-*/
+config.global.plugins = [i18n, router];

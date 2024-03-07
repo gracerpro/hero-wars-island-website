@@ -1,6 +1,6 @@
-//import { mount } from '@vue/test-utils'
-//import TheIsland from '../../src/views/TheIsland.vue'
-import { describe, it } from 'vitest';
+import { shallowMount } from '@vue/test-utils'
+import TheHome from '../../src/views/TheHome.vue'
+import { describe, it, expect } from 'vitest'
 
 /*
 let responseJson = {
@@ -30,14 +30,15 @@ let responseJson = {
   totalCount: 3,
 };*/
 
-describe('The home page TODO', () => {
+describe('The home page', () => {
   it("mount component", async () => {
-    /*expect(TheIsland).toBeTruthy()
+    expect(TheHome).toBeTruthy()
 
-    const wrapper = mount(TheIsland, {
-      props: {},
+    const wrapper = shallowMount(TheHome, {
+      props: {}
     })
 
-    await wrapper.get('h1').toContain('Adventures islands - Hero Wars Dominion Era')*/
+    const h1 = await wrapper.get('h1');
+    expect(h1.text()).toBe("Adventures islands - Hero Wars Dominion Era")
   })
 })
