@@ -52,7 +52,6 @@ describe('The home page', () => {
     expect(getList).toBeCalled()
     expect(wrapper.vm.islands).toHaveLength(3)
     expect(wrapper.vm.errorMessage).toBe("")
-    console.log(wrapper.html());
 
   //  const h1 = await wrapper.get('h1');
   //  expect(h1.text()).toBe("Adventures islands - Hero Wars Dominion Era")
