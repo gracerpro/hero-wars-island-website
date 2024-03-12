@@ -81,7 +81,6 @@ onMounted(() => {
       if (currentIsland.value) {
         loadIsland(currentIsland.value.id);
       }
-      // TODO: loading_start >change< loading_end
     }
   );
 
