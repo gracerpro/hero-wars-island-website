@@ -5,8 +5,18 @@
 Up the containers
 
 ```bash
-docker-compose up --detach
-docker-compose up --detach --build --force-recreate
+docker compose up --detach
+docker compose up --detach --build --force-recreate
+```
+
+Log in to the container
+
+```bash
+docker exec -it hero-wars-website__vite bash
+# or
+docker exec -it --user "$(id -u):$(id -g)" hero-wars-website__vite bash
+
+npm run dev
 ```
 
 Run a command, without log in to the container
@@ -16,12 +26,6 @@ docker exec hero-wars-website__vite npm run build
 docker exec hero-wars-website__vite npm run lint --fix
 ```
 
-Log in to the container
-
-```bash
-docker exec -it hero-wars-website__vite bash
-docker exec -it --user "$(id -u):$(id -g)" hero-wars-website__vite bash
-```
 
 ## Project setup
 
