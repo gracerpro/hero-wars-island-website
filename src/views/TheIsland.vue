@@ -136,7 +136,6 @@ async function loadIsland(id) {
     const isWithDescription = true;
     currentIsland.value = await client.island.get(id, isWithDescription);
   } catch (error) {
-    console.log(error);
     if (error instanceof HttpError && error.statusCode === 404) {
       errorMessage.value = t("page.island.islandNotFound");
     } else {

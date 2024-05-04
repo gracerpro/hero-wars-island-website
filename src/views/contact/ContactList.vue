@@ -2,10 +2,9 @@
 <div>
   <h2 class="mt-3">{{ t("common.feedback") }}</h2>
 
-  <row-loading v-if="loading" />
-  <div v-else-if="errorMessage" class="alert alert-danger">
-    {{ errorMessage }}
-  </div>
+  <p v-if="isShowNoData">
+    {{ t("common.noData") }}
+  </p>
   <div v-else v-for="item in feedbackItems" :key="item.id" class="mb-4">
     <h5>{{ item.subject }}</h5>
     <div>
@@ -18,8 +17,17 @@
       {{ item.answer }}
     </div>
   </div>
-  <div v-if="hasMoreItems">
-    <button class="btn btn-default">{{ t("common.showMore") }}</button>
+
+  <row-loading v-if="loading" />
+  <div v-else-if="errorMessage" class="alert alert-danger">
+    {{ errorMessage }}
+  </div>
+  <div v-else-if="hasMoreItems" class="text-center">
+    <button
+      type="button"
+      class="btn btn-link"
+      :disabled="loading"
+      @click="loadFeedbackItems">{{ t("common.showMore") }}</button>
   </div>
 </div>
 </template>
@@ -34,14 +42,16 @@ import { STATUS_CREATED, STATUS_ABORT, STATUS_CLOSED, STATUS_QUEUE, getStatusNam
 const { t } = useI18n();
 const client = new HeroClient();
 
+const loaded = ref(false);
+const loading = ref(false);
 const feedbackItems = ref([]);
 const feedbackTotalCount = ref(0);
-const loading = ref(true);
 const errorMessage = ref("");
 const pageSize = 2;
-const pageNumber = ref(1);
+const pageNumber = ref(0);
 
 const hasMoreItems = computed(() => pageNumber.value * pageSize < feedbackTotalCount.value);
+const isShowNoData = computed(() => loaded.value && !feedbackItems.value.length && !errorMessage.value);
 
 loadFeedbackItems()
 
@@ -57,17 +67,25 @@ function getStatusClass(status) {
 }
 
 function loadFeedbackItems() {
+  if (loading.value) {
+    return
+  }
+
   loading.value = true;
   client.feedback
-    .getList(5)
+    .getList(pageSize, pageNumber.value)
     .then((list) => {
-      console.log("loaded...", list)
-      feedbackItems.value = list.items;
+      list.items.forEach((item) => feedbackItems.value.push(item));
       feedbackTotalCount.value = list.totalCount;
+
+      ++pageNumber.value;
     })
     .catch(() => {
       errorMessage.value = t("common.loadingFailDeveloperShow");
     })
-    .finally(() => (loading.value = false));
+    .finally(() => {
+      loading.value = false;
+      loaded.value = true;
+    });
 }
 </script>
