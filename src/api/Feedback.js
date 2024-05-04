@@ -1,6 +1,13 @@
 import { getCurrentLocale } from "@/i18n/translation";
 import ApiRequest from "../core/ApiRequest";
 
+export const STATUS_CREATED = "created";
+export const STATUS_IN_PROCESS = "in_process";
+export const STATUS_MODERATED = "moderated";
+export const STATUS_ABORT = "abort";
+export const STATUS_CLOSED = "closed";
+export const STATUS_QUEUE = "queue";
+
 export default class Feedback {
   constructor() {
     this._apiRequest = new ApiRequest();
@@ -42,4 +49,17 @@ export default class Feedback {
       feedbackItem.createdAt = new Date(feedbackItem.createdAt);
     }
   }
+}
+
+export function getStatusName(t, statusId) {
+  const names = {
+    [STATUS_CREATED]: t("common.created"),
+    [STATUS_IN_PROCESS]: t("common.inProgress"),
+    [STATUS_MODERATED]: t("common.moderated"),
+    [STATUS_ABORT]: t("common.abort"),
+    [STATUS_CLOSED]: t("common.closed"),
+    [STATUS_QUEUE]: t("common.inQueue")
+  };
+
+  return names[statusId] ? names[statusId] : t("common.unknownStatus");
 }
