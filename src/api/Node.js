@@ -91,5 +91,5 @@ export function getStatusName(t, statusId) {
     [STATUS_ACCEPTED_SUCCESS]: t("common.accepted"),
   };
 
-  return names[statusId] ? names[statusId] : "";
+  return names[statusId] ? names[statusId] : t("common.unknownStatus");
 }

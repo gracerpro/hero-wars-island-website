@@ -1,13 +1,6 @@
 <template>
   <div>
-    <div class="text-center map">
-      <div
-        class="spinner-border"
-        role="status"
-      >
-        <span class="visually-hidden">Loading...</span>
-      </div>
-    </div>
+    <row-loading class="map" />
     <div class="row mb-4">
       <div
         class="col-lg-3"
@@ -52,6 +45,9 @@
     </div>
   </div>
 </template>
+<script setup>
+import RowLoading from '@/components/RowLoading.vue';
+</script>
 <style scoped>
 .map {
   padding: 100px;

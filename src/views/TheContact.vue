@@ -8,11 +8,13 @@
         <contact-form />
       </div>
     </div>
+    <contact-list />
   </div>
 </template>
 <script setup>
 import { setMetaInfo } from "@/services/page-meta";
 import ContactForm from "./contact/ContactForm.vue";
+import ContactList from "./contact/ContactList.vue";
 import { useI18n } from "vue-i18n";
 import { useSSRContext } from "vue";
 
