@@ -24,6 +24,11 @@ export default class Feedback {
     return this._apiRequest.post("/feedback-items/create", data);
   }
 
+  /**
+   * @param {Number} pageSize
+   * @param {Number} pageNumber
+   * @returns {Promise<Object>}
+   */
   async getList(pageSize, pageNumber = 1) {
     const params = { pageSize };
 
@@ -31,7 +36,7 @@ export default class Feedback {
       params.pageNumber = pageNumber;
     }
 
-    const list = await this._apiRequest.get("/feedback-items/index", params);
+    const list = await this._apiRequest.get("/feedback-items", params);
 
     if (list.items) {
       list.items.forEach((item) => this.modifyFeedback(item));
