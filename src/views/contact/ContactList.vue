@@ -47,10 +47,10 @@ const loading = ref(false);
 const feedbackItems = ref([]);
 const feedbackTotalCount = ref(0);
 const errorMessage = ref("");
-const pageSize = 2;
-const pageNumber = ref(0);
+const pageSize = 5;
+const pageNumber = ref(1);
 
-const hasMoreItems = computed(() => pageNumber.value * pageSize < feedbackTotalCount.value);
+const hasMoreItems = computed(() => (pageNumber.value - 1) * pageSize < feedbackTotalCount.value);
 const isShowNoData = computed(() => loaded.value && !feedbackItems.value.length && !errorMessage.value);
 
 loadFeedbackItems()
