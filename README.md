@@ -2,18 +2,13 @@
 
 ## Quick hints
 
-Up the containers
-
 ```bash
+# Up the containers
 docker compose up --detach
 docker compose up --detach --build --force-recreate
-```
 
-Log in to the container
-
-```bash
+# Log in to the container
 docker exec -it hero-wars-website__vite bash
-# or
 docker exec -it --user "$(id -u):$(id -g)" hero-wars-website__vite bash
 
 npm run dev

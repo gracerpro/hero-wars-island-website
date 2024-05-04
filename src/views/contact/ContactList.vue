@@ -2,7 +2,11 @@
 <div>
   <h2 class="mt-3">Обратная связь</h2>
 
-  <div v-for="item in feedbackItems" :key="item.id" class="mb-3">
+  <row-loading v-if="loading" />
+  <div v-else-if="errorMessage" class="alert alert-danger">
+    {{ errorMessage }}
+  </div>
+  <div v-else v-for="item in feedbackItems" :key="item.id" class="mb-3">
     <h5>{{ item.subject }}</h5>
     <div>{{ item.subject }}</div>
     <div v-if="item.answer">
@@ -18,6 +22,7 @@
 <script setup>
 import { useI18n } from "vue-i18n";
 import { ref, computed } from "vue";
+import RowLoading from "@/components/RowLoading.vue"
 import HeroClient from "@/api/HeroClient";
 
 const { t } = useI18n();
@@ -37,7 +42,6 @@ const hasMoreItems = computed(() => {
 loadFeedbackItems()
 
 function loadFeedbackItems() {
-  console.log("load...")
   loading.value = true;
   client.feedback
     .getList(5)
