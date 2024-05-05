@@ -63,7 +63,7 @@ export function getStatusName(t, statusId) {
     [STATUS_MODERATED]: t("common.moderated"),
     [STATUS_ABORT]: t("common.abort"),
     [STATUS_CLOSED]: t("common.closed"),
-    [STATUS_QUEUE]: t("common.inQueue")
+    [STATUS_QUEUE]: t("common.inQueue"),
   };
 
   return names[statusId] ? names[statusId] : t("common.unknownStatus");

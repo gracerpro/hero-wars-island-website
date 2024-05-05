@@ -46,7 +46,7 @@
   </div>
 </template>
 <script setup>
-import RowLoading from '@/components/RowLoading.vue';
+import RowLoading from "@/components/RowLoading.vue";
 </script>
 <style scoped>
 .map {

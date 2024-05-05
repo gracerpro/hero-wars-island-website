@@ -74,5 +74,15 @@ The end.
 Get commits history
 
 ```bash
-git log --since=2022-10-16 --pretty=format:"%cD %s"
+git log --since=2024-03-01 --pretty=format:"%cD %s"
+```
+
+Run some commands
+
+```bash
+npm run format
+npm run lint
+npm run test
+
+npm run build
 ```

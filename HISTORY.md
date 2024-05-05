@@ -1,5 +1,25 @@
 # History
 
+## v1.3.5
+
+What has been done
+
+* Add feedback list
+* Add filter for tower and chest
+* Optimize map loading by cache
+* Save scale, translate, user nodes for each island
+
+Technical part
+
+* Add vitest!
+* Add status pages, help, about, home and contact simple tests
+* Test some functions
+* Add code coverage
+* Refactoring: divide a hero client
+* Format the code
+* Update readme
+* Change robots.txt
+
 
 ## v1.3.1-beta
 

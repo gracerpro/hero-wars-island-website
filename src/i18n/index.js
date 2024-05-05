@@ -8,7 +8,7 @@ export function createI18n(locale, messages) {
     locale = import.meta.env.VITE_DEFAULT_LOCALE;
   }
   if (!messages) {
-    messages = { ru }
+    messages = { ru };
   }
 
   i18n = _createI18n({
