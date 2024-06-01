@@ -173,7 +173,7 @@ const props = defineProps({
   items: { type: Array, required: true },
   inputNodes: { type: Object, required: true },
   userNodesMap: { type: Object, required: true },
-  isSelectAnyNode: { type: Boolean, default: true }
+  isSelectAnyNode: { type: Boolean, default: true },
 });
 defineExpose({
   canvas,
