@@ -173,6 +173,7 @@ const props = defineProps({
   items: { type: Array, required: true },
   inputNodes: { type: Object, required: true },
   userNodesMap: { type: Object, required: true },
+  isSelectAnyNode: { type: Boolean, default: true }
 });
 defineExpose({
   canvas,
@@ -372,15 +373,17 @@ const nodeMouseEnter = (node) => {
 const onNodeClick = (node) => {
   const isRemove = isUserNode(node);
 
-  if (isRemove) {
-    if (!canSelectNode(node)) {
-      return;
-    }
-  } else {
-    const message = canSelectNextNode(nodes.value, props.userNodesMap, node);
-    if (message) {
-      toast.value.show(message, TYPE_DANGER);
-      return;
+  if (!canSelectNode(node)) {
+    return;
+  }
+
+  if (!isRemove) {
+    if (!props.isSelectAnyNode) {
+      const message = canSelectNextNode(nodes.value, props.userNodesMap, node);
+      if (message) {
+        toast.value.show(message, TYPE_DANGER);
+        return;
+      }
     }
   }
 

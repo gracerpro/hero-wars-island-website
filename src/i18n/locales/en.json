@@ -47,6 +47,7 @@
     "reset": "Reset",
     "resource": "Resource | Resources",
     "save": "Save",
+    "selectAnyNodeQuestion": "Select any node?",
     "send": "Send",
     "show": "Show",
     "showMore": "Show more",

@@ -26,6 +26,7 @@
         :translate-y="translateY"
         :is-only-image="isOnlyImage"
         :is-show-no-moderate="isShowNoModerate"
+        :is-select-any-node="isSelectAnyNode"
         :items="visibleItems"
         :input-nodes="nodes"
         :user-nodes-map="userNodesMap"
@@ -46,12 +47,16 @@
           />
         </div>
         <div class="col-lg-6">
-          <div class="mb-2">
+          <div class="float-end">
             <router-link
               :to="createI18nRouteTo({ name: 'contact' })"
-              class="float-end"
               >{{ t("common.haveErrosOrProposal") }}</router-link
-            >
+            ><br>
+            <label class="mt-2">
+              <input type="checkbox" v-model="isSelectAnyNode"> {{ t("common.selectAnyNodeQuestion") }}
+            </label>
+          </div>
+          <div class="mb-2">
             {{ t("page.island.myExplorersMoves") }}
           </div>
           <div>
@@ -132,6 +137,7 @@ const userNodesMap = ref({});
 const scale = ref(1);
 const translateX = ref(0);
 const translateY = ref(0);
+const isSelectAnyNode = ref(true);
 const isOnlyImage = ref(false);
 const isShowNoModerate = ref(true);
 const isShowGroupItems = ref(false);
@@ -376,6 +382,10 @@ function loadState() {
   filter.value = state.filter;
   isOnlyImage.value = state.isOnlyImage;
   isShowNoModerate.value = state.isShowNoModerate;
+
+  console.log("state.isSelectAnyNode", state.isSelectAnyNode);
+
+  isSelectAnyNode.value = typeof state.isSelectAnyNode === "boolean" ? state.isSelectAnyNode : true
 }
 
 function saveState() {
@@ -383,13 +393,14 @@ function saveState() {
     filter: filter.value,
     isOnlyImage: isOnlyImage.value,
     isShowNoModerate: isShowNoModerate.value,
-  };
+    isSelectAnyNode: isSelectAnyNode.value,
+  }
   byIslandState[props.island.id] = {
     userNodesIds: Object.keys(userNodesMap.value).map((id) => parseInt(id)),
     scale: scale.value,
     translateX: translateX.value,
     translateY: translateY.value,
-  };
+  }
   state.byIsland = byIslandState;
 
   localStorage.setItem(componentId, JSON.stringify(state));
