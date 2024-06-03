@@ -1,5 +1,13 @@
 # History
 
+## v1.3.6
+
+What has been done
+
+* Add plan and going mode on select nodes
+* Add select all nodes checkbox
+
+
 ## v1.3.5
 
 What has been done

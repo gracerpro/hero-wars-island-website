@@ -76,8 +76,17 @@
             </button>
           </div>
           <div class="mt-2">
-            <label v-for="mode in selectModes" :key="mode.value" class="me-2">
-              <input type="radio" :value="mode.value" v-model="selectMode"> {{ mode.label }}
+            <label
+              v-for="mode in selectModes"
+              :key="mode.value"
+              class="me-2"
+            >
+              <input
+                type="radio"
+                :value="mode.value"
+                v-model="selectMode"
+              />
+              {{ mode.label }}
             </label>
           </div>
           <div class="fst-italic text-secondary small">{{ selectModeHint }}</div>
@@ -139,8 +148,8 @@ let byIslandState = {};
 const minCharsCount = 3;
 const componentId = props.parentPageId + "__map";
 
-const SELECT_MODE_PLAN = "plan"
-const SELECT_MODE_GOING = "going"
+const SELECT_MODE_PLAN = "plan";
+const SELECT_MODE_GOING = "going";
 
 const loadingNodes = ref(true);
 const calculatingItems = ref(false);
@@ -213,15 +222,15 @@ const canEditNodes = computed(() => {
 });
 const selectModes = computed(() => {
   return [
-    {value: SELECT_MODE_PLAN, label: t("page.island.planning")},
-    {value: SELECT_MODE_GOING, label: t("page.island.going")}
-  ]
-})
+    { value: SELECT_MODE_PLAN, label: t("page.island.planning") },
+    { value: SELECT_MODE_GOING, label: t("page.island.going") },
+  ];
+});
 const selectModeHint = computed(() => {
   return selectMode.value === SELECT_MODE_PLAN
     ? t("page.island.canSelectAnyNode")
-    : t("page.island.canSelectOnlyPlannedNode")
-})
+    : t("page.island.canSelectOnlyPlannedNode");
+});
 
 onMounted(() => {
   loadNodes().then((responseNodes) => {
@@ -263,7 +272,7 @@ function initUserNodes(nodes) {
       nodesMap[id] = node;
     }
     if (userNodesGoingIds.includes(id)) {
-      node.isGoingChecked = true
+      node.isGoingChecked = true;
     }
   });
 
@@ -355,15 +364,15 @@ const onSelectNode = (id) => {
     }
   } else {
     if (userNodesMap.value[id] !== undefined) {
-      userNodesMap.value[id].isGoingChecked = !userNodesMap.value[id].isGoingChecked
+      userNodesMap.value[id].isGoingChecked = !userNodesMap.value[id].isGoingChecked;
     }
   }
 };
 const onResetUserNodes = () => {
-  userNodesMap.value = {}
-  selectMode.value = SELECT_MODE_PLAN
+  userNodesMap.value = {};
+  selectMode.value = SELECT_MODE_PLAN;
   for (let id in nodes.value) {
-    delete nodes.value[id].isGoingChecked
+    delete nodes.value[id].isGoingChecked;
   }
 };
 

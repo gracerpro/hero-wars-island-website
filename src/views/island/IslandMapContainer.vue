@@ -471,11 +471,9 @@ const isUserNode = (node) => {
 };
 const getUserNodeClass = (node) => {
   if (props.userNodesMap[node.id] !== undefined) {
-    return props.userNodesMap[node.id].isGoingChecked
-      ? "user-node-going"
-      : "user-node"
+    return props.userNodesMap[node.id].isGoingChecked ? "user-node-going" : "user-node";
   }
-}
+};
 
 const getWarningTitle = (item) => {
   if (item.node.statusId === STATUS_ON_MODERATION || item.node.statusId === STATUS_NOT_SURE) {
