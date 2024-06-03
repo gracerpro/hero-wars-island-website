@@ -32,7 +32,7 @@
           v-for="node in nodes"
           :key="node.xyId"
           :points="node.points"
-          :class="['node', node.class, isUserNode(node) ? 'user-node' : '']"
+          :class="['node', node.class, getUserNodeClass(node)]"
           @mouseenter="nodeMouseEnter(node)"
           @click="onNodeClick(node)"
         />
@@ -171,6 +171,7 @@ const props = defineProps({
   isOnlyImage: { type: Boolean, required: true },
   isShowNoModerate: { type: Boolean, required: true },
   items: { type: Array, required: true },
+  selectMode: { type: String, required: true },
   inputNodes: { type: Object, required: true },
   userNodesMap: { type: Object, required: true },
   isSelectAnyNode: { type: Boolean, default: true },
@@ -371,13 +372,11 @@ const nodeMouseEnter = (node) => {
   activeNode = node;
 };
 const onNodeClick = (node) => {
-  const isRemove = isUserNode(node);
-
   if (!canSelectNode(node)) {
     return;
   }
 
-  if (!isRemove) {
+  if (!isUserNode(node)) {
     if (!props.isSelectAnyNode) {
       const message = canSelectNextNode(nodes.value, props.userNodesMap, node);
       if (message) {
@@ -387,7 +386,7 @@ const onNodeClick = (node) => {
     }
   }
 
-  emit(EVENT_SELECT_NODE, node.id, isRemove);
+  emit(EVENT_SELECT_NODE, node.id);
 };
 /**
  * @param {Object} button
@@ -470,6 +469,14 @@ const onMountedNodeDialog = () => {
 const isUserNode = (node) => {
   return props.userNodesMap[node.id] !== undefined;
 };
+const getUserNodeClass = (node) => {
+  if (props.userNodesMap[node.id] !== undefined) {
+    return props.userNodesMap[node.id].isGoingChecked
+      ? "user-node-going"
+      : "user-node"
+  }
+}
+
 const getWarningTitle = (item) => {
   if (item.node.statusId === STATUS_ON_MODERATION || item.node.statusId === STATUS_NOT_SURE) {
     return getStatusName(t, item.node.statusId);
@@ -516,6 +523,9 @@ const getItemName = (item) => {
 }
 .node.user-node {
   fill: #6668f8;
+}
+.node.user-node-going {
+  fill: #f86696;
 }
 .text {
   font-size: 20px;

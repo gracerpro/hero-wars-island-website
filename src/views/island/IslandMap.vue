@@ -60,10 +60,10 @@
               {{ t("common.selectAnyNodeQuestion") }}
             </label>
           </div>
-          <div class="mb-2">
+          <div>
             {{ t("page.island.myExplorersMoves") }}
           </div>
-          <div>
+          <div class="mt-2">
             <span class="fs-4 me-2 align-middle">
               <b>{{ userNodesCount }}</b> / {{ totalNodesCount }}
             </span>
@@ -75,6 +75,12 @@
               {{ t("common.reset") }}
             </button>
           </div>
+          <div class="mt-2">
+            <label v-for="mode in selectModes" :key="mode.value" class="me-2">
+              <input type="radio" :value="mode.value" v-model="selectMode"> {{ mode.label }}
+            </label>
+          </div>
+          <div class="fst-italic text-secondary small">{{ selectModeHint }}</div>
         </div>
       </div>
       <div class="row mt-3">
@@ -128,9 +134,13 @@ const props = defineProps({
 });
 
 let userNodesIds = [];
+let userNodesGoingIds = [];
 let byIslandState = {};
 const minCharsCount = 3;
 const componentId = props.parentPageId + "__map";
+
+const SELECT_MODE_PLAN = "plan"
+const SELECT_MODE_GOING = "going"
 
 const loadingNodes = ref(true);
 const calculatingItems = ref(false);
@@ -142,6 +152,7 @@ const scale = ref(1);
 const translateX = ref(0);
 const translateY = ref(0);
 const isSelectAnyNode = ref(true);
+const selectMode = ref(SELECT_MODE_PLAN);
 const isOnlyImage = ref(false);
 const isShowNoModerate = ref(true);
 const isShowGroupItems = ref(false);
@@ -200,6 +211,17 @@ const canEditNodes = computed(() => {
 
   return false;
 });
+const selectModes = computed(() => {
+  return [
+    {value: SELECT_MODE_PLAN, label: t("page.island.planning")},
+    {value: SELECT_MODE_GOING, label: t("page.island.going")}
+  ]
+})
+const selectModeHint = computed(() => {
+  return selectMode.value === SELECT_MODE_PLAN
+    ? t("page.island.canSelectAnyNode")
+    : t("page.island.canSelectOnlyPlannedNode")
+})
 
 onMounted(() => {
   loadNodes().then((responseNodes) => {
@@ -239,6 +261,9 @@ function initUserNodes(nodes) {
     const node = nodes[id];
     if (node && canSelectNode(node)) {
       nodesMap[id] = node;
+    }
+    if (userNodesGoingIds.includes(id)) {
+      node.isGoingChecked = true
     }
   });
 
@@ -316,17 +341,31 @@ const onChangeNode = (node) => {
   }
   nodes.value[node.id] = node;
 };
-const onSelectNode = (id, isRemove) => {
-  if (isRemove) {
-    delete userNodesMap.value[id];
-  } else {
+const onSelectNode = (id) => {
+  if (selectMode.value === SELECT_MODE_PLAN) {
     if (!nodes.value[id]) {
       throw new Error(t("page.island.notFoundNodeAdmin"));
     }
-    userNodesMap.value[id] = nodes.value[id];
+
+    if (userNodesMap.value[id] !== undefined) {
+      delete userNodesMap.value[id];
+      nodes.value[id].isGoingChecked = false;
+    } else {
+      userNodesMap.value[id] = nodes.value[id];
+    }
+  } else {
+    if (userNodesMap.value[id] !== undefined) {
+      userNodesMap.value[id].isGoingChecked = !userNodesMap.value[id].isGoingChecked
+    }
   }
 };
-const onResetUserNodes = () => (userNodesMap.value = {});
+const onResetUserNodes = () => {
+  userNodesMap.value = {}
+  selectMode.value = SELECT_MODE_PLAN
+  for (let id in nodes.value) {
+    delete nodes.value[id].isGoingChecked
+  }
+};
 
 const onFullscreen = () => {
   fullscreenElement(mapContainer.value.canvas);
@@ -382,12 +421,11 @@ function loadState() {
   translateX.value = byIsland.translateX !== undefined ? byIsland.translateX : 0;
   translateY.value = byIsland.translateY !== undefined ? byIsland.translateY : 0;
   userNodesIds = byIsland.userNodesIds ? byIsland.userNodesIds : [];
+  userNodesGoingIds = byIsland.userNodesGoingIds ? byIsland.userNodesGoingIds : [];
 
   filter.value = state.filter;
   isOnlyImage.value = state.isOnlyImage;
   isShowNoModerate.value = state.isShowNoModerate;
-
-  console.log("state.isSelectAnyNode", state.isSelectAnyNode);
 
   isSelectAnyNode.value = typeof state.isSelectAnyNode === "boolean" ? state.isSelectAnyNode : true;
 }
@@ -401,6 +439,9 @@ function saveState() {
   };
   byIslandState[props.island.id] = {
     userNodesIds: Object.keys(userNodesMap.value).map((id) => parseInt(id)),
+    userNodesGoingIds: Object.values(userNodesMap.value)
+      .filter((node) => node.isGoingChecked)
+      .map((node) => parseInt(node.id)),
     scale: scale.value,
     translateX: translateX.value,
     translateY: translateY.value,
