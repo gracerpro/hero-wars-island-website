@@ -12,7 +12,7 @@ let gameData = fetch(index_url).json()
 =>
 static_url + gameData["lib/lib.json"].path
 =>
-"https://heroesru-a.akamaihd.net/mg/" + "lib/lib.json"
+"https://heroesru-a.akamaihd.net/mg/" + "v1106/lib/lib.json"
 =>
 let libUrl = "https://heroesru-a.akamaihd.net/mg/v1106/lib/lib.json"
 

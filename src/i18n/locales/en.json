@@ -126,6 +126,7 @@
       "showEditNodes": "Show edit an nodes?",
       "showOnlyIconWithoutQuantity": "Show only an icons, without a quantity?",
       "oneResource": "One resource",
+      "planRenderMapMessage": "Plan to show a map by game data. In process.",
       "namesByComma": "Several names are separated by a comma.",
       "notFoundNodeAdmin": "The node was not found. Contact the administrators.",
       "notFoundStartNodeAdmin": "The entry node was not found. Contact the administrators.",
