@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <script src="./season-adventure.js"></script>
+</head>
+<body>
+  <script>
+    const data = window.adventureData.seasonAdventure.level;
+    const arr = Object.values(data)
+    //console.log(arr);
+
+    const seasonNodes = arr.filter((o) => o.season === 4)
+    console.log(seasonNodes);
+
+    seasonNodes.forEach((o) => {
+      if (o.steps.length > 0) {
+        o.steps.forEach((o2) => {
+          //console.log("cost.coin", o2.cost.coin)
+          console.log("cost.reward", o2.reward)
+        })
+      }
+    })
+  </script>
+</body>
+</html>
