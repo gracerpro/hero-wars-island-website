@@ -5,6 +5,14 @@
 </head>
 <body>
   <script>
+    const TYPE_GOLD = "gold"
+    const TYPE_CONSUMABLE = "consumable"
+    const TYPE_BANNER_STONE = "bannerStone"
+    const TYPE_COIN = "coin"
+    const TYPE_FRAGMENT_GEAR = "fragmentGear"
+
+    console.log(window.adventureData.seasonAdventure)
+
     const data = window.adventureData.seasonAdventure.level;
     const arr = Object.values(data)
     //console.log(arr);
@@ -12,14 +20,51 @@
     const seasonNodes = arr.filter((o) => o.season === 4)
     console.log(seasonNodes);
 
+    let itemTypesMap = {}
+    let nodeCoins = []
+    let rewardsMap = {}
+    let items = []
+
+    let levelMap = {}
+
     seasonNodes.forEach((o) => {
       if (o.steps.length > 0) {
         o.steps.forEach((o2) => {
-          //console.log("cost.coin", o2.cost.coin)
-          console.log("cost.reward", o2.reward)
+          //console.log(o2.cost)
+
+          if (typeof o2.cost.coin === "object") {
+            nodeCoins.push(o2.cost.coin)
+          }
+
+          const reward = o2.reward
+          //console.log("cost.reward", reward)
+
+          for (const typeName in reward) {
+            itemTypesMap[typeName] = true
+
+            if (typeName === TYPE_GOLD) {
+              const count = reward[typeName]
+              items.push({type: TYPE_GOLD, count})
+            } else {
+              const rewardCountMap = reward[typeName]
+              //console.log(rewardCountMap);
+
+              for (const id in rewardCountMap) {
+                const count = parseInt(rewardCountMap[id])
+                items.push({type: typeName, id: parseInt(id), count})
+              }
+            }
+          }
         })
       }
+
+      levelMap[o.level] = levelMap[o.level] ? levelMap[o.level] + 1 : 1
     })
+
+    console.log("item types", Object.keys(itemTypesMap))
+    console.log("coins size (nodes size?)", nodeCoins.length)
+    console.log(levelMap)
+    console.log("items", items)
   </script>
 </body>
 </html>
