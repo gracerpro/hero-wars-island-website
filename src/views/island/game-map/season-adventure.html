@@ -4,6 +4,7 @@
   <script src="./lib.js"></script>
 </head>
 <body>
+  <canvas id="cells" style="width: 800px; height: 600px; outline: 1px solid gray; margin: 0 auto; display: block;">&nbsp</canvas>
   <script>
     const TYPE_GOLD = "gold"
     const TYPE_CONSUMABLE = "consumable"
@@ -20,7 +21,9 @@
 
     const adventureData = window.libData.seasonAdventure
     const nodes = Object.values(adventureData.level)
-    //console.log(nodes);
+    const map = adventureData.list["4"].map
+
+    console.log(map);
 
 /*
 v1147, 25.07.2024 13:40
@@ -35,18 +38,19 @@ adventureData.list.4
 Часть 1?
 regions[0]
 - condition: time > 0
+- levels: Array(859)
+- initLevels: Array(7)
 
 Часть 2
 regions[1]
 - condition: time > 1721613600, time > 03.07.2024 @ 05:00:00 MSK (GTM +03:00)
-
-Часть 1?
-regions[3]
-- condition: time > 1719972000, time > 03.07.2024 @ 05:00:00 MSK (GTM +03:00)
+- levels: Array(7)
+- initLevels: Array(7)
 
 Для летнего фестиваля
 regions[2]
 - condition: time > 1721613600, time > 22.07.2024 @ 05:00:00 MSK (GTM +03:00)
+- levels: Array(7)
 - initLevels: Array(7)
 ​​​​​​​0: 146
 ​​​​​​​1: 148
@@ -55,16 +59,50 @@ regions[2]
 ​​​​​​​4: 167
 ​​​​​​​5: 132 Древний сундук артефактов титанов 3 шт, consumable, id = 149
 ​​​​​​​6: 131
+
+Часть 1?
+regions[3]
+- condition: time > 1719972000, time > 03.07.2024 @ 05:00:00 MSK (GTM +03:00)
+- levels: Array(1)
+- initLevels: Array(1)
 */
 
     const seasonNodes = nodes.filter((o) => o.season === 4)
-    console.log("seasonNodes", seasonNodes)
+    console.log("seasonNodes, level", seasonNodes)
 
     const summerInitLevels = [130, 131, 132, 146, 148, 166, 167]
     const summerNodes = seasonNodes.filter((o) => {
       return summerInitLevels.includes(o.level)
     })
-    console.log("summerInitNodes", summerNodes)
+  //  console.log("summerInitNodes", summerNodes)
+
+    let minX = 9999
+    let maxX = -9999
+    let minY = 9999
+    let maxY = -9999
+    let isX = true
+    map.cells.forEach((v) => {
+      if (isX) {
+        if (v < minX) {
+          minX = v
+        }
+        if (v > maxX) {
+          maxX = v
+        }
+      } else {
+        if (v < minY) {
+          minY = v
+        }
+        if (v > maxY) {
+          maxY = v
+        }
+      }
+
+      isX = !isX
+    })
+    console.log("minX, maxX", minX, maxX, "minY, maxY", minY, maxY)
+
+    drawCells(map.cells)
 
     let itemTypesMap = {}
     let nodeCoins = []
@@ -75,7 +113,7 @@ regions[2]
 
     seasonNodes.forEach((node) => {
       if (summerInitLevels.includes(node.level)) {
-        console.log(node)
+     //   console.log(node)
 
         // level: 167
         // шагов нет, где награды лежат? 1 монета летнего фестиваля
@@ -90,13 +128,13 @@ regions[2]
           }
 
           const reward = step.reward
-          //console.log("cost.reward", reward)
+         // console.log("cost.reward", reward)
 
           for (const typeName in reward) {
             itemTypesMap[typeName] = true
 
             if (typeName === TYPE_STAR_MONEY) {
-              console.log(reward)
+              //console.log(TYPE_STAR_MONEY, reward)
             }
 
             if (typeName === TYPE_GOLD) {
@@ -104,7 +142,7 @@ regions[2]
               items.push({type: TYPE_GOLD, count})
             } else {
               const rewardCountMap = reward[typeName]
-              //console.log(rewardCountMap);
+             // console.log(rewardCountMap);
 
               for (const id in rewardCountMap) {
                 const count = parseInt(rewardCountMap[id])
@@ -122,6 +160,17 @@ regions[2]
     console.log("coins size (nodes size?)", nodeCoins.length)
     console.log(levelMap)
     console.log("items", items)
+
+    function drawCells(cells) {
+      // 0 - x, 1 - y, 2 - x, 3- y...
+      const cellsElement = document.getElementById("cells")
+      console.log(cellsElement)
+      const ctx = cellsElement.getContext("2d")
+
+      ctx.beginPath()
+      ctx.arc(0, 0, 1, 0, 2 * Math.PI)
+      ctx.stroke()
+    }
   </script>
 </body>
 </html>
