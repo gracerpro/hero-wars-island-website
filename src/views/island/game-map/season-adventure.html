@@ -165,11 +165,37 @@ regions[3]
       // 0 - x, 1 - y, 2 - x, 3- y...
       const cellsElement = document.getElementById("cells")
       console.log(cellsElement)
-      const ctx = cellsElement.getContext("2d")
+      const context = cellsElement.getContext("2d")
 
-      ctx.beginPath()
-      ctx.arc(0, 0, 1, 0, 2 * Math.PI)
-      ctx.stroke()
+      const minX = -14
+      const minY = -15
+      // -14 30 = 44
+      // -15 21 = 36
+      const xCount = 14 + 30 + 2
+      const yCount = 15 + 21 + 2
+
+      const radius = 1
+      context.beginPath()
+      context.translate(40, 40)
+      context.scale(2, 2);
+
+      i = 0
+      while (i < cells.length) {
+        const x = cells[i]
+        const y = cells[i+1]
+
+        console.log(x, y)
+
+        context.moveTo(x * 4, y * 4);
+        context.arc(x * 4, y * 4, radius, 0, 2 * Math.PI, true)
+        context.stroke()
+
+        i = i + 2
+
+        if (i > 30) {
+          break
+        }
+      }
     }
   </script>
 </body>
