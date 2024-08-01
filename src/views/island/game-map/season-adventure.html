@@ -22,6 +22,7 @@
     const adventureData = window.libData.seasonAdventure
     const nodes = Object.values(adventureData.level)
     const map = adventureData.list["4"].map
+    const cells = map.cells
 
     console.log("map.4 =", map);
 
@@ -35,7 +36,6 @@ adventureData.list.4
 -- cells: Array(1718) 
 -- regions: Array(4)
 
-Часть 1?
 regions[0]
 - condition: time > 0
 - levels: Array(859)
@@ -60,7 +60,7 @@ regions[2]
 ​​​​​​​5: 132 Древний сундук артефактов титанов 3 шт, consumable, id = 149
 ​​​​​​​6: 131
 
-Часть 1?
+Часть 1
 regions[3]
 - condition: time > 1719972000, time > 03.07.2024 @ 05:00:00 MSK (GTM +03:00)
 - levels: Array(1)
@@ -70,7 +70,7 @@ regions[3]
     const levels = nodes.filter((o) => o.season === 4)
     console.log("seasonNodes, level", levels)
 
-    showMinMax(map.cells)
+    showMinMax(cells)
     showData()
 
     const cellsElement = document.getElementById("cells")
@@ -82,8 +82,8 @@ regions[3]
     const TRANSLATE_Y = 80
 
     drawAxes()
-    drawCells(map.cells)
-    drawRewardCells(map.cells)
+    drawCells(cells)
+    drawRewardCells(cells)
 
     function showMinMax(cells) {
       let minX = 9999
@@ -180,9 +180,8 @@ regions[3]
       i = 0
       while (i < cells.length) {
         const x = cells[i]
-        const y = -cells[i+1] + x * 0.5
+        const y = getY(cells, i + 1, x)
 
-        context.moveTo(x * 4, y * 4);
         context.rect(x * S - SIDE - BORDER, y * S - SIDE - BORDER, SIDE * 2 + 1, SIDE * 2 + 1)
 
         i = i + 2
@@ -193,7 +192,7 @@ regions[3]
     }
 
     function drawRewardCells(cells) {
-      // seasonNodes, level: Array(859) 
+      // seasonNodes, level: Array(859)
       // map.4.cells: Array(1718)
       // 1718 / 2 = 859
       // level => cell : level * 2
@@ -211,25 +210,35 @@ regions[3]
         if (!levelData.steps || levelData.steps.length === 0) {
           continue
         }
-        if (levelData.steps.length > 1) {
-          console.log("WARNING", levelData.steps.length)
-        }
 
         const step = levelData.steps[0]
         const x = cells[levelData.level * 2]
-        const y = -cells[levelData.level * 2 + 1] + x * 0.5
+        const y = getY(cells, levelData.level * 2 + 1, x)
 
-        if (x === 12) {
-          console.log(step)
+        if (x === 11) {
+        //if (Object.keys(step.reward).length > 1) {
+          console.log(x, y, step.reward)
+
+          // LIB_COIN_NAME_27	"Монета Летнего Фестиваля" <=
+          // LIB_COIN_NAME_43	"Монета Летнего Фестиваля"
+
+          // LIB_COIN_NAME_24	"Камень облика Титана"
+
+          // LIB_CONSUMABLE_NAME_204	"Высшая регалия на выбор"
+          // LIB_CONSUMABLE_NAME_4	"Рунный монолит"
+          // LIB_CONSUMABLE_NAME_339	"Сундук Абсолютных Артефактов"
         }
 
-        context.moveTo(x * 4, y * 4);
         const wide = SIDE * 2 + 1
         context.rect(x * S - SIDE - BORDER, y * S - SIDE - BORDER, wide, wide)
       }
 
       context.fill()
       context.restore()
+    }
+
+    function getY(cells, index, x) {
+      return -cells[index] + x * 0.5
     }
   </script>
 </body>
