@@ -268,13 +268,15 @@ function initUserNodes(nodes) {
 
   userNodesIds.forEach((id) => {
     const node = nodes[id];
-    if (node && canSelectNode(node)) {
-      nodesMap[id] = node;
+    if (node) {
+      if (canSelectNode(node)) {
+        nodesMap[id] = node;
+      }
+      if (userNodesGoingIds.includes(id)) {
+        node.isGoingChecked = true;
+      }
     }
-    if (userNodesGoingIds.includes(id)) {
-      node.isGoingChecked = true;
-    }
-  });
+  })
 
   return nodesMap;
 }

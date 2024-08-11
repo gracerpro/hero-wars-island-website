@@ -11,6 +11,7 @@ const gameData = fetch(window.NXFlashVars.index_url).json()
 
 "lib/lib.json": {"path": "v1106/lib/lib.json","size": 18038132,"md5": "a9621bd23d35f26d9b1842d23d7e7925","s": "85b76f24cedef29f1c81bc7c670e1683"},
 "lib/lib.json.gz": {"path": "v1106/lib/lib.json.gz","size": 1397033,"md5": "9063b37a650216273e1c5ae9827cb82b","s": "fa9f16aea83bcfa5de82d83b321f7166"},
+"locale/ru.json": {"path": "v1106/locale/ru.json"}
 ```
 
 lib_url = window.NXFlashVars.static_url + gameData["lib/lib.json"].path
