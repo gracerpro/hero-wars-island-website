@@ -25,7 +25,8 @@
     </div>
     <div v-else>
       <game-island-map v-if="currentIsland.isGrabFromGame" />
-      <island-map v-else
+      <island-map
+        v-else
         :island="currentIsland"
         parent-page-id="islandPage"
       />

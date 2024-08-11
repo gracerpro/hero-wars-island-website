@@ -81,11 +81,7 @@ const EVENT_SELECT_NODE = "select-node";
 </script>
 <script setup>
 import { TYPE_DANGER } from "@/components/ToastMessage.vue";
-import {
-  TYPE_START,
-  TYPE_TOWN,
-  TYPE_CHEST,
-} from "@/api/Node";
+import { TYPE_START, TYPE_TOWN, TYPE_CHEST } from "@/api/Node";
 import { ref, computed, defineAsyncComponent } from "vue";
 import {
   TRANSLATE_X,
@@ -156,7 +152,7 @@ const nodes = computed(() => {
   }
 
   return nodes;
-})
+});
 const iconsItems = computed(() => {
   let countsByNode = getCountsByNode(props.items);
   let resultItems = [];

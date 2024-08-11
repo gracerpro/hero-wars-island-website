@@ -1,10 +1,9 @@
-
 GET https://www.hero-wars.com/
 
 Нужны свойства у глобального объекта window.NXFlashVars
 
-* index_url: "https://heroesru-a.akamaihd.net/mg/index.v1106.json.gz"
-* static_url: "https://heroesru-a.akamaihd.net/mg/"
+- index_url: "https://heroesru-a.akamaihd.net/mg/index.v1106.json.gz"
+- static_url: "https://heroesru-a.akamaihd.net/mg/"
 
 ```js
 const gameData = fetch(window.NXFlashVars.index_url).json()
@@ -17,22 +16,22 @@ const gameData = fetch(window.NXFlashVars.index_url).json()
 lib_url = window.NXFlashVars.static_url + gameData["lib/lib.json"].path
 
 ```js
-const libUrl = "https://heroesru-a.akamaihd.net/mg/" + "v1147/lib/lib.json"
-const libData = fetch(libUrl).json()
+const libUrl = "https://heroesru-a.akamaihd.net/mg/" + "v1147/lib/lib.json";
+const libData = fetch(libUrl).json();
 ```
 
 В `libData` лежат данные для всей игры.
 
-* `libData.seasonAdventure` - это данные для острова приключений
-* `libData.seasonAdventure.level` - это все узлы всех островов
-* `libData.seasonAdventure.list` - это массив островов
+- `libData.seasonAdventure` - это данные для острова приключений
+- `libData.seasonAdventure.level` - это все узлы всех островов
+- `libData.seasonAdventure.list` - это массив островов
 
 ### libData.seasonAdventure.level
 
 объект
 
-* key, имя свойства это ID ячейки/узла?
-* value, значение свойства это объект вида
+- key, имя свойства это ID ячейки/узла?
+- value, значение свойства это объект вида
 
 ```js
 {
@@ -59,12 +58,13 @@ const libData = fetch(libUrl).json()
 }
 ```
 
-* id - уникальный ID
-* level - ?
-* season это номер острова (карты), начинается с 1
-* steps это ходы с наградами за стоимость, как правило равную предмету id = 41
+- id - уникальный ID
+- level - ?
+- season это номер острова (карты), начинается с 1
+- steps это ходы с наградами за стоимость, как правило равную предмету id = 41
 
 `steps[i].reward` - награды, может быть несколько, объект где ключ это тип предмета, а значение это
+
 1. для типа gold это количество
 2. для остальных типов это объект где ключ это ID предмета, значение это количество
 

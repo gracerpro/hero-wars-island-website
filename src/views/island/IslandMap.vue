@@ -262,7 +262,7 @@ function initUserNodes(nodes) {
         node.isGoingChecked = true;
       }
     }
-  })
+  });
 
   return nodesMap;
 }
@@ -332,7 +332,7 @@ function onResetTranslate() {
 
 const onChangeOnlyImage = () => {
   isOnlyImage.value = !isOnlyImage.value;
-}
+};
 
 function onChangeNode(node) {
   if (!nodes.value[node.id]) {
