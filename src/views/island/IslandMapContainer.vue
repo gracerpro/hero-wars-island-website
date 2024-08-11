@@ -12,21 +12,6 @@
       @wheel="onMouseWheel"
       ref="canvas"
     >
-      <line
-        x1="0"
-        :y1="-SIDE"
-        x2="0"
-        :y2="SIDE"
-        style="stroke: black; stroke-width: 1"
-      />
-      <line
-        :x1="-SIDE"
-        y1="0"
-        :x2="SIDE"
-        y2="0"
-        style="stroke: black; stroke-width: 1"
-      />
-
       <g :transform="'translate(' + translateX + ' ' + translateY + ')'">
         <polygon
           v-for="node in nodes"
@@ -456,9 +441,6 @@ const getItemName = (item) => {
 }
 .unknown-text:hover {
   fill: #ffe500;
-}
-.-on-moderation {
-  fill: green;
 }
 .item-image {
   stroke: #999;

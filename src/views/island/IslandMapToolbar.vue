@@ -83,7 +83,7 @@
         :class="['btn', isOnlyImage ? 'btn-secondary' : 'btn-outline-secondary']"
         @click="onChangeOnlyImage"
       >
-        Im
+        N
       </button>
     </div>
     <div
@@ -96,7 +96,7 @@
         @click="onHelpClick"
         :title="t('common.help')"
       >
-        h
+        ?
       </button>
     </div>
     <div

@@ -1,4 +1,4 @@
-import { STATUS_ACCEPTED_SUCCESS, TYPE_START } from "@/api/Node";
+import { TYPE_BLOCKER, TYPE_START } from "@/api/Node";
 import { useI18n } from "@/i18n";
 
 export const TRANSLATE_X = 6;
@@ -78,7 +78,9 @@ export function canSelectNextNode(nodes, selectedNodes, nextNode) {
  */
 export function canEditNode(node) {
   return (
-    node.typeId !== TYPE_START && node.statusId !== STATUS_ACCEPTED_SUCCESS && !node?.items.length
+    node.typeId !== TYPE_START
+    && node.typeId != TYPE_BLOCKER
+    && !node?.items.length
   );
 }
 

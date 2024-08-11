@@ -5,10 +5,9 @@ export const TYPE_NODE = 0;
 export const TYPE_START = 1;
 export const TYPE_TOWN = 2;
 export const TYPE_CHEST = 3;
+export const TYPE_BLOCKER = 4;
 
 export const STATUS_CREATED = 0;
-export const STATUS_ON_MODERATION = 1;
-export const STATUS_ACCEPTED_SUCCESS = 2;
 export const STATUS_NOT_SURE = 3;
 
 export default class Node {
@@ -57,7 +56,7 @@ export default class Node {
       node.typeId = TYPE_NODE;
     }
     if (node.statusId === undefined) {
-      node.statusId = STATUS_ACCEPTED_SUCCESS;
+      node.statusId = STATUS_CREATED;
     }
     if (node.items) {
       node.items.forEach((item) => {
@@ -80,9 +79,7 @@ export default class Node {
 export function getStatusName(t, statusId) {
   const names = {
     [STATUS_CREATED]: t("common.created"),
-    [STATUS_ON_MODERATION]: t("common.onModeration"),
     [STATUS_NOT_SURE]: t("common.haveDoubts"),
-    [STATUS_ACCEPTED_SUCCESS]: t("common.accepted"),
   };
 
   return names[statusId] ? names[statusId] : t("common.unknownStatus");

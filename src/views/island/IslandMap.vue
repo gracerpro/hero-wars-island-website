@@ -141,6 +141,7 @@ const props = defineProps({
 let userNodesIds = [];
 let userNodesGoingIds = [];
 let byIslandState = {};
+
 const minCharsCount = 3;
 const componentId = props.parentPageId + "__map";
 
@@ -298,12 +299,12 @@ function calculateItems(nodes) {
   return items;
 }
 /**
- * @param {Boolean} inc
+ * @param {Number} value
  */
-const onChangeScale = (value) => {
+function onChangeScale(value) {
   scale.value += value;
 
-  const MAX_SCALE = 4;
+  const MAX_SCALE = 6;
   const MIN_SCALE = 0.3;
 
   if (scale.value > MAX_SCALE) {
@@ -311,30 +312,36 @@ const onChangeScale = (value) => {
   } else if (scale.value < MIN_SCALE) {
     scale.value = MIN_SCALE;
   }
-};
+}
+
 const onResetScale = () => (scale.value = 1);
-const onChangeTranslate = (dx, dy) => {
+
+function onChangeTranslate(dx, dy) {
   if (dx !== 0) {
     translateX.value += dx;
   }
   if (dy !== 0) {
     translateY.value += dy;
   }
-};
-const onResetTranslate = () => {
+}
+
+function onResetTranslate() {
   translateX.value = 0;
   translateY.value = 0;
-};
+}
+
 const onChangeOnlyImage = () => {
   isOnlyImage.value = !isOnlyImage.value;
-};
-const onChangeNode = (node) => {
+}
+
+function onChangeNode(node) {
   if (!nodes.value[node.id]) {
     throw new Error(t("page.island.notFoundNodeAdmin"));
   }
   nodes.value[node.id] = node;
-};
-const onSelectNode = (id) => {
+}
+
+function onSelectNode(id) {
   if (selectMode.value === SELECT_MODE_PLAN) {
     if (!nodes.value[id]) {
       throw new Error(t("page.island.notFoundNodeAdmin"));
@@ -351,14 +358,15 @@ const onSelectNode = (id) => {
       userNodesMap.value[id].isGoingChecked = !userNodesMap.value[id].isGoingChecked;
     }
   }
-};
-const onResetUserNodes = () => {
+}
+
+function onResetUserNodes() {
   userNodesMap.value = {};
   selectMode.value = SELECT_MODE_PLAN;
   for (let id in nodes.value) {
     delete nodes.value[id].isGoingChecked;
   }
-};
+}
 
 const onFullscreen = () => {
   fullscreenElement(mapContainer.value.canvas);
