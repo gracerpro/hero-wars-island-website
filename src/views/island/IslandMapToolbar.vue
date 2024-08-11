@@ -85,15 +85,6 @@
       >
         Im
       </button>
-      <button
-        v-if="canEditNodes"
-        type="button"
-        :title="t('page.island.showEditNodes')"
-        :class="['btn', isShowNoModerate ? 'btn-secondary' : 'btn-outline-secondary']"
-        @click="onChangeIsShowNoModerate"
-      >
-        ?
-      </button>
     </div>
     <div
       class="btn-group-vertical w-100 mt-2"
@@ -134,7 +125,6 @@
 const EVENT_RESET_TRANSLATE = "reset-translate";
 const EVENT_RESET_SCALE = "reset-scale";
 const EVENT_CHANGE_ONLY_IMAGE = "update:is-only-image";
-const EVENT_CHANGE_IS_SHOW_NO_MODERATE = "update:is-show-no-moderate";
 const EVENT_FULLSCREEN_ON = "fullscreen-on";
 </script>
 <script setup>
@@ -153,7 +143,6 @@ const { t } = useI18n();
 
 defineProps({
   isOnlyImage: { type: Boolean, required: true },
-  isShowNoModerate: { type: Boolean, required: true },
   canEditNodes: { type: Boolean, default: true },
 });
 
@@ -163,7 +152,6 @@ const emit = defineEmits([
   EVENT_RESET_SCALE,
   EVENT_CHANGE_SCALE,
   EVENT_CHANGE_ONLY_IMAGE,
-  EVENT_CHANGE_IS_SHOW_NO_MODERATE,
   EVENT_FULLSCREEN_ON,
 ]);
 
@@ -197,9 +185,6 @@ const onHelpClick = () => {
 };
 const onChangeOnlyImage = () => {
   emit(EVENT_CHANGE_ONLY_IMAGE);
-};
-const onChangeIsShowNoModerate = () => {
-  emit(EVENT_CHANGE_IS_SHOW_NO_MODERATE);
 };
 const onMountedHelpDialog = () => {
   helpDialog.value.show().finally(() => {

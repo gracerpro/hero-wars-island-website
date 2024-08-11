@@ -19,15 +19,6 @@
         <li><span class="node-box node-town"></span>{{ t("common.tower") }}</li>
         <li><span class="node-box node-chest"></span>{{ t("common.chest") }}</li>
       </ul>
-
-      <template v-if="canEditNodes">
-        <h4>{{ t("common.help") }}</h4>
-        <p class="mb-0">{{ t("page.island.helpOnQuestion") }}</p>
-        <ul class="mb-0">
-          <li>{{ t("page.island.helpResource1") }}</li>
-          <li>{{ t("page.island.helpResource2") }}</li>
-        </ul>
-      </template>
     </modal-dialog>
   </suspense>
 </template>
@@ -38,10 +29,6 @@ import { useI18n } from "vue-i18n";
 import { useShow } from "@/components/modal-dialog";
 
 const { t } = useI18n();
-
-defineProps({
-  canEditNodes: { type: Boolean, default: true },
-});
 
 const dialog = ref(null);
 

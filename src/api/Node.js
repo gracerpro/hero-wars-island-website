@@ -53,12 +53,6 @@ export default class Node {
    * @param {Object} node
    */
   modifyNode(node) {
-    if (!node.userComment) {
-      node.userComment = "";
-    }
-    if (!node.userQuantity) {
-      node.userQuantity = "";
-    }
     if (node.typeId === undefined) {
       node.typeId = TYPE_NODE;
     }

@@ -10,10 +10,7 @@
     <div v-else>
       <island-map-toolbar
         :is-only-image="isOnlyImage"
-        :is-show-no-moderate="isShowNoModerate"
-        :can-edit-nodes="canEditNodes"
         @update:is-only-image="onChangeOnlyImage"
-        @update:is-show-no-moderate="onChangeIsShowNoModerate"
         @reset-scale="onResetScale"
         @reset-translate="onResetTranslate"
         @change-scale="onChangeScale"
@@ -25,7 +22,6 @@
         :translate-x="translateX"
         :translate-y="translateY"
         :is-only-image="isOnlyImage"
-        :is-show-no-moderate="isShowNoModerate"
         :is-select-any-node="isSelectAnyNode"
         :items="visibleItems"
         :input-nodes="nodes"
@@ -125,7 +121,7 @@ import IslandMapContainer from "./IslandMapContainer.vue";
 import IslandMapFilter from "./IslandMapFilter.vue";
 import IslandMapTable from "./IslandMapTable.vue";
 import IslandMapGroupItems from "./IslandMapGroupItems.vue";
-import { canEditNode, canSelectNode } from "@/services/island-map";
+import { canSelectNode } from "@/services/island-map";
 import { onMounted, onUnmounted, ref, computed, shallowReactive } from "vue";
 import { getHumanQuantity } from "@/helpers/formatter";
 import { useI18n } from "vue-i18n";
@@ -163,7 +159,6 @@ const translateY = ref(0);
 const isSelectAnyNode = ref(true);
 const selectMode = ref(SELECT_MODE_PLAN);
 const isOnlyImage = ref(false);
-const isShowNoModerate = ref(true);
 const isShowGroupItems = ref(false);
 const filter = shallowReactive({
   itemName: "",
@@ -209,16 +204,6 @@ const userNodesCount = computed(() => Object.keys(userNodesMap.value).length);
 const totalNodesCount = computed(() => {
   const length = Object.keys(nodes.value).length;
   return length > 0 ? length - 1 : 0; // "-1" it means subtract an entry node
-});
-const canEditNodes = computed(() => {
-  for (const id in nodes.value) {
-    const node = nodes.value[id];
-    if (canEditNode(node)) {
-      return true;
-    }
-  }
-
-  return false;
 });
 const selectModes = computed(() => {
   return [
@@ -343,9 +328,6 @@ const onResetTranslate = () => {
 const onChangeOnlyImage = () => {
   isOnlyImage.value = !isOnlyImage.value;
 };
-const onChangeIsShowNoModerate = () => {
-  isShowNoModerate.value = !isShowNoModerate.value;
-};
 const onChangeNode = (node) => {
   if (!nodes.value[node.id]) {
     throw new Error(t("page.island.notFoundNodeAdmin"));
@@ -394,7 +376,6 @@ function loadState() {
   if (!state) {
     state = {
       isOnlyImage: false,
-      isShowNoModerate: true,
       byIsland: {},
       filter: {},
     };
@@ -418,9 +399,6 @@ function loadState() {
   if (!state.isOnlyImage) {
     state.isOnlyImage = false;
   }
-  if (state.isShowNoModerate === undefined) {
-    state.isShowNoModerate = true;
-  }
 
   if (!state.byIsland || !isObject(state.byIsland)) {
     state.byIsland = {};
@@ -436,7 +414,6 @@ function loadState() {
 
   filter.value = state.filter;
   isOnlyImage.value = state.isOnlyImage;
-  isShowNoModerate.value = state.isShowNoModerate;
 
   isSelectAnyNode.value = typeof state.isSelectAnyNode === "boolean" ? state.isSelectAnyNode : true;
 }
@@ -445,7 +422,6 @@ function saveState() {
   const state = {
     filter: filter.value,
     isOnlyImage: isOnlyImage.value,
-    isShowNoModerate: isShowNoModerate.value,
     isSelectAnyNode: isSelectAnyNode.value,
   };
   byIslandState[props.island.id] = {

@@ -76,19 +76,6 @@
           </text>
         </template>
 
-        <text
-          v-for="item in warningNodes"
-          :key="item.node.xyId"
-          :x="item.x"
-          :y="item.y"
-          :class="['unknown-text', item.isOnModeration ? '-on-moderation' : '']"
-          @click="onEditNodeClick(item.node)"
-        >
-          ?
-          <title>
-            {{ getWarningTitle(item) }}
-          </title>
-        </text>
         <polyline
           v-if="activeNode"
           :points="getActivePoints()"
@@ -97,12 +84,6 @@
       </g>
     </svg>
 
-    <component
-      :is="nodeDialog.component"
-      :node="nodeDialog.node"
-      ref="editNodeDialog"
-      @vue:mounted="onMountedNodeDialog"
-    />
     <toast-message
       ref="toast"
       element-id="mapContainerToast"
@@ -114,17 +95,13 @@ const EVENT_CHANGE_NODE = "change-node";
 const EVENT_SELECT_NODE = "select-node";
 </script>
 <script setup>
-import UpdateNodeDialog from "./UpdateNodeDialog.vue";
 import { TYPE_DANGER } from "@/components/ToastMessage.vue";
 import {
   TYPE_START,
   TYPE_TOWN,
   TYPE_CHEST,
-  STATUS_ON_MODERATION,
-  STATUS_NOT_SURE,
-  getStatusName,
 } from "@/api/Node";
-import { ref, shallowReactive, computed, defineAsyncComponent } from "vue";
+import { ref, computed, defineAsyncComponent } from "vue";
 import {
   TRANSLATE_X,
   TRANSLATE_Y,
@@ -133,7 +110,6 @@ import {
   DELTA_SCALE,
   canSelectNode,
   canSelectNextNode,
-  canEditNode,
 } from "@/services/island-map";
 import { useI18n } from "vue-i18n";
 
@@ -169,7 +145,6 @@ const props = defineProps({
   translateX: { type: Number, required: true },
   translateY: { type: Number, required: true },
   isOnlyImage: { type: Boolean, required: true },
-  isShowNoModerate: { type: Boolean, required: true },
   items: { type: Array, required: true },
   selectMode: { type: String, required: true },
   inputNodes: { type: Object, required: true },
@@ -181,12 +156,6 @@ defineExpose({
 });
 
 const toast = ref(null);
-const updating = ref(false);
-const editNodeDialog = ref(null);
-const nodeDialog = shallowReactive({
-  node: null,
-  component: null,
-});
 let activeNode = null;
 
 const viewBox = computed(() => {
@@ -202,29 +171,7 @@ const nodes = computed(() => {
   }
 
   return nodes;
-});
-const warningNodes = computed(() => {
-  if (!props.isShowNoModerate) {
-    return [];
-  }
-
-  let items = [];
-
-  for (let id in nodes.value) {
-    const node = nodes.value[id];
-
-    if (canEditNode(node)) {
-      items.push({
-        node,
-        x: node.x - 0.2 * SIDE,
-        y: node.y + 0.64 * HEIGHT,
-        isOnModeration: node.statusId === STATUS_ON_MODERATION,
-      });
-    }
-  }
-
-  return items;
-});
+})
 const iconsItems = computed(() => {
   let countsByNode = getCountsByNode(props.items);
   let resultItems = [];
@@ -445,27 +392,6 @@ const onMouseWheel = (event) => {
   emit(EVENT_CHANGE_SCALE, event.deltaY > 0 ? DELTA_SCALE : -DELTA_SCALE);
   event.preventDefault();
 };
-const onEditNodeClick = (node) => {
-  if (!updating.value) {
-    updating.value = true;
-    nodeDialog.node = node;
-    nodeDialog.component = UpdateNodeDialog;
-  }
-};
-const onMountedNodeDialog = () => {
-  editNodeDialog.value
-    .show()
-    .then((node) => {
-      if (node !== null && node !== undefined) {
-        emit(EVENT_CHANGE_NODE, node);
-      }
-    })
-    .finally(() => {
-      nodeDialog.component = null;
-      nodeDialog.node = null;
-      updating.value = false;
-    });
-};
 const isUserNode = (node) => {
   return props.userNodesMap[node.id] !== undefined;
 };
@@ -473,17 +399,6 @@ const getUserNodeClass = (node) => {
   if (props.userNodesMap[node.id] !== undefined) {
     return props.userNodesMap[node.id].isGoingChecked ? "user-node-going" : "user-node";
   }
-};
-
-const getWarningTitle = (item) => {
-  if (item.node.statusId === STATUS_ON_MODERATION || item.node.statusId === STATUS_NOT_SURE) {
-    return getStatusName(t, item.node.statusId);
-  }
-  if (!item.node.items || !item.node.items.length) {
-    return t("page.island.notLinkedResource");
-  }
-
-  return "";
 };
 const getQuantity = (item) => {
   return item.item.quantity > 1 ? ", " + item.item.quantity : "";
