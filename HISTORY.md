@@ -8,7 +8,7 @@ What has been done
 * Change scale and translate values
 * Remove node user comments
 * Remove node update dialog
-* Remove ative node frame
+* Remove aсtive node frame
 
 Technical part
 
