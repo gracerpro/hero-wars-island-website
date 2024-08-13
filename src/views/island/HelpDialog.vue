@@ -18,6 +18,7 @@
         <li><span class="node-box node"></span>{{ t("page.island.oneResource") }}</li>
         <li><span class="node-box node-town"></span>{{ t("common.tower") }}</li>
         <li><span class="node-box node-chest"></span>{{ t("common.chest") }}</li>
+        <li><span class="node-box node-blocker"></span>{{ t("common.blockerExNames") }}</li>
       </ul>
     </modal-dialog>
   </suspense>
@@ -58,5 +59,8 @@ defineExpose({
 }
 .node-chest {
   background-color: #1a660b;
+}
+.node-blocker {
+  background-color: #ddd;
 }
 </style>

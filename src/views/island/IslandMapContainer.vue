@@ -81,7 +81,7 @@ const EVENT_SELECT_NODE = "select-node";
 </script>
 <script setup>
 import { TYPE_DANGER } from "@/components/ToastMessage.vue";
-import { TYPE_START, TYPE_TOWN, TYPE_CHEST } from "@/api/Node";
+import { TYPE_START, TYPE_TOWN, TYPE_CHEST, TYPE_BLOCKER } from "@/api/Node";
 import { ref, computed, defineAsyncComponent } from "vue";
 import {
   TRANSLATE_X,
@@ -255,6 +255,7 @@ function drawNode(node) {
     [TYPE_START]: "node-start",
     [TYPE_TOWN]: "node-town",
     [TYPE_CHEST]: "node-chest",
+    [TYPE_BLOCKER]: "node-blocker",
   };
   const data = getCoordinates(node);
 
@@ -414,6 +415,12 @@ const getItemName = (item) => {
 }
 .node-chest:hover {
   fill: #566d51;
+}
+.node-blocker {
+  fill: #ddd;
+}
+.node-blocker:hover {
+  fill: #eee;
 }
 .node.user-node {
   fill: #6668f8;

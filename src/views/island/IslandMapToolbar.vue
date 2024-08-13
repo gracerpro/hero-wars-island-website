@@ -115,7 +115,6 @@
 
     <component
       :is="helpDialogComponent"
-      :can-edit-nodes="canEditNodes"
       ref="helpDialog"
       @vue:mounted="onMountedHelpDialog"
     />
@@ -143,7 +142,6 @@ const { t } = useI18n();
 
 defineProps({
   isOnlyImage: { type: Boolean, required: true },
-  canEditNodes: { type: Boolean, default: true },
 });
 
 const emit = defineEmits([

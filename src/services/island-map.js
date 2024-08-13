@@ -9,7 +9,7 @@ export const DELTA_SCALE = 0.1;
 export const EVENT_CHANGE_SCALE = "change-scale";
 
 export function canSelectNode(node) {
-  return node.typeId !== TYPE_START;
+  return node.typeId !== TYPE_START && node.typeId != TYPE_BLOCKER;
 }
 
 /**
@@ -70,14 +70,6 @@ export function canSelectNextNode(nodes, selectedNodes, nextNode) {
   }
 
   return result;
-}
-
-/**
- * @param {Object} node
- * @returns {Boolean}
- */
-export function canEditNode(node) {
-  return node.typeId !== TYPE_START && node.typeId != TYPE_BLOCKER && !node?.items.length;
 }
 
 function isNearNode(nextNode, node) {
