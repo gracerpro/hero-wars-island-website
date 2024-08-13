@@ -1,11 +1,11 @@
 import { TYPE_BLOCKER, TYPE_START } from "@/api/Node";
 import { useI18n } from "@/i18n";
 
-export const TRANSLATE_X = 6;
-export const TRANSLATE_Y = 6;
+export const TRANSLATE_X = 20;
+export const TRANSLATE_Y = 20;
 export const EVENT_CHANGE_TRANSLATE = "change-translate";
 
-export const DELTA_SCALE = 0.1;
+export const DELTA_SCALE = 0.3;
 export const EVENT_CHANGE_SCALE = "change-scale";
 
 export function canSelectNode(node) {

@@ -336,14 +336,14 @@ function onMouseMove(button) {
     y = 0;
 
   if (isLeft) {
-    x = -TRANSLATE_X;
+    x = -TRANSLATE_X * props.scale;
   } else if (isRight) {
-    x = TRANSLATE_X;
+    x = TRANSLATE_X * props.scale;
   }
   if (isTop) {
-    y = -TRANSLATE_Y;
+    y = -TRANSLATE_Y * props.scale;
   } else if (isBottom) {
-    y = TRANSLATE_Y;
+    y = TRANSLATE_Y * props.scale;
   }
 
   emit(EVENT_CHANGE_TRANSLATE, x, y);
@@ -403,10 +403,10 @@ const getItemName = (item) => {
   fill: #566d51;
 }
 .node-blocker {
-  fill: #ddd;
+  fill: #867878;
 }
 .node-blocker:hover {
-  fill: #eee;
+  fill: #9c8e8e;
 }
 .node.user-node {
   fill: #6668f8;

@@ -61,6 +61,6 @@ defineExpose({
   background-color: #1a660b;
 }
 .node-blocker {
-  background-color: #ddd;
+  background-color: #867878;
 }
 </style>
