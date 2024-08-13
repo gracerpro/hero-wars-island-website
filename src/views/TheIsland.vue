@@ -23,14 +23,10 @@
         {{ t("page.island.islandNotAvailable") }}
       </div>
     </div>
-    <div v-else>
-      <game-island-map v-if="currentIsland.isGrabFromGame" />
-      <island-map
-        v-else
-        :island="currentIsland"
-        parent-page-id="islandPage"
-      />
-    </div>
+    <island-map v-else
+      :island="currentIsland"
+      parent-page-id="islandPage"
+    />
 
     <div v-if="islandDescription">
       <hr />
@@ -41,7 +37,6 @@
 <script setup>
 import HeroClient from "@/api/HeroClient";
 import IslandMap from "./island/IslandMap.vue";
-import GameIslandMap from "./island/game-map/GameIslandMap.vue";
 import IslandMapLoading from "./island/IslandMapLoading.vue";
 import HttpError from "@/exceptions/HttpError";
 import { setMetaInfo } from "@/services/page-meta";
