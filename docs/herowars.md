@@ -2,36 +2,30 @@ GET https://www.hero-wars.com/
 
 Нужны свойства у глобального объекта window.NXFlashVars
 
-- index_url: "https://heroesru-a.akamaihd.net/mg/index.v1106.json.gz"
+- index_url: "https://heroesru-a.akamaihd.net/mg/index.v1161.json.gz"
 - static_url: "https://heroesru-a.akamaihd.net/mg/"
 
-```js
-const gameData = fetch(window.NXFlashVars.index_url).json()
-
-"lib/lib.json": {"path": "v1106/lib/lib.json","size": 18038132,"md5": "a9621bd23d35f26d9b1842d23d7e7925","s": "85b76f24cedef29f1c81bc7c670e1683"},
-"lib/lib.json.gz": {"path": "v1106/lib/lib.json.gz","size": 1397033,"md5": "9063b37a650216273e1c5ae9827cb82b","s": "fa9f16aea83bcfa5de82d83b321f7166"},
-"locale/ru.json": {"path": "v1106/locale/ru.json"}
-```
-
-lib_url = window.NXFlashVars.static_url + gameData["lib/lib.json"].path
+Получаем json индексного файла, в котором нужны поля `lib/lib.json` или `lib/lib.json.gz`, `locale/ru.json`, `locale/en.json`
 
 ```js
-const libUrl = "https://heroesru-a.akamaihd.net/mg/" + "v1147/lib/lib.json";
+const indexData = fetch(window.NXFlashVars.index_url).json()
+const libUrl = window.NXFlashVars.static_url + indexData["lib/lib.json"].path
 const libData = fetch(libUrl).json();
 ```
 
 В `libData` лежат данные для всей игры.
 
 - `libData.seasonAdventure` - это данные для острова приключений
-- `libData.seasonAdventure.level` - это все узлы всех островов
-- `libData.seasonAdventure.list` - это массив островов
+- `libData.seasonAdventure.level` - это все ячейки всех островов
+- `libData.seasonAdventure.list` - это список островов
+
 
 ### libData.seasonAdventure.level
 
 объект
 
-- key, имя свойства это ID ячейки/узла?
-- value, значение свойства это объект вида
+- key, имя свойства это ID ячейки
+- value, значение свойства это данные для ячейки, например
 
 ```js
 {
@@ -44,8 +38,6 @@ const libData = fetch(libUrl).json();
       cost: {
         coin: { 41: "1" }
       },
-      reward: { gold: 1000000 }
-      или
       reward: {
         bannerStone: { 4: "1" }
         coin: { 9: "300" }
@@ -53,36 +45,36 @@ const libData = fetch(libUrl).json();
         fragmentGear: { 223: "50" }
       }
     }
-  ​  ​...
   ]
 }
 ```
 
-- id - уникальный ID
-- level - ?
-- season это номер острова (карты), начинается с 1
-- steps это ходы с наградами за стоимость, как правило равную предмету id = 41
+* `id` это уникальный ID
+* `level` - ?
+* `season` это номер острова или номер сезона, начинается с 1
+* `steps` это ходы с наградами за стоимость, как правило равную предмету id = 41
 
-`steps[i].reward` - награды, может быть несколько, объект где ключ это тип предмета, а значение это
+`steps[i].reward` - награды, может быть несколько, объект где
 
-1. для типа gold это количество
-2. для остальных типов это объект где ключ это ID предмета, значение это количество
+* ключ это тип предмета
+* значение это
+  * для типа gold, starmoney это количество
+  * для остальных типов это объект где ключ это ID предмета, значение это количество
 
-**где взять описание предмета по ID?**
-
-**где взять базу данных всех предметов?**
-
-...
 
 ### libData.seasonAdventure.list
 
-libData.seasonAdventure.list - это массив островов
+Это список островов, объект
 
-let island = libData.seasonAdventure.list[i]
+* ключ это ID острова или номеро сезона или номер острова
+* значение это данные острова
 
-island.map.cells - массив, это ячейки (узлы) карты?
-island.map.cells[i] = похоже это смещение от какой то ячейки/узла?
+```
+const island = libData.seasonAdventure.list[i]
+```
 
-island.map.regions - массив, это части карты
-island.map.regions[i].levels - это узлы конкретной части карты
-island.map.regions[i].initLevels - это доступные узлы в начале, по ним можно кликать, конкретной части карты
+* `island.map.cells` - массив, это координаты ячеек, размер равен количеству ячеек умноденным на 2
+* `island.map.cells[i]` при четном индексе это координата X, при нечетном индексе это координата Y.
+* `island.map.regions` - массив, это части карты
+* `island.map.regions[i].levels` - ?
+* `island.map.regions[i].initLevels` - это доступные ячейки в начале (когда ни разу не открывали ячейки), по ним можно кликать
