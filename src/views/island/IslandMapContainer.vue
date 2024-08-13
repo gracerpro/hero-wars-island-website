@@ -231,7 +231,7 @@ const iconsItems = computed(() => {
 
     return countsByNode;
   }
-})
+});
 
 /**
  * @param {Object} node
@@ -350,7 +350,7 @@ function onMouseMove(button) {
 
   mouse.preventX = button.pageX;
   mouse.preventY = button.pageY;
-};
+}
 const onMouseUp = (event) => {
   if (event.button === MIDDLE_BUTTON) {
     mouse.isDown = false;

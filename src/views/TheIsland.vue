@@ -23,7 +23,8 @@
         {{ t("page.island.islandNotAvailable") }}
       </div>
     </div>
-    <island-map v-else
+    <island-map
+      v-else
       :island="currentIsland"
       parent-page-id="islandPage"
     />
