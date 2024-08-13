@@ -18,7 +18,6 @@
           :key="node.xyId"
           :points="node.points"
           :class="['node', node.class, getUserNodeClass(node)]"
-          @mouseenter="nodeMouseEnter(node)"
           @click="onNodeClick(node)"
         />
         <template
@@ -60,12 +59,6 @@
             {{ item.humanQuantity }}
           </text>
         </template>
-
-        <polyline
-          v-if="activeNode"
-          :points="getActivePoints()"
-          class="active-frame"
-        />
       </g>
     </svg>
 
@@ -137,7 +130,6 @@ defineExpose({
 });
 
 const toast = ref(null);
-let activeNode = null;
 
 const viewBox = computed(() => {
   const side = SIDE * 5 * props.scale;
@@ -239,14 +231,8 @@ const iconsItems = computed(() => {
 
     return countsByNode;
   }
-});
+})
 
-const getActivePoints = () => {
-  let data = getCoordinates(activeNode);
-  data.coordinates.push(data.coordinates[0]);
-
-  return getPoints(data.coordinates);
-};
 /**
  * @param {Object} node
  */
@@ -297,10 +283,8 @@ function getCoordinates(node) {
     coordinates,
   };
 }
-const nodeMouseEnter = (node) => {
-  activeNode = node;
-};
-const onNodeClick = (node) => {
+
+function onNodeClick(node) {
   if (!canSelectNode(node)) {
     return;
   }
@@ -316,21 +300,23 @@ const onNodeClick = (node) => {
   }
 
   emit(EVENT_SELECT_NODE, node.id);
-};
+}
+
 /**
  * @param {Object} button
  */
-const onMouseDown = (event) => {
+function onMouseDown(event) {
   if (event.button === MIDDLE_BUTTON) {
     mouse.preventX = event.button.pageX;
     mouse.preventY = event.button.pageY;
     mouse.isDown = true;
   }
-};
+}
+
 /**
  * @param {Object} button
  */
-const onMouseMove = (button) => {
+function onMouseMove(button) {
   if (!mouse.isDown) {
     return;
   }
@@ -454,10 +440,5 @@ const getItemName = (item) => {
 <style scoped>
 .canvas:fullscreen {
   background-color: #fff;
-}
-.active-frame {
-  fill: none;
-  stroke: red;
-  stroke-width: 3;
 }
 </style>
