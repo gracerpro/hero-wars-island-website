@@ -1,5 +1,21 @@
 # History
 
+## v1.4.0
+
+What has been done
+
+* Add blocker nodes
+* Change scale and translate values
+* Remove node user comments
+* Remove node update dialog
+* Remove ative node frame
+
+Technical part
+
+* Add simple hero wars documentation
+* Update dependencies
+
+
 ## v1.3.6
 
 What has been done
