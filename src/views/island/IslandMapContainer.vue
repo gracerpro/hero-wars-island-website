@@ -308,8 +308,8 @@ function onNodeClick(node) {
  */
 function onMouseDown(event) {
   if (event.button === MIDDLE_BUTTON) {
-    mouse.preventX = event.button.pageX;
-    mouse.preventY = event.button.pageY;
+    mouse.preventX = event.pageX;
+    mouse.preventY = event.pageY;
     mouse.isDown = true;
   }
 }
@@ -333,18 +333,19 @@ function onMouseMove(button) {
   const isRight = button.pageX > mouse.preventX;
   const isTop = button.pageY < mouse.preventY;
   const isBottom = button.pageY > mouse.preventY;
-  let x = 0,
-    y = 0;
+
+  let x = 0, y = 0
+  const halfScale = props.scale / 2
 
   if (isLeft) {
-    x = -TRANSLATE_X * props.scale / 2;
+    x = -TRANSLATE_X * halfScale;
   } else if (isRight) {
-    x = TRANSLATE_X * props.scale / 2;
+    x = TRANSLATE_X * halfScale;
   }
   if (isTop) {
-    y = -TRANSLATE_Y * props.scale / 2;
+    y = -TRANSLATE_Y * halfScale;
   } else if (isBottom) {
-    y = TRANSLATE_Y * props.scale / 2;
+    y = TRANSLATE_Y * halfScale;
   }
 
   emit(EVENT_CHANGE_TRANSLATE, x, y);
