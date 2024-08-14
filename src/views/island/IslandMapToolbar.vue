@@ -79,9 +79,9 @@
     >
       <button
         type="button"
-        :title="t('page.island.showOnlyIconWithoutQuantity')"
-        :class="['btn', isOnlyImage ? 'btn-secondary' : 'btn-outline-secondary']"
-        @click="onChangeOnlyImage"
+        :title="t('page.island.isShowQuantity')"
+        :class="['btn', isShowQuantity ? 'btn-secondary' : 'btn-outline-secondary']"
+        @click="onChangeIsShowQuantity"
       >
         N
       </button>
@@ -123,7 +123,7 @@
 <script>
 const EVENT_RESET_TRANSLATE = "reset-translate";
 const EVENT_RESET_SCALE = "reset-scale";
-const EVENT_CHANGE_ONLY_IMAGE = "update:is-only-image";
+const EVENT_CHANGE_IS_SHOW_QUANTITY = "update:is-show-quantity";
 const EVENT_FULLSCREEN_ON = "fullscreen-on";
 </script>
 <script setup>
@@ -141,7 +141,7 @@ import { useI18n } from "vue-i18n";
 const { t } = useI18n();
 
 defineProps({
-  isOnlyImage: { type: Boolean, required: true },
+  isShowQuantity: { type: Boolean, required: true },
 });
 
 const emit = defineEmits([
@@ -149,7 +149,7 @@ const emit = defineEmits([
   EVENT_CHANGE_TRANSLATE,
   EVENT_RESET_SCALE,
   EVENT_CHANGE_SCALE,
-  EVENT_CHANGE_ONLY_IMAGE,
+  EVENT_CHANGE_IS_SHOW_QUANTITY,
   EVENT_FULLSCREEN_ON,
 ]);
 
@@ -181,8 +181,8 @@ const onChangeScale = (inc) => {
 const onHelpClick = () => {
   helpDialogComponent.value = HelpDialog;
 };
-const onChangeOnlyImage = () => {
-  emit(EVENT_CHANGE_ONLY_IMAGE);
+function onChangeIsShowQuantity() {
+  emit(EVENT_CHANGE_IS_SHOW_QUANTITY);
 };
 const onMountedHelpDialog = () => {
   helpDialog.value.show().finally(() => {

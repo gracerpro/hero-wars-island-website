@@ -119,7 +119,7 @@ const props = defineProps({
   scale: { type: Number, required: true },
   translateX: { type: Number, required: true },
   translateY: { type: Number, required: true },
-  isOnlyImage: { type: Boolean, required: true },
+  isShowQuantity: { type: Boolean, required: true },
   items: { type: Array, required: true },
   inputNodes: { type: Object, required: true },
   userNodesMap: { type: Object, required: true },
@@ -153,7 +153,7 @@ const iconsItems = computed(() => {
   props.items.forEach((item) => {
     const node = nodes.value[item.node.id];
     const count = countsByNode[node.id];
-    const isShowText = item.item.quantity > 1 && !props.isOnlyImage;
+    const isShowText = item.item.quantity > 1 && props.isShowQuantity;
 
     item.textX = null;
     item.textY = null;

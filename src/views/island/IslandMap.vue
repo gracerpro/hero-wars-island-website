@@ -9,8 +9,8 @@
     </div>
     <div v-else>
       <island-map-toolbar
-        :is-only-image="isOnlyImage"
-        @update:is-only-image="onChangeOnlyImage"
+        :is-show-quantity="isShowQuantity"
+        @update:is-show-quantity="onChangeIsShowQuantity"
         @reset-scale="onResetScale"
         @reset-translate="onResetTranslate"
         @change-scale="onChangeScale"
@@ -21,7 +21,7 @@
         :scale="scale"
         :translate-x="translateX"
         :translate-y="translateY"
-        :is-only-image="isOnlyImage"
+        :is-show-quantity="isShowQuantity"
         :is-select-any-node="isSelectAnyNode"
         :items="visibleItems"
         :input-nodes="nodes"
@@ -159,7 +159,7 @@ const translateX = ref(0);
 const translateY = ref(0);
 const isSelectAnyNode = ref(true);
 const selectMode = ref(SELECT_MODE_PLAN);
-const isOnlyImage = ref(false);
+const isShowQuantity = ref(true);
 const isShowGroupItems = ref(false);
 const filter = shallowReactive({
   itemName: "",
@@ -330,8 +330,8 @@ function onResetTranslate() {
   translateY.value = 0;
 }
 
-const onChangeOnlyImage = () => {
-  isOnlyImage.value = !isOnlyImage.value;
+function onChangeIsShowQuantity() {
+  isShowQuantity.value = !isShowQuantity.value;
 };
 
 function onChangeNode(node) {
@@ -383,7 +383,7 @@ function loadState() {
 
   if (!state) {
     state = {
-      isOnlyImage: false,
+      isShowQuantity: true,
       byIsland: {},
       filter: {},
     };
@@ -404,8 +404,8 @@ function loadState() {
     state.filter.isNodeTypeTower = false;
   }
 
-  if (!state.isOnlyImage) {
-    state.isOnlyImage = false;
+  if (state.isShowQuantity === undefined) {
+    state.isShowQuantity = true;
   }
 
   if (!state.byIsland || !isObject(state.byIsland)) {
@@ -421,7 +421,7 @@ function loadState() {
   userNodesGoingIds = byIsland.userNodesGoingIds ? byIsland.userNodesGoingIds : [];
 
   filter.value = state.filter;
-  isOnlyImage.value = state.isOnlyImage;
+  isShowQuantity.value = state.isShowQuantity;
 
   isSelectAnyNode.value = typeof state.isSelectAnyNode === "boolean" ? state.isSelectAnyNode : true;
 }
@@ -429,7 +429,7 @@ function loadState() {
 function saveState() {
   const state = {
     filter: filter.value,
-    isOnlyImage: isOnlyImage.value,
+    isShowQuantity: isShowQuantity.value,
     isSelectAnyNode: isSelectAnyNode.value,
   };
   byIslandState[props.island.id] = {
