@@ -31,6 +31,7 @@
             :width="item.iconWidth"
             :height="item.iconHeight"
             :href="item.item.iconUrl"
+            class="item-image"
             @click="onNodeClick(item.node)"
           >
             <title>{{ getItemName(item) + getQuantity(item) }}</title>
@@ -41,7 +42,7 @@
             :y="item.iconY"
             :width="item.iconWidth"
             :height="item.iconHeight"
-            class="item-image"
+            class="item-empty-image"
             @click="onNodeClick(item.node)"
           >
             <title>
@@ -74,7 +75,7 @@ const EVENT_SELECT_NODE = "select-node";
 </script>
 <script setup>
 import { TYPE_DANGER } from "@/components/ToastMessage.vue";
-import { TYPE_START, TYPE_TOWN, TYPE_CHEST, TYPE_BLOCKER } from "@/api/Node";
+import { TYPE_START, TYPE_TOWN, TYPE_CHEST, TYPE_BLOCKER, TYPE_NODE } from "@/api/Node";
 import { ref, computed, defineAsyncComponent } from "vue";
 import {
   TRANSLATE_X,
@@ -120,7 +121,6 @@ const props = defineProps({
   translateY: { type: Number, required: true },
   isOnlyImage: { type: Boolean, required: true },
   items: { type: Array, required: true },
-  selectMode: { type: String, required: true },
   inputNodes: { type: Object, required: true },
   userNodesMap: { type: Object, required: true },
   isSelectAnyNode: { type: Boolean, default: true },
@@ -238,6 +238,7 @@ const iconsItems = computed(() => {
  */
 function drawNode(node) {
   const classes = {
+    [TYPE_NODE]: "node-step",
     [TYPE_START]: "node-start",
     [TYPE_TOWN]: "node-town",
     [TYPE_CHEST]: "node-chest",
@@ -336,14 +337,14 @@ function onMouseMove(button) {
     y = 0;
 
   if (isLeft) {
-    x = -TRANSLATE_X * props.scale;
+    x = -TRANSLATE_X * props.scale / 2;
   } else if (isRight) {
-    x = TRANSLATE_X * props.scale;
+    x = TRANSLATE_X * props.scale / 2;
   }
   if (isTop) {
-    y = -TRANSLATE_Y * props.scale;
+    y = -TRANSLATE_Y * props.scale / 2;
   } else if (isBottom) {
-    y = TRANSLATE_Y * props.scale;
+    y = TRANSLATE_Y * props.scale / 2;
   }
 
   emit(EVENT_CHANGE_TRANSLATE, x, y);
@@ -377,11 +378,14 @@ const getItemName = (item) => {
 </script>
 <style>
 .node {
-  fill: #9da7c9;
-  stroke: #dddddd;
   stroke-width: 1;
 }
-.node:hover {
+.node-step {
+  fill: #9da7c9;
+  stroke: #dddddd;
+  cursor: pointer;
+}
+.node-step:hover {
   fill: #bcc5e6;
 }
 .node-start {
@@ -392,12 +396,14 @@ const getItemName = (item) => {
 }
 .node-town {
   fill: #94440e;
+  cursor: pointer;
 }
 .node-town:hover {
-  fill: #88776c;
+  fill: #b95b1b;
 }
 .node-chest {
   fill: #1a660b;
+  cursor: pointer;
 }
 .node-chest:hover {
   fill: #566d51;
@@ -418,23 +424,19 @@ const getItemName = (item) => {
   font-size: 20px;
   fill: #000;
   font-weight: bold;
+  cursor: pointer;
 }
 .text-2 {
   font-size: 16px;
 }
-.unknown-text {
-  font-size: 58px;
-  fill: #ebdd60;
-  font-weight: bold;
+.item-image {
   cursor: pointer;
 }
-.unknown-text:hover {
-  fill: #ffe500;
-}
-.item-image {
+.item-empty-image {
   stroke: #999;
   stroke-width: 2;
   fill: #fff;
+  cursor: pointer;
 }
 </style>
 <style scoped>
