@@ -31,42 +31,23 @@
 </template>
 <script setup>
 import { useI18n } from "vue-i18n";
-import { computed } from "vue";
+import { computed, watch } from "vue";
+
+const EVENT_CHANGE_COUNT = "changeCount"
 
 const { t } = useI18n();
 
 const props = defineProps({
   items: { type: Object, required: true },
 });
+const emit = defineEmits([EVENT_CHANGE_COUNT])
 
-const groupItems = computed(() => {
-  let map = {};
+watch(
+  () => groupItemsCount.value,
+  (value) => emit(EVENT_CHANGE_COUNT, value)
+)
 
-  props.items.forEach(({ item }) => {
-    if (!map[item.id]) {
-      map[item.id] = {
-        id: item.id,
-        quantity: 0,
-        item,
-      };
-    }
-    map[item.id].quantity += item.quantity;
-  });
 
-  let arr = Object.values(map);
-
-  arr.sort((a, b) => {
-    if (a.item.name < b.item.name) {
-      return -1;
-    }
-    if (a.item.name > b.item.name) {
-      return 1;
-    }
-    return 0;
-  });
-
-  return arr;
-});
 
 function getItemName(item) {
   return item.item.name ? item.item.name : t("common.noName");

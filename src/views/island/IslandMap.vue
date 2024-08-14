@@ -88,16 +88,28 @@
           <div class="fst-italic text-secondary small">{{ selectModeHint }}</div>
         </div>
       </div>
-      <div class="row mt-3">
-        <div class="col-lg-6">
-          <island-map-table :items="visibleItems" />
+      <div class="row">
+        <div class="col-lg-6 mt-4">
+          <h3>
+            Ресурсы на карте
+          </h3>
+          <a href="#" @click.prevent="isShowItemsBlock = !isShowItemsBlock">
+            {{ t(isShowItemsBlock ? "common.hide" : "common.show") }}
+          </a>
+          <span class="badge text-bg-secondary ms-2">{{ visibleItemsCount }}</span>
+          <island-map-table v-if="isShowItemsBlock" :items="visibleItems" />
         </div>
-        <div class="col-lg-6">
-          <island-map-table :items="userItems" />
+        <div class="col-lg-6 mt-4">
+          <h3>Выбранные ресурсы</h3>
+          <a href="#" @click.prevent="isShowUserItemsBlock = !isShowUserItemsBlock">
+            {{ t(isShowUserItemsBlock ? "common.hide" : "common.show") }}
+          </a>
+          <span class="badge text-bg-secondary ms-2">{{ userItemsCount }}</span>
+          <island-map-table v-if="isShowUserItemsBlock" :items="userItems" />
         </div>
       </div>
       <div class="row">
-        <div class="col-lg-6">
+        <div class="col-lg-6 mt-4">
           <h3 class="mt-2">{{ t("common.groupData") }}</h3>
           <a
             href="#"
@@ -105,10 +117,8 @@
           >
             {{ t(isShowGroupItems ? "common.hide" : "common.show") }}
           </a>
-          <island-map-group-items
-            v-if="isShowGroupItems"
-            :items="items"
-          />
+          <span class="badge text-bg-secondary ms-2">{{ groupItemsCount }}</span>
+          <island-map-table v-if="isShowGroupItems" :items="groupItems" />
         </div>
       </div>
     </div>
@@ -120,7 +130,6 @@ import IslandMapToolbar from "./IslandMapToolbar.vue";
 import IslandMapContainer from "./IslandMapContainer.vue";
 import IslandMapFilter from "./IslandMapFilter.vue";
 import IslandMapTable from "./IslandMapTable.vue";
-import IslandMapGroupItems from "./IslandMapGroupItems.vue";
 import { canSelectNode } from "@/services/island-map";
 import { onMounted, onUnmounted, ref, computed, shallowReactive } from "vue";
 import { getHumanQuantity } from "@/helpers/formatter";
@@ -161,6 +170,8 @@ const isSelectAnyNode = ref(true);
 const selectMode = ref(SELECT_MODE_PLAN);
 const isShowQuantity = ref(true);
 const isShowGroupItems = ref(false);
+const isShowItemsBlock = ref(true)
+const isShowUserItemsBlock = ref(true)
 const filter = shallowReactive({
   itemName: "",
   typeId: null,
@@ -196,11 +207,44 @@ const visibleItems = computed(() => {
 
   return resultItems;
 });
+const visibleItemsCount = computed(() => visibleItems.value.length)
 const userItems = computed(() => {
   return items.value.filter((item) => {
     return userNodesMap.value[item.node.id] !== undefined;
   });
 });
+const userItemsCount = computed(() => userItems.value.length)
+const groupItems = computed(() => {
+  let map = {};
+
+  items.value.forEach(({ item }) => {
+    if (!map[item.id]) {
+      map[item.id] = {
+        id: item.id,
+        quantity: 0,
+        item,
+      };
+    }
+    map[item.id].quantity += item.quantity;
+  });
+
+  let arr = Object.values(map);
+
+  arr.sort((a, b) => {
+    if (a.item.name < b.item.name) {
+      return -1;
+    }
+    if (a.item.name > b.item.name) {
+      return 1;
+    }
+    return 0;
+  });
+  arr.every((item) => item.humanQuantity = getHumanQuantity(item.quantity))
+
+  return arr;
+});
+const groupItemsCount = computed(() => Object.keys(groupItems.value).length)
+
 const userNodesCount = computed(() => Object.keys(userNodesMap.value).length);
 const totalNodesCount = computed(() => {
   const length = Object.keys(nodes.value).length;
@@ -386,6 +430,9 @@ function loadState() {
       isShowQuantity: true,
       byIsland: {},
       filter: {},
+      isShowItemsBlock: true,
+      isShowUserItemsBlock: true,
+      isShowGroupItems: false,
     };
   }
   if (!state.filter) {
@@ -403,9 +450,17 @@ function loadState() {
   if (typeof state.filter.isNodeTypeTower !== "boolean") {
     state.filter.isNodeTypeTower = false;
   }
-
   if (state.isShowQuantity === undefined) {
     state.isShowQuantity = true;
+  }
+  if (state.isShowItemsBlock === undefined) {
+    state.isShowItemsBlock = true
+  }
+  if (state.isShowUserItemsBlock === undefined) {
+    state.isShowUserItemsBlock = true
+  }
+  if (state.isShowGroupItems === undefined) {
+    state.isShowGroupItems = false
   }
 
   if (!state.byIsland || !isObject(state.byIsland)) {
@@ -422,6 +477,9 @@ function loadState() {
 
   filter.value = state.filter;
   isShowQuantity.value = state.isShowQuantity;
+  isShowItemsBlock.value = state.isShowItemsBlock
+  isShowUserItemsBlock.value = state.isShowUserItemsBlock
+  isShowGroupItems.value = state.isShowGroupItems
 
   isSelectAnyNode.value = typeof state.isSelectAnyNode === "boolean" ? state.isSelectAnyNode : true;
 }
@@ -431,6 +489,9 @@ function saveState() {
     filter: filter.value,
     isShowQuantity: isShowQuantity.value,
     isSelectAnyNode: isSelectAnyNode.value,
+    isShowGroupItems: isShowGroupItems.value,
+    isShowItemsBlock: isShowItemsBlock.value,
+    isShowUserItemsBlock: isShowUserItemsBlock.value,
   };
   byIslandState[props.island.id] = {
     userNodesIds: Object.keys(userNodesMap.value).map((id) => parseInt(id)),

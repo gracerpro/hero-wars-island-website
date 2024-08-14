@@ -29,10 +29,7 @@
       parent-page-id="islandPage"
     />
 
-    <div v-if="islandDescription">
-      <hr />
-      <div v-html="islandDescription"></div>
-    </div>
+    <div v-if="islandDescription" v-html="islandDescription" class="description mt-4"></div>
   </div>
 </template>
 <script setup>
@@ -149,3 +146,9 @@ async function loadIsland(id) {
   return currentIsland.value;
 }
 </script>
+<style scoped>
+.description {
+  border-top: 1px solid #ccc;
+  padding-top: 10px;
+}
+</style>
