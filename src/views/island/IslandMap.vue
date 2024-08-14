@@ -35,6 +35,7 @@
       <div class="row mt-3">
         <div class="col-lg-6">
           <island-map-filter
+            :items="items"
             v-model:item-name="filter.itemName"
             v-model:type-id="filter.typeId"
             v-model:is-node-type-tower="filter.isNodeTypeTower"
@@ -91,7 +92,7 @@
       <div class="row">
         <div class="col-lg-6 mt-4">
           <h3>
-            Ресурсы на карте
+            {{ t("page.island.resourcesOnMap" )}}
           </h3>
           <a href="#" @click.prevent="isShowItemsBlock = !isShowItemsBlock">
             {{ t(isShowItemsBlock ? "common.hide" : "common.show") }}
@@ -100,7 +101,7 @@
           <island-map-table v-if="isShowItemsBlock" :items="visibleItems" />
         </div>
         <div class="col-lg-6 mt-4">
-          <h3>Выбранные ресурсы</h3>
+          <h3>{{ t("page.island.selectedResources") }}</h3>
           <a href="#" @click.prevent="isShowUserItemsBlock = !isShowUserItemsBlock">
             {{ t(isShowUserItemsBlock ? "common.hide" : "common.show") }}
           </a>

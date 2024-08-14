@@ -25,7 +25,7 @@
       <clear-select
         :modelValue="typeId"
         :input-id="formId + '__typeId'"
-        :select-values="getLabelsByTypes(t)"
+        :select-values="visibleTypes"
         @update:model-value="onChangeType"
       />
     </div>
@@ -75,12 +75,14 @@ import ClearSelect from "@/components/ClearSelect.vue";
 import { getLabelsByTypes } from "@/api/Item";
 import { useI18n } from "vue-i18n";
 import { TYPE_CHEST, TYPE_TOWN } from "@/api/Node";
+import { computed } from "vue";
 
 const { t } = useI18n();
 
 const formId = "nodesForm";
 
-defineProps({
+const props = defineProps({
+  items: { type: Object, required: true },
   itemName: { type: String, required: true },
   typeId: { type: [Number, null], required: true },
   isNodeTypeTower: { type: Boolean, required: true },
@@ -93,6 +95,24 @@ const emit = defineEmits([
   EVENT_UPDATE_IS_NODE_TYPE_TOWER,
   EVENT_UPDATE_IS_NODE_TYPE_CHEST,
 ]);
+
+const visibleTypes = computed(() => {
+  const map = {};
+  const labels = getLabelsByTypes(t)
+
+  props.items.forEach((item) => {
+    map[item.item.typeId] = true
+  })
+
+  const types = {}
+  Object.keys(map).forEach((typeId) => {
+    if (typeId > 0) {
+      types[typeId] = labels[typeId]
+    }
+  })
+
+  return types;
+})
 
 const onUpdateName = (name) => {
   emit(EVENT_UPDATE_ITEM_NAME, name);
