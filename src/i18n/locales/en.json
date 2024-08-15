@@ -62,7 +62,8 @@
     "unknownStatus": "Unknown status",
     "version": "Version",
     "zoomIn": "Zoom in",
-    "zoomOut": "Zoom out"
+    "zoomOut": "Zoom out",
+    "warningCellDescription": "Warning cell. Administrator not sure in a reward."
   },
   "locale": {
     "en": "English",

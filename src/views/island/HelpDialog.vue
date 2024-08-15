@@ -19,6 +19,7 @@
         <li><span class="node-box node-town"></span>{{ t("common.tower") }}</li>
         <li><span class="node-box node-chest"></span>{{ t("common.chest") }}</li>
         <li><span class="node-box node-blocker"></span>{{ t("common.blockerExNames") }}</li>
+        <li><span class="node-box -warning"></span>{{ t("common.warningCellDescription") }}</li>
       </ul>
     </modal-dialog>
   </suspense>
@@ -62,5 +63,8 @@ defineExpose({
 }
 .node-blocker {
   background-color: #867878;
+}
+.-warning {
+  background-color: yellow;
 }
 </style>

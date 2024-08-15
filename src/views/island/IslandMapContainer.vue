@@ -75,7 +75,7 @@ const EVENT_SELECT_NODE = "select-node";
 </script>
 <script setup>
 import { TYPE_DANGER } from "@/components/ToastMessage.vue";
-import { TYPE_START, TYPE_TOWN, TYPE_CHEST, TYPE_BLOCKER, TYPE_NODE } from "@/api/Node";
+import { TYPE_START, TYPE_TOWN, TYPE_CHEST, TYPE_BLOCKER, TYPE_NODE, STATUS_NOT_SURE } from "@/api/Node";
 import { ref, computed, defineAsyncComponent } from "vue";
 import {
   TRANSLATE_X,
@@ -246,13 +246,19 @@ function drawNode(node) {
   };
   const data = getCoordinates(node);
 
+  let nodeClass = classes[node.typeId] ? classes[node.typeId] : ""
+
+  if (node.statusId == STATUS_NOT_SURE) {
+    nodeClass += " -warning"
+  }
+
   return {
     ...node,
     xyId: node.mx + "_" + node.my,
     x: data.x,
     y: data.y,
     points: getPoints(data.coordinates),
-    class: classes[node.typeId] ? classes[node.typeId] : "",
+    class: nodeClass,
   };
 }
 /**
@@ -414,6 +420,9 @@ const getItemName = (item) => {
 }
 .node-blocker:hover {
   fill: #9c8e8e;
+}
+.-warning {
+  fill: yellow;
 }
 .node.user-node {
   fill: #6668f8;
