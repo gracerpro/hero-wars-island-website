@@ -45,6 +45,7 @@ export default [
     component: () => import("../views/status-pages/TheInternalServerError.vue"),
   },
   {
+    // [Vue Router warn]: Discarded invalid param(s) "catchAll" when navigating. See https://github.com/vuejs/router/blob/main/packages/router/CHANGELOG.md#414-2022-08-22 for more details
     path: "/:catchAll(.*)",
     redirect: (to) => {
       return createI18nRouteTo(

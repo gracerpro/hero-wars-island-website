@@ -38,6 +38,8 @@
           class="badge text-bg-primary ms-2"
           >{{ t("page.home.actual") }}</span
         >
+        <br>
+        <span v-for="i in island.regionsCount" :key="i" class="badge text-bg-secondary me-2">{{ i }}</span>
       </li>
     </ol>
   </div>
