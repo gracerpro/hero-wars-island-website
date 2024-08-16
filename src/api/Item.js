@@ -53,6 +53,6 @@ export function getLabelsByTypes(t) {
     [TYPE_GOLD]: t("common.gold"),
     [TYPE_STARMONEY]: t("common.starmoney"),
     [TYPE_AVATAR]: t("common.avatarType"),
-    [TYPE_BANNER]: t("common.bannerType")
+    [TYPE_BANNER]: t("common.bannerType"),
   };
 }

@@ -29,7 +29,11 @@
       parent-page-id="islandPage"
     />
 
-    <div v-if="islandDescription" v-html="islandDescription" class="description mt-4"></div>
+    <div
+      v-if="islandDescription"
+      v-html="islandDescription"
+      class="description mt-4"
+    ></div>
   </div>
 </template>
 <script setup>

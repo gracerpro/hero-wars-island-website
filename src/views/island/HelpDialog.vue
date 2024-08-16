@@ -16,7 +16,7 @@
       <ul class="list-unstyled">
         <li><span class="node-box node-start"></span>{{ t("common.startNode") }}</li>
         <li><span class="node-box node"></span>{{ t("page.island.oneResource") }}</li>
-        <li><span class="node-box node-town"></span>{{ t("common.tower") }}</li>
+        <li><span class="node-box node-tower"></span>{{ t("common.tower") }}</li>
         <li><span class="node-box node-chest"></span>{{ t("common.chest") }}</li>
         <li><span class="node-box node-blocker"></span>{{ t("common.blockerExNames") }}</li>
         <li><span class="node-box -warning"></span>{{ t("common.warningCellDescription") }}</li>
@@ -55,7 +55,7 @@ defineExpose({
 .node-start {
   background-color: #a6f3fd;
 }
-.node-town {
+.node-tower {
   background-color: #94440e;
 }
 .node-chest {

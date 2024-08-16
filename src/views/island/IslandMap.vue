@@ -92,21 +92,33 @@
       <div class="row">
         <div class="col-lg-6 mt-4">
           <h3>
-            {{ t("page.island.resourcesOnMap" )}}
+            {{ t("page.island.resourcesOnMap") }}
           </h3>
-          <a href="#" @click.prevent="isShowItemsBlock = !isShowItemsBlock">
+          <a
+            href="#"
+            @click.prevent="isShowItemsBlock = !isShowItemsBlock"
+          >
             {{ t(isShowItemsBlock ? "common.hide" : "common.show") }}
           </a>
           <span class="badge text-bg-secondary ms-2">{{ visibleItemsCount }}</span>
-          <island-map-table v-if="isShowItemsBlock" :items="visibleItems" />
+          <island-map-table
+            v-if="isShowItemsBlock"
+            :items="visibleItems"
+          />
         </div>
         <div class="col-lg-6 mt-4">
           <h3>{{ t("page.island.selectedResources") }}</h3>
-          <a href="#" @click.prevent="isShowUserItemsBlock = !isShowUserItemsBlock">
+          <a
+            href="#"
+            @click.prevent="isShowUserItemsBlock = !isShowUserItemsBlock"
+          >
             {{ t(isShowUserItemsBlock ? "common.hide" : "common.show") }}
           </a>
           <span class="badge text-bg-secondary ms-2">{{ userItemsCount }}</span>
-          <island-map-table v-if="isShowUserItemsBlock" :items="userItems" />
+          <island-map-table
+            v-if="isShowUserItemsBlock"
+            :items="userItems"
+          />
         </div>
       </div>
       <div class="row">
@@ -119,7 +131,10 @@
             {{ t(isShowGroupItems ? "common.hide" : "common.show") }}
           </a>
           <span class="badge text-bg-secondary ms-2">{{ groupItemsCount }}</span>
-          <island-map-table v-if="isShowGroupItems" :items="groupItems" />
+          <island-map-table
+            v-if="isShowGroupItems"
+            :items="groupItems"
+          />
         </div>
       </div>
     </div>
@@ -137,7 +152,7 @@ import { getHumanQuantity } from "@/helpers/formatter";
 import { useI18n } from "vue-i18n";
 import { createI18nRouteTo } from "@/i18n/translation";
 import { fullscreenElement } from "@/core/fullscreen";
-import { TYPE_CHEST, TYPE_TOWN } from "@/api/Node";
+import { TYPE_CHEST, TYPE_TOWER } from "@/api/Node";
 import { isObject } from "@/helpers/core";
 import { getNodesMap } from "@/services/api/island-node";
 
@@ -171,8 +186,8 @@ const isSelectAnyNode = ref(true);
 const selectMode = ref(SELECT_MODE_PLAN);
 const isShowQuantity = ref(true);
 const isShowGroupItems = ref(false);
-const isShowItemsBlock = ref(true)
-const isShowUserItemsBlock = ref(true)
+const isShowItemsBlock = ref(true);
+const isShowUserItemsBlock = ref(true);
 const filter = shallowReactive({
   itemName: "",
   typeId: null,
@@ -198,23 +213,23 @@ const visibleItems = computed(() => {
   }
   if (filter.isNodeTypeChest && filter.isNodeTypeTower) {
     resultItems = resultItems.filter((item) => {
-      return item.node.typeId === TYPE_CHEST || item.node.typeId === TYPE_TOWN;
+      return item.node.typeId === TYPE_CHEST || item.node.typeId === TYPE_TOWER;
     });
   } else if (filter.isNodeTypeChest) {
     resultItems = resultItems.filter((item) => item.node.typeId === TYPE_CHEST);
   } else if (filter.isNodeTypeTower) {
-    resultItems = resultItems.filter((item) => item.node.typeId === TYPE_TOWN);
+    resultItems = resultItems.filter((item) => item.node.typeId === TYPE_TOWER);
   }
 
   return resultItems;
 });
-const visibleItemsCount = computed(() => visibleItems.value.length)
+const visibleItemsCount = computed(() => visibleItems.value.length);
 const userItems = computed(() => {
   return items.value.filter((item) => {
     return userNodesMap.value[item.node.id] !== undefined;
   });
 });
-const userItemsCount = computed(() => userItems.value.length)
+const userItemsCount = computed(() => userItems.value.length);
 const groupItems = computed(() => {
   let map = {};
 
@@ -240,11 +255,11 @@ const groupItems = computed(() => {
     }
     return 0;
   });
-  arr.every((item) => item.humanQuantity = getHumanQuantity(item.quantity))
+  arr.every((item) => (item.humanQuantity = getHumanQuantity(item.quantity)));
 
   return arr;
 });
-const groupItemsCount = computed(() => Object.keys(groupItems.value).length)
+const groupItemsCount = computed(() => Object.keys(groupItems.value).length);
 
 const userNodesCount = computed(() => Object.keys(userNodesMap.value).length);
 const totalNodesCount = computed(() => {
@@ -377,7 +392,7 @@ function onResetTranslate() {
 
 function onChangeIsShowQuantity() {
   isShowQuantity.value = !isShowQuantity.value;
-};
+}
 
 function onChangeNode(node) {
   if (!nodes.value[node.id]) {
@@ -455,13 +470,13 @@ function loadState() {
     state.isShowQuantity = true;
   }
   if (state.isShowItemsBlock === undefined) {
-    state.isShowItemsBlock = true
+    state.isShowItemsBlock = true;
   }
   if (state.isShowUserItemsBlock === undefined) {
-    state.isShowUserItemsBlock = true
+    state.isShowUserItemsBlock = true;
   }
   if (state.isShowGroupItems === undefined) {
-    state.isShowGroupItems = false
+    state.isShowGroupItems = false;
   }
 
   if (!state.byIsland || !isObject(state.byIsland)) {
@@ -478,9 +493,9 @@ function loadState() {
 
   filter.value = state.filter;
   isShowQuantity.value = state.isShowQuantity;
-  isShowItemsBlock.value = state.isShowItemsBlock
-  isShowUserItemsBlock.value = state.isShowUserItemsBlock
-  isShowGroupItems.value = state.isShowGroupItems
+  isShowItemsBlock.value = state.isShowItemsBlock;
+  isShowUserItemsBlock.value = state.isShowUserItemsBlock;
+  isShowGroupItems.value = state.isShowGroupItems;
 
   isSelectAnyNode.value = typeof state.isSelectAnyNode === "boolean" ? state.isSelectAnyNode : true;
 }

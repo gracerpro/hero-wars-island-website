@@ -75,7 +75,14 @@ const EVENT_SELECT_NODE = "select-node";
 </script>
 <script setup>
 import { TYPE_DANGER } from "@/components/ToastMessage.vue";
-import { TYPE_START, TYPE_TOWN, TYPE_CHEST, TYPE_BLOCKER, TYPE_NODE, STATUS_NOT_SURE } from "@/api/Node";
+import {
+  TYPE_START,
+  TYPE_TOWER,
+  TYPE_CHEST,
+  TYPE_BLOCKER,
+  TYPE_NODE,
+  STATUS_NOT_SURE,
+} from "@/api/Node";
 import { ref, computed, defineAsyncComponent } from "vue";
 import {
   TRANSLATE_X,
@@ -240,16 +247,16 @@ function drawNode(node) {
   const classes = {
     [TYPE_NODE]: "node-step",
     [TYPE_START]: "node-start",
-    [TYPE_TOWN]: "node-town",
+    [TYPE_TOWER]: "node-tower",
     [TYPE_CHEST]: "node-chest",
     [TYPE_BLOCKER]: "node-blocker",
   };
   const data = getCoordinates(node);
 
-  let nodeClass = classes[node.typeId] ? classes[node.typeId] : ""
+  let nodeClass = classes[node.typeId] ? classes[node.typeId] : "";
 
   if (node.statusId == STATUS_NOT_SURE) {
-    nodeClass += " -warning"
+    nodeClass += " -warning";
   }
 
   return {
@@ -340,8 +347,9 @@ function onMouseMove(button) {
   const isTop = button.pageY < mouse.preventY;
   const isBottom = button.pageY > mouse.preventY;
 
-  let x = 0, y = 0
-  const halfScale = props.scale / 2
+  let x = 0,
+    y = 0;
+  const halfScale = props.scale / 2;
 
   if (isLeft) {
     x = -TRANSLATE_X * halfScale;
@@ -401,11 +409,11 @@ const getItemName = (item) => {
 .node-start:hover {
   fill: #d6f7fc;
 }
-.node-town {
+.node-tower {
   fill: #94440e;
   cursor: pointer;
 }
-.node-town:hover {
+.node-tower:hover {
   fill: #b95b1b;
 }
 .node-chest {

@@ -183,7 +183,7 @@ const onHelpClick = () => {
 };
 function onChangeIsShowQuantity() {
   emit(EVENT_CHANGE_IS_SHOW_QUANTITY);
-};
+}
 const onMountedHelpDialog = () => {
   helpDialog.value.show().finally(() => {
     helpDialogComponent.value = null;

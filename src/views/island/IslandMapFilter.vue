@@ -35,7 +35,7 @@
           class="form-check-input"
           type="checkbox"
           :id="formId + '__nodeTypeTower'"
-          :value="TYPE_TOWN"
+          :value="TYPE_TOWER"
           :checked="isNodeTypeTower"
           @change="onChangeNodeType"
         />
@@ -74,7 +74,7 @@ import TextInput from "@/components/TextInput.vue";
 import ClearSelect from "@/components/ClearSelect.vue";
 import { getLabelsByTypes } from "@/api/Item";
 import { useI18n } from "vue-i18n";
-import { TYPE_CHEST, TYPE_TOWN } from "@/api/Node";
+import { TYPE_CHEST, TYPE_TOWER } from "@/api/Node";
 import { computed } from "vue";
 
 const { t } = useI18n();
@@ -98,21 +98,21 @@ const emit = defineEmits([
 
 const visibleTypes = computed(() => {
   const map = {};
-  const labels = getLabelsByTypes(t)
+  const labels = getLabelsByTypes(t);
 
   props.items.forEach((item) => {
-    map[item.item.typeId] = true
-  })
+    map[item.item.typeId] = true;
+  });
 
-  const types = {}
+  const types = {};
   Object.keys(map).forEach((typeId) => {
     if (typeId > 0) {
-      types[typeId] = labels[typeId]
+      types[typeId] = labels[typeId];
     }
-  })
+  });
 
   return types;
-})
+});
 
 const onUpdateName = (name) => {
   emit(EVENT_UPDATE_ITEM_NAME, name);
@@ -123,7 +123,7 @@ const onChangeType = (typeId) => {
 const onChangeNodeType = (event) => {
   const typeId = parseInt(event.target.value);
 
-  if (typeId === TYPE_TOWN) {
+  if (typeId === TYPE_TOWER) {
     emit(EVENT_UPDATE_IS_NODE_TYPE_TOWER, event.target.checked);
   }
   if (typeId === TYPE_CHEST) {
