@@ -67,6 +67,10 @@
       ref="toast"
       element-id="mapContainerToast"
     />
+
+    <div>
+      <button type="button" @click="download">Download</button>
+    </div>
   </div>
 </template>
 <script>
@@ -390,6 +394,34 @@ const getQuantity = (item) => {
 const getItemName = (item) => {
   return item.item.name ? item.item.name : t("common.noName");
 };
+
+function download() {
+  console.log(canvas.value) 
+
+  const svg = canvas.value
+  const svgData = svg.innerHTML
+  const header = `<svg width="800" height="600" viewBox="${viewBox.value}" version="1.1" xmlns="http://www.w3.org/2000/svg">`
+  const style = `<style>
+  .node-step { fill: #9da7c9; stroke: #dddddd; cursor: pointer; }
+  .node-start { fill: #a6f3fd; }
+  .node-tower { fill: #94440e; }
+  .node-chest { fill: #1a660b; cursor: pointer; }
+  .node-blocker { fill: #867878; }
+  .-warning { fill: yellow; }
+  .node.user-node { fill: #6668f8; }
+  .node.user-node-going { fill: #f86696; }
+  .text { font-size: 20px; fill: #000; font-weight: bold; cursor: pointer; }
+  .text-2 { font-size: 16px; }
+  .item-empty-image { stroke: #999; stroke-width: 2; fill: #fff; cursor: pointer; }
+  </style>`
+  const s = header + style + svgData + "</svg>"
+  const base64doc = btoa(unescape(encodeURIComponent(s)));
+  const a = document.createElement('a');
+  const e = new MouseEvent('click');
+  a.download = 'download.svg';
+  a.href = 'data:image/svg+xml;base64,' + base64doc;
+  a.dispatchEvent(e);
+}
 </script>
 <style>
 .node {
