@@ -4,7 +4,7 @@ import ApiRequest from "../core/ApiRequest";
 export const TYPE_RECIPES = 1;
 export const TYPE_CONSUMABLE = 2;
 export const TYPE_COIN = 3;
-export const TYPE_PATTERN = 4;
+export const TYPE_BANNER_STONE = 4;
 export const TYPE_FRAGMENT = 5;
 export const TYPE_SOUL_STONE = 6;
 export const TYPE_EQUIPMENT = 7;
@@ -47,7 +47,7 @@ export function getLabelsByTypes(t) {
     [TYPE_RECIPES]: t("common.recipes"),
     [TYPE_CONSUMABLE]: t("common.consumable"),
     [TYPE_COIN]: t("common.coins"),
-    [TYPE_PATTERN]: t("common.pattern", 2),
+    [TYPE_BANNER_STONE]: t("common.bannerStone", 2),
     [TYPE_FRAGMENT]: t("common.fragment", 2),
     [TYPE_SOUL_STONE]: t("common.soulStones"),
     [TYPE_GOLD]: t("common.gold"),
