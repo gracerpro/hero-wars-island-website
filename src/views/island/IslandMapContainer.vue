@@ -69,7 +69,8 @@
     />
 
     <div>
-      <button type="button" @click="download">Download</button>
+      <button type="button" @click="downloadAsSvg">SVG</button>
+      <button type="button" @click="downloadAsPng">PNG</button>
     </div>
   </div>
 </template>
@@ -395,32 +396,113 @@ const getItemName = (item) => {
   return item.item.name ? item.item.name : t("common.noName");
 };
 
-function download() {
-  console.log(canvas.value) 
-
-  const svg = canvas.value
-  const svgData = svg.innerHTML
-  const header = `<svg width="800" height="600" viewBox="${viewBox.value}" version="1.1" xmlns="http://www.w3.org/2000/svg">`
-  const style = `<style>
-  .node-step { fill: #9da7c9; stroke: #dddddd; cursor: pointer; }
-  .node-start { fill: #a6f3fd; }
-  .node-tower { fill: #94440e; }
-  .node-chest { fill: #1a660b; cursor: pointer; }
-  .node-blocker { fill: #867878; }
-  .-warning { fill: yellow; }
-  .node.user-node { fill: #6668f8; }
-  .node.user-node-going { fill: #f86696; }
-  .text { font-size: 20px; fill: #000; font-weight: bold; cursor: pointer; }
-  .text-2 { font-size: 16px; }
-  .item-empty-image { stroke: #999; stroke-width: 2; fill: #fff; cursor: pointer; }
-  </style>`
-  const s = header + style + svgData + "</svg>"
-  const base64doc = btoa(unescape(encodeURIComponent(s)));
+function download(url, fileName) {
+  const e = new MouseEvent('click', {
+    view: window,
+    bubbles: false,
+    cancelable: true
+  });
   const a = document.createElement('a');
-  const e = new MouseEvent('click');
-  a.download = 'download.svg';
-  a.href = 'data:image/svg+xml;base64,' + base64doc;
+
+  a.download = fileName;
+  a.href = url
   a.dispatchEvent(e);
+  a.remove()
+}
+
+function downloadAsPng() {
+  const svgElem = canvas.value
+  const svgBlob = getSvgBlob(svgElem)
+  const url = URL.createObjectURL(svgBlob);
+
+  const img = new Image();
+  img.onload = () => {
+    const canvas = document.createElement('canvas');
+    const context = canvas.getContext('2d');
+    const domRect = svgElem.getBBox();
+    canvas.width = domRect.width;
+    canvas.height = domRect.height;
+    context.drawImage(img, 0, 0, domRect.width, domRect.height);
+
+    const imgUri = canvas
+      .toDataURL('image/png')
+      .replace('image/png', 'image/octet-stream');
+
+    download(imgUri, "map.png");
+
+    URL.revokeObjectURL(url);
+  };
+  img.onerror = (e) => {
+    console.error('Image not loaded', e);
+  };
+
+  img.src = url;
+}
+
+function downloadAsSvg() {
+  const svgElem = canvas.value
+  const svgBlob = getSvgBlob(svgElem)
+
+  const url = URL.createObjectURL(svgBlob);
+
+  download(url, "map.svg")
+
+  URL.revokeObjectURL(url)
+}
+
+function getSvgBlob(svgElem) {
+  const svgData = svgElem.innerHTML
+  const svgAttributes = `width="${svgElem.clientWidth}" height="${svgElem.clientHeight}" viewBox="${viewBox.value}" version="1.1" xmlns="http://www.w3.org/2000/svg"`
+  const svgStyle = "<style>" + getStyleContent() + "</style>"
+  const data = `<svg ${svgAttributes}>${svgStyle} ${svgData}</svg>`
+  const svgBlob = new Blob([data], {
+    type: "image/svg+xml;charset=utf-8"
+  });
+
+  return svgBlob
+}
+
+// TODO: use v-bind, see "begin SVG styles" in css
+function getStyleContent() {
+  return `
+  .node-start {
+    fill: #a6f3fd;
+  }
+  .node-step {
+    fill: #9da7c9;
+    stroke: #dddddd;
+  }
+  .node-tower {
+    fill: #94440e;
+  }
+  .node-chest {
+    fill: #1a660b;
+  }
+  .node-blocker {
+    fill: #867878;
+  }
+  .-warning {
+    fill: yellow;
+  }
+  .node.user-node {
+    fill: #6668f8;
+  }
+  .node.user-node-going {
+    fill: #f86696;
+  }
+  .text {
+    font-size: 20px;
+    fill: #000;
+    font-weight: bold;
+  }
+  .text-2 {
+    font-size: 16px;
+  }
+  .item-empty-image {
+    stroke: #999;
+    stroke-width: 2;
+    fill: #fff;
+  }`
 }
 </script>
 <style>
@@ -428,38 +510,56 @@ function download() {
   stroke-width: 1;
 }
 .node-step {
-  fill: #9da7c9;
-  stroke: #dddddd;
   cursor: pointer;
 }
 .node-step:hover {
   fill: #bcc5e6;
 }
-.node-start {
-  fill: #a6f3fd;
-}
 .node-start:hover {
   fill: #d6f7fc;
 }
 .node-tower {
-  fill: #94440e;
   cursor: pointer;
 }
 .node-tower:hover {
   fill: #b95b1b;
 }
 .node-chest {
-  fill: #1a660b;
   cursor: pointer;
 }
 .node-chest:hover {
   fill: #566d51;
 }
-.node-blocker {
-  fill: #867878;
-}
 .node-blocker:hover {
   fill: #9c8e8e;
+}
+.text {
+  cursor: pointer;
+}
+.item-image {
+  cursor: pointer;
+}
+.item-empty-image {
+  cursor: pointer;
+}
+</style>
+<!-- begin SVG styles -->
+<style>
+.node-start {
+  fill: #a6f3fd;
+}
+.node-step {
+  fill: #9da7c9;
+  stroke: #dddddd;
+}
+.node-tower {
+  fill: #94440e;
+}
+.node-chest {
+  fill: #1a660b;
+}
+.node-blocker {
+  fill: #867878;
 }
 .-warning {
   fill: yellow;
@@ -474,22 +574,24 @@ function download() {
   font-size: 20px;
   fill: #000;
   font-weight: bold;
-  cursor: pointer;
 }
 .text-2 {
   font-size: 16px;
-}
-.item-image {
-  cursor: pointer;
 }
 .item-empty-image {
   stroke: #999;
   stroke-width: 2;
   fill: #fff;
-  cursor: pointer;
 }
 </style>
+<!-- end SVG styles -->
 <style scoped>
+.map {
+  margin-left: 45px;
+}
+.canvas {
+  outline: 1px solid #dddddd;
+}
 .canvas:fullscreen {
   background-color: #fff;
 }

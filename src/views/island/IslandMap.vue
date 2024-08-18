@@ -523,15 +523,3 @@ function saveState() {
   localStorage.setItem(componentId, JSON.stringify(state));
 }
 </script>
-<style scoped>
-.map {
-  margin-left: 45px;
-  height: 600px;
-  outline: 1px solid #dddddd;
-}
-
-.-left-toolbar {
-  width: 40px;
-  float: left;
-}
-</style>
