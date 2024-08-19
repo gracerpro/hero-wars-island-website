@@ -10,7 +10,7 @@
       @mouseup="onMouseUp"
       @mousemove="onMouseMove"
       @wheel="onMouseWheel"
-      ref="canvas"
+      ref="svgMap"
     >
       <g :transform="'translate(' + translateX + ' ' + translateY + ')'">
         <polygon
@@ -67,11 +67,6 @@
       ref="toast"
       element-id="mapContainerToast"
     />
-
-    <div>
-      <button type="button" @click="downloadAsSvg">SVG</button>
-      <button type="button" @click="downloadAsPng">PNG</button>
-    </div>
   </div>
 </template>
 <script>
@@ -99,6 +94,7 @@ import {
   canSelectNextNode,
 } from "@/services/island-map";
 import { useI18n } from "vue-i18n";
+//import { Canvg } from "canvg";
 
 const { t } = useI18n();
 
@@ -119,6 +115,7 @@ const mouse = {
   preventY: null,
 };
 
+const svgMap = ref(null);
 const canvas = ref(null);
 
 const emit = defineEmits([
@@ -138,7 +135,7 @@ const props = defineProps({
   isSelectAnyNode: { type: Boolean, default: true },
 });
 defineExpose({
-  canvas,
+  svgMap,
 });
 
 const toast = ref(null);
@@ -279,22 +276,21 @@ function drawNode(node) {
 function getPoints(coordinates) {
   return coordinates.map((item) => item.x + "," + item.y).join(" ");
 }
+
 /**
  * @param {Object} node
  */
 function getCoordinates(node) {
-  const side = SIDE;
-  const h = HEIGHT;
-  const x = node.mx * (1.5 * side);
-  const y = node.my * 2 * h + (node.mx % 2 === 0 ? 0 : h);
+  const x = node.mx * (1.5 * SIDE);
+  const y = node.my * 2 * HEIGHT + (node.mx % 2 === 0 ? 0 : HEIGHT);
 
   let coordinates = new Array(6);
-  coordinates[0] = { x: x + side, y };
-  coordinates[1] = { x: x + HALF_SIDE, y: y + h };
-  coordinates[2] = { x: x - HALF_SIDE, y: y + h };
-  coordinates[3] = { x: x - side, y };
-  coordinates[4] = { x: x - HALF_SIDE, y: y - h };
-  coordinates[5] = { x: x + HALF_SIDE, y: y - h };
+  coordinates[0] = { x: x + SIDE, y };
+  coordinates[1] = { x: x + HALF_SIDE, y: y + HEIGHT };
+  coordinates[2] = { x: x - HALF_SIDE, y: y + HEIGHT };
+  coordinates[3] = { x: x - SIDE, y };
+  coordinates[4] = { x: x - HALF_SIDE, y: y - HEIGHT };
+  coordinates[5] = { x: x + HALF_SIDE, y: y - HEIGHT };
 
   return {
     x,
@@ -396,6 +392,56 @@ const getItemName = (item) => {
   return item.item.name ? item.item.name : t("common.noName");
 };
 
+/*
+TODO: make a downlaod as PNG
+
+function downloadAsPng() {
+  const svgElem = svgMap.value
+  const svgContent = getSvgHtml(svgElem)
+  const canvasElem = canvas.value
+  const context = canvasElem.getContext('2d');
+  const canvg = Canvg.fromString(context, svgContent);
+
+  canvg.render().then(() => {
+    // TODO: Uncaught (in promise) DOMException: The operation is insecure.
+    canvasElem.toBlob((blob) => {
+      let url = URL.createObjectURL(blob);
+
+      const img = new Image();
+      img.onload = () => {
+        //const canvas = document.createElement('canvas');
+        //const context = canvasElem.getContext('2d');
+        const domRect = svgElem.getBBox();
+        console.log(domRect)
+        //canvas.width = domRect.width;
+        //canvas.height = domRect.height;
+        context.drawImage(img, 0, 0, domRect.width, domRect.height);
+
+        const imgUri = canvasElem
+        .toDataURL('image/png')
+        .replace(/^data:image\/png/,'data:application/octet-stream');
+
+        download(imgUri, "map.png");
+
+        URL.revokeObjectURL(url);
+      };
+      img.onerror = (e) => {
+        console.error('Image not loaded', e);
+      };
+
+      img.src = url;
+    })
+  })
+}
+
+function getSvgHtml(svgElem) {
+  const svgData = svgElem.innerHTML
+  const svgAttributes = `width="${svgElem.clientWidth}" height="${svgElem.clientHeight}" viewBox="${viewBox.value}" version="1.1" xmlns="http://www.w3.org/2000/svg"`
+  const svgStyle = "<style>" + getStyleContent() + "</style>"
+
+  return `<svg ${svgAttributes}>${svgStyle} ${svgData}</svg>`
+}
+
 function download(url, fileName) {
   const e = new MouseEvent('click', {
     view: window,
@@ -408,58 +454,6 @@ function download(url, fileName) {
   a.href = url
   a.dispatchEvent(e);
   a.remove()
-}
-
-function downloadAsPng() {
-  const svgElem = canvas.value
-  const svgBlob = getSvgBlob(svgElem)
-  const url = URL.createObjectURL(svgBlob);
-
-  const img = new Image();
-  img.onload = () => {
-    const canvas = document.createElement('canvas');
-    const context = canvas.getContext('2d');
-    const domRect = svgElem.getBBox();
-    canvas.width = domRect.width;
-    canvas.height = domRect.height;
-    context.drawImage(img, 0, 0, domRect.width, domRect.height);
-
-    const imgUri = canvas
-      .toDataURL('image/png')
-      .replace('image/png', 'image/octet-stream');
-
-    download(imgUri, "map.png");
-
-    URL.revokeObjectURL(url);
-  };
-  img.onerror = (e) => {
-    console.error('Image not loaded', e);
-  };
-
-  img.src = url;
-}
-
-function downloadAsSvg() {
-  const svgElem = canvas.value
-  const svgBlob = getSvgBlob(svgElem)
-
-  const url = URL.createObjectURL(svgBlob);
-
-  download(url, "map.svg")
-
-  URL.revokeObjectURL(url)
-}
-
-function getSvgBlob(svgElem) {
-  const svgData = svgElem.innerHTML
-  const svgAttributes = `width="${svgElem.clientWidth}" height="${svgElem.clientHeight}" viewBox="${viewBox.value}" version="1.1" xmlns="http://www.w3.org/2000/svg"`
-  const svgStyle = "<style>" + getStyleContent() + "</style>"
-  const data = `<svg ${svgAttributes}>${svgStyle} ${svgData}</svg>`
-  const svgBlob = new Blob([data], {
-    type: "image/svg+xml;charset=utf-8"
-  });
-
-  return svgBlob
 }
 
 // TODO: use v-bind, see "begin SVG styles" in css
@@ -504,6 +498,7 @@ function getStyleContent() {
     fill: #fff;
   }`
 }
+*/
 </script>
 <style>
 .node {
