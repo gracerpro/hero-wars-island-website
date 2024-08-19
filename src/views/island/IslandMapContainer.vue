@@ -10,7 +10,7 @@
       @mouseup="onMouseUp"
       @mousemove="onMouseMove"
       @wheel="onMouseWheel"
-      ref="canvas"
+      ref="svgMap"
     >
       <g :transform="'translate(' + translateX + ' ' + translateY + ')'">
         <polygon
@@ -94,6 +94,7 @@ import {
   canSelectNextNode,
 } from "@/services/island-map";
 import { useI18n } from "vue-i18n";
+//import { Canvg } from "canvg";
 
 const { t } = useI18n();
 
@@ -114,6 +115,7 @@ const mouse = {
   preventY: null,
 };
 
+const svgMap = ref(null);
 const canvas = ref(null);
 
 const emit = defineEmits([
@@ -133,7 +135,7 @@ const props = defineProps({
   isSelectAnyNode: { type: Boolean, default: true },
 });
 defineExpose({
-  canvas,
+  svgMap,
 });
 
 const toast = ref(null);
@@ -274,22 +276,21 @@ function drawNode(node) {
 function getPoints(coordinates) {
   return coordinates.map((item) => item.x + "," + item.y).join(" ");
 }
+
 /**
  * @param {Object} node
  */
 function getCoordinates(node) {
-  const side = SIDE;
-  const h = HEIGHT;
-  const x = node.mx * (1.5 * side);
-  const y = node.my * 2 * h + (node.mx % 2 === 0 ? 0 : h);
+  const x = node.mx * (1.5 * SIDE);
+  const y = node.my * 2 * HEIGHT + (node.mx % 2 === 0 ? 0 : HEIGHT);
 
   let coordinates = new Array(6);
-  coordinates[0] = { x: x + side, y };
-  coordinates[1] = { x: x + HALF_SIDE, y: y + h };
-  coordinates[2] = { x: x - HALF_SIDE, y: y + h };
-  coordinates[3] = { x: x - side, y };
-  coordinates[4] = { x: x - HALF_SIDE, y: y - h };
-  coordinates[5] = { x: x + HALF_SIDE, y: y - h };
+  coordinates[0] = { x: x + SIDE, y };
+  coordinates[1] = { x: x + HALF_SIDE, y: y + HEIGHT };
+  coordinates[2] = { x: x - HALF_SIDE, y: y + HEIGHT };
+  coordinates[3] = { x: x - SIDE, y };
+  coordinates[4] = { x: x - HALF_SIDE, y: y - HEIGHT };
+  coordinates[5] = { x: x + HALF_SIDE, y: y - HEIGHT };
 
   return {
     x,
@@ -390,44 +391,170 @@ const getQuantity = (item) => {
 const getItemName = (item) => {
   return item.item.name ? item.item.name : t("common.noName");
 };
+
+/*
+TODO: make a downlaod as PNG
+
+function downloadAsPng() {
+  const svgElem = svgMap.value
+  const svgContent = getSvgHtml(svgElem)
+  const canvasElem = canvas.value
+  const context = canvasElem.getContext('2d');
+  const canvg = Canvg.fromString(context, svgContent);
+
+  canvg.render().then(() => {
+    // TODO: Uncaught (in promise) DOMException: The operation is insecure.
+    canvasElem.toBlob((blob) => {
+      let url = URL.createObjectURL(blob);
+
+      const img = new Image();
+      img.onload = () => {
+        //const canvas = document.createElement('canvas');
+        //const context = canvasElem.getContext('2d');
+        const domRect = svgElem.getBBox();
+        console.log(domRect)
+        //canvas.width = domRect.width;
+        //canvas.height = domRect.height;
+        context.drawImage(img, 0, 0, domRect.width, domRect.height);
+
+        const imgUri = canvasElem
+        .toDataURL('image/png')
+        .replace(/^data:image\/png/,'data:application/octet-stream');
+
+        download(imgUri, "map.png");
+
+        URL.revokeObjectURL(url);
+      };
+      img.onerror = (e) => {
+        console.error('Image not loaded', e);
+      };
+
+      img.src = url;
+    })
+  })
+}
+
+function getSvgHtml(svgElem) {
+  const svgData = svgElem.innerHTML
+  const svgAttributes = `width="${svgElem.clientWidth}" height="${svgElem.clientHeight}" viewBox="${viewBox.value}" version="1.1" xmlns="http://www.w3.org/2000/svg"`
+  const svgStyle = "<style>" + getStyleContent() + "</style>"
+
+  return `<svg ${svgAttributes}>${svgStyle} ${svgData}</svg>`
+}
+
+function download(url, fileName) {
+  const e = new MouseEvent('click', {
+    view: window,
+    bubbles: false,
+    cancelable: true
+  });
+  const a = document.createElement('a');
+
+  a.download = fileName;
+  a.href = url
+  a.dispatchEvent(e);
+  a.remove()
+}
+
+// TODO: use v-bind, see "begin SVG styles" in css
+function getStyleContent() {
+  return `
+  .node-start {
+    fill: #a6f3fd;
+  }
+  .node-step {
+    fill: #9da7c9;
+    stroke: #dddddd;
+  }
+  .node-tower {
+    fill: #94440e;
+  }
+  .node-chest {
+    fill: #1a660b;
+  }
+  .node-blocker {
+    fill: #867878;
+  }
+  .-warning {
+    fill: yellow;
+  }
+  .node.user-node {
+    fill: #6668f8;
+  }
+  .node.user-node-going {
+    fill: #f86696;
+  }
+  .text {
+    font-size: 20px;
+    fill: #000;
+    font-weight: bold;
+  }
+  .text-2 {
+    font-size: 16px;
+  }
+  .item-empty-image {
+    stroke: #999;
+    stroke-width: 2;
+    fill: #fff;
+  }`
+}
+*/
 </script>
 <style>
 .node {
   stroke-width: 1;
 }
 .node-step {
-  fill: #9da7c9;
-  stroke: #dddddd;
   cursor: pointer;
 }
 .node-step:hover {
   fill: #bcc5e6;
 }
-.node-start {
-  fill: #a6f3fd;
-}
 .node-start:hover {
   fill: #d6f7fc;
 }
 .node-tower {
-  fill: #94440e;
   cursor: pointer;
 }
 .node-tower:hover {
   fill: #b95b1b;
 }
 .node-chest {
-  fill: #1a660b;
   cursor: pointer;
 }
 .node-chest:hover {
   fill: #566d51;
 }
-.node-blocker {
-  fill: #867878;
-}
 .node-blocker:hover {
   fill: #9c8e8e;
+}
+.text {
+  cursor: pointer;
+}
+.item-image {
+  cursor: pointer;
+}
+.item-empty-image {
+  cursor: pointer;
+}
+</style>
+<!-- begin SVG styles -->
+<style>
+.node-start {
+  fill: #a6f3fd;
+}
+.node-step {
+  fill: #9da7c9;
+  stroke: #dddddd;
+}
+.node-tower {
+  fill: #94440e;
+}
+.node-chest {
+  fill: #1a660b;
+}
+.node-blocker {
+  fill: #867878;
 }
 .-warning {
   fill: yellow;
@@ -442,22 +569,24 @@ const getItemName = (item) => {
   font-size: 20px;
   fill: #000;
   font-weight: bold;
-  cursor: pointer;
 }
 .text-2 {
   font-size: 16px;
-}
-.item-image {
-  cursor: pointer;
 }
 .item-empty-image {
   stroke: #999;
   stroke-width: 2;
   fill: #fff;
-  cursor: pointer;
 }
 </style>
+<!-- end SVG styles -->
 <style scoped>
+.map {
+  margin-left: 45px;
+}
+.canvas {
+  outline: 1px solid #dddddd;
+}
 .canvas:fullscreen {
   background-color: #fff;
 }

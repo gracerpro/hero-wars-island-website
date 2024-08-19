@@ -190,6 +190,12 @@ const onMountedHelpDialog = () => {
   });
 };
 </script>
+<style scoped>
+.-left-toolbar {
+  width: 40px;
+  float: left;
+}
+</style>
 <style>
 .fullscreen-btn {
   padding: 5px;
