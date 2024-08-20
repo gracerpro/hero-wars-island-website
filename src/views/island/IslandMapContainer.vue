@@ -32,6 +32,7 @@
             :height="item.iconHeight"
             :href="item.item.iconUrl"
             class="item-image"
+            cross-origin="anonymous"
             @click="onNodeClick(item.node)"
           >
             <title>{{ getItemName(item) + getQuantity(item) }}</title>
@@ -67,6 +68,14 @@
       ref="toast"
       element-id="mapContainerToast"
     />
+
+    <div>
+      <button type="button" @click="downloadAsPng">PNG</button>
+    </div>
+
+    <div>
+      <canvas ref="canvas" style="outline: 1px solid #ccc;"></canvas>
+    </div>
   </div>
 </template>
 <script>
@@ -94,7 +103,7 @@ import {
   canSelectNextNode,
 } from "@/services/island-map";
 import { useI18n } from "vue-i18n";
-//import { Canvg } from "canvg";
+import { Canvg } from "canvg";
 
 const { t } = useI18n();
 
@@ -154,6 +163,45 @@ const nodes = computed(() => {
 
   return nodes;
 });
+const minMaxNodeCoordinates = computed(() => {
+  let minX = null;
+  let minY = null;
+  let maxX = null;
+  let maxY = null;
+
+  for (const id in props.inputNodes) {
+    const node = props.inputNodes[id]
+    minX = node.mx
+    maxX = node.mx
+    minY = node.my
+    maxY = node.my
+    break;
+  }
+
+  for (const id in props.inputNodes) {
+    const node = props.inputNodes[id];
+    
+    if (node.mx > maxX) {
+      maxX = node.mx
+    }
+    if (node.mx < minX) {
+      minX = node.mx
+    }
+    if (node.my < minY) {
+      minY = node.my
+    }
+    if (node.my > maxY) {
+      maxY = node.my
+    }
+  }
+
+  return {
+    minX,
+    maxX,
+    minY,
+    maxY
+  }
+})
 const iconsItems = computed(() => {
   let countsByNode = getCountsByNode(props.items);
   let resultItems = [];
@@ -266,6 +314,7 @@ function drawNode(node) {
     xyId: node.mx + "_" + node.my,
     x: data.x,
     y: data.y,
+    coordinates: data.coordinates,
     points: getPoints(data.coordinates),
     class: nodeClass,
   };
@@ -392,52 +441,105 @@ const getItemName = (item) => {
   return item.item.name ? item.item.name : t("common.noName");
 };
 
-/*
-TODO: make a downlaod as PNG
+// TODO: make a downlaod as PNG
 
 function downloadAsPng() {
   const svgElem = svgMap.value
   const svgContent = getSvgHtml(svgElem)
-  const canvasElem = canvas.value
+  const canvasElem = canvas.value //document.createElement('canvas');
   const context = canvasElem.getContext('2d');
-  const canvg = Canvg.fromString(context, svgContent);
+  //const canvg = Canvg.fromString(context, svgContent);
 
-  canvg.render().then(() => {
-    // TODO: Uncaught (in promise) DOMException: The operation is insecure.
-    canvasElem.toBlob((blob) => {
-      let url = URL.createObjectURL(blob);
+  const xCount = Math.abs(minMaxNodeCoordinates.value.maxX - minMaxNodeCoordinates.value.minX)
+  const yCount = Math.abs(minMaxNodeCoordinates.value.maxY - minMaxNodeCoordinates.value.minY)
+  console.log(xCount, yCount)
 
-      const img = new Image();
-      img.onload = () => {
-        //const canvas = document.createElement('canvas');
-        //const context = canvasElem.getContext('2d');
-        const domRect = svgElem.getBBox();
-        console.log(domRect)
-        //canvas.width = domRect.width;
-        //canvas.height = domRect.height;
-        context.drawImage(img, 0, 0, domRect.width, domRect.height);
+  //const domRect = svgElem.getBBox();
+  const width = xCount * 1.5 * SIDE
+  const height = yCount * 2 * HEIGHT
+  canvasElem.width = xCount * 1.5 * SIDE + 10 + 10
+  canvasElem.height = yCount * 2 * HEIGHT + 10 + 10 + 10 + 10
 
-        const imgUri = canvasElem
-        .toDataURL('image/png')
-        .replace(/^data:image\/png/,'data:application/octet-stream');
+  //console.log(canvasElem.width, canvasElem.height)
 
-        download(imgUri, "map.png");
+  context.beginPath()
+  context.rect(10, 20, width, height)
+  context.stroke()
 
-        URL.revokeObjectURL(url);
-      };
-      img.onerror = (e) => {
-        console.error('Image not loaded', e);
-      };
+  context.translate(-minMaxNodeCoordinates.value.minX, -minMaxNodeCoordinates.value.minY)
 
-      img.src = url;
+  for (const id in nodes.value) {
+    const node = nodes.value[id]
+
+    context.beginPath()
+    context.moveTo(node.coordinates[0].x, node.coordinates[0].y)
+    context.lineTo(node.coordinates[1].x, node.coordinates[1].y)
+    context.lineTo(node.coordinates[2].x, node.coordinates[2].y)
+    context.lineTo(node.coordinates[3].x, node.coordinates[3].y)
+    context.lineTo(node.coordinates[4].x, node.coordinates[4].y)
+    context.lineTo(node.coordinates[5].x, node.coordinates[5].y)
+    context.fill()
+  }
+
+  console.log(minMaxNodeCoordinates.value)
+
+/*  canvg.render().then(() => {
+    console.log("canvg rendered!")
+
+    let itemsByUrl = {};
+    iconsItems.value.forEach((item) => {
+      if (item.item.iconUrl) {
+        if (!itemsByUrl[item.item.iconUrl]) {
+          itemsByUrl[item.item.iconUrl] = []
+        }
+        itemsByUrl[item.item.iconUrl].push(item)
+      }
     })
+    const imageUrls = Object.keys(itemsByUrl)
+    console.log(imageUrls, itemsByUrl)
+
+    for (const url in itemsByUrl) {
+      console.log(url, itemsByUrl[url].length)
+    }
+
+    /* :x="item.iconX"
+            :y="item.iconY"
+            :width="item.iconWidth"
+            :height="item.iconHeight"
+    */
+    /*
+    const image = new Image()
+    image.crossOrigin = "anonymous"
+    image.onload = () => {
+      console.log(image.width, image.height)
+      context.drawImage(image, 0, 0, image.width, image.height)
+
+      const url = canvasElem.toDataURL('image/png')
+      .replace(/^data:image\/png/,'data:application/octet-stream')
+
+      download(url, "map.png");
+    }
+    image.onerror = (e) => {
+      console.log("error", e)
+    }
+    image.src = "http://backend-hero-wars.vyacheslaff.local:8080/common-uploads/hero/item-icons/bc439b_kamen-oblika-lovkost-78x77.png"
+
+    // TODO: Uncaught (in promise) DOMException: The operation is insecure.
+    // 1. render without images
+    // 2. add images
   })
+  .finally(() => {
+   // canvasElem.remove()
+  })
+  */
 }
 
 function getSvgHtml(svgElem) {
   const svgData = svgElem.innerHTML
   const svgAttributes = `width="${svgElem.clientWidth}" height="${svgElem.clientHeight}" viewBox="${viewBox.value}" version="1.1" xmlns="http://www.w3.org/2000/svg"`
   const svgStyle = "<style>" + getStyleContent() + "</style>"
+
+  console.log(svgAttributes)
 
   return `<svg ${svgAttributes}>${svgStyle} ${svgData}</svg>`
 }
@@ -498,7 +600,7 @@ function getStyleContent() {
     fill: #fff;
   }`
 }
-*/
+
 </script>
 <style>
 .node {
