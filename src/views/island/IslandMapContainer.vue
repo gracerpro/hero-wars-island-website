@@ -158,7 +158,7 @@ const nodes = computed(() => {
 
   for (const id in props.inputNodes) {
     const node = props.inputNodes[id];
-    nodes[id] = drawNode(node);
+    nodes[id] = getDrawNode(node);
   }
 
   return nodes;
@@ -293,7 +293,7 @@ const iconsItems = computed(() => {
 /**
  * @param {Object} node
  */
-function drawNode(node) {
+function getDrawNode(node) {
   const classes = {
     [TYPE_NODE]: "node-step",
     [TYPE_START]: "node-start",
@@ -326,12 +326,20 @@ function getPoints(coordinates) {
   return coordinates.map((item) => item.x + "," + item.y).join(" ");
 }
 
+function getOneWidth() {
+  return 1.5 * SIDE
+}
+
+function getOneHeight() {
+  return 2 * HEIGHT
+}
+
 /**
  * @param {Object} node
  */
 function getCoordinates(node) {
-  const x = node.mx * (1.5 * SIDE);
-  const y = node.my * 2 * HEIGHT + (node.mx % 2 === 0 ? 0 : HEIGHT);
+  const x = node.mx * getOneWidth();
+  const y = node.my * getOneHeight() + (node.mx % 2 === 0 ? 0 : getOneHeight() / 2);
 
   let coordinates = new Array(6);
   coordinates[0] = { x: x + SIDE, y };
@@ -450,36 +458,19 @@ function downloadAsPng() {
   const context = canvasElem.getContext('2d');
   //const canvg = Canvg.fromString(context, svgContent);
 
-  const xCount = Math.abs(minMaxNodeCoordinates.value.maxX - minMaxNodeCoordinates.value.minX)
-  const yCount = Math.abs(minMaxNodeCoordinates.value.maxY - minMaxNodeCoordinates.value.minY)
+  const xCount = Math.abs(minMaxNodeCoordinates.value.maxX - minMaxNodeCoordinates.value.minX) + 1 + 1
+  const yCount = Math.abs(minMaxNodeCoordinates.value.maxY - minMaxNodeCoordinates.value.minY) + 1 + 1
   console.log(xCount, yCount)
 
   //const domRect = svgElem.getBBox();
-  const width = xCount * 1.5 * SIDE
-  const height = yCount * 2 * HEIGHT
-  canvasElem.width = xCount * 1.5 * SIDE + 10 + 10
-  canvasElem.height = yCount * 2 * HEIGHT + 10 + 10 + 10 + 10
+  const width = xCount * getOneWidth()
+  const height = (yCount + 0.5) * getOneHeight()
+  canvasElem.width = width
+  canvasElem.height = height
 
-  //console.log(canvasElem.width, canvasElem.height)
+  console.log(canvasElem.width, canvasElem.height)
 
-  context.beginPath()
-  context.rect(10, 20, width, height)
-  context.stroke()
-
-  context.translate(-minMaxNodeCoordinates.value.minX, -minMaxNodeCoordinates.value.minY)
-
-  for (const id in nodes.value) {
-    const node = nodes.value[id]
-
-    context.beginPath()
-    context.moveTo(node.coordinates[0].x, node.coordinates[0].y)
-    context.lineTo(node.coordinates[1].x, node.coordinates[1].y)
-    context.lineTo(node.coordinates[2].x, node.coordinates[2].y)
-    context.lineTo(node.coordinates[3].x, node.coordinates[3].y)
-    context.lineTo(node.coordinates[4].x, node.coordinates[4].y)
-    context.lineTo(node.coordinates[5].x, node.coordinates[5].y)
-    context.fill()
-  }
+  drawMap(context)
 
   console.log(minMaxNodeCoordinates.value)
 
@@ -532,6 +523,36 @@ function downloadAsPng() {
    // canvasElem.remove()
   })
   */
+}
+
+function drawMap(context) {
+  context.translate(
+    -(minMaxNodeCoordinates.value.minX - 1) * getOneWidth(),
+    -(minMaxNodeCoordinates.value.minY - 1) * getOneHeight()
+  )
+
+  for (const id in nodes.value) {
+    const node = nodes.value[id]
+    const coordinates = node.coordinates
+
+    context.beginPath()
+    context.moveTo(coordinates[0].x, coordinates[0].y)
+    context.lineTo(coordinates[1].x, coordinates[1].y)
+    context.lineTo(coordinates[2].x, coordinates[2].y)
+    context.lineTo(coordinates[3].x, coordinates[3].y)
+    context.lineTo(coordinates[4].x, coordinates[4].y)
+    context.lineTo(coordinates[5].x, coordinates[5].y)
+    context.stroke()
+  }
+
+  // context.fillStyle = "#fff"
+  context.font = "16px bold"
+  for (const i in iconsItems.value) {
+    const item = iconsItems.value[i]
+    context.strokeRect(item.iconX, item.iconY, item.iconWidth, item.iconHeight)
+
+    context.fillText(item.humanQuantity, item.textX, item.textY)
+  }
 }
 
 function getSvgHtml(svgElem) {
