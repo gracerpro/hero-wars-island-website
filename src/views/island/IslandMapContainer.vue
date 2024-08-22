@@ -103,7 +103,7 @@ import {
   canSelectNextNode,
 } from "@/services/island-map";
 import { useI18n } from "vue-i18n";
-import { Canvg } from "canvg";
+//import { Canvg } from "canvg";
 
 const { t } = useI18n();
 
@@ -526,11 +526,15 @@ function downloadAsPng() {
 }
 
 function drawMap(context) {
+  context.save()
+
   context.translate(
     -(minMaxNodeCoordinates.value.minX - 1) * getOneWidth(),
     -(minMaxNodeCoordinates.value.minY - 1) * getOneHeight()
   )
 
+  context.fillStyle = "#9da7c9"
+  context.strokeStyle = "#ddd"
   for (const id in nodes.value) {
     const node = nodes.value[id]
     const coordinates = node.coordinates
@@ -542,17 +546,29 @@ function drawMap(context) {
     context.lineTo(coordinates[3].x, coordinates[3].y)
     context.lineTo(coordinates[4].x, coordinates[4].y)
     context.lineTo(coordinates[5].x, coordinates[5].y)
+    context.closePath()
+    context.fill()
     context.stroke()
   }
 
-  // context.fillStyle = "#fff"
-  context.font = "16px bold"
+  context.font = "bold 16px sans-serif"
+  context.lineWidth = 2
   for (const i in iconsItems.value) {
     const item = iconsItems.value[i]
-    context.strokeRect(item.iconX, item.iconY, item.iconWidth, item.iconHeight)
 
+    if (item.item.iconUrl) {
+      context.fillStyle = "green"
+      context.strokeRect(item.iconX, item.iconY, item.iconWidth, item.iconHeight)
+    } else {
+      context.fillStyle = "#fff"
+      context.fillRect(item.iconX, item.iconY, item.iconWidth, item.iconHeight)
+    }
+
+    context.fillStyle = "#000"
     context.fillText(item.humanQuantity, item.textX, item.textY)
   }
+
+  context.restore()
 }
 
 function getSvgHtml(svgElem) {
