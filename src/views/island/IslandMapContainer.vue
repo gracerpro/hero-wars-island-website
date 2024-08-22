@@ -32,7 +32,6 @@
             :height="item.iconHeight"
             :href="item.item.iconUrl"
             class="item-image"
-            cross-origin="anonymous"
             @click="onNodeClick(item.node)"
           >
             <title>{{ getItemName(item) + getQuantity(item) }}</title>
@@ -452,80 +451,64 @@ const getItemName = (item) => {
 // TODO: make a downlaod as PNG
 
 function downloadAsPng() {
-  const svgElem = svgMap.value
-  const svgContent = getSvgHtml(svgElem)
   const canvasElem = canvas.value //document.createElement('canvas');
-  const context = canvasElem.getContext('2d');
-  //const canvg = Canvg.fromString(context, svgContent);
-
   const xCount = Math.abs(minMaxNodeCoordinates.value.maxX - minMaxNodeCoordinates.value.minX) + 1 + 1
   const yCount = Math.abs(minMaxNodeCoordinates.value.maxY - minMaxNodeCoordinates.value.minY) + 1 + 1
   console.log(xCount, yCount)
 
-  //const domRect = svgElem.getBBox();
   const width = xCount * getOneWidth()
   const height = (yCount + 0.5) * getOneHeight()
   canvasElem.width = width
   canvasElem.height = height
 
-  console.log(canvasElem.width, canvasElem.height)
+  console.log(width, height)
 
-  drawMap(context)
+  loadImages().then((imagesByUrls) => {
+    const context = canvasElem.getContext('2d');
 
-  console.log(minMaxNodeCoordinates.value)
+    drawMap(context, imagesByUrls)
 
-/*  canvg.render().then(() => {
-    console.log("canvg rendered!")
-
-    let itemsByUrl = {};
-    iconsItems.value.forEach((item) => {
-      if (item.item.iconUrl) {
-        if (!itemsByUrl[item.item.iconUrl]) {
-          itemsByUrl[item.item.iconUrl] = []
-        }
-        itemsByUrl[item.item.iconUrl].push(item)
-      }
-    })
-    const imageUrls = Object.keys(itemsByUrl)
-    console.log(imageUrls, itemsByUrl)
-
-    for (const url in itemsByUrl) {
-      console.log(url, itemsByUrl[url].length)
-    }
-
-    /* :x="item.iconX"
-            :y="item.iconY"
-            :width="item.iconWidth"
-            :height="item.iconHeight"
-    */
-    /*
-    const image = new Image()
-    image.crossOrigin = "anonymous"
-    image.onload = () => {
-      console.log(image.width, image.height)
-      context.drawImage(image, 0, 0, image.width, image.height)
-
-      const url = canvasElem.toDataURL('image/png')
+    const url = canvasElem.toDataURL('image/png')
       .replace(/^data:image\/png/,'data:application/octet-stream')
 
-      download(url, "map.png");
-    }
-    image.onerror = (e) => {
-      console.log("error", e)
-    }
-    image.src = "http://backend-hero-wars.vyacheslaff.local:8080/common-uploads/hero/item-icons/bc439b_kamen-oblika-lovkost-78x77.png"
+    download(url, "map.png")
+  })
 
-    // TODO: Uncaught (in promise) DOMException: The operation is insecure.
-    // 1. render without images
-    // 2. add images
-  })
-  .finally(() => {
-   // canvasElem.remove()
-  })
-  */
+  console.log(minMaxNodeCoordinates.value)
 }
 
-function drawMap(context) {
+async function loadImages() {
+  let itemsByUrl = {};
+  let imagesByUrls = {}
+
+  iconsItems.value.forEach((item) => {
+    if (item.item.iconUrl) {
+      if (!itemsByUrl[item.item.iconUrl]) {
+        itemsByUrl[item.item.iconUrl] = []
+      }
+      itemsByUrl[item.item.iconUrl].push(item)
+    }
+  })
+  const promises = Object.keys(itemsByUrl)
+    .map((url) => {
+      return new Promise((resolve, reject) => {
+        const image = new Image()
+        image.crossOrigin = "anonymous"
+        image.onload = () => {
+          imagesByUrls[url] = image
+          resolve()
+        }
+        image.onerror = reject
+        image.src = url
+      })
+    })
+
+  await Promise.all(promises)
+
+  return imagesByUrls
+}
+
+function drawMap(context, imagesByUrls) {
   context.save()
 
   context.translate(
@@ -557,8 +540,12 @@ function drawMap(context) {
     const item = iconsItems.value[i]
 
     if (item.item.iconUrl) {
-      context.fillStyle = "green"
-      context.strokeRect(item.iconX, item.iconY, item.iconWidth, item.iconHeight)
+      if (imagesByUrls[item.item.iconUrl]) {
+        const image = imagesByUrls[item.item.iconUrl]
+        context.drawImage(image, item.iconX, item.iconY, item.iconWidth, item.iconHeight)
+      } else {
+        // todo: not found image
+      }
     } else {
       context.fillStyle = "#fff"
       context.fillRect(item.iconX, item.iconY, item.iconWidth, item.iconHeight)
@@ -569,16 +556,6 @@ function drawMap(context) {
   }
 
   context.restore()
-}
-
-function getSvgHtml(svgElem) {
-  const svgData = svgElem.innerHTML
-  const svgAttributes = `width="${svgElem.clientWidth}" height="${svgElem.clientHeight}" viewBox="${viewBox.value}" version="1.1" xmlns="http://www.w3.org/2000/svg"`
-  const svgStyle = "<style>" + getStyleContent() + "</style>"
-
-  console.log(svgAttributes)
-
-  return `<svg ${svgAttributes}>${svgStyle} ${svgData}</svg>`
 }
 
 function download(url, fileName) {
@@ -594,50 +571,6 @@ function download(url, fileName) {
   a.dispatchEvent(e);
   a.remove()
 }
-
-// TODO: use v-bind, see "begin SVG styles" in css
-function getStyleContent() {
-  return `
-  .node-start {
-    fill: #a6f3fd;
-  }
-  .node-step {
-    fill: #9da7c9;
-    stroke: #dddddd;
-  }
-  .node-tower {
-    fill: #94440e;
-  }
-  .node-chest {
-    fill: #1a660b;
-  }
-  .node-blocker {
-    fill: #867878;
-  }
-  .-warning {
-    fill: yellow;
-  }
-  .node.user-node {
-    fill: #6668f8;
-  }
-  .node.user-node-going {
-    fill: #f86696;
-  }
-  .text {
-    font-size: 20px;
-    fill: #000;
-    font-weight: bold;
-  }
-  .text-2 {
-    font-size: 16px;
-  }
-  .item-empty-image {
-    stroke: #999;
-    stroke-width: 2;
-    fill: #fff;
-  }`
-}
-
 </script>
 <style>
 .node {
