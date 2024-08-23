@@ -516,11 +516,27 @@ function drawMap(context, imagesByUrls) {
     -(minMaxNodeCoordinates.value.minY - 1) * getOneHeight()
   )
 
-  context.fillStyle = "#9da7c9"
+  const colors = {
+    [TYPE_NODE]: "#9da7c9",
+    [TYPE_START]: "#a6f3fd",
+    [TYPE_TOWER]: "#94440e",
+    [TYPE_CHEST]: "#1a660b",
+    [TYPE_BLOCKER]: "#867878",
+  };
+
   context.strokeStyle = "#ddd"
   for (const id in nodes.value) {
     const node = nodes.value[id]
     const coordinates = node.coordinates
+
+    if (colors[node.typeId]) {
+      context.fillStyle = colors[node.typeId]
+    } else {
+      context.fillStyle = "#ffff00"
+    }
+    if (node.statusId == STATUS_NOT_SURE) {
+      context.fillStyle = "#ffff00"
+    }
 
     context.beginPath()
     context.moveTo(coordinates[0].x, coordinates[0].y)
@@ -534,7 +550,7 @@ function drawMap(context, imagesByUrls) {
     context.stroke()
   }
 
-  context.font = "bold 16px sans-serif"
+  context.font = "bold 15px sans-serif"
   context.lineWidth = 2
   for (const i in iconsItems.value) {
     const item = iconsItems.value[i]
@@ -575,61 +591,61 @@ function download(url, fileName) {
 <style>
 .node {
   stroke-width: 1;
+  stroke: #ddd;
 }
 .node-step {
+  fill: #9da7c9;
   cursor: pointer;
 }
 .node-step:hover {
   fill: #bcc5e6;
 }
+.node-start {
+  fill: #a6f3fd;
+}
 .node-start:hover {
   fill: #d6f7fc;
 }
 .node-tower {
+  fill: #94440e;
   cursor: pointer;
 }
 .node-tower:hover {
   fill: #b95b1b;
 }
 .node-chest {
+  fill: #1a660b;
   cursor: pointer;
 }
 .node-chest:hover {
   fill: #566d51;
 }
+.node-blocker {
+  fill: #867878;
+}
 .node-blocker:hover {
   fill: #9c8e8e;
 }
+.-warning {
+  fill: #ffff00;
+}
 .text {
+  font-size: 20px;
+  fill: #000;
+  font-weight: bold;
   cursor: pointer;
+}
+.text-2 {
+  font-size: 16px;
 }
 .item-image {
   cursor: pointer;
 }
 .item-empty-image {
+  stroke: #999;
+  stroke-width: 2;
+  fill: #fff;
   cursor: pointer;
-}
-</style>
-<!-- begin SVG styles -->
-<style>
-.node-start {
-  fill: #a6f3fd;
-}
-.node-step {
-  fill: #9da7c9;
-  stroke: #dddddd;
-}
-.node-tower {
-  fill: #94440e;
-}
-.node-chest {
-  fill: #1a660b;
-}
-.node-blocker {
-  fill: #867878;
-}
-.-warning {
-  fill: yellow;
 }
 .node.user-node {
   fill: #6668f8;
@@ -637,21 +653,7 @@ function download(url, fileName) {
 .node.user-node-going {
   fill: #f86696;
 }
-.text {
-  font-size: 20px;
-  fill: #000;
-  font-weight: bold;
-}
-.text-2 {
-  font-size: 16px;
-}
-.item-empty-image {
-  stroke: #999;
-  stroke-width: 2;
-  fill: #fff;
-}
 </style>
-<!-- end SVG styles -->
 <style scoped>
 .map {
   margin-left: 45px;
