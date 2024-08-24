@@ -44,49 +44,13 @@
           />
         </div>
         <div class="col-lg-6">
-          <div class="float-end">
-            <router-link :to="createI18nRouteTo({ name: 'contact' })">{{
-              t("common.haveErrosOrProposal")
-            }}</router-link
-            ><br />
-            <label class="mt-2">
-              <input
-                type="checkbox"
-                v-model="isSelectAnyNode"
-              />
-              {{ t("common.selectAnyNodeQuestion") }}
-            </label>
-          </div>
-          <div>
-            {{ t("page.island.myExplorersMoves") }}
-          </div>
-          <div class="mt-2">
-            <span class="fs-4 me-2 align-middle">
-              <b>{{ userNodesCount }}</b> / {{ totalNodesCount }}
-            </span>
-            <button
-              type="button"
-              :class="['btn btn-secondary align-middle', userNodesCount > 0 ? '' : 'disabled']"
-              @click="onResetUserNodes"
-            >
-              {{ t("common.reset") }}
-            </button>
-          </div>
-          <div class="mt-2">
-            <label
-              v-for="mode in selectModes"
-              :key="mode.value"
-              class="me-2"
-            >
-              <input
-                type="radio"
-                :value="mode.value"
-                v-model="selectMode"
-              />
-              {{ mode.label }}
-            </label>
-          </div>
-          <div class="fst-italic text-secondary small">{{ selectModeHint }}</div>
+          <island-map-steps
+            v-model:is-select-any-node="isSelectAnyNode"
+            v-model:select-mode="selectMode"
+            :user-nodes-count="userNodesCount"
+            :total-nodes-count="totalNodesCount"
+            @reset-user-nodes="onResetUserNodes"
+          />
         </div>
       </div>
       <div class="row">
@@ -143,6 +107,7 @@
 <script setup>
 import IslandMapLoading from "./IslandMapLoading.vue";
 import IslandMapToolbar from "./IslandMapToolbar.vue";
+import IslandMapSteps from "./IslandMapSteps.vue";
 import IslandMapContainer from "./IslandMapContainer.vue";
 import IslandMapFilter from "./IslandMapFilter.vue";
 import IslandMapTable from "./IslandMapTable.vue";
@@ -150,11 +115,11 @@ import { canSelectNode } from "@/services/island-map";
 import { onMounted, onUnmounted, ref, computed, shallowReactive } from "vue";
 import { getHumanQuantity } from "@/helpers/formatter";
 import { useI18n } from "vue-i18n";
-import { createI18nRouteTo } from "@/i18n/translation";
 import { fullscreenElement } from "@/core/fullscreen";
 import { TYPE_CHEST, TYPE_TOWER } from "@/api/Node";
 import { isObject } from "@/helpers/core";
 import { getNodesMap } from "@/services/api/island-node";
+import { SELECT_MODE_PLAN } from "./select-mode";
 
 const { t } = useI18n();
 
@@ -169,9 +134,6 @@ let byIslandState = {};
 
 const minCharsCount = 3;
 const componentId = props.parentPageId + "__map";
-
-const SELECT_MODE_PLAN = "plan";
-const SELECT_MODE_GOING = "going";
 
 const loadingNodes = ref(true);
 const calculatingItems = ref(false);
@@ -265,17 +227,6 @@ const userNodesCount = computed(() => Object.keys(userNodesMap.value).length);
 const totalNodesCount = computed(() => {
   const length = Object.keys(nodes.value).length;
   return length > 0 ? length - 1 : 0; // "-1" it means subtract an entry node
-});
-const selectModes = computed(() => {
-  return [
-    { value: SELECT_MODE_PLAN, label: t("page.island.planning") },
-    { value: SELECT_MODE_GOING, label: t("page.island.going") },
-  ];
-});
-const selectModeHint = computed(() => {
-  return selectMode.value === SELECT_MODE_PLAN
-    ? t("page.island.canSelectAnyNode")
-    : t("page.island.canSelectOnlyPlannedNode");
 });
 
 onMounted(() => {
