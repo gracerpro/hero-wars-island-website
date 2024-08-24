@@ -54,7 +54,7 @@
             v-if="item.textX && item.textY"
             :x="item.textX"
             :y="item.textY"
-            :class="['text', item.fontClass ? item.fontClass : '']"
+            :class="['text', item.isSmallText ? 'text-small' : '']"
             @click="onNodeClick(item.node)"
           >
             {{ item.humanQuantity }}
@@ -72,7 +72,7 @@
       <button type="button" @click="downloadAsPng">PNG</button>
     </div>
 
-    <div>
+    <div style="overflow: hidden; width: 1px; height: 1px;">
       <canvas ref="canvas" style="outline: 1px solid #ccc;"></canvas>
     </div>
   </div>
@@ -213,7 +213,7 @@ const iconsItems = computed(() => {
 
     item.textX = null;
     item.textY = null;
-    item.fontClass = null;
+    item.isSmallText = null;
 
     if (count === 1) {
       const fontSize = 20;
@@ -244,7 +244,7 @@ const iconsItems = computed(() => {
         if (isShowText) {
           item.textX = srartX + cx * index;
           item.textY = node.y + HEIGHT - fontSize * 0.7;
-          item.fontClass = "text-2";
+          item.isSmallText = true;
         }
       } else if (index <= 3) {
         // count >= 3
@@ -516,6 +516,8 @@ function drawMap(context, imagesByUrls) {
     -(minMaxNodeCoordinates.value.minY - 1) * getOneHeight()
   )
 
+  const FONT_SIZE = 16
+  const FONT_SIZE_SMALL = 13
   const colors = {
     [TYPE_NODE]: "#9da7c9",
     [TYPE_START]: "#a6f3fd",
@@ -550,8 +552,7 @@ function drawMap(context, imagesByUrls) {
     context.stroke()
   }
 
-  context.font = "bold 15px sans-serif"
-  context.lineWidth = 2
+  context.lineWidth = 1
   for (const i in iconsItems.value) {
     const item = iconsItems.value[i]
 
@@ -560,27 +561,40 @@ function drawMap(context, imagesByUrls) {
         const image = imagesByUrls[item.item.iconUrl]
         context.drawImage(image, item.iconX, item.iconY, item.iconWidth, item.iconHeight)
       } else {
-        // todo: not found image
+        drawEmptyImage(context, item)
+        context.fillStyle = "#000"
+        context.fillText("?", item.iconX + item.iconWidth / 2, item.iconY + item.iconHeight / 2)
       }
     } else {
-      context.fillStyle = "#fff"
-      context.fillRect(item.iconX, item.iconY, item.iconWidth, item.iconHeight)
+      drawEmptyImage(context, item)
     }
 
-    context.fillStyle = "#000"
-    context.fillText(item.humanQuantity, item.textX, item.textY)
+    if (item.textX && item.textY) {
+      const fontSize = item.isSmallText ? FONT_SIZE_SMALL : FONT_SIZE
+      context.font = `bold ${fontSize}px sans-serif`
+      context.fillStyle = "#000"
+      context.fillText(item.humanQuantity, item.textX, item.textY)
+    }
   }
 
   context.restore()
 }
 
+function drawEmptyImage(context, item) {
+  context.fillStyle = "#fff"
+  context.beginPath()
+  context.rect(item.iconX, item.iconY, item.iconWidth, item.iconHeight)
+  context.fill()
+  context.stroke()
+}
+
 function download(url, fileName) {
-  const e = new MouseEvent('click', {
+  const e = new MouseEvent("click", {
     view: window,
     bubbles: false,
     cancelable: true
   });
-  const a = document.createElement('a');
+  const a = document.createElement("a");
 
   a.download = fileName;
   a.href = url
@@ -635,7 +649,7 @@ function download(url, fileName) {
   font-weight: bold;
   cursor: pointer;
 }
-.text-2 {
+.text-small {
   font-size: 16px;
 }
 .item-image {
@@ -643,7 +657,6 @@ function download(url, fileName) {
 }
 .item-empty-image {
   stroke: #999;
-  stroke-width: 2;
   fill: #fff;
   cursor: pointer;
 }
