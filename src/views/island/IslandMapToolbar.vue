@@ -127,7 +127,7 @@ const EVENT_CHANGE_IS_SHOW_QUANTITY = "update:is-show-quantity";
 const EVENT_FULLSCREEN_ON = "fullscreen-on";
 </script>
 <script setup>
-import HelpDialog from "./HelpDialog.vue";
+import HelpDialog from "./IslandMapHelpDialog.vue";
 import { ref, shallowRef } from "vue";
 import {
   TRANSLATE_X,
