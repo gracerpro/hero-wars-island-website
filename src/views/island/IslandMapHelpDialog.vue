@@ -1,7 +1,7 @@
 <template>
   <suspense>
     <modal-dialog
-      element-id="node-help-dialog"
+      element-id="island-map-help-dialog"
       :is-show-submit="false"
       :header="t('common.map')"
       ref="dialog"

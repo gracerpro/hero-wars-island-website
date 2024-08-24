@@ -16,6 +16,7 @@
         @change-scale="onChangeScale"
         @change-translate="onChangeTranslate"
         @fullscreen-on="onFullscreen"
+        @begin-download="onBeginDownload"
       />
       <island-map-container
         :scale="scale"
@@ -102,6 +103,11 @@
         </div>
       </div>
     </div>
+    <component
+      :is="downloadDialogComponent"
+      ref="downloadDialog"
+      @vue:mounted="onMountedDownloadDialog"
+    />
   </div>
 </template>
 <script setup>
@@ -109,6 +115,7 @@ import IslandMapLoading from "./IslandMapLoading.vue";
 import IslandMapToolbar from "./IslandMapToolbar.vue";
 import IslandMapSteps from "./IslandMapSteps.vue";
 import IslandMapContainer from "./IslandMapContainer.vue";
+import IslandMapDownloadDialog from "./IslandMapDownloadDialog.vue";
 import IslandMapFilter from "./IslandMapFilter.vue";
 import IslandMapTable from "./IslandMapTable.vue";
 import { canSelectNode } from "@/services/island-map";
@@ -120,6 +127,7 @@ import { TYPE_CHEST, TYPE_TOWER } from "@/api/Node";
 import { isObject } from "@/helpers/core";
 import { getNodesMap } from "@/services/api/island-node";
 import { SELECT_MODE_PLAN } from "./select-mode";
+import { shallowRef } from "vue";
 
 const { t } = useI18n();
 
@@ -157,6 +165,8 @@ const filter = shallowReactive({
   isNodeTypeChest: false,
 });
 const mapContainer = ref(null);
+const downloadDialog = ref(null)
+const downloadDialogComponent = shallowRef(null)
 
 const loading = computed(() => loadingNodes.value || calculatingItems.value);
 const visibleItems = computed(() => {
@@ -379,9 +389,19 @@ function onResetUserNodes() {
   }
 }
 
-const onFullscreen = () => {
+function onFullscreen() {
   fullscreenElement(mapContainer.value.canvas);
-};
+}
+
+function onBeginDownload() {
+  downloadDialogComponent.value = IslandMapDownloadDialog
+}
+
+function onMountedDownloadDialog() {
+  downloadDialog.value.show().finally(() => {
+    downloadDialogComponent.value = null;
+  });
+}
 
 function loadState() {
   let state;

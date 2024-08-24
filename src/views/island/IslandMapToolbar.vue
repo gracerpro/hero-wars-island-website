@@ -105,6 +105,19 @@
     >
       <button
         type="button"
+        class="btn btn-secondary"
+        @click="emit(EVENT_BEGIN_DOWNLOAD)"
+        :title="t('common.download')"
+      >
+        D
+      </button>
+    </div>
+    <div
+      class="btn-group-vertical w-100 mt-2"
+      role="group"
+    >
+      <button
+        type="button"
         class="btn btn-secondary fullscreen-btn"
         :title="t('common.fullscreenMode')"
         @click="emit(EVENT_FULLSCREEN_ON)"
@@ -125,6 +138,7 @@ const EVENT_RESET_TRANSLATE = "reset-translate";
 const EVENT_RESET_SCALE = "reset-scale";
 const EVENT_CHANGE_IS_SHOW_QUANTITY = "update:is-show-quantity";
 const EVENT_FULLSCREEN_ON = "fullscreen-on";
+const EVENT_BEGIN_DOWNLOAD = "begin-download"
 </script>
 <script setup>
 import HelpDialog from "./IslandMapHelpDialog.vue";
@@ -151,6 +165,7 @@ const emit = defineEmits([
   EVENT_CHANGE_SCALE,
   EVENT_CHANGE_IS_SHOW_QUANTITY,
   EVENT_FULLSCREEN_ON,
+  EVENT_BEGIN_DOWNLOAD,
 ]);
 
 const helpDialog = ref(null);
