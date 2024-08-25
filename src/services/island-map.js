@@ -22,7 +22,7 @@ export function canSelectNextNode(nodes, selectedNodes, nextNode) {
   const { t } = useI18n();
   let result = null;
 
-  if (nextNode.typeId === TYPE_START) {
+  if (nextNode.node.typeId === TYPE_START) {
     return t("page.island.canNotSelectStartNode");
   }
 

@@ -106,6 +106,7 @@
     <component
       :is="downloadDialogComponent"
       ref="downloadDialog"
+      :input-nodes="nodes"
       @vue:mounted="onMountedDownloadDialog"
     />
   </div>
@@ -192,6 +193,9 @@ const visibleItems = computed(() => {
   } else if (filter.isNodeTypeTower) {
     resultItems = resultItems.filter((item) => item.node.typeId === TYPE_TOWER);
   }
+
+
+  console.log("visibleItems", resultItems)
 
   return resultItems;
 });

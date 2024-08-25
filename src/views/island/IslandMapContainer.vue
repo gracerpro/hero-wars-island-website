@@ -14,10 +14,10 @@
     >
       <g :transform="'translate(' + translateX + ' ' + translateY + ')'">
         <polygon
-          v-for="node in nodes"
+          v-for="node in totalNodes"
           :key="node.xyId"
           :points="node.points"
-          :class="['node', node.class, getUserNodeClass(node)]"
+          :class="['node', node.nodeClass, getUserNodeClass(node)]"
           @click="onNodeClick(node)"
         />
         <template
@@ -68,17 +68,12 @@
       element-id="mapContainerToast"
     />
 
-    <div>
-      <button type="button" @click="downloadAsPng">PNG</button>
-    </div>
-
     <div style="overflow: hidden; width: 1px; height: 1px;">
       <canvas ref="canvas" style="outline: 1px solid #ccc;"></canvas>
     </div>
   </div>
 </template>
 <script>
-const EVENT_CHANGE_NODE = "change-node";
 const EVENT_SELECT_NODE = "select-node";
 </script>
 <script setup>
@@ -101,19 +96,14 @@ import {
   canSelectNode,
   canSelectNextNode,
 } from "@/services/island-map";
+import { getIconsItems, getDrawedNodes, SIDE } from "./map"
 import { useI18n } from "vue-i18n";
-//import { Canvg } from "canvg";
 
 const { t } = useI18n();
 
 const ToastMessage = import.meta.env.SSR
   ? null
   : defineAsyncComponent(() => import("@/components/ToastMessage.vue"));
-
-const SIDE = 50;
-const HALF_SIDE = SIDE / 2;
-const HEIGHT = 34;
-const IMAGE_SIDE = 24;
 
 const MIDDLE_BUTTON = 1;
 
@@ -129,7 +119,6 @@ const canvas = ref(null);
 const emit = defineEmits([
   EVENT_CHANGE_TRANSLATE,
   EVENT_CHANGE_SCALE,
-  EVENT_CHANGE_NODE,
   EVENT_SELECT_NODE,
 ]);
 const props = defineProps({
@@ -152,147 +141,21 @@ const viewBox = computed(() => {
   const side = SIDE * 5 * props.scale;
   return `-${side} -${side} ${side * 2} ${side * 2}`;
 });
-const nodes = computed(() => {
-  let nodes = {};
+const totalNodes = computed(() => {
+  let drawedNodes = getDrawedNodes(props.inputNodes)
 
-  for (const id in props.inputNodes) {
-    const node = props.inputNodes[id];
-    nodes[id] = getDrawNode(node);
+  for (const id in drawedNodes) {
+    const drawedNode = drawedNodes[id];
+    drawedNode.nodeClass = getNodeClass(drawedNode.node)
+    drawedNode.points = getPoints(drawedNode.coordinates)
   }
 
-  return nodes;
-});
-const minMaxNodeCoordinates = computed(() => {
-  let minX = null;
-  let minY = null;
-  let maxX = null;
-  let maxY = null;
-
-  for (const id in props.inputNodes) {
-    const node = props.inputNodes[id]
-    minX = node.mx
-    maxX = node.mx
-    minY = node.my
-    maxY = node.my
-    break;
-  }
-
-  for (const id in props.inputNodes) {
-    const node = props.inputNodes[id];
-    
-    if (node.mx > maxX) {
-      maxX = node.mx
-    }
-    if (node.mx < minX) {
-      minX = node.mx
-    }
-    if (node.my < minY) {
-      minY = node.my
-    }
-    if (node.my > maxY) {
-      maxY = node.my
-    }
-  }
-
-  return {
-    minX,
-    maxX,
-    minY,
-    maxY
-  }
+  return drawedNodes;
 })
-const iconsItems = computed(() => {
-  let countsByNode = getCountsByNode(props.items);
-  let resultItems = [];
-  let indexesByNode = {};
 
-  props.items.forEach((item) => {
-    const node = nodes.value[item.node.id];
-    const count = countsByNode[node.id];
-    const isShowText = item.item.quantity > 1 && props.isShowQuantity;
+const iconsItems = computed(() => getIconsItems(props.items, totalNodes.value, props.isShowQuantity))
 
-    item.textX = null;
-    item.textY = null;
-    item.isSmallText = null;
-
-    if (count === 1) {
-      const fontSize = 20;
-      item.iconWidth = IMAGE_SIDE * (isShowText ? 1.9 : 2.2);
-      item.iconHeight = IMAGE_SIDE * (isShowText ? 1.9 : 2.2);
-      item.iconX = node.x - item.iconWidth / 2;
-      item.iconY = node.y - item.iconHeight / 2 - (isShowText ? fontSize / 2 : 0);
-      if (isShowText) {
-        item.textX = item.iconX + item.iconWidth * 0.05;
-        item.textY = node.y + HEIGHT - 3;
-      }
-    } else {
-      if (!indexesByNode[node.id]) {
-        indexesByNode[node.id] = 0;
-      }
-      const index = indexesByNode[node.id];
-      const borderWidth = 2;
-
-      if (count === 2) {
-        const fontSize = 16;
-        item.iconWidth = IMAGE_SIDE * (isShowText ? 1.3 : 1.4);
-        item.iconHeight = IMAGE_SIDE * (isShowText ? 1.3 : 1.4);
-        const cx = item.iconWidth + borderWidth;
-        const srartX = node.x - cx + borderWidth / 2;
-        item.iconX = srartX + cx * index;
-        item.iconY = node.y - item.iconHeight / 2 - (isShowText ? fontSize / 2 : 0);
-
-        if (isShowText) {
-          item.textX = srartX + cx * index;
-          item.textY = node.y + HEIGHT - fontSize * 0.7;
-          item.isSmallText = true;
-        }
-      } else if (index <= 3) {
-        // count >= 3
-        // 0,0   1,0
-        //     *
-        // 0,1   1,1
-        item.iconWidth = IMAGE_SIDE * 1.1;
-        item.iconHeight = IMAGE_SIDE * 1.1;
-        const cx = item.iconWidth + borderWidth;
-        const srartX = node.x - cx + borderWidth / 2;
-        item.iconX = srartX + (index % 2 === 0 ? 0 : cx);
-        const cy = item.iconHeight + borderWidth;
-        const srartY = node.y - cy + borderWidth / 2;
-        item.iconY = srartY + (index < 2 ? 0 : cy);
-      } else {
-        item = false;
-      }
-
-      indexesByNode[node.id]++;
-    }
-
-    if (item) {
-      resultItems.push(item);
-    }
-  });
-
-  return resultItems;
-
-  function getCountsByNode(items) {
-    let countsByNode = {};
-
-    items.forEach((item) => {
-      const nodeId = item.node.id;
-
-      if (!countsByNode[nodeId]) {
-        countsByNode[nodeId] = 0;
-      }
-      countsByNode[nodeId]++;
-    });
-
-    return countsByNode;
-  }
-});
-
-/**
- * @param {Object} node
- */
-function getDrawNode(node) {
+function getNodeClass(node) {
   const classes = {
     [TYPE_NODE]: "node-step",
     [TYPE_START]: "node-start",
@@ -300,24 +163,15 @@ function getDrawNode(node) {
     [TYPE_CHEST]: "node-chest",
     [TYPE_BLOCKER]: "node-blocker",
   };
-  const data = getCoordinates(node);
-
   let nodeClass = classes[node.typeId] ? classes[node.typeId] : "";
 
   if (node.statusId == STATUS_NOT_SURE) {
     nodeClass += " -warning";
   }
 
-  return {
-    ...node,
-    xyId: node.mx + "_" + node.my,
-    x: data.x,
-    y: data.y,
-    coordinates: data.coordinates,
-    points: getPoints(data.coordinates),
-    class: nodeClass,
-  };
+  return nodeClass
 }
+
 /**
  * @param {Array} coordinates
  */
@@ -325,44 +179,14 @@ function getPoints(coordinates) {
   return coordinates.map((item) => item.x + "," + item.y).join(" ");
 }
 
-function getOneWidth() {
-  return 1.5 * SIDE
-}
-
-function getOneHeight() {
-  return 2 * HEIGHT
-}
-
-/**
- * @param {Object} node
- */
-function getCoordinates(node) {
-  const x = node.mx * getOneWidth();
-  const y = node.my * getOneHeight() + (node.mx % 2 === 0 ? 0 : getOneHeight() / 2);
-
-  let coordinates = new Array(6);
-  coordinates[0] = { x: x + SIDE, y };
-  coordinates[1] = { x: x + HALF_SIDE, y: y + HEIGHT };
-  coordinates[2] = { x: x - HALF_SIDE, y: y + HEIGHT };
-  coordinates[3] = { x: x - SIDE, y };
-  coordinates[4] = { x: x - HALF_SIDE, y: y - HEIGHT };
-  coordinates[5] = { x: x + HALF_SIDE, y: y - HEIGHT };
-
-  return {
-    x,
-    y,
-    coordinates,
-  };
-}
-
-function onNodeClick(node) {
-  if (!canSelectNode(node)) {
+function onNodeClick(drawedNode) {
+  if (!canSelectNode(drawedNode.node)) {
     return;
   }
 
-  if (!isUserNode(node)) {
+  if (!isUserNode(drawedNode.node)) {
     if (!props.isSelectAnyNode) {
-      const message = canSelectNextNode(nodes.value, props.userNodesMap, node);
+      const message = canSelectNextNode(totalNodes.value, props.userNodesMap, drawedNode.node);
       if (message) {
         toast.value.show(message, TYPE_DANGER);
         return;
@@ -424,182 +248,34 @@ function onMouseMove(button) {
   mouse.preventX = button.pageX;
   mouse.preventY = button.pageY;
 }
-const onMouseUp = (event) => {
+
+function onMouseUp(event) {
   if (event.button === MIDDLE_BUTTON) {
     mouse.isDown = false;
   }
-};
-const onMouseWheel = (event) => {
+}
+
+function onMouseWheel(event) {
   emit(EVENT_CHANGE_SCALE, event.deltaY > 0 ? DELTA_SCALE : -DELTA_SCALE);
   event.preventDefault();
-};
-const isUserNode = (node) => {
+}
+
+function isUserNode(node) {
   return props.userNodesMap[node.id] !== undefined;
-};
-const getUserNodeClass = (node) => {
+}
+
+function getUserNodeClass(node) {
   if (props.userNodesMap[node.id] !== undefined) {
     return props.userNodesMap[node.id].isGoingChecked ? "user-node-going" : "user-node";
   }
-};
-const getQuantity = (item) => {
+}
+
+function getQuantity(item) {
   return item.item.quantity > 1 ? ", " + item.item.quantity : "";
-};
-const getItemName = (item) => {
+}
+
+function getItemName(item) {
   return item.item.name ? item.item.name : t("common.noName");
-};
-
-// TODO: make a downlaod as PNG
-
-function downloadAsPng() {
-  const canvasElem = canvas.value //document.createElement('canvas');
-  const xCount = Math.abs(minMaxNodeCoordinates.value.maxX - minMaxNodeCoordinates.value.minX) + 1 + 1
-  const yCount = Math.abs(minMaxNodeCoordinates.value.maxY - minMaxNodeCoordinates.value.minY) + 1 + 1
-  console.log(xCount, yCount)
-
-  const width = xCount * getOneWidth()
-  const height = (yCount + 0.5) * getOneHeight()
-  canvasElem.width = width
-  canvasElem.height = height
-
-  console.log(width, height)
-
-  loadImages().then((imagesByUrls) => {
-    const context = canvasElem.getContext('2d');
-
-    drawMap(context, imagesByUrls)
-
-    const url = canvasElem.toDataURL('image/png')
-      .replace(/^data:image\/png/,'data:application/octet-stream')
-
-    download(url, "map.png")
-  })
-
-  console.log(minMaxNodeCoordinates.value)
-}
-
-async function loadImages() {
-  let itemsByUrl = {};
-  let imagesByUrls = {}
-
-  iconsItems.value.forEach((item) => {
-    if (item.item.iconUrl) {
-      if (!itemsByUrl[item.item.iconUrl]) {
-        itemsByUrl[item.item.iconUrl] = []
-      }
-      itemsByUrl[item.item.iconUrl].push(item)
-    }
-  })
-  const promises = Object.keys(itemsByUrl)
-    .map((url) => {
-      return new Promise((resolve, reject) => {
-        const image = new Image()
-        image.crossOrigin = "anonymous"
-        image.onload = () => {
-          imagesByUrls[url] = image
-          resolve()
-        }
-        image.onerror = reject
-        image.src = url
-      })
-    })
-
-  await Promise.all(promises)
-
-  return imagesByUrls
-}
-
-function drawMap(context, imagesByUrls) {
-  context.save()
-
-  context.translate(
-    -(minMaxNodeCoordinates.value.minX - 1) * getOneWidth(),
-    -(minMaxNodeCoordinates.value.minY - 1) * getOneHeight()
-  )
-
-  const FONT_SIZE = 16
-  const FONT_SIZE_SMALL = 13
-  const colors = {
-    [TYPE_NODE]: "#9da7c9",
-    [TYPE_START]: "#a6f3fd",
-    [TYPE_TOWER]: "#94440e",
-    [TYPE_CHEST]: "#1a660b",
-    [TYPE_BLOCKER]: "#867878",
-  };
-
-  context.strokeStyle = "#ddd"
-  for (const id in nodes.value) {
-    const node = nodes.value[id]
-    const coordinates = node.coordinates
-
-    if (colors[node.typeId]) {
-      context.fillStyle = colors[node.typeId]
-    } else {
-      context.fillStyle = "#ffff00"
-    }
-    if (node.statusId == STATUS_NOT_SURE) {
-      context.fillStyle = "#ffff00"
-    }
-
-    context.beginPath()
-    context.moveTo(coordinates[0].x, coordinates[0].y)
-    context.lineTo(coordinates[1].x, coordinates[1].y)
-    context.lineTo(coordinates[2].x, coordinates[2].y)
-    context.lineTo(coordinates[3].x, coordinates[3].y)
-    context.lineTo(coordinates[4].x, coordinates[4].y)
-    context.lineTo(coordinates[5].x, coordinates[5].y)
-    context.closePath()
-    context.fill()
-    context.stroke()
-  }
-
-  context.lineWidth = 1
-  for (const i in iconsItems.value) {
-    const item = iconsItems.value[i]
-
-    if (item.item.iconUrl) {
-      if (imagesByUrls[item.item.iconUrl]) {
-        const image = imagesByUrls[item.item.iconUrl]
-        context.drawImage(image, item.iconX, item.iconY, item.iconWidth, item.iconHeight)
-      } else {
-        drawEmptyImage(context, item)
-        context.fillStyle = "#000"
-        context.fillText("?", item.iconX + item.iconWidth / 2, item.iconY + item.iconHeight / 2)
-      }
-    } else {
-      drawEmptyImage(context, item)
-    }
-
-    if (item.textX && item.textY) {
-      const fontSize = item.isSmallText ? FONT_SIZE_SMALL : FONT_SIZE
-      context.font = `bold ${fontSize}px sans-serif`
-      context.fillStyle = "#000"
-      context.fillText(item.humanQuantity, item.textX, item.textY)
-    }
-  }
-
-  context.restore()
-}
-
-function drawEmptyImage(context, item) {
-  context.fillStyle = "#fff"
-  context.beginPath()
-  context.rect(item.iconX, item.iconY, item.iconWidth, item.iconHeight)
-  context.fill()
-  context.stroke()
-}
-
-function download(url, fileName) {
-  const e = new MouseEvent("click", {
-    view: window,
-    bubbles: false,
-    cancelable: true
-  });
-  const a = document.createElement("a");
-
-  a.download = fileName;
-  a.href = url
-  a.dispatchEvent(e);
-  a.remove()
 }
 </script>
 <style>
