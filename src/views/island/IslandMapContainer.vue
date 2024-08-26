@@ -32,7 +32,7 @@
             :height="item.iconHeight"
             :href="item.item.iconUrl"
             class="item-image"
-            @click="onNodeClick(item.node)"
+            @click="onItemClick(item)"
           >
             <title>{{ getItemName(item) + getQuantity(item) }}</title>
           </image>
@@ -43,7 +43,7 @@
             :width="item.iconWidth"
             :height="item.iconHeight"
             class="item-empty-image"
-            @click="onNodeClick(item.node)"
+            @click="onItemClick(item)"
           >
             <title>
               {{ getItemName(item) + getQuantity(item) }},
@@ -55,7 +55,7 @@
             :x="item.textX"
             :y="item.textY"
             :class="['text', item.isSmallText ? 'text-small' : '']"
-            @click="onNodeClick(item.node)"
+            @click="onItemClick(item)"
           >
             {{ item.humanQuantity }}
           </text>
@@ -67,10 +67,6 @@
       ref="toast"
       element-id="mapContainerToast"
     />
-
-    <div style="overflow: hidden; width: 1px; height: 1px;">
-      <canvas ref="canvas" style="outline: 1px solid #ccc;"></canvas>
-    </div>
   </div>
 </template>
 <script>
@@ -113,9 +109,6 @@ const mouse = {
   preventY: null,
 };
 
-const svgMap = ref(null);
-const canvas = ref(null);
-
 const emit = defineEmits([
   EVENT_CHANGE_TRANSLATE,
   EVENT_CHANGE_SCALE,
@@ -131,6 +124,9 @@ const props = defineProps({
   userNodesMap: { type: Object, required: true },
   isSelectAnyNode: { type: Boolean, default: true },
 });
+
+const svgMap = ref(null);
+
 defineExpose({
   svgMap,
 });
@@ -179,14 +175,30 @@ function getPoints(coordinates) {
   return coordinates.map((item) => item.x + "," + item.y).join(" ");
 }
 
+/**
+ * @param {Object} drawedNode
+ */
 function onNodeClick(drawedNode) {
+  selectNode(drawedNode)
+}
+
+/**
+ * @param {Object} item
+ */
+function onItemClick(item) {
+  selectNode(totalNodes.value[item.node.id]);
+}
+
+/**
+ * @param {Object} drawedNode
+ */
+function selectNode(drawedNode) {
   if (!canSelectNode(drawedNode.node)) {
     return;
   }
-
   if (!isUserNode(drawedNode.node)) {
     if (!props.isSelectAnyNode) {
-      const message = canSelectNextNode(totalNodes.value, props.userNodesMap, drawedNode.node);
+      const message = canSelectNextNode(totalNodes.value, props.userNodesMap, drawedNode);
       if (message) {
         toast.value.show(message, TYPE_DANGER);
         return;
@@ -194,7 +206,7 @@ function onNodeClick(drawedNode) {
     }
   }
 
-  emit(EVENT_SELECT_NODE, node.id);
+  emit(EVENT_SELECT_NODE, drawedNode.node.id);
 }
 
 /**
@@ -260,14 +272,23 @@ function onMouseWheel(event) {
   event.preventDefault();
 }
 
+/**
+ * @param {Object} node
+ * @returns {Boolean}
+ */
 function isUserNode(node) {
   return props.userNodesMap[node.id] !== undefined;
 }
 
-function getUserNodeClass(node) {
-  if (props.userNodesMap[node.id] !== undefined) {
-    return props.userNodesMap[node.id].isGoingChecked ? "user-node-going" : "user-node";
+/**
+ * @param {Object} drawedNode
+ * @returns {String}
+ */
+function getUserNodeClass(drawedNode) {
+  if (props.userNodesMap[drawedNode.node.id] !== undefined) {
+    return props.userNodesMap[drawedNode.node.id].isGoingChecked ? "user-node-going" : "user-node";
   }
+  return ""
 }
 
 function getQuantity(item) {

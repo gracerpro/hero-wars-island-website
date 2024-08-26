@@ -339,7 +339,9 @@ function onChangeScale(value) {
   }
 }
 
-const onResetScale = () => (scale.value = 1);
+function onResetScale() {
+  scale.value = 1;
+}
 
 function onChangeTranslate(dx, dy) {
   if (dx !== 0) {
@@ -366,21 +368,21 @@ function onChangeNode(node) {
   nodes.value[node.id] = node;
 }
 
-function onSelectNode(id) {
+function onSelectNode(nodeId) {
   if (selectMode.value === SELECT_MODE_PLAN) {
-    if (!nodes.value[id]) {
+    if (!nodes.value[nodeId]) {
       throw new Error(t("page.island.notFoundNodeAdmin"));
     }
 
-    if (userNodesMap.value[id] !== undefined) {
-      delete userNodesMap.value[id];
-      nodes.value[id].isGoingChecked = false;
+    if (userNodesMap.value[nodeId] !== undefined) {
+      delete userNodesMap.value[nodeId];
+      nodes.value[nodeId].isGoingChecked = false;
     } else {
-      userNodesMap.value[id] = nodes.value[id];
+      userNodesMap.value[nodeId] = nodes.value[nodeId];
     }
   } else {
-    if (userNodesMap.value[id] !== undefined) {
-      userNodesMap.value[id].isGoingChecked = !userNodesMap.value[id].isGoingChecked;
+    if (userNodesMap.value[nodeId] !== undefined) {
+      userNodesMap.value[nodeId].isGoingChecked = !userNodesMap.value[nodeId].isGoingChecked;
     }
   }
 }
