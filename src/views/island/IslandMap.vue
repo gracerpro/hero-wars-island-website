@@ -25,7 +25,7 @@
         :is-show-quantity="isShowQuantity"
         :is-select-any-node="isSelectAnyNode"
         :items="visibleItems"
-        :input-nodes="nodes"
+        :nodes="nodes"
         :user-nodes-map="userNodesMap"
         @change-translate="onChangeTranslate"
         @change-scale="onChangeScale"
@@ -106,7 +106,9 @@
     <component
       :is="downloadDialogComponent"
       ref="downloadDialog"
-      :input-nodes="nodes"
+      :nodes="nodes"
+      :rewards="visibleItems"
+      :is-show-quantity="isShowQuantity"
       @vue:mounted="onMountedDownloadDialog"
     />
   </div>
@@ -193,9 +195,6 @@ const visibleItems = computed(() => {
   } else if (filter.isNodeTypeTower) {
     resultItems = resultItems.filter((item) => item.node.typeId === TYPE_TOWER);
   }
-
-
-  console.log("visibleItems", resultItems)
 
   return resultItems;
 });

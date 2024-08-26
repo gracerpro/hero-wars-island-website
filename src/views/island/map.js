@@ -1,5 +1,3 @@
-import { computed } from "vue";
-
 export const SIDE = 50;
 const HALF_SIDE = SIDE / 2;
 const HEIGHT = 34;
@@ -21,15 +19,17 @@ export function getDrawedNodes(nodes) {
 }
 
 /**
- * @param {Array} dataItems 
+ * @param {Array} dataItems
  * @param {Object} drawedNodes 
  * @param {Boolean} isShowQuantity 
- * @returns {Object}
+ * @returns {Array}
  */
 export function getIconsItems(dataItems, drawedNodes, isShowQuantity) {
   let countsByNode = getCountsByNode(dataItems);
   let resultItems = [];
   let indexesByNode = {};
+
+  console.log("getIconsItems.drawedNodes", drawedNodes)
 
   dataItems.forEach((item) => {
     const nodeId = item.node.id
@@ -131,11 +131,11 @@ function getDrawedNode(node) {
   };
 }
 
-function getOneWidth() {
+export function getOneWidth() {
   return 1.5 * SIDE
 }
 
-function getOneHeight() {
+export function getOneHeight() {
   return 2 * HEIGHT
 }
 

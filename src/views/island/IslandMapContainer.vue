@@ -120,7 +120,7 @@ const props = defineProps({
   translateY: { type: Number, required: true },
   isShowQuantity: { type: Boolean, required: true },
   items: { type: Array, required: true },
-  inputNodes: { type: Object, required: true },
+  nodes: { type: Object, required: true },
   userNodesMap: { type: Object, required: true },
   isSelectAnyNode: { type: Boolean, default: true },
 });
@@ -138,7 +138,7 @@ const viewBox = computed(() => {
   return `-${side} -${side} ${side * 2} ${side * 2}`;
 });
 const totalNodes = computed(() => {
-  let drawedNodes = getDrawedNodes(props.inputNodes)
+  let drawedNodes = getDrawedNodes(props.nodes)
 
   for (const id in drawedNodes) {
     const drawedNode = drawedNodes[id];

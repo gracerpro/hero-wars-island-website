@@ -9,7 +9,7 @@
         <input
           type="checkbox"
           :checked="isSelectAnyNode"
-          :change="onChangeIsSelectAnyNode"
+          @change="onChangeIsSelectAnyNode"
         />
         {{ t("common.selectAnyNodeQuestion") }}
       </label>
@@ -85,12 +85,10 @@ const selectModeHint = computed(() => {
 });
 
 function onChangeIsSelectAnyNode(event) {
-  console.log(event)
-  emit(EVENT_UPDATE_IS_SELECT_ANY_NODE, event.target.checked == true)
+  emit(EVENT_UPDATE_IS_SELECT_ANY_NODE, event.target.checked)
 }
 
 function onChangeSelectMode(event) {
-  console.log(event.target.value)
   emit(EVENT_UPDATE_SELECT_MODE, event.target.value)
 }
 </script>
