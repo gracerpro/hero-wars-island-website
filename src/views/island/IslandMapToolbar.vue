@@ -11,7 +11,7 @@
         type="button"
         class="btn btn-secondary"
         :title="t('common.zoomOut')"
-        @click="onChangeScale(true)"
+        @click="onChangeScale(1, $event)"
       >
         -
       </button>
@@ -19,7 +19,7 @@
         type="button"
         class="btn btn-secondary"
         :title="t('common.zoomIn')"
-        @click="onChangeScale(false)"
+        @click="onChangeScale(-1, $event)"
       >
         +
       </button>
@@ -39,28 +39,28 @@
       <button
         type="button"
         class="btn btn-secondary"
-        @click="onChangeTranslate(-1, 0)"
+        @click="onChangeTranslate(-1, 0, $event)"
       >
         &larr;
       </button>
       <button
         type="button"
         class="btn btn-secondary"
-        @click="onChangeTranslate(1, 0)"
+        @click="onChangeTranslate(1, 0, $event)"
       >
         &rarr;
       </button>
       <button
         type="button"
         class="btn btn-secondary"
-        @click="onChangeTranslate(0, -1)"
+        @click="onChangeTranslate(0, -1, $event)"
       >
         &uarr;
       </button>
       <button
         type="button"
         class="btn btn-secondary"
-        @click="onChangeTranslate(0, 1)"
+        @click="onChangeTranslate(0, 1, $event)"
       >
         &darr;
       </button>
@@ -171,39 +171,63 @@ const emit = defineEmits([
 const helpDialog = ref(null);
 const helpDialogComponent = shallowRef(null);
 
-const onResetTranslate = () => {
+function onResetTranslate() {
   emit(EVENT_RESET_TRANSLATE);
-};
-const onChangeTranslate = (dx, dy) => {
+}
+function onChangeTranslate(dx, dy, event) {
   let x = 0,
     y = 0;
 
   if (dx !== 0) {
     x = 5 * dx * TRANSLATE_X;
+    if (event.ctrlKey) {
+      x /= 10
+    } else if (event.shiftKey) {
+      x /= 2
+    }
   }
   if (dy !== 0) {
-    y = 5 * dy * TRANSLATE_Y;
+    y = dy * TRANSLATE_Y;
+    if (event.ctrlKey) {
+      y /= 10
+    } else if (event.shiftKey) {
+      y /= 2
+    }
   }
 
   emit(EVENT_CHANGE_TRANSLATE, x, y);
-};
-const onResetScale = () => {
+}
+
+function onResetScale() {
   emit(EVENT_RESET_SCALE);
-};
-const onChangeScale = (inc) => {
-  emit(EVENT_CHANGE_SCALE, 2 * (inc ? DELTA_SCALE : -DELTA_SCALE));
-};
-const onHelpClick = () => {
+}
+
+function onChangeScale(zoom, event) {
+  let value = zoom * DELTA_SCALE
+
+  if (event.ctrlKey) {
+    value /= 10
+  }
+  else if (event.shiftKey) {
+    value /= 2
+  }
+
+  emit(EVENT_CHANGE_SCALE, value);
+}
+
+function onHelpClick() {
   helpDialogComponent.value = HelpDialog;
-};
+}
+
 function onChangeIsShowQuantity() {
   emit(EVENT_CHANGE_IS_SHOW_QUANTITY);
 }
-const onMountedHelpDialog = () => {
+
+function onMountedHelpDialog() {
   helpDialog.value.show().finally(() => {
     helpDialogComponent.value = null;
   });
-};
+}
 </script>
 <style scoped>
 .-left-toolbar {

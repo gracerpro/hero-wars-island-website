@@ -10,7 +10,8 @@
       <p>
         {{ t("page.island.helpParagraph1") }}<br />
         {{ t("page.island.helpParagraph2") }}<br />
-        {{ t("page.island.helpFullscreenExit") }}
+        {{ t("page.island.helpFullscreenExit") }}<br />
+        {{ t("page.island.helpKeyboard") }}<br />
       </p>
       <h4>{{ t("common.node", 2) }}</h4>
       <ul class="list-unstyled">

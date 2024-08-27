@@ -268,7 +268,16 @@ function onMouseUp(event) {
 }
 
 function onMouseWheel(event) {
-  emit(EVENT_CHANGE_SCALE, event.deltaY > 0 ? DELTA_SCALE : -DELTA_SCALE);
+  let value = event.deltaY > 0 ? DELTA_SCALE : -DELTA_SCALE
+
+  if (event.ctrlKey) {
+    value /= 10
+  }
+  else if (event.shiftKey) {
+    value /= 2
+  }
+
+  emit(EVENT_CHANGE_SCALE, value);
   event.preventDefault();
 }
 

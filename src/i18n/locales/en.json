@@ -119,6 +119,7 @@
       "going": "Going",
       "failNodesLoading": "Failed to load map nodes",
       "helpFullscreenExit": "Esc - exit fullscreen mode.",
+      "helpKeyboard": "If to press a Shift key then offset or zoom will decrease by 50%. If to press a Ctrl key then will decrease by 10%.",
       "helpParagraph1": "When moving the cursor, if you press the middle mouse button, the shift.",
       "helpParagraph2": "Scroll with the middle mouse button - zoom in or out.",
       "islandNotAvailable": "The island is not available.",

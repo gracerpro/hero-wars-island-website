@@ -5,7 +5,7 @@ export const TRANSLATE_X = 20;
 export const TRANSLATE_Y = 20;
 export const EVENT_CHANGE_TRANSLATE = "change-translate";
 
-export const DELTA_SCALE = 0.3;
+export const DELTA_SCALE = 0.5;
 export const EVENT_CHANGE_SCALE = "change-scale";
 
 /**
