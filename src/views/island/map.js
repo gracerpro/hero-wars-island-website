@@ -29,8 +29,6 @@ export function getIconsItems(dataItems, drawedNodes, isShowQuantity) {
   let resultItems = [];
   let indexesByNode = {};
 
-  console.log("getIconsItems.drawedNodes", drawedNodes)
-
   dataItems.forEach((item) => {
     const nodeId = item.node.id
     const drawedNode = drawedNodes[item.node.id];

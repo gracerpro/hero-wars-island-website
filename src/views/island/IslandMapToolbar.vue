@@ -93,19 +93,6 @@
       <button
         type="button"
         class="btn btn-secondary"
-        @click="onHelpClick"
-        :title="t('common.help')"
-      >
-        ?
-      </button>
-    </div>
-    <div
-      class="btn-group-vertical w-100 mt-2"
-      role="group"
-    >
-      <button
-        type="button"
-        class="btn btn-secondary"
         @click="emit(EVENT_BEGIN_DOWNLOAD)"
         :title="t('common.download')"
       >
@@ -123,6 +110,19 @@
         @click="emit(EVENT_FULLSCREEN_ON)"
       >
         <span class="fullscreen-icon"></span>
+      </button>
+    </div>
+    <div
+      class="btn-group-vertical w-100 mt-2"
+      role="group"
+    >
+      <button
+        type="button"
+        class="btn btn-secondary"
+        @click="onHelpClick"
+        :title="t('common.help')"
+      >
+        ?
       </button>
     </div>
 

@@ -395,7 +395,7 @@ function onResetUserNodes() {
 }
 
 function onFullscreen() {
-  fullscreenElement(mapContainer.value.canvas);
+  fullscreenElement(mapContainer.value.svgMap);
 }
 
 function onBeginDownload() {

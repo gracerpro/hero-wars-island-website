@@ -4,7 +4,8 @@
       element-id="island-map-download-dialog"
       :form-id="formId"
       :header="t('common.download')"
-      :loading="loading"
+      :saving="loading"
+      :submit-button-text="t('common.download')"
       ref="dialog"
       @vue:mounted="onMountedDialog"
     >
