@@ -39,7 +39,10 @@
           >{{ t("page.home.actual") }}</span
         >
         <br>
-        <span v-for="i in island.regionsCount" :key="i" class="badge text-bg-secondary me-2">{{ i }}</span>
+        <span v-for="i in island.regionsCount" :key="i"
+          class="badge text-bg-secondary me-2"
+          :title="t('page.home.thePartNumber', {n: i})"
+        >{{ i }}</span>
       </li>
     </ol>
   </div>

@@ -107,6 +107,7 @@
       "firstParagraph": "There is a new <b>Adventure</b> Island event in the game. Where you need to spend the researcher's moves and open the map nodes, receive gifts. Initially, the entire map is closed and it is unknown which way to move to get the best prize. Let's discover the island together!",
       "fromToDates": "from {dateFrom} to {dateTo}",
       "notFound": "Not found",
+      "thePartNumber": "The part's number {n}",
       "toDateDaysCount": "to {toDate}, days left {daysCount}"
     },
     "island": {
