@@ -117,8 +117,8 @@ function getCountsByNode(items) {
  * @param {Object} node
  */
 function getDrawedNode(node) {
-  const x = node.mx * getOneWidth();
-  const y = node.my * getOneHeight() + (node.mx % 2 === 0 ? 0 : getOneHeight() / 2);
+  const x = node.mx * getHorizontalStep();
+  const y = node.my * getVerticalStep() + (node.mx % 2 === 0 ? 0 : getVerticalStep() / 2);
 
   return {
     node,
@@ -129,11 +129,17 @@ function getDrawedNode(node) {
   };
 }
 
-export function getOneWidth() {
+/**
+ * @returns {Number}
+ */
+export function getHorizontalStep() {
   return 1.5 * SIDE
 }
 
-export function getOneHeight() {
+/**
+ * @returns {Number}
+ */
+export function getVerticalStep() {
   return 2 * HEIGHT
 }
 

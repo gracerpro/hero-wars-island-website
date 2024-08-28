@@ -9,7 +9,10 @@
       ref="dialog"
       @vue:mounted="onMountedDialog"
     >
-      <p>Скачать карту в формате PNG</p>
+      <p>{{ t("page.island.downloadMapInFormat", {format: "PNG"}) }}</p>
+
+      <div>{{ t("page.island.downloadVerticalAndHorizontalCount", {verticalCount: verticalCellsCount, horizontalCount: horizontalCellsCount}) }}</div>
+      <div>{{ t("page.island.downloadMapSize", {mapSize: mapSize}) }}</div>
 
       <form @submit.prevent="downloadAsPng" :id="formId"></form>
     </modal-dialog>
@@ -22,7 +25,7 @@ import { useI18n } from "vue-i18n";
 import { useShow } from "@/components/modal-dialog";
 import { download } from "@/helpers/download";
 import { computed } from "vue";
-import { getDrawedNodes, getIconsItems, getOneHeight, getOneWidth } from "./map";
+import { getDrawedNodes, getIconsItems, getVerticalStep, getHorizontalStep } from "./map";
 import { STATUS_NOT_SURE, TYPE_BLOCKER, TYPE_CHEST, TYPE_NODE, TYPE_START, TYPE_TOWER } from "@/api/Node";
 
 const { t } = useI18n();
@@ -82,30 +85,49 @@ const minMaxNodeCoordinates = computed(() => {
     maxY
   }
 })
+const horizontalCellsCount = computed(() => {
+  // +1 for center cell
+  return minMaxNodeCoordinates.value.maxX - minMaxNodeCoordinates.value.minX + 1
+})
+const verticalCellsCount = computed(() => {
+  // +1 for center cell
+  return minMaxNodeCoordinates.value.maxY - minMaxNodeCoordinates.value.minY + 1
+})
+const canvasWidth = computed(() => {
+  return horizontalCellsCount.value * getHorizontalStep() + 1 * getHorizontalStep()
+})
+const canvasHeight = computed(() => {
+  return verticalCellsCount.value * getVerticalStep() + (1 + 0.5) * getVerticalStep()
+})
+const mapSize = computed(() => {
+  return canvasWidth.value + "x" + canvasHeight.value
+})
 
 async function downloadAsPng() {
   loading.value = true
 
-  const canvasElem = document.createElement("canvas");
-  const xCount = Math.abs(minMaxNodeCoordinates.value.maxX - minMaxNodeCoordinates.value.minX) + 1 + 1
-  const yCount = Math.abs(minMaxNodeCoordinates.value.maxY - minMaxNodeCoordinates.value.minY) + 1 + 1
-
-  // TODO: max size!
-  canvasElem.width = xCount * getOneWidth()
-  canvasElem.height = (yCount + 0.5) * getOneHeight()
-
   const imagesByUrls = await loadImages()
-  const context = canvasElem.getContext('2d');
 
-  drawMap(context, imagesByUrls)
+  const canvasElem = document.createElement("canvas");
 
-  const url = canvasElem.toDataURL('image/png')
-    .replace(/^data:image\/png/,'data:application/octet-stream')
+  try {
+    // TODO: max size!
+    canvasElem.width = canvasWidth.value
+    canvasElem.height = canvasHeight.value
 
-  download(url, "map.png")
+    const context = canvasElem.getContext('2d');
 
-  canvasElem.remove()
-  loading.value = false
+    drawMap(context, imagesByUrls)
+
+    const url = canvasElem.toDataURL('image/png')
+      .replace(/^data:image\/png/,'data:application/octet-stream')
+
+    download(url, "map.png")
+  }
+  finally {
+    canvasElem.remove()
+    loading.value = false
+  }
 
   dialog.value.hide()
 }
@@ -146,8 +168,8 @@ function drawMap(context, imagesByUrls) {
   context.save()
 
   context.translate(
-    -(minMaxNodeCoordinates.value.minX - 1) * getOneWidth(),
-    -(minMaxNodeCoordinates.value.minY - 1) * getOneHeight()
+    -(minMaxNodeCoordinates.value.minX - 1) * getHorizontalStep(),
+    -(minMaxNodeCoordinates.value.minY - 1) * getVerticalStep()
   )
 
   const FONT_SIZE = 16
