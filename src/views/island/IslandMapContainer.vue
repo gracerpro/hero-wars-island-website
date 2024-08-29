@@ -18,7 +18,7 @@
           :key="node.xyId"
           :points="node.points"
           :class="['node', node.nodeClass, getUserNodeClass(node)]"
-          @click="onNodeClick(node)"
+          @click="onNodeClick(node, $event)"
         />
         <template
           v-for="item in iconsItems"
@@ -32,7 +32,7 @@
             :height="item.iconHeight"
             :href="item.item.iconUrl"
             class="item-image"
-            @click="onItemClick(item)"
+            @click="onItemClick(item, $event)"
           >
             <title>{{ getItemName(item) + getQuantity(item) }}</title>
           </image>
@@ -43,7 +43,7 @@
             :width="item.iconWidth"
             :height="item.iconHeight"
             class="item-empty-image"
-            @click="onItemClick(item)"
+            @click="onItemClick(item, $event)"
           >
             <title>
               {{ getItemName(item) + getQuantity(item) }},
@@ -55,13 +55,20 @@
             :x="item.textX"
             :y="item.textY"
             :class="['text', item.isSmallText ? 'text-small' : '']"
-            @click="onItemClick(item)"
+            @click="onItemClick(item, $event)"
           >
             {{ item.humanQuantity }}
           </text>
         </template>
       </g>
     </svg>
+
+    <component
+      :is="infoDialogComponent"
+      ref="infoDialog"
+      :drawed-node="infoDialogDrawedNode"
+      @vue:mounted="onMountedInfoDialog"
+    />
 
     <toast-message
       ref="toast"
@@ -82,7 +89,7 @@ import {
   TYPE_NODE,
   STATUS_NOT_SURE,
 } from "@/api/Node";
-import { ref, computed, defineAsyncComponent } from "vue";
+import { ref, shallowRef, computed, defineAsyncComponent } from "vue";
 import {
   TRANSLATE_X,
   TRANSLATE_Y,
@@ -94,6 +101,7 @@ import {
 } from "@/services/island-map";
 import { getIconsItems, getDrawedNodes, SIDE } from "./map"
 import { useI18n } from "vue-i18n";
+import IslandMapInfoDialog from "./IslandMapInfoDialog.vue"
 
 const { t } = useI18n();
 
@@ -126,6 +134,9 @@ const props = defineProps({
 });
 
 const svgMap = ref(null);
+const infoDialog = ref(null)
+const infoDialogComponent = shallowRef(null)
+const infoDialogDrawedNode = ref(null)
 
 defineExpose({
   svgMap,
@@ -177,16 +188,30 @@ function getPoints(coordinates) {
 
 /**
  * @param {Object} drawedNode
+ * @param {Object} event
  */
-function onNodeClick(drawedNode) {
-  selectNode(drawedNode)
+function onNodeClick(drawedNode, event) {
+  if (event.ctrlKey) {
+    infoDialogDrawedNode.value = drawedNode
+    infoDialogComponent.value = IslandMapInfoDialog
+  } else {
+    selectNode(drawedNode)
+  }
 }
 
 /**
  * @param {Object} item
+ * @param {Object} event
  */
-function onItemClick(item) {
-  selectNode(totalNodes.value[item.node.id]);
+function onItemClick(item, event) {
+  const drawedNode = totalNodes.value[item.node.id]
+
+  if (event.ctrlKey) {
+    infoDialogDrawedNode.value = drawedNode
+    infoDialogComponent.value = IslandMapInfoDialog
+  } else {
+    selectNode(drawedNode);
+  }
 }
 
 /**
@@ -279,6 +304,13 @@ function onMouseWheel(event) {
 
   emit(EVENT_CHANGE_SCALE, value);
   event.preventDefault();
+}
+
+function onMountedInfoDialog() {
+  infoDialog.value.show().finally(() => {
+    infoDialogDrawedNode.value = null
+    infoDialogComponent.value = null
+  });
 }
 
 /**

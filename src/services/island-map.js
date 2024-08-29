@@ -37,7 +37,7 @@ export function canSelectNextNode(drawedNodes, selectedNodes, nextDrawedNode) {
     let isFound = false;
     for (const id in drawedNodes) {
       const drawedNode = drawedNodes[id];
-      if (drawedNode.typeId === TYPE_START) {
+      if (drawedNode.node.typeId === TYPE_START) {
         isFound = true;
 
         if (!isNearNode(nextDrawedNode, drawedNode)) {
