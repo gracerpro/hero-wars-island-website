@@ -106,6 +106,7 @@
     <component
       :is="downloadDialogComponent"
       ref="downloadDialog"
+      :island="island"
       :nodes="nodes"
       :rewards="visibleItems"
       :is-show-quantity="isShowQuantity"

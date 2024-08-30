@@ -37,6 +37,7 @@ const dialog = ref(null);
 const { show, onMountedDialog } = useShow(dialog);
 
 const props = defineProps({
+  island: { type: Object, required: true },
   nodes: { type: Object, required: true },
   rewards: { type: Array, required: true },
   isShowQuantity: { type: Boolean, required: true },
@@ -122,7 +123,7 @@ async function downloadAsPng() {
     const url = canvasElem.toDataURL('image/png')
       .replace(/^data:image\/png/,'data:application/octet-stream')
 
-    download(url, "map.png")
+    download(url, t("common.map") + " " + props.island.name + ".png")
   }
   finally {
     canvasElem.remove()
