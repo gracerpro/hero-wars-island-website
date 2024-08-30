@@ -74,7 +74,7 @@ The end.
 Get commits history
 
 ```bash
-git log --since=2024-08-13 --pretty=format:"%cD %s"
+git log --since=2024-08-30 --pretty=format:"%cD %s"
 ```
 
 Run some commands
@@ -86,3 +86,13 @@ npm run test
 
 npm run build
 ```
+
+## Deploy
+
+```bash
+npm run generate
+```
+
+build the swagger.json and move it to /dist/static/backend-api
+
+copy /dist/static/* to /public on server

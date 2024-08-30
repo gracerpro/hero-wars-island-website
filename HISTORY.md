@@ -1,5 +1,29 @@
 # History
 
+## v1.4.1 at 2024-08-30
+
+What has been done
+
+* Add island parts on home page
+* Add download the island in PNG format
+* Add cell information dialog
+* Some UI changes
+* Add warning cells
+* Add to filter only visible on map reward types
+
+Technical part
+
+* Refactoring: rename parameters
+* Refactoring: create steps component
+* Refactoring: show quantity button
+* Format code
+
+Fix bugs
+
+* Fix: find nearest node on two start nodes
+* Fix: get mouse position on mousedown
+
+
 ## v1.4.0
 
 What has been done
