@@ -138,7 +138,7 @@ const EVENT_RESET_TRANSLATE = "reset-translate";
 const EVENT_RESET_SCALE = "reset-scale";
 const EVENT_CHANGE_IS_SHOW_QUANTITY = "update:is-show-quantity";
 const EVENT_FULLSCREEN_ON = "fullscreen-on";
-const EVENT_BEGIN_DOWNLOAD = "begin-download"
+const EVENT_BEGIN_DOWNLOAD = "begin-download";
 </script>
 <script setup>
 import HelpDialog from "./IslandMapHelpDialog.vue";
@@ -181,17 +181,17 @@ function onChangeTranslate(dx, dy, event) {
   if (dx !== 0) {
     x = 5 * dx * TRANSLATE_X;
     if (event.ctrlKey) {
-      x /= 10
+      x /= 10;
     } else if (event.shiftKey) {
-      x /= 2
+      x /= 2;
     }
   }
   if (dy !== 0) {
     y = dy * TRANSLATE_Y;
     if (event.ctrlKey) {
-      y /= 10
+      y /= 10;
     } else if (event.shiftKey) {
-      y /= 2
+      y /= 2;
     }
   }
 
@@ -203,13 +203,12 @@ function onResetScale() {
 }
 
 function onChangeScale(zoom, event) {
-  let value = zoom * DELTA_SCALE
+  let value = zoom * DELTA_SCALE;
 
   if (event.ctrlKey) {
-    value /= 10
-  }
-  else if (event.shiftKey) {
-    value /= 2
+    value /= 10;
+  } else if (event.shiftKey) {
+    value /= 2;
   }
 
   emit(EVENT_CHANGE_SCALE, value);

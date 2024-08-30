@@ -4,7 +4,7 @@ const HEIGHT = 34;
 const IMAGE_SIDE = 24;
 
 /**
- * @param {Object} nodes 
+ * @param {Object} nodes
  * @returns {Object}
  */
 export function getDrawedNodes(nodes) {
@@ -20,8 +20,8 @@ export function getDrawedNodes(nodes) {
 
 /**
  * @param {Array} dataItems
- * @param {Object} drawedNodes 
- * @param {Boolean} isShowQuantity 
+ * @param {Object} drawedNodes
+ * @param {Boolean} isShowQuantity
  * @returns {Array}
  */
 export function getIconsItems(dataItems, drawedNodes, isShowQuantity) {
@@ -30,7 +30,7 @@ export function getIconsItems(dataItems, drawedNodes, isShowQuantity) {
   let indexesByNode = {};
 
   dataItems.forEach((item) => {
-    const nodeId = item.node.id
+    const nodeId = item.node.id;
     const drawedNode = drawedNodes[item.node.id];
     const count = countsByNode[nodeId];
     const isShowText = item.item.quantity > 1 && isShowQuantity;
@@ -133,14 +133,14 @@ function getDrawedNode(node) {
  * @returns {Number}
  */
 export function getHorizontalStep() {
-  return 1.5 * SIDE
+  return 1.5 * SIDE;
 }
 
 /**
  * @returns {Number}
  */
 export function getVerticalStep() {
-  return 2 * HEIGHT
+  return 2 * HEIGHT;
 }
 
 /**
@@ -156,5 +156,5 @@ function getCoordinates(x, y) {
   coordinates[4] = { x: x - HALF_SIDE, y: y - HEIGHT };
   coordinates[5] = { x: x + HALF_SIDE, y: y - HEIGHT };
 
-  return coordinates
+  return coordinates;
 }

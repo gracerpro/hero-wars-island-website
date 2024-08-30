@@ -9,12 +9,22 @@
       ref="dialog"
       @vue:mounted="onMountedDialog"
     >
-      <p>{{ t("page.island.downloadMapInFormat", {format: "PNG"}) }}</p>
+      <p>{{ t("page.island.downloadMapInFormat", { format: "PNG" }) }}</p>
 
-      <div>{{ t("page.island.downloadVerticalAndHorizontalCount", {verticalCount: verticalCellsCount, horizontalCount: horizontalCellsCount}) }}</div>
-      <div>{{ t("page.island.downloadMapSize", {mapSize: mapSize}) }}</div>
+      <div>
+        {{
+          t("page.island.downloadVerticalAndHorizontalCount", {
+            verticalCount: verticalCellsCount,
+            horizontalCount: horizontalCellsCount,
+          })
+        }}
+      </div>
+      <div>{{ t("page.island.downloadMapSize", { mapSize: mapSize }) }}</div>
 
-      <form @submit.prevent="downloadAsPng" :id="formId"></form>
+      <form
+        @submit.prevent="downloadAsPng"
+        :id="formId"
+      ></form>
     </modal-dialog>
   </suspense>
 </template>
@@ -26,11 +36,18 @@ import { useShow } from "@/components/modal-dialog";
 import { download } from "@/helpers/download";
 import { computed } from "vue";
 import { getDrawedNodes, getIconsItems, getVerticalStep, getHorizontalStep } from "./map";
-import { STATUS_NOT_SURE, TYPE_BLOCKER, TYPE_CHEST, TYPE_NODE, TYPE_START, TYPE_TOWER } from "@/api/Node";
+import {
+  STATUS_NOT_SURE,
+  TYPE_BLOCKER,
+  TYPE_CHEST,
+  TYPE_NODE,
+  TYPE_START,
+  TYPE_TOWER,
+} from "@/api/Node";
 
 const { t } = useI18n();
 
-const formId = "download-map-form"
+const formId = "download-map-form";
 
 const dialog = ref(null);
 
@@ -41,12 +58,14 @@ const props = defineProps({
   nodes: { type: Object, required: true },
   rewards: { type: Array, required: true },
   isShowQuantity: { type: Boolean, required: true },
-})
+});
 
-const loading = ref(false)
+const loading = ref(false);
 
-const drawedNodes = computed(() => getDrawedNodes(props.nodes))
-const iconModifyRewards = computed(() => getIconsItems(props.rewards, drawedNodes.value, props.isShowQuantity))
+const drawedNodes = computed(() => getDrawedNodes(props.nodes));
+const iconModifyRewards = computed(() =>
+  getIconsItems(props.rewards, drawedNodes.value, props.isShowQuantity)
+);
 const minMaxNodeCoordinates = computed(() => {
   let minX = null;
   let minY = null;
@@ -54,28 +73,28 @@ const minMaxNodeCoordinates = computed(() => {
   let maxY = null;
 
   for (const id in props.nodes) {
-    const node = props.nodes[id]
-    minX = node.mx
-    maxX = node.mx
-    minY = node.my
-    maxY = node.my
+    const node = props.nodes[id];
+    minX = node.mx;
+    maxX = node.mx;
+    minY = node.my;
+    maxY = node.my;
     break;
   }
 
   for (const id in props.nodes) {
     const node = props.nodes[id];
-    
+
     if (node.mx > maxX) {
-      maxX = node.mx
+      maxX = node.mx;
     }
     if (node.mx < minX) {
-      minX = node.mx
+      minX = node.mx;
     }
     if (node.my < minY) {
-      minY = node.my
+      minY = node.my;
     }
     if (node.my > maxY) {
-      maxY = node.my
+      maxY = node.my;
     }
   }
 
@@ -83,98 +102,97 @@ const minMaxNodeCoordinates = computed(() => {
     minX,
     maxX,
     minY,
-    maxY
-  }
-})
+    maxY,
+  };
+});
 const horizontalCellsCount = computed(() => {
   // +1 for center cell
-  return minMaxNodeCoordinates.value.maxX - minMaxNodeCoordinates.value.minX + 1
-})
+  return minMaxNodeCoordinates.value.maxX - minMaxNodeCoordinates.value.minX + 1;
+});
 const verticalCellsCount = computed(() => {
   // +1 for center cell
-  return minMaxNodeCoordinates.value.maxY - minMaxNodeCoordinates.value.minY + 1
-})
+  return minMaxNodeCoordinates.value.maxY - minMaxNodeCoordinates.value.minY + 1;
+});
 const canvasWidth = computed(() => {
-  return horizontalCellsCount.value * getHorizontalStep() + 1 * getHorizontalStep()
-})
+  return horizontalCellsCount.value * getHorizontalStep() + 1 * getHorizontalStep();
+});
 const canvasHeight = computed(() => {
-  return verticalCellsCount.value * getVerticalStep() + (1 + 0.5) * getVerticalStep()
-})
+  return verticalCellsCount.value * getVerticalStep() + (1 + 0.5) * getVerticalStep();
+});
 const mapSize = computed(() => {
-  return canvasWidth.value + "x" + canvasHeight.value
-})
+  return canvasWidth.value + "x" + canvasHeight.value;
+});
 
 async function downloadAsPng() {
-  loading.value = true
+  loading.value = true;
 
-  const imagesByUrls = await loadImages()
+  const imagesByUrls = await loadImages();
 
   const canvasElem = document.createElement("canvas");
 
   try {
     // TODO: max size!
-    canvasElem.width = canvasWidth.value
-    canvasElem.height = canvasHeight.value
+    canvasElem.width = canvasWidth.value;
+    canvasElem.height = canvasHeight.value;
 
-    const context = canvasElem.getContext('2d');
+    const context = canvasElem.getContext("2d");
 
-    drawMap(context, imagesByUrls)
+    drawMap(context, imagesByUrls);
 
-    const url = canvasElem.toDataURL('image/png')
-      .replace(/^data:image\/png/,'data:application/octet-stream')
+    const url = canvasElem
+      .toDataURL("image/png")
+      .replace(/^data:image\/png/, "data:application/octet-stream");
 
-    download(url, t("common.map") + " " + props.island.name + ".png")
+    download(url, t("common.map") + " " + props.island.name + ".png");
+  } finally {
+    canvasElem.remove();
+    loading.value = false;
   }
-  finally {
-    canvasElem.remove()
-    loading.value = false
-  }
 
-  dialog.value.hide()
+  dialog.value.hide();
 }
 
 async function loadImages() {
   let urlMap = {};
-  let imagesByUrls = {}
+  let imagesByUrls = {};
 
   iconModifyRewards.value.forEach((modifyReward) => {
-    const reward = modifyReward.item
+    const reward = modifyReward.item;
 
     if (reward.iconUrl) {
       if (!urlMap[reward.iconUrl]) {
-        urlMap[reward.iconUrl] = true
+        urlMap[reward.iconUrl] = true;
       }
     }
-  })
-  const promises = Object.keys(urlMap)
-    .map((url) => {
-      return new Promise((resolve, reject) => {
-        const image = new Image()
-        image.crossOrigin = "anonymous"
-        image.onload = () => {
-          imagesByUrls[url] = image
-          resolve()
-        }
-        image.onerror = reject
-        image.src = url
-      })
-    })
+  });
+  const promises = Object.keys(urlMap).map((url) => {
+    return new Promise((resolve, reject) => {
+      const image = new Image();
+      image.crossOrigin = "anonymous";
+      image.onload = () => {
+        imagesByUrls[url] = image;
+        resolve();
+      };
+      image.onerror = reject;
+      image.src = url;
+    });
+  });
 
-  await Promise.all(promises)
+  await Promise.all(promises);
 
-  return imagesByUrls
+  return imagesByUrls;
 }
 
 function drawMap(context, imagesByUrls) {
-  context.save()
+  context.save();
 
   context.translate(
     -(minMaxNodeCoordinates.value.minX - 1) * getHorizontalStep(),
     -(minMaxNodeCoordinates.value.minY - 1) * getVerticalStep()
-  )
+  );
 
-  const FONT_SIZE = 16
-  const FONT_SIZE_SMALL = 13
+  const FONT_SIZE = 16;
+  const FONT_SIZE_SMALL = 13;
   const colors = {
     [TYPE_NODE]: "#9da7c9",
     [TYPE_START]: "#a6f3fd",
@@ -183,67 +201,77 @@ function drawMap(context, imagesByUrls) {
     [TYPE_BLOCKER]: "#867878",
   };
 
-  context.strokeStyle = "#ddd"
+  context.strokeStyle = "#ddd";
   for (const id in drawedNodes.value) {
-    const drawedNode = drawedNodes.value[id]
-    const coordinates = drawedNode.coordinates
-    const node = drawedNode.node
+    const drawedNode = drawedNodes.value[id];
+    const coordinates = drawedNode.coordinates;
+    const node = drawedNode.node;
 
     if (colors[node.typeId]) {
-      context.fillStyle = colors[node.typeId]
+      context.fillStyle = colors[node.typeId];
     } else {
-      context.fillStyle = "#ffff00"
+      context.fillStyle = "#ffff00";
     }
     if (node.statusId == STATUS_NOT_SURE) {
-      context.fillStyle = "#ffff00"
+      context.fillStyle = "#ffff00";
     }
 
-    context.beginPath()
-    context.moveTo(coordinates[0].x, coordinates[0].y)
-    context.lineTo(coordinates[1].x, coordinates[1].y)
-    context.lineTo(coordinates[2].x, coordinates[2].y)
-    context.lineTo(coordinates[3].x, coordinates[3].y)
-    context.lineTo(coordinates[4].x, coordinates[4].y)
-    context.lineTo(coordinates[5].x, coordinates[5].y)
-    context.closePath()
-    context.fill()
-    context.stroke()
+    context.beginPath();
+    context.moveTo(coordinates[0].x, coordinates[0].y);
+    context.lineTo(coordinates[1].x, coordinates[1].y);
+    context.lineTo(coordinates[2].x, coordinates[2].y);
+    context.lineTo(coordinates[3].x, coordinates[3].y);
+    context.lineTo(coordinates[4].x, coordinates[4].y);
+    context.lineTo(coordinates[5].x, coordinates[5].y);
+    context.closePath();
+    context.fill();
+    context.stroke();
   }
 
-  context.lineWidth = 1
+  context.lineWidth = 1;
   iconModifyRewards.value.forEach((modifyReward) => {
-    const item = modifyReward.item
+    const item = modifyReward.item;
 
     if (item.iconUrl) {
       if (imagesByUrls[item.iconUrl]) {
-        const image = imagesByUrls[item.iconUrl]
-        context.drawImage(image, modifyReward.iconX, modifyReward.iconY, modifyReward.iconWidth, modifyReward.iconHeight)
+        const image = imagesByUrls[item.iconUrl];
+        context.drawImage(
+          image,
+          modifyReward.iconX,
+          modifyReward.iconY,
+          modifyReward.iconWidth,
+          modifyReward.iconHeight
+        );
       } else {
-        drawEmptyImage(context, modifyReward)
-        context.fillStyle = "#000"
-        context.fillText("?", modifyReward.iconX + modifyReward.iconWidth / 2, modifyReward.iconY + modifyReward.iconHeight / 2)
+        drawEmptyImage(context, modifyReward);
+        context.fillStyle = "#000";
+        context.fillText(
+          "?",
+          modifyReward.iconX + modifyReward.iconWidth / 2,
+          modifyReward.iconY + modifyReward.iconHeight / 2
+        );
       }
     } else {
-      drawEmptyImage(context, modifyReward)
+      drawEmptyImage(context, modifyReward);
     }
 
     if (modifyReward.textX && modifyReward.textY) {
-      const fontSize = modifyReward.isSmallText ? FONT_SIZE_SMALL : FONT_SIZE
-      context.font = `bold ${fontSize}px sans-serif`
-      context.fillStyle = "#000"
-      context.fillText(modifyReward.humanQuantity, modifyReward.textX, modifyReward.textY)
+      const fontSize = modifyReward.isSmallText ? FONT_SIZE_SMALL : FONT_SIZE;
+      context.font = `bold ${fontSize}px sans-serif`;
+      context.fillStyle = "#000";
+      context.fillText(modifyReward.humanQuantity, modifyReward.textX, modifyReward.textY);
     }
-  })
+  });
 
-  context.restore()
+  context.restore();
 }
 
 function drawEmptyImage(context, item) {
-  context.fillStyle = "#fff"
-  context.beginPath()
-  context.rect(item.iconX, item.iconY, item.iconWidth, item.iconHeight)
-  context.fill()
-  context.stroke()
+  context.fillStyle = "#fff";
+  context.beginPath();
+  context.rect(item.iconX, item.iconY, item.iconWidth, item.iconHeight);
+  context.fill();
+  context.stroke();
 }
 
 defineExpose({

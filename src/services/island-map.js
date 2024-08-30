@@ -35,15 +35,15 @@ export function canSelectNextNode(drawedNodes, selectedNodes, nextDrawedNode) {
 
   if (Object.keys(selectedNodes).length === 0) {
     let isFound = false;
-    let isNearStart = false
+    let isNearStart = false;
     for (const id in drawedNodes) {
       const drawedNode = drawedNodes[id];
       if (drawedNode.node.typeId === TYPE_START) {
         isFound = true;
 
         if (isNearNode(nextDrawedNode, drawedNode)) {
-          isNearStart = true
-          break
+          isNearStart = true;
+          break;
         }
       }
     }
@@ -94,7 +94,7 @@ function isNearNode(nextDrawedNode, drawedNode) {
   const dx = nextDrawedNode.node.mx - drawedNode.node.mx;
 
   if (dx < -1 || dx > 1) {
-    return false
+    return false;
   }
 
   return nextDrawedNode.node.mx % 2 === 0 ? dy >= 0 && dy <= 1 : dy >= -1 && dy <= 0;

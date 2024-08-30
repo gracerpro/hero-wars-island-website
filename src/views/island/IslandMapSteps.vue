@@ -47,15 +47,16 @@
     <div class="fst-italic text-secondary small">{{ selectModeHint }}</div>
   </div>
 </template>
+<script>
+const EVENT_UPDATE_IS_SELECT_ANY_NODE = "update:is-select-any-node";
+const EVENT_RESET_USER_NODES = "reset-user-nodes";
+const EVENT_UPDATE_SELECT_MODE = "update:select-mode";
+</script>
 <script setup>
 import { createI18nRouteTo } from "@/i18n/translation";
 import { computed } from "vue";
 import { useI18n } from "vue-i18n";
 import { SELECT_MODE_GOING, SELECT_MODE_PLAN } from "./select-mode";
-
-const EVENT_UPDATE_IS_SELECT_ANY_NODE = "update:is-select-any-node"
-const EVENT_RESET_USER_NODES = "reset-user-nodes"
-const EVENT_UPDATE_SELECT_MODE = "update:select-mode"
 
 const { t } = useI18n();
 
@@ -64,13 +65,13 @@ const props = defineProps({
   isSelectAnyNode: { type: Boolean, required: true },
   userNodesCount: { type: Number, required: true },
   totalNodesCount: { type: Number, required: true },
-})
+});
 
 const emit = defineEmits([
   EVENT_UPDATE_IS_SELECT_ANY_NODE,
   EVENT_RESET_USER_NODES,
   EVENT_UPDATE_SELECT_MODE,
-])
+]);
 
 const selectModes = computed(() => {
   return [
@@ -85,10 +86,10 @@ const selectModeHint = computed(() => {
 });
 
 function onChangeIsSelectAnyNode(event) {
-  emit(EVENT_UPDATE_IS_SELECT_ANY_NODE, event.target.checked)
+  emit(EVENT_UPDATE_IS_SELECT_ANY_NODE, event.target.checked);
 }
 
 function onChangeSelectMode(event) {
-  emit(EVENT_UPDATE_SELECT_MODE, event.target.value)
+  emit(EVENT_UPDATE_SELECT_MODE, event.target.value);
 }
 </script>

@@ -99,9 +99,9 @@ import {
   canSelectNode,
   canSelectNextNode,
 } from "@/services/island-map";
-import { getIconsItems, getDrawedNodes, SIDE } from "./map"
+import { getIconsItems, getDrawedNodes, SIDE } from "./map";
 import { useI18n } from "vue-i18n";
-import IslandMapInfoDialog from "./IslandMapInfoDialog.vue"
+import IslandMapInfoDialog from "./IslandMapInfoDialog.vue";
 
 const { t } = useI18n();
 
@@ -117,11 +117,7 @@ const mouse = {
   preventY: null,
 };
 
-const emit = defineEmits([
-  EVENT_CHANGE_TRANSLATE,
-  EVENT_CHANGE_SCALE,
-  EVENT_SELECT_NODE,
-]);
+const emit = defineEmits([EVENT_CHANGE_TRANSLATE, EVENT_CHANGE_SCALE, EVENT_SELECT_NODE]);
 const props = defineProps({
   scale: { type: Number, required: true },
   translateX: { type: Number, required: true },
@@ -134,9 +130,9 @@ const props = defineProps({
 });
 
 const svgMap = ref(null);
-const infoDialog = ref(null)
-const infoDialogComponent = shallowRef(null)
-const infoDialogDrawedNode = ref(null)
+const infoDialog = ref(null);
+const infoDialogComponent = shallowRef(null);
+const infoDialogDrawedNode = ref(null);
 
 defineExpose({
   svgMap,
@@ -149,18 +145,20 @@ const viewBox = computed(() => {
   return `-${side} -${side} ${side * 2} ${side * 2}`;
 });
 const totalNodes = computed(() => {
-  let drawedNodes = getDrawedNodes(props.nodes)
+  let drawedNodes = getDrawedNodes(props.nodes);
 
   for (const id in drawedNodes) {
     const drawedNode = drawedNodes[id];
-    drawedNode.nodeClass = getNodeClass(drawedNode.node)
-    drawedNode.points = getPoints(drawedNode.coordinates)
+    drawedNode.nodeClass = getNodeClass(drawedNode.node);
+    drawedNode.points = getPoints(drawedNode.coordinates);
   }
 
   return drawedNodes;
-})
+});
 
-const iconsItems = computed(() => getIconsItems(props.items, totalNodes.value, props.isShowQuantity))
+const iconsItems = computed(() =>
+  getIconsItems(props.items, totalNodes.value, props.isShowQuantity)
+);
 
 function getNodeClass(node) {
   const classes = {
@@ -176,7 +174,7 @@ function getNodeClass(node) {
     nodeClass += " -warning";
   }
 
-  return nodeClass
+  return nodeClass;
 }
 
 /**
@@ -192,10 +190,10 @@ function getPoints(coordinates) {
  */
 function onNodeClick(drawedNode, event) {
   if (event.ctrlKey) {
-    infoDialogDrawedNode.value = drawedNode
-    infoDialogComponent.value = IslandMapInfoDialog
+    infoDialogDrawedNode.value = drawedNode;
+    infoDialogComponent.value = IslandMapInfoDialog;
   } else {
-    selectNode(drawedNode)
+    selectNode(drawedNode);
   }
 }
 
@@ -204,11 +202,11 @@ function onNodeClick(drawedNode, event) {
  * @param {Object} event
  */
 function onItemClick(item, event) {
-  const drawedNode = totalNodes.value[item.node.id]
+  const drawedNode = totalNodes.value[item.node.id];
 
   if (event.ctrlKey) {
-    infoDialogDrawedNode.value = drawedNode
-    infoDialogComponent.value = IslandMapInfoDialog
+    infoDialogDrawedNode.value = drawedNode;
+    infoDialogComponent.value = IslandMapInfoDialog;
   } else {
     selectNode(drawedNode);
   }
@@ -293,13 +291,12 @@ function onMouseUp(event) {
 }
 
 function onMouseWheel(event) {
-  let value = event.deltaY > 0 ? DELTA_SCALE : -DELTA_SCALE
+  let value = event.deltaY > 0 ? DELTA_SCALE : -DELTA_SCALE;
 
   if (event.ctrlKey) {
-    value /= 10
-  }
-  else if (event.shiftKey) {
-    value /= 2
+    value /= 10;
+  } else if (event.shiftKey) {
+    value /= 2;
   }
 
   emit(EVENT_CHANGE_SCALE, value);
@@ -308,8 +305,8 @@ function onMouseWheel(event) {
 
 function onMountedInfoDialog() {
   infoDialog.value.show().finally(() => {
-    infoDialogDrawedNode.value = null
-    infoDialogComponent.value = null
+    infoDialogDrawedNode.value = null;
+    infoDialogComponent.value = null;
   });
 }
 
@@ -329,7 +326,7 @@ function getUserNodeClass(drawedNode) {
   if (props.userNodesMap[drawedNode.node.id] !== undefined) {
     return props.userNodesMap[drawedNode.node.id].isGoingChecked ? "user-node-going" : "user-node";
   }
-  return ""
+  return "";
 }
 
 function getQuantity(item) {

@@ -13,16 +13,21 @@
       <div>type: {{ drawedNode.node.typeId }}</div>
 
       <h4 class="mt-3 mb-0">Rewards</h4>
-      <div v-if="!hasRewards">
-        No
-      </div>
-      <ul v-else class="mb-0">
-        <li v-for="reward in drawedNode.node.items" class="reward-item">
-          ID: {{ reward.id }}<br>
-          name: {{ reward.name }}<br>
-          type: {{ reward.typeId }}<br>
-          quantity: {{ reward.quantity }}<br>
-          game ID: {{ reward.gameId }}<br>
+      <div v-if="!hasRewards">No</div>
+      <ul
+        v-else
+        class="mb-0"
+      >
+        <li
+          v-for="reward in drawedNode.node.items"
+          :key="reward.id"
+          class="reward-item"
+        >
+          ID: {{ reward.id }}<br />
+          name: {{ reward.name }}<br />
+          type: {{ reward.typeId }}<br />
+          quantity: {{ reward.quantity }}<br />
+          game ID: {{ reward.gameId }}<br />
           game type: {{ reward.gameType }}
         </li>
       </ul>
@@ -42,10 +47,12 @@ const dialog = ref(null);
 const { show, onMountedDialog } = useShow(dialog);
 
 const props = defineProps({
-  drawedNode: { type: Object, required: true }
-})
+  drawedNode: { type: Object, required: true },
+});
 
-const hasRewards = computed(() => props.drawedNode.node.items && props.drawedNode.node.items.length > 0)
+const hasRewards = computed(
+  () => props.drawedNode.node.items && props.drawedNode.node.items.length > 0
+);
 
 defineExpose({
   show,

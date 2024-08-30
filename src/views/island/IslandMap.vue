@@ -128,6 +128,7 @@ import { getHumanQuantity } from "@/helpers/formatter";
 import { useI18n } from "vue-i18n";
 import { fullscreenElement } from "@/core/fullscreen";
 import { TYPE_CHEST, TYPE_TOWER } from "@/api/Node";
+import { TYPE_UNKNOWN } from "@/api/Item";
 import { isObject } from "@/helpers/core";
 import { getNodesMap } from "@/services/api/island-node";
 import { SELECT_MODE_PLAN } from "./select-mode";
@@ -169,8 +170,8 @@ const filter = shallowReactive({
   isNodeTypeChest: false,
 });
 const mapContainer = ref(null);
-const downloadDialog = ref(null)
-const downloadDialogComponent = shallowRef(null)
+const downloadDialog = ref(null);
+const downloadDialogComponent = shallowRef(null);
 
 const loading = computed(() => loadingNodes.value || calculatingItems.value);
 const visibleItems = computed(() => {
@@ -299,6 +300,7 @@ function calculateItems(nodes) {
   calculatingItems.value = true;
 
   let items = [];
+  let index = 0;
 
   for (const id in nodes) {
     const node = nodes[id];
@@ -309,13 +311,15 @@ function calculateItems(nodes) {
 
     node.items.forEach((item) => {
       items.push({
-        uniqueId: node.mx + "_" + node.my + "_" + item.id,
+        uniqueId: getUniqueId(node, item, index),
         iconUrl: item.iconUrl,
         humanQuantity: getHumanQuantity(item.quantity),
         emeraldCost: item.emeraldCost !== null ? item.emeraldCost * item.quantity : null,
         node,
         item,
       });
+
+      ++index;
     });
   }
 
@@ -323,6 +327,23 @@ function calculateItems(nodes) {
 
   return items;
 }
+
+/**
+ * @param {Object} node
+ * @param {Object} reward
+ * @param {Number} index
+ * @returns {String}
+ */
+function getUniqueId(node, reward, index) {
+  let rewardId = reward.id;
+
+  if (reward.typeId === TYPE_UNKNOWN) {
+    rewardId += "_" + index;
+  }
+
+  return node.mx + "_" + node.my + "_" + rewardId;
+}
+
 /**
  * @param {Number} value
  */
@@ -400,7 +421,7 @@ function onFullscreen() {
 }
 
 function onBeginDownload() {
-  downloadDialogComponent.value = IslandMapDownloadDialog
+  downloadDialogComponent.value = IslandMapDownloadDialog;
 }
 
 function onMountedDownloadDialog() {
