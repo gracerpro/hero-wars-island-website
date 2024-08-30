@@ -11,7 +11,7 @@
         type="button"
         class="btn btn-secondary"
         :title="t('common.zoomOut')"
-        @click="onChangeScale(true)"
+        @click="onChangeScale(1, $event)"
       >
         -
       </button>
@@ -19,7 +19,7 @@
         type="button"
         class="btn btn-secondary"
         :title="t('common.zoomIn')"
-        @click="onChangeScale(false)"
+        @click="onChangeScale(-1, $event)"
       >
         +
       </button>
@@ -39,28 +39,28 @@
       <button
         type="button"
         class="btn btn-secondary"
-        @click="onChangeTranslate(-1, 0)"
+        @click="onChangeTranslate(-1, 0, $event)"
       >
         &larr;
       </button>
       <button
         type="button"
         class="btn btn-secondary"
-        @click="onChangeTranslate(1, 0)"
+        @click="onChangeTranslate(1, 0, $event)"
       >
         &rarr;
       </button>
       <button
         type="button"
         class="btn btn-secondary"
-        @click="onChangeTranslate(0, -1)"
+        @click="onChangeTranslate(0, -1, $event)"
       >
         &uarr;
       </button>
       <button
         type="button"
         class="btn btn-secondary"
-        @click="onChangeTranslate(0, 1)"
+        @click="onChangeTranslate(0, 1, $event)"
       >
         &darr;
       </button>
@@ -93,10 +93,10 @@
       <button
         type="button"
         class="btn btn-secondary"
-        @click="onHelpClick"
-        :title="t('common.help')"
+        @click="emit(EVENT_BEGIN_DOWNLOAD)"
+        :title="t('common.download')"
       >
-        ?
+        D
       </button>
     </div>
     <div
@@ -112,6 +112,19 @@
         <span class="fullscreen-icon"></span>
       </button>
     </div>
+    <div
+      class="btn-group-vertical w-100 mt-2"
+      role="group"
+    >
+      <button
+        type="button"
+        class="btn btn-secondary"
+        @click="onHelpClick"
+        :title="t('common.help')"
+      >
+        ?
+      </button>
+    </div>
 
     <component
       :is="helpDialogComponent"
@@ -125,9 +138,10 @@ const EVENT_RESET_TRANSLATE = "reset-translate";
 const EVENT_RESET_SCALE = "reset-scale";
 const EVENT_CHANGE_IS_SHOW_QUANTITY = "update:is-show-quantity";
 const EVENT_FULLSCREEN_ON = "fullscreen-on";
+const EVENT_BEGIN_DOWNLOAD = "begin-download";
 </script>
 <script setup>
-import HelpDialog from "./HelpDialog.vue";
+import HelpDialog from "./IslandMapHelpDialog.vue";
 import { ref, shallowRef } from "vue";
 import {
   TRANSLATE_X,
@@ -151,44 +165,68 @@ const emit = defineEmits([
   EVENT_CHANGE_SCALE,
   EVENT_CHANGE_IS_SHOW_QUANTITY,
   EVENT_FULLSCREEN_ON,
+  EVENT_BEGIN_DOWNLOAD,
 ]);
 
 const helpDialog = ref(null);
 const helpDialogComponent = shallowRef(null);
 
-const onResetTranslate = () => {
+function onResetTranslate() {
   emit(EVENT_RESET_TRANSLATE);
-};
-const onChangeTranslate = (dx, dy) => {
+}
+function onChangeTranslate(dx, dy, event) {
   let x = 0,
     y = 0;
 
   if (dx !== 0) {
     x = 5 * dx * TRANSLATE_X;
+    if (event.ctrlKey) {
+      x /= 10;
+    } else if (event.shiftKey) {
+      x /= 2;
+    }
   }
   if (dy !== 0) {
-    y = 5 * dy * TRANSLATE_Y;
+    y = dy * TRANSLATE_Y;
+    if (event.ctrlKey) {
+      y /= 10;
+    } else if (event.shiftKey) {
+      y /= 2;
+    }
   }
 
   emit(EVENT_CHANGE_TRANSLATE, x, y);
-};
-const onResetScale = () => {
+}
+
+function onResetScale() {
   emit(EVENT_RESET_SCALE);
-};
-const onChangeScale = (inc) => {
-  emit(EVENT_CHANGE_SCALE, 2 * (inc ? DELTA_SCALE : -DELTA_SCALE));
-};
-const onHelpClick = () => {
+}
+
+function onChangeScale(zoom, event) {
+  let value = zoom * DELTA_SCALE;
+
+  if (event.ctrlKey) {
+    value /= 10;
+  } else if (event.shiftKey) {
+    value /= 2;
+  }
+
+  emit(EVENT_CHANGE_SCALE, value);
+}
+
+function onHelpClick() {
   helpDialogComponent.value = HelpDialog;
-};
+}
+
 function onChangeIsShowQuantity() {
   emit(EVENT_CHANGE_IS_SHOW_QUANTITY);
 }
-const onMountedHelpDialog = () => {
+
+function onMountedHelpDialog() {
   helpDialog.value.show().finally(() => {
     helpDialogComponent.value = null;
   });
-};
+}
 </script>
 <style scoped>
 .-left-toolbar {

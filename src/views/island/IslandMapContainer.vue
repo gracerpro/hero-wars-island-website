@@ -14,11 +14,11 @@
     >
       <g :transform="'translate(' + translateX + ' ' + translateY + ')'">
         <polygon
-          v-for="node in nodes"
+          v-for="node in totalNodes"
           :key="node.xyId"
           :points="node.points"
-          :class="['node', node.class, getUserNodeClass(node)]"
-          @click="onNodeClick(node)"
+          :class="['node', node.nodeClass, getUserNodeClass(node)]"
+          @click="onNodeClick(node, $event)"
         />
         <template
           v-for="item in iconsItems"
@@ -32,7 +32,7 @@
             :height="item.iconHeight"
             :href="item.item.iconUrl"
             class="item-image"
-            @click="onNodeClick(item.node)"
+            @click="onItemClick(item, $event)"
           >
             <title>{{ getItemName(item) + getQuantity(item) }}</title>
           </image>
@@ -43,7 +43,7 @@
             :width="item.iconWidth"
             :height="item.iconHeight"
             class="item-empty-image"
-            @click="onNodeClick(item.node)"
+            @click="onItemClick(item, $event)"
           >
             <title>
               {{ getItemName(item) + getQuantity(item) }},
@@ -54,14 +54,21 @@
             v-if="item.textX && item.textY"
             :x="item.textX"
             :y="item.textY"
-            :class="['text', item.fontClass ? item.fontClass : '']"
-            @click="onNodeClick(item.node)"
+            :class="['text', item.isSmallText ? 'text-small' : '']"
+            @click="onItemClick(item, $event)"
           >
             {{ item.humanQuantity }}
           </text>
         </template>
       </g>
     </svg>
+
+    <component
+      :is="infoDialogComponent"
+      ref="infoDialog"
+      :drawed-node="infoDialogDrawedNode"
+      @vue:mounted="onMountedInfoDialog"
+    />
 
     <toast-message
       ref="toast"
@@ -70,7 +77,6 @@
   </div>
 </template>
 <script>
-const EVENT_CHANGE_NODE = "change-node";
 const EVENT_SELECT_NODE = "select-node";
 </script>
 <script setup>
@@ -83,7 +89,7 @@ import {
   TYPE_NODE,
   STATUS_NOT_SURE,
 } from "@/api/Node";
-import { ref, computed, defineAsyncComponent } from "vue";
+import { ref, shallowRef, computed, defineAsyncComponent } from "vue";
 import {
   TRANSLATE_X,
   TRANSLATE_Y,
@@ -93,19 +99,15 @@ import {
   canSelectNode,
   canSelectNextNode,
 } from "@/services/island-map";
+import { getIconsItems, getDrawedNodes, SIDE } from "./map";
 import { useI18n } from "vue-i18n";
-//import { Canvg } from "canvg";
+import IslandMapInfoDialog from "./IslandMapInfoDialog.vue";
 
 const { t } = useI18n();
 
 const ToastMessage = import.meta.env.SSR
   ? null
   : defineAsyncComponent(() => import("@/components/ToastMessage.vue"));
-
-const SIDE = 50;
-const HALF_SIDE = SIDE / 2;
-const HEIGHT = 34;
-const IMAGE_SIDE = 24;
 
 const MIDDLE_BUTTON = 1;
 
@@ -115,25 +117,23 @@ const mouse = {
   preventY: null,
 };
 
-const svgMap = ref(null);
-const canvas = ref(null);
-
-const emit = defineEmits([
-  EVENT_CHANGE_TRANSLATE,
-  EVENT_CHANGE_SCALE,
-  EVENT_CHANGE_NODE,
-  EVENT_SELECT_NODE,
-]);
+const emit = defineEmits([EVENT_CHANGE_TRANSLATE, EVENT_CHANGE_SCALE, EVENT_SELECT_NODE]);
 const props = defineProps({
   scale: { type: Number, required: true },
   translateX: { type: Number, required: true },
   translateY: { type: Number, required: true },
   isShowQuantity: { type: Boolean, required: true },
   items: { type: Array, required: true },
-  inputNodes: { type: Object, required: true },
+  nodes: { type: Object, required: true },
   userNodesMap: { type: Object, required: true },
   isSelectAnyNode: { type: Boolean, default: true },
 });
+
+const svgMap = ref(null);
+const infoDialog = ref(null);
+const infoDialogComponent = shallowRef(null);
+const infoDialogDrawedNode = ref(null);
+
 defineExpose({
   svgMap,
 });
@@ -144,108 +144,23 @@ const viewBox = computed(() => {
   const side = SIDE * 5 * props.scale;
   return `-${side} -${side} ${side * 2} ${side * 2}`;
 });
-const nodes = computed(() => {
-  let nodes = {};
+const totalNodes = computed(() => {
+  let drawedNodes = getDrawedNodes(props.nodes);
 
-  for (const id in props.inputNodes) {
-    const node = props.inputNodes[id];
-    nodes[id] = drawNode(node);
+  for (const id in drawedNodes) {
+    const drawedNode = drawedNodes[id];
+    drawedNode.nodeClass = getNodeClass(drawedNode.node);
+    drawedNode.points = getPoints(drawedNode.coordinates);
   }
 
-  return nodes;
-});
-const iconsItems = computed(() => {
-  let countsByNode = getCountsByNode(props.items);
-  let resultItems = [];
-  let indexesByNode = {};
-
-  props.items.forEach((item) => {
-    const node = nodes.value[item.node.id];
-    const count = countsByNode[node.id];
-    const isShowText = item.item.quantity > 1 && props.isShowQuantity;
-
-    item.textX = null;
-    item.textY = null;
-    item.fontClass = null;
-
-    if (count === 1) {
-      const fontSize = 20;
-      item.iconWidth = IMAGE_SIDE * (isShowText ? 1.9 : 2.2);
-      item.iconHeight = IMAGE_SIDE * (isShowText ? 1.9 : 2.2);
-      item.iconX = node.x - item.iconWidth / 2;
-      item.iconY = node.y - item.iconHeight / 2 - (isShowText ? fontSize / 2 : 0);
-      if (isShowText) {
-        item.textX = item.iconX + item.iconWidth * 0.05;
-        item.textY = node.y + HEIGHT - 3;
-      }
-    } else {
-      if (!indexesByNode[node.id]) {
-        indexesByNode[node.id] = 0;
-      }
-      const index = indexesByNode[node.id];
-      const borderWidth = 2;
-
-      if (count === 2) {
-        const fontSize = 16;
-        item.iconWidth = IMAGE_SIDE * (isShowText ? 1.3 : 1.4);
-        item.iconHeight = IMAGE_SIDE * (isShowText ? 1.3 : 1.4);
-        const cx = item.iconWidth + borderWidth;
-        const srartX = node.x - cx + borderWidth / 2;
-        item.iconX = srartX + cx * index;
-        item.iconY = node.y - item.iconHeight / 2 - (isShowText ? fontSize / 2 : 0);
-
-        if (isShowText) {
-          item.textX = srartX + cx * index;
-          item.textY = node.y + HEIGHT - fontSize * 0.7;
-          item.fontClass = "text-2";
-        }
-      } else if (index <= 3) {
-        // count >= 3
-        // 0,0   1,0
-        //     *
-        // 0,1   1,1
-        item.iconWidth = IMAGE_SIDE * 1.1;
-        item.iconHeight = IMAGE_SIDE * 1.1;
-        const cx = item.iconWidth + borderWidth;
-        const srartX = node.x - cx + borderWidth / 2;
-        item.iconX = srartX + (index % 2 === 0 ? 0 : cx);
-        const cy = item.iconHeight + borderWidth;
-        const srartY = node.y - cy + borderWidth / 2;
-        item.iconY = srartY + (index < 2 ? 0 : cy);
-      } else {
-        item = false;
-      }
-
-      indexesByNode[node.id]++;
-    }
-
-    if (item) {
-      resultItems.push(item);
-    }
-  });
-
-  return resultItems;
-
-  function getCountsByNode(items) {
-    let countsByNode = {};
-
-    items.forEach((item) => {
-      const nodeId = item.node.id;
-
-      if (!countsByNode[nodeId]) {
-        countsByNode[nodeId] = 0;
-      }
-      countsByNode[nodeId]++;
-    });
-
-    return countsByNode;
-  }
+  return drawedNodes;
 });
 
-/**
- * @param {Object} node
- */
-function drawNode(node) {
+const iconsItems = computed(() =>
+  getIconsItems(props.items, totalNodes.value, props.isShowQuantity)
+);
+
+function getNodeClass(node) {
   const classes = {
     [TYPE_NODE]: "node-step",
     [TYPE_START]: "node-start",
@@ -253,23 +168,15 @@ function drawNode(node) {
     [TYPE_CHEST]: "node-chest",
     [TYPE_BLOCKER]: "node-blocker",
   };
-  const data = getCoordinates(node);
-
   let nodeClass = classes[node.typeId] ? classes[node.typeId] : "";
 
   if (node.statusId == STATUS_NOT_SURE) {
     nodeClass += " -warning";
   }
 
-  return {
-    ...node,
-    xyId: node.mx + "_" + node.my,
-    x: data.x,
-    y: data.y,
-    points: getPoints(data.coordinates),
-    class: nodeClass,
-  };
+  return nodeClass;
 }
+
 /**
  * @param {Array} coordinates
  */
@@ -278,35 +185,43 @@ function getPoints(coordinates) {
 }
 
 /**
- * @param {Object} node
+ * @param {Object} drawedNode
+ * @param {Object} event
  */
-function getCoordinates(node) {
-  const x = node.mx * (1.5 * SIDE);
-  const y = node.my * 2 * HEIGHT + (node.mx % 2 === 0 ? 0 : HEIGHT);
-
-  let coordinates = new Array(6);
-  coordinates[0] = { x: x + SIDE, y };
-  coordinates[1] = { x: x + HALF_SIDE, y: y + HEIGHT };
-  coordinates[2] = { x: x - HALF_SIDE, y: y + HEIGHT };
-  coordinates[3] = { x: x - SIDE, y };
-  coordinates[4] = { x: x - HALF_SIDE, y: y - HEIGHT };
-  coordinates[5] = { x: x + HALF_SIDE, y: y - HEIGHT };
-
-  return {
-    x,
-    y,
-    coordinates,
-  };
+function onNodeClick(drawedNode, event) {
+  if (event.ctrlKey) {
+    infoDialogDrawedNode.value = drawedNode;
+    infoDialogComponent.value = IslandMapInfoDialog;
+  } else {
+    selectNode(drawedNode);
+  }
 }
 
-function onNodeClick(node) {
-  if (!canSelectNode(node)) {
+/**
+ * @param {Object} item
+ * @param {Object} event
+ */
+function onItemClick(item, event) {
+  const drawedNode = totalNodes.value[item.node.id];
+
+  if (event.ctrlKey) {
+    infoDialogDrawedNode.value = drawedNode;
+    infoDialogComponent.value = IslandMapInfoDialog;
+  } else {
+    selectNode(drawedNode);
+  }
+}
+
+/**
+ * @param {Object} drawedNode
+ */
+function selectNode(drawedNode) {
+  if (!canSelectNode(drawedNode.node)) {
     return;
   }
-
-  if (!isUserNode(node)) {
+  if (!isUserNode(drawedNode.node)) {
     if (!props.isSelectAnyNode) {
-      const message = canSelectNextNode(nodes.value, props.userNodesMap, node);
+      const message = canSelectNextNode(totalNodes.value, props.userNodesMap, drawedNode);
       if (message) {
         toast.value.show(message, TYPE_DANGER);
         return;
@@ -314,7 +229,7 @@ function onNodeClick(node) {
     }
   }
 
-  emit(EVENT_SELECT_NODE, node.id);
+  emit(EVENT_SELECT_NODE, drawedNode.node.id);
 }
 
 /**
@@ -368,196 +283,117 @@ function onMouseMove(button) {
   mouse.preventX = button.pageX;
   mouse.preventY = button.pageY;
 }
-const onMouseUp = (event) => {
+
+function onMouseUp(event) {
   if (event.button === MIDDLE_BUTTON) {
     mouse.isDown = false;
   }
-};
-const onMouseWheel = (event) => {
-  emit(EVENT_CHANGE_SCALE, event.deltaY > 0 ? DELTA_SCALE : -DELTA_SCALE);
+}
+
+function onMouseWheel(event) {
+  let value = event.deltaY > 0 ? DELTA_SCALE : -DELTA_SCALE;
+
+  if (event.ctrlKey) {
+    value /= 10;
+  } else if (event.shiftKey) {
+    value /= 2;
+  }
+
+  emit(EVENT_CHANGE_SCALE, value);
   event.preventDefault();
-};
-const isUserNode = (node) => {
-  return props.userNodesMap[node.id] !== undefined;
-};
-const getUserNodeClass = (node) => {
-  if (props.userNodesMap[node.id] !== undefined) {
-    return props.userNodesMap[node.id].isGoingChecked ? "user-node-going" : "user-node";
-  }
-};
-const getQuantity = (item) => {
-  return item.item.quantity > 1 ? ", " + item.item.quantity : "";
-};
-const getItemName = (item) => {
-  return item.item.name ? item.item.name : t("common.noName");
-};
-
-/*
-TODO: make a downlaod as PNG
-
-function downloadAsPng() {
-  const svgElem = svgMap.value
-  const svgContent = getSvgHtml(svgElem)
-  const canvasElem = canvas.value
-  const context = canvasElem.getContext('2d');
-  const canvg = Canvg.fromString(context, svgContent);
-
-  canvg.render().then(() => {
-    // TODO: Uncaught (in promise) DOMException: The operation is insecure.
-    canvasElem.toBlob((blob) => {
-      let url = URL.createObjectURL(blob);
-
-      const img = new Image();
-      img.onload = () => {
-        //const canvas = document.createElement('canvas');
-        //const context = canvasElem.getContext('2d');
-        const domRect = svgElem.getBBox();
-        console.log(domRect)
-        //canvas.width = domRect.width;
-        //canvas.height = domRect.height;
-        context.drawImage(img, 0, 0, domRect.width, domRect.height);
-
-        const imgUri = canvasElem
-        .toDataURL('image/png')
-        .replace(/^data:image\/png/,'data:application/octet-stream');
-
-        download(imgUri, "map.png");
-
-        URL.revokeObjectURL(url);
-      };
-      img.onerror = (e) => {
-        console.error('Image not loaded', e);
-      };
-
-      img.src = url;
-    })
-  })
 }
 
-function getSvgHtml(svgElem) {
-  const svgData = svgElem.innerHTML
-  const svgAttributes = `width="${svgElem.clientWidth}" height="${svgElem.clientHeight}" viewBox="${viewBox.value}" version="1.1" xmlns="http://www.w3.org/2000/svg"`
-  const svgStyle = "<style>" + getStyleContent() + "</style>"
-
-  return `<svg ${svgAttributes}>${svgStyle} ${svgData}</svg>`
-}
-
-function download(url, fileName) {
-  const e = new MouseEvent('click', {
-    view: window,
-    bubbles: false,
-    cancelable: true
+function onMountedInfoDialog() {
+  infoDialog.value.show().finally(() => {
+    infoDialogDrawedNode.value = null;
+    infoDialogComponent.value = null;
   });
-  const a = document.createElement('a');
-
-  a.download = fileName;
-  a.href = url
-  a.dispatchEvent(e);
-  a.remove()
 }
 
-// TODO: use v-bind, see "begin SVG styles" in css
-function getStyleContent() {
-  return `
-  .node-start {
-    fill: #a6f3fd;
-  }
-  .node-step {
-    fill: #9da7c9;
-    stroke: #dddddd;
-  }
-  .node-tower {
-    fill: #94440e;
-  }
-  .node-chest {
-    fill: #1a660b;
-  }
-  .node-blocker {
-    fill: #867878;
-  }
-  .-warning {
-    fill: yellow;
-  }
-  .node.user-node {
-    fill: #6668f8;
-  }
-  .node.user-node-going {
-    fill: #f86696;
-  }
-  .text {
-    font-size: 20px;
-    fill: #000;
-    font-weight: bold;
-  }
-  .text-2 {
-    font-size: 16px;
-  }
-  .item-empty-image {
-    stroke: #999;
-    stroke-width: 2;
-    fill: #fff;
-  }`
+/**
+ * @param {Object} node
+ * @returns {Boolean}
+ */
+function isUserNode(node) {
+  return props.userNodesMap[node.id] !== undefined;
 }
-*/
+
+/**
+ * @param {Object} drawedNode
+ * @returns {String}
+ */
+function getUserNodeClass(drawedNode) {
+  if (props.userNodesMap[drawedNode.node.id] !== undefined) {
+    return props.userNodesMap[drawedNode.node.id].isGoingChecked ? "user-node-going" : "user-node";
+  }
+  return "";
+}
+
+function getQuantity(item) {
+  return item.item.quantity > 1 ? ", " + item.item.quantity : "";
+}
+
+function getItemName(item) {
+  return item.item.name ? item.item.name : t("common.noName");
+}
 </script>
 <style>
 .node {
   stroke-width: 1;
+  stroke: #ddd;
 }
 .node-step {
+  fill: #9da7c9;
   cursor: pointer;
 }
 .node-step:hover {
   fill: #bcc5e6;
 }
+.node-start {
+  fill: #a6f3fd;
+}
 .node-start:hover {
   fill: #d6f7fc;
 }
 .node-tower {
+  fill: #94440e;
   cursor: pointer;
 }
 .node-tower:hover {
   fill: #b95b1b;
 }
 .node-chest {
+  fill: #1a660b;
   cursor: pointer;
 }
 .node-chest:hover {
   fill: #566d51;
 }
+.node-blocker {
+  fill: #867878;
+}
 .node-blocker:hover {
   fill: #9c8e8e;
 }
+.-warning {
+  fill: #ffff00;
+}
 .text {
+  font-size: 20px;
+  fill: #000;
+  font-weight: bold;
   cursor: pointer;
+}
+.text-small {
+  font-size: 16px;
 }
 .item-image {
   cursor: pointer;
 }
 .item-empty-image {
+  stroke: #999;
+  fill: #fff;
   cursor: pointer;
-}
-</style>
-<!-- begin SVG styles -->
-<style>
-.node-start {
-  fill: #a6f3fd;
-}
-.node-step {
-  fill: #9da7c9;
-  stroke: #dddddd;
-}
-.node-tower {
-  fill: #94440e;
-}
-.node-chest {
-  fill: #1a660b;
-}
-.node-blocker {
-  fill: #867878;
-}
-.-warning {
-  fill: yellow;
 }
 .node.user-node {
   fill: #6668f8;
@@ -565,21 +401,7 @@ function getStyleContent() {
 .node.user-node-going {
   fill: #f86696;
 }
-.text {
-  font-size: 20px;
-  fill: #000;
-  font-weight: bold;
-}
-.text-2 {
-  font-size: 16px;
-}
-.item-empty-image {
-  stroke: #999;
-  stroke-width: 2;
-  fill: #fff;
-}
 </style>
-<!-- end SVG styles -->
 <style scoped>
 .map {
   margin-left: 45px;

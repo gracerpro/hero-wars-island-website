@@ -42,7 +42,7 @@
               class="visually-hidden"
               >Loading...</span
             >
-            {{ t("common.save") }}
+            {{ submitButtonText ? submitButtonText : t("common.save") }}
           </button>
           <button
             type="button"
@@ -85,6 +85,7 @@ const props = defineProps({
   saving: { type: Boolean, default: false },
   formId: { type: String, default: "" },
   header: { type: String, default: "" },
+  submitButtonText: { type: String, default: "" },
   size: { type: String, default: "lg" },
   isShowSubmit: { type: Boolean, default: true },
   initResult: {

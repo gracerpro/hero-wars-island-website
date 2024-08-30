@@ -5,24 +5,28 @@ export const TRANSLATE_X = 20;
 export const TRANSLATE_Y = 20;
 export const EVENT_CHANGE_TRANSLATE = "change-translate";
 
-export const DELTA_SCALE = 0.3;
+export const DELTA_SCALE = 0.5;
 export const EVENT_CHANGE_SCALE = "change-scale";
 
+/**
+ * @param {Object} node
+ * @returns {Boolean}
+ */
 export function canSelectNode(node) {
   return node.typeId !== TYPE_START && node.typeId != TYPE_BLOCKER;
 }
 
 /**
- * @param {Object} nodes
+ * @param {Object} drawedNodes
  * @param {Object} selectedNodes
  * @param {Object} node
  * @returns {String|null}
  */
-export function canSelectNextNode(nodes, selectedNodes, nextNode) {
+export function canSelectNextNode(drawedNodes, selectedNodes, nextDrawedNode) {
   const { t } = useI18n();
   let result = null;
 
-  if (nextNode.typeId === TYPE_START) {
+  if (nextDrawedNode.node.typeId === TYPE_START) {
     return t("page.island.canNotSelectStartNode");
   }
 
@@ -31,34 +35,37 @@ export function canSelectNextNode(nodes, selectedNodes, nextNode) {
 
   if (Object.keys(selectedNodes).length === 0) {
     let isFound = false;
-    for (const id in nodes) {
-      const node = nodes[id];
-      if (node.typeId === TYPE_START) {
+    let isNearStart = false;
+    for (const id in drawedNodes) {
+      const drawedNode = drawedNodes[id];
+      if (drawedNode.node.typeId === TYPE_START) {
         isFound = true;
 
-        if (!isNearNode(nextNode, node)) {
-          result = t("page.island.canSelectNearStart");
+        if (isNearNode(nextDrawedNode, drawedNode)) {
+          isNearStart = true;
           break;
         }
       }
     }
     if (!isFound) {
       result = t("page.island.notFoundStartNodeAdmin");
+    } else if (!isNearStart) {
+      result = t("page.island.canSelectNearStart");
     }
   } else {
     let isFound = false;
-    for (const id in nodes) {
-      const node = nodes[id];
+    for (const id in drawedNodes) {
+      const drawedNode = drawedNodes[id];
 
-      if (nextNode.xyId === node.xyId) {
+      if (nextDrawedNode.xyId === drawedNode.xyId) {
         continue;
       }
-      if (isNearNode(nextNode, node)) {
-        if (node.typeId === TYPE_START) {
+      if (isNearNode(nextDrawedNode, drawedNode)) {
+        if (drawedNode.node.typeId === TYPE_START) {
           isFound = true;
           break;
         }
-        if (selectedNodes[node.id]) {
+        if (selectedNodes[drawedNode.node.id]) {
           isFound = true;
           break;
         }
@@ -72,16 +79,23 @@ export function canSelectNextNode(nodes, selectedNodes, nextNode) {
   return result;
 }
 
-function isNearNode(nextNode, node) {
-  const dy = nextNode.my - node.my;
+/**
+ * @param {Object} nextDrawedNode
+ * @param {Object} drawedNode
+ * @returns {Boolean}
+ */
+function isNearNode(nextDrawedNode, drawedNode) {
+  const dy = nextDrawedNode.node.my - drawedNode.node.my;
 
-  if (nextNode.mx == node.mx) {
+  if (nextDrawedNode.node.mx == drawedNode.node.mx) {
     return dy >= -1 && dy <= 1;
   }
 
-  const dx = nextNode.mx - node.mx;
+  const dx = nextDrawedNode.node.mx - drawedNode.node.mx;
 
-  const canY = nextNode.mx % 2 === 0 ? dy >= 0 && dy <= 1 : dy >= -1 && dy <= 0;
+  if (dx < -1 || dx > 1) {
+    return false;
+  }
 
-  return dx >= -1 && dx <= 1 && canY;
+  return nextDrawedNode.node.mx % 2 === 0 ? dy >= 0 && dy <= 1 : dy >= -1 && dy <= 0;
 }

@@ -12,6 +12,7 @@ export const TYPE_GOLD = 8;
 export const TYPE_STARMONEY = 9;
 export const TYPE_AVATAR = 10;
 export const TYPE_BANNER = 11;
+export const TYPE_UNKNOWN = 12;
 
 // TODO: const TYPE_BANNER_STONE = 4;
 

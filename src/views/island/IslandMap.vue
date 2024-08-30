@@ -16,6 +16,7 @@
         @change-scale="onChangeScale"
         @change-translate="onChangeTranslate"
         @fullscreen-on="onFullscreen"
+        @begin-download="onBeginDownload"
       />
       <island-map-container
         :scale="scale"
@@ -24,7 +25,7 @@
         :is-show-quantity="isShowQuantity"
         :is-select-any-node="isSelectAnyNode"
         :items="visibleItems"
-        :input-nodes="nodes"
+        :nodes="nodes"
         :user-nodes-map="userNodesMap"
         @change-translate="onChangeTranslate"
         @change-scale="onChangeScale"
@@ -44,49 +45,13 @@
           />
         </div>
         <div class="col-lg-6">
-          <div class="float-end">
-            <router-link :to="createI18nRouteTo({ name: 'contact' })">{{
-              t("common.haveErrosOrProposal")
-            }}</router-link
-            ><br />
-            <label class="mt-2">
-              <input
-                type="checkbox"
-                v-model="isSelectAnyNode"
-              />
-              {{ t("common.selectAnyNodeQuestion") }}
-            </label>
-          </div>
-          <div>
-            {{ t("page.island.myExplorersMoves") }}
-          </div>
-          <div class="mt-2">
-            <span class="fs-4 me-2 align-middle">
-              <b>{{ userNodesCount }}</b> / {{ totalNodesCount }}
-            </span>
-            <button
-              type="button"
-              :class="['btn btn-secondary align-middle', userNodesCount > 0 ? '' : 'disabled']"
-              @click="onResetUserNodes"
-            >
-              {{ t("common.reset") }}
-            </button>
-          </div>
-          <div class="mt-2">
-            <label
-              v-for="mode in selectModes"
-              :key="mode.value"
-              class="me-2"
-            >
-              <input
-                type="radio"
-                :value="mode.value"
-                v-model="selectMode"
-              />
-              {{ mode.label }}
-            </label>
-          </div>
-          <div class="fst-italic text-secondary small">{{ selectModeHint }}</div>
+          <island-map-steps
+            v-model:is-select-any-node="isSelectAnyNode"
+            v-model:select-mode="selectMode"
+            :user-nodes-count="userNodesCount"
+            :total-nodes-count="totalNodesCount"
+            @reset-user-nodes="onResetUserNodes"
+          />
         </div>
       </div>
       <div class="row">
@@ -138,23 +103,36 @@
         </div>
       </div>
     </div>
+    <component
+      :is="downloadDialogComponent"
+      ref="downloadDialog"
+      :island="island"
+      :nodes="nodes"
+      :rewards="visibleItems"
+      :is-show-quantity="isShowQuantity"
+      @vue:mounted="onMountedDownloadDialog"
+    />
   </div>
 </template>
 <script setup>
 import IslandMapLoading from "./IslandMapLoading.vue";
 import IslandMapToolbar from "./IslandMapToolbar.vue";
+import IslandMapSteps from "./IslandMapSteps.vue";
 import IslandMapContainer from "./IslandMapContainer.vue";
+import IslandMapDownloadDialog from "./IslandMapDownloadDialog.vue";
 import IslandMapFilter from "./IslandMapFilter.vue";
 import IslandMapTable from "./IslandMapTable.vue";
 import { canSelectNode } from "@/services/island-map";
 import { onMounted, onUnmounted, ref, computed, shallowReactive } from "vue";
 import { getHumanQuantity } from "@/helpers/formatter";
 import { useI18n } from "vue-i18n";
-import { createI18nRouteTo } from "@/i18n/translation";
 import { fullscreenElement } from "@/core/fullscreen";
 import { TYPE_CHEST, TYPE_TOWER } from "@/api/Node";
+import { TYPE_UNKNOWN } from "@/api/Item";
 import { isObject } from "@/helpers/core";
 import { getNodesMap } from "@/services/api/island-node";
+import { SELECT_MODE_PLAN } from "./select-mode";
+import { shallowRef } from "vue";
 
 const { t } = useI18n();
 
@@ -169,9 +147,6 @@ let byIslandState = {};
 
 const minCharsCount = 3;
 const componentId = props.parentPageId + "__map";
-
-const SELECT_MODE_PLAN = "plan";
-const SELECT_MODE_GOING = "going";
 
 const loadingNodes = ref(true);
 const calculatingItems = ref(false);
@@ -195,6 +170,8 @@ const filter = shallowReactive({
   isNodeTypeChest: false,
 });
 const mapContainer = ref(null);
+const downloadDialog = ref(null);
+const downloadDialogComponent = shallowRef(null);
 
 const loading = computed(() => loadingNodes.value || calculatingItems.value);
 const visibleItems = computed(() => {
@@ -266,17 +243,6 @@ const totalNodesCount = computed(() => {
   const length = Object.keys(nodes.value).length;
   return length > 0 ? length - 1 : 0; // "-1" it means subtract an entry node
 });
-const selectModes = computed(() => {
-  return [
-    { value: SELECT_MODE_PLAN, label: t("page.island.planning") },
-    { value: SELECT_MODE_GOING, label: t("page.island.going") },
-  ];
-});
-const selectModeHint = computed(() => {
-  return selectMode.value === SELECT_MODE_PLAN
-    ? t("page.island.canSelectAnyNode")
-    : t("page.island.canSelectOnlyPlannedNode");
-});
 
 onMounted(() => {
   loadNodes().then((responseNodes) => {
@@ -334,6 +300,7 @@ function calculateItems(nodes) {
   calculatingItems.value = true;
 
   let items = [];
+  let index = 0;
 
   for (const id in nodes) {
     const node = nodes[id];
@@ -344,13 +311,15 @@ function calculateItems(nodes) {
 
     node.items.forEach((item) => {
       items.push({
-        uniqueId: node.mx + "_" + node.my + "_" + item.id,
+        uniqueId: getUniqueId(node, item, index),
         iconUrl: item.iconUrl,
         humanQuantity: getHumanQuantity(item.quantity),
         emeraldCost: item.emeraldCost !== null ? item.emeraldCost * item.quantity : null,
         node,
         item,
       });
+
+      ++index;
     });
   }
 
@@ -358,6 +327,23 @@ function calculateItems(nodes) {
 
   return items;
 }
+
+/**
+ * @param {Object} node
+ * @param {Object} reward
+ * @param {Number} index
+ * @returns {String}
+ */
+function getUniqueId(node, reward, index) {
+  let rewardId = reward.id;
+
+  if (reward.typeId === TYPE_UNKNOWN) {
+    rewardId += "_" + index;
+  }
+
+  return node.mx + "_" + node.my + "_" + rewardId;
+}
+
 /**
  * @param {Number} value
  */
@@ -374,7 +360,9 @@ function onChangeScale(value) {
   }
 }
 
-const onResetScale = () => (scale.value = 1);
+function onResetScale() {
+  scale.value = 1;
+}
 
 function onChangeTranslate(dx, dy) {
   if (dx !== 0) {
@@ -401,21 +389,21 @@ function onChangeNode(node) {
   nodes.value[node.id] = node;
 }
 
-function onSelectNode(id) {
+function onSelectNode(nodeId) {
   if (selectMode.value === SELECT_MODE_PLAN) {
-    if (!nodes.value[id]) {
+    if (!nodes.value[nodeId]) {
       throw new Error(t("page.island.notFoundNodeAdmin"));
     }
 
-    if (userNodesMap.value[id] !== undefined) {
-      delete userNodesMap.value[id];
-      nodes.value[id].isGoingChecked = false;
+    if (userNodesMap.value[nodeId] !== undefined) {
+      delete userNodesMap.value[nodeId];
+      nodes.value[nodeId].isGoingChecked = false;
     } else {
-      userNodesMap.value[id] = nodes.value[id];
+      userNodesMap.value[nodeId] = nodes.value[nodeId];
     }
   } else {
-    if (userNodesMap.value[id] !== undefined) {
-      userNodesMap.value[id].isGoingChecked = !userNodesMap.value[id].isGoingChecked;
+    if (userNodesMap.value[nodeId] !== undefined) {
+      userNodesMap.value[nodeId].isGoingChecked = !userNodesMap.value[nodeId].isGoingChecked;
     }
   }
 }
@@ -428,9 +416,19 @@ function onResetUserNodes() {
   }
 }
 
-const onFullscreen = () => {
-  fullscreenElement(mapContainer.value.canvas);
-};
+function onFullscreen() {
+  fullscreenElement(mapContainer.value.svgMap);
+}
+
+function onBeginDownload() {
+  downloadDialogComponent.value = IslandMapDownloadDialog;
+}
+
+function onMountedDownloadDialog() {
+  downloadDialog.value.show().finally(() => {
+    downloadDialogComponent.value = null;
+  });
+}
 
 function loadState() {
   let state;
