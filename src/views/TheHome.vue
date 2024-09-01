@@ -115,11 +115,25 @@ function getIslandHint(island) {
       dateTo: fromCurrentDate(island.eventEndAt, locale.value),
     });
   } else {
-    const days = Math.ceil((island.eventEndAt - now) / 1000 / 60 / 60 / 24);
-    result = t("page.home.toDateDaysCount", {
-      toDate: fromCurrentDate(island.eventEndAt, locale.value),
-      daysCount: days,
-    });
+    const toEndHours = (island.eventEndAt - now) / 1000 / 60 / 60
+
+    if (toEndHours >= 24) {
+      result = t("page.home.toDateDaysCount", {
+        toDate: fromCurrentDate(island.eventEndAt, locale.value),
+        daysCount: Math.ceil(toEndHours / 24),
+      });
+    } else if (toEndHours < 1) {
+      const toEndMinutes = ((island.eventEndAt - now) / 1000 / 60) % 60
+      result = t("page.home.toDateMinutesCount", {
+        toDate: fromCurrentDate(island.eventEndAt, locale.value),
+        minutesCount: Math.ceil(toEndMinutes),
+      });
+    } else {
+      result = t("page.home.toDateHoursCount", {
+        toDate: fromCurrentDate(island.eventEndAt, locale.value),
+        hoursCount: Math.ceil(toEndHours),
+      });
+    }
   }
 
   return result;

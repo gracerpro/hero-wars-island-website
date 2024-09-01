@@ -109,7 +109,9 @@
       "fromToDates": "from {dateFrom} to {dateTo}",
       "notFound": "Not found",
       "thePartNumber": "The part's number {n}",
-      "toDateDaysCount": "to {toDate}, days left {daysCount}"
+      "toDateDaysCount": "to {toDate}, days left {daysCount}",
+      "toDateHoursCount": "до {toDate}, осталось часов {hoursCount}",
+      "toDateMinutesCount": "до {toDate}, осталось минут {minutesCount}"
     },
     "island": {
       "canNotSelectStartNode": "It is not possible to select an entry.",

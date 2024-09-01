@@ -109,7 +109,9 @@
       "fromToDates": "от {dateFrom} до {dateTo}",
       "notFound": "Не найдено доступных",
       "thePartNumber": "Часть номер {n}",
-      "toDateDaysCount": "до {toDate}, осталось дней {daysCount}"
+      "toDateDaysCount": "до {toDate}, осталось дней {daysCount}",
+      "toDateHoursCount": "до {toDate}, осталось часов {hoursCount}",
+      "toDateMinutesCount": "до {toDate}, осталось минут {minutesCount}"
     },
     "island": {
       "canNotSelectStartNode": "Невозможно выбрать стартовый узел.",
