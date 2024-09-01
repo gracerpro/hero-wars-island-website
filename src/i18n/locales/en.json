@@ -65,7 +65,8 @@
     "version": "Version",
     "zoomIn": "Zoom in",
     "zoomOut": "Zoom out",
-    "warningCellDescription": "Warning cell. Administrator not sure in a reward."
+    "warningCellDescription": "Warning cell. Administrator not sure in a reward.",
+    "wood": "Wood"
   },
   "locale": {
     "en": "English",

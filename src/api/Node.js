@@ -6,6 +6,8 @@ export const TYPE_START = 1;
 export const TYPE_TOWER = 2;
 export const TYPE_CHEST = 3;
 export const TYPE_BLOCKER = 4;
+export const TYPE_WOOD = 6;
+export const TYPE_BUBBLE = 7;
 
 export const STATUS_CREATED = 0;
 export const STATUS_NOT_SURE = 3;

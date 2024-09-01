@@ -39,10 +39,12 @@ import { getDrawedNodes, getIconsItems, getVerticalStep, getHorizontalStep } fro
 import {
   STATUS_NOT_SURE,
   TYPE_BLOCKER,
+  TYPE_BUBBLE,
   TYPE_CHEST,
   TYPE_NODE,
   TYPE_START,
   TYPE_TOWER,
+  TYPE_WOOD,
 } from "@/api/Node";
 
 const { t } = useI18n();
@@ -196,7 +198,9 @@ function drawMap(context, imagesByUrls) {
   const colors = {
     [TYPE_NODE]: "#9da7c9",
     [TYPE_START]: "#a6f3fd",
-    [TYPE_TOWER]: "#94440e",
+    [TYPE_TOWER]: "#ffa500",
+    [TYPE_WOOD]: "#b3563e",
+    [TYPE_BUBBLE]: "#416bf7",
     [TYPE_CHEST]: "#1a660b",
     [TYPE_BLOCKER]: "#867878",
   };

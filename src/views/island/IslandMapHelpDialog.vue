@@ -18,9 +18,11 @@
         <li><span class="node-box node-start"></span>{{ t("common.startNode") }}</li>
         <li><span class="node-box node"></span>{{ t("page.island.oneResource") }}</li>
         <li><span class="node-box node-tower"></span>{{ t("common.tower") }}</li>
+        <li><span class="node-box node-wood"></span>{{ t("common.wood") }}</li>
         <li><span class="node-box node-chest"></span>{{ t("common.chest") }}</li>
         <li><span class="node-box node-blocker"></span>{{ t("common.blockerExNames") }}</li>
         <li><span class="node-box -warning"></span>{{ t("common.warningCellDescription") }}</li>
+        <li><span class="node-box node-bubble"></span>Bubble</li>
       </ul>
     </modal-dialog>
   </suspense>
@@ -57,7 +59,13 @@ defineExpose({
   background-color: #a6f3fd;
 }
 .node-tower {
-  background-color: #94440e;
+  background-color: #ffa500;
+}
+.node-wood {
+  background-color: #b3563e;
+}
+.node-bubble {
+  background-color: #416bf7;
 }
 .node-chest {
   background-color: #1a660b;

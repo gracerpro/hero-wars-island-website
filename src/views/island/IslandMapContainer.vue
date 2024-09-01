@@ -88,6 +88,8 @@ import {
   TYPE_BLOCKER,
   TYPE_NODE,
   STATUS_NOT_SURE,
+  TYPE_WOOD,
+  TYPE_BUBBLE,
 } from "@/api/Node";
 import { ref, shallowRef, computed, defineAsyncComponent } from "vue";
 import {
@@ -165,6 +167,8 @@ function getNodeClass(node) {
     [TYPE_NODE]: "node-step",
     [TYPE_START]: "node-start",
     [TYPE_TOWER]: "node-tower",
+    [TYPE_WOOD]: "node-wood",
+    [TYPE_BUBBLE]: "node-bubble",
     [TYPE_CHEST]: "node-chest",
     [TYPE_BLOCKER]: "node-blocker",
   };
@@ -356,11 +360,25 @@ function getItemName(item) {
   fill: #d6f7fc;
 }
 .node-tower {
-  fill: #94440e;
+  fill: #ffa500;
   cursor: pointer;
 }
 .node-tower:hover {
-  fill: #b95b1b;
+  fill: #ffbd42;
+}
+.node-wood {
+  fill: #b3563e;
+  cursor: pointer;
+}
+.node-wood:hover {
+  fill: #b36b59
+}
+.node-bubble {
+  fill: #416bf7;
+  cursor: pointer;
+}
+.node-bubble:hover {
+  fill: #567bf7;
 }
 .node-chest {
   fill: #1a660b;
