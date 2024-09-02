@@ -354,31 +354,28 @@ function getItemName(item) {
   fill: #bcc5e6;
 }
 .node-start {
-  fill: #a6f3fd;
+  fill: #94fdfe;
 }
 .node-start:hover {
-  fill: #d6f7fc;
+  fill: #b5f9fa;
 }
 .node-tower {
-  fill: #ffa500;
-  cursor: pointer;
+  fill: #ba662c;
 }
 .node-tower:hover {
-  fill: #ffbd42;
+  fill: #da8237;
 }
 .node-wood {
-  fill: #b3563e;
-  cursor: pointer;
+  fill: #773e23;
 }
 .node-wood:hover {
-  fill: #b36b59
+  fill: #9a5832;
 }
 .node-bubble {
-  fill: #416bf7;
-  cursor: pointer;
+  fill: #deb28d;
 }
 .node-bubble:hover {
-  fill: #567bf7;
+  fill: #f7cba6;
 }
 .node-chest {
   fill: #1a660b;

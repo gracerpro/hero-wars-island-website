@@ -56,16 +56,16 @@ defineExpose({
   background-color: #9da7c9;
 }
 .node-start {
-  background-color: #a6f3fd;
+  background-color: #94fdfe;
 }
 .node-tower {
-  background-color: #ffa500;
+  background-color: #ba662c;
 }
 .node-wood {
-  background-color: #b3563e;
+  background-color: #773e23;
 }
 .node-bubble {
-  background-color: #416bf7;
+  background-color: #deb28d;
 }
 .node-chest {
   background-color: #1a660b;

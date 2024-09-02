@@ -197,10 +197,10 @@ function drawMap(context, imagesByUrls) {
   const FONT_SIZE_SMALL = 13;
   const colors = {
     [TYPE_NODE]: "#9da7c9",
-    [TYPE_START]: "#a6f3fd",
-    [TYPE_TOWER]: "#ffa500",
-    [TYPE_WOOD]: "#b3563e",
-    [TYPE_BUBBLE]: "#416bf7",
+    [TYPE_START]: "#94fdfe",
+    [TYPE_TOWER]: "#ba662c",
+    [TYPE_WOOD]: "#773e23",
+    [TYPE_BUBBLE]: "#deb28d",
     [TYPE_CHEST]: "#1a660b",
     [TYPE_BLOCKER]: "#867878",
   };
