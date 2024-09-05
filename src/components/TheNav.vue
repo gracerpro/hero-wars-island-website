@@ -24,6 +24,11 @@
           >{{ t("common.contacts") }}</router-link
         >
         <router-link
+          :to="createI18nRouteTo({ name: 'news' })"
+          class="nav-link"
+          >{{ t("common.news") }}</router-link
+        >
+        <router-link
           :to="createI18nRouteTo({ name: 'about' })"
           class="nav-link"
           >{{ t("common.about") }}</router-link

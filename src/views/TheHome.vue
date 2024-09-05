@@ -7,9 +7,23 @@
     <p v-html="t('page.home.firstParagraph')"></p>
 
     <div v-if="islandsLoading">
-      <span class="placeholder col-4"></span><br />
-      <span class="placeholder col-4"></span><br />
-      <span class="placeholder col-4"></span>
+      <ol>
+        <li>
+          <div><span class="placeholder col-5"></span></div>
+          <span class="placeholder col-1 ms-2"></span>
+          <span class="placeholder col-1 ms-2"></span>
+        </li>
+        <li>
+          <div><span class="placeholder col-5"></span></div>
+          <span class="placeholder col-1 ms-2"></span>
+          <span class="placeholder col-1 ms-2"></span>
+        </li>
+        <li>
+          <div><span class="placeholder col-5"></span></div>
+          <span class="placeholder col-1 ms-2"></span>
+          <span class="placeholder col-1 ms-2"></span>
+        </li>
+      </ol>
     </div>
     <div
       v-else-if="errorMessage"
@@ -48,6 +62,43 @@
         >
       </li>
     </ol>
+
+    <router-link
+      class="float-end"
+      :to="createI18nRouteTo({ name: 'news' })"
+      >{{ t("page.home.readAllNews") }}</router-link
+    >
+    <h2>{{ t("common.news") }}</h2>
+
+    <div v-if="newsLoading">
+      <div v-for="i in visibleNewsMax" :key="i" class="mb-3">
+        <div class="placeholder-glow">
+          <div class="placeholder col-6"></div>
+        </div>
+        <div class="placeholder-glow">
+          <div class="placeholder placeholder-sm col-3"></div>
+        </div>
+      </div>
+    </div>
+    <p v-else-if="!news.length">
+      {{ t('common.noData') }}
+    </p>
+    <div>
+      <div v-for="oneNews in news" :key="oneNews.id">
+        <h4>
+          <router-link
+           :to="createI18nRouteTo({ name: 'newsView', params: { slug: oneNews.slug } })"
+          >{{ oneNews.name }}</router-link>
+        </h4>
+        <div v-html="oneNews.snippet"></div>
+      </div>
+      <div v-if="newsTotalCount > visibleNewsMax">
+        <router-link
+          :to="createI18nRouteTo({ name: 'news' })"
+          >{{ t("common.more") }}</router-link
+        >
+      </div>
+    </div>
   </div>
 </template>
 <script setup>
@@ -60,12 +111,18 @@ import { createI18nRouteTo } from "@/i18n/translation";
 import { useRoute } from "vue-router";
 import { useSSRContext } from "vue";
 
+const visibleNewsMax = 3
+
 const { t, locale } = useI18n();
 const route = useRoute();
 const ssrContext = import.meta.env.SSR ? useSSRContext() : null;
 
 const client = new HeroClient();
 const now = new Date();
+
+const news = ref([]);
+const newsLoading = ref(true);
+const newsTotalCount = ref(0);
 
 const islands = ref([]);
 const islandsLoading = ref(true);
@@ -83,11 +140,16 @@ setMetaInfo(
 onMounted(() => {
   watch(
     () => route.params.locale,
-    () => loadIslands()
+    () => load()
   );
 
-  loadIslands();
+  load();
 });
+
+function load() {
+  loadIslands()
+  loadNews()
+}
 
 function loadIslands() {
   islandsLoading.value = true;
@@ -100,6 +162,17 @@ function loadIslands() {
       errorMessage.value = t("common.loadingFailDeveloperShow");
     })
     .finally(() => (islandsLoading.value = false));
+}
+
+function loadNews() {
+  newsLoading.value = true;
+  client.news
+    .getList(3)
+    .then((list) => {
+      news.value = list.items;
+      newsTotalCount.value = list.totalCount
+    })
+    .finally(() => (newsLoading.value = false));
 }
 
 function isActual(island) {

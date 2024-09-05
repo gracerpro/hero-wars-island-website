@@ -33,6 +33,16 @@ export default [
         component: () => import("../views/TheHelp.vue"),
       },
       {
+        path: "news",
+        name: "news",
+        component: () => import("../views/TheNews.vue"),
+      },
+      {
+        path: "news/:slug(\\[a-zA-Z0-9\-]+)",
+        name: "newsView",
+        component: () => import("../views/TheNewsView.vue"),
+      },
+      {
         path: "page-not-found",
         name: "page-not-found",
         component: () => import("../views/status-pages/ThePageNotFound.vue"),
