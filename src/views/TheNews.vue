@@ -2,16 +2,38 @@
   <div class="container">
     <h1>{{ t("common.news") }}</h1>
 
+    <form class="row mb-3" @submit.prevent="onSearch">
+      <div class="col-lg-6">
+        <div class="input-group">
+          <input v-model.trim="filter.name" class="form-control" id="filter__name" :placeholder="t('common.name')">
+          <button
+            type="button"
+            :disabled="filter.name.length === 0"
+            class="btn btn-outline-secondary"
+            @click="onClearName"
+          >X</button>
+        </div>
+        <div class="form-text">{{ t("common.needEnterAtLeastCharacters", { n: filterNameMinCharsCount }) }}</div>
+      </div>
+      <div class="col-auto">
+        <button type="submit" :disabled="loading" class="btn btn-primary">{{ t("common.find") }}</button>
+      </div>
+    </form>
+
     <div v-for="oneNews in news" :key="oneNews.id">
       <h4>
         <router-link
         :to="createI18nRouteTo({ name: 'newsView', params: { slug: oneNews.slug } })"
         >{{ oneNews.name }}</router-link>
       </h4>
+      <div class="fst-italic">{{ fromCurrentDate(oneNews.createdAt) }}</div>
       <div v-html="oneNews.snippet"></div>
     </div>
 
     <row-loading v-if="loading" />
+    <div v-else-if="!totalCount" class="alert alert-info">
+      {{ t("common.noData") }}
+    </div>
     <div v-else-if="visibleCount < totalCount" class="text-center">
       <button
         type="button"
@@ -30,10 +52,15 @@ import { ref } from "vue";
 import RowLoading from "@/components/RowLoading.vue";
 import HeroClient from "@/api/HeroClient";
 import { createI18nRouteTo } from "@/i18n/translation";
+import { useSSRContext } from "vue";
+import { setMetaInfo } from "@/services/page-meta";
+import { fromCurrentDate } from "@/helpers/formatter";
 
 const { t } = useI18n();
+const ssrContext = import.meta.env.SSR ? useSSRContext() : null;
 
 const PAGE_SIZE = 2
+const filterNameMinCharsCount = 3
 
 const client = new HeroClient();
 
@@ -42,8 +69,34 @@ const visibleCount = ref(0)
 const totalCount = ref(0)
 const loading = ref(true)
 const pageNumber = ref(1)
+const filter = ref({
+  name: "",
+})
+
+setMetaInfo(
+  {
+    title: t("common.news") + " - " + t("common.projectName"),
+    description: t("seo.news.description"),
+    keywords: t("seo.news.keywords"),
+  },
+  ssrContext
+);
 
 loadNews()
+
+function onClearName() {
+  filter.value.name = ''
+
+  onSearch()
+}
+
+function onSearch() {
+  pageNumber.value = 1
+  news.value = []
+  visibleCount.value = 0
+
+  loadNews()
+}
 
 function showMore() {
   pageNumber.value++
@@ -52,8 +105,15 @@ function showMore() {
 
 function loadNews() {
   loading.value = true;
+
+  let requestFilter = {}
+
+  if (filter.value.name.length >= filterNameMinCharsCount) {
+    requestFilter.name = filter.value.name
+  }
+
   client.news
-    .getList(PAGE_SIZE, pageNumber.value)
+    .getList(PAGE_SIZE, pageNumber.value, requestFilter)
     .then((list) => {
       list.items.forEach((oneNews) => {
         news.value.push(oneNews);

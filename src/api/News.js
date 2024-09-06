@@ -12,13 +12,17 @@ export default class News {
   /**
    * @param {Number} pageSize
    * @param {Number} pageNumber
+   * @param {Object} filter
    * @returns {Promise<Object|null>}
    */
-  async getList(pageSize, pageNumber = 1) {
-    const params = { pageSize };
+  async getList(pageSize, pageNumber = 1, filter = null) {
+    let params = "pageSize=" + pageSize;
 
     if (pageNumber > 1) {
-      params.pageNumber = pageNumber;
+      params += "&pageNumber=" + pageNumber;
+    }
+    if (filter && Object.keys(filter).length) {
+      params += "&" + Object.keys(filter).map(key => `filter[${key}]=${encodeURIComponent(filter[key])}`).join('&')
     }
 
     const list = await this._apiRequest.get("/news", params);

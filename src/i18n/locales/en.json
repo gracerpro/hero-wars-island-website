@@ -23,6 +23,7 @@
     "edit": "Edit",
     "equipment": "Equipment",
     "feedback": "Feedback",
+    "find": "Find",
     "fragment": "Fragment | Fragments",
     "fullscreenMode": "Fullscreen mode",
     "haveErrosOrProposal": "Have an error or proposal?",
@@ -42,6 +43,7 @@
     "moderated": "Moderated",
     "more": "More",
     "movedPageMayBe": "The page may have been moved.",
+    "name": "Name",
     "needEnterAtLeastCharacters": "Need to enter at least {n} characters",
     "news": "News",
     "node": "Node | Nodes",
@@ -171,6 +173,10 @@
     "island": {
       "description": "An open map of the island. Search for resources and moves on the adventure island map.",
       "keywords": "island, map, adventure, hero wars, dominion era, new event"
+    },
+    "news": {
+      "description": "News on the service, description of an updates, dates of a releases.",
+      "keywords": "news, updates, releases"
     }
   }
 }
