@@ -9,6 +9,9 @@
       </div>
       <row-loading  />
     </div>
+    <div v-else-if="errorMessage" class="alert alert-danger mt-3">
+      {{ errorMessage }}
+    </div>
     <div v-else>
       <h1>{{ oneNews.name }}</h1>
       <div class="fst-italic">{{ fromCurrentDate(oneNews.createdAt) }}</div>
@@ -20,7 +23,7 @@
 <script setup>
 import HeroClient from "@/api/HeroClient";
 import RowLoading from "@/components/RowLoading.vue";
-import { ref } from "vue";
+import { ref, watch } from "vue";
 import { useRoute } from "vue-router";
 import { fromCurrentDate } from "@/helpers/formatter";
 import HttpError from "@/exceptions/HttpError";
@@ -30,7 +33,6 @@ const { t } = useI18n();
 const route = useRoute();
 
 const slug = route.params.slug;
-console.log(slug)
 
 const client = new HeroClient();
 
@@ -45,21 +47,27 @@ const oneNews = ref({
   content: "",
 })
 
-try {
-  loadOneNews()
-} catch(error) {
-  if (error instanceof HttpError && error.statusCode === 404) {
-    errorMessage.value = t("common.pageNotFound");
-  } else {
-    throw error
+watch(
+  () => route.params.locale,
+  () => {
+    loadOneNews()
   }
-}
+);
+
+loadOneNews()
 
 function loadOneNews() {
   client.news
     .get(slug)
     .then((responseOneNews) => {
       oneNews.value = responseOneNews
+    })
+    .catch((error) => {
+      if (error instanceof HttpError && error.statusCode === 404) {
+        errorMessage.value = t("common.pageNotFound");
+      } else {
+        throw error
+      }
     })
     .finally(() => (loading.value = false));
 }
