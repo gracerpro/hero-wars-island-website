@@ -35,6 +35,18 @@ export default class News {
   }
 
   /**
+   * @param {String} slug
+   * @returns {Promise<Object>}
+   */
+  async get(slug) {
+    let oneNews = await this._apiRequest.get("/news/view?slug=" + slug)
+
+    this.modifyOneNews(oneNews)
+
+    return oneNews
+  }
+
+  /**
    * @private
    */
   modifyOneNews(oneNews) {

@@ -64,11 +64,11 @@
     </ol>
 
     <router-link
-      class="float-end"
+      class="float-end mt-4"
       :to="createI18nRouteTo({ name: 'news' })"
       >{{ t("page.home.readAllNews") }}</router-link
     >
-    <h2>{{ t("common.news") }}</h2>
+    <h2 class="mt-4">{{ t("common.news") }}</h2>
 
     <div v-if="newsLoading">
       <div v-for="i in visibleNewsMax" :key="i" class="mb-3">
@@ -84,19 +84,13 @@
       {{ t('common.noData') }}
     </p>
     <div>
-      <div v-for="oneNews in news" :key="oneNews.id">
+      <div v-for="oneNews in news" :key="oneNews.id" class="mb-2">
         <h4>
           <router-link
            :to="createI18nRouteTo({ name: 'newsView', params: { slug: oneNews.slug } })"
           >{{ oneNews.name }}</router-link>
         </h4>
-        <div v-html="oneNews.snippet"></div>
-      </div>
-      <div v-if="newsTotalCount > visibleNewsMax">
-        <router-link
-          :to="createI18nRouteTo({ name: 'news' })"
-          >{{ t("common.more") }}</router-link
-        >
+        <div v-html="oneNews.snippet" class="news-item"></div>
       </div>
     </div>
   </div>
@@ -212,3 +206,8 @@ function getIslandHint(island) {
   return result;
 }
 </script>
+<style>
+.news-item p {
+  margin-bottom: 0;
+}
+</style>

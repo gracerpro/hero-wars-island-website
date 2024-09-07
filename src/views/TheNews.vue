@@ -2,8 +2,8 @@
   <div class="container">
     <h1>{{ t("common.news") }}</h1>
 
-    <form class="row mb-3" @submit.prevent="onSearch">
-      <div class="col-lg-6">
+    <form class="row" @submit.prevent="resetNews">
+      <div class="col-lg-3 mb-3">
         <div class="input-group">
           <input v-model.trim="filter.name" class="form-control" id="filter__name" :placeholder="t('common.name')">
           <button
@@ -15,7 +15,7 @@
         </div>
         <div class="form-text">{{ t("common.needEnterAtLeastCharacters", { n: filterNameMinCharsCount }) }}</div>
       </div>
-      <div class="col-auto">
+      <div class="col-auto mb-3">
         <button type="submit" :disabled="loading" class="btn btn-primary">{{ t("common.find") }}</button>
       </div>
     </form>
@@ -48,16 +48,18 @@
 </template>
 <script setup>
 import { useI18n } from "vue-i18n";
-import { ref } from "vue";
+import { ref, watch } from "vue";
 import RowLoading from "@/components/RowLoading.vue";
 import HeroClient from "@/api/HeroClient";
 import { createI18nRouteTo } from "@/i18n/translation";
 import { useSSRContext } from "vue";
 import { setMetaInfo } from "@/services/page-meta";
 import { fromCurrentDate } from "@/helpers/formatter";
+import { useRoute } from "vue-router";
 
 const { t } = useI18n();
 const ssrContext = import.meta.env.SSR ? useSSRContext() : null;
+const route = useRoute();
 
 const PAGE_SIZE = 2
 const filterNameMinCharsCount = 3
@@ -73,6 +75,13 @@ const filter = ref({
   name: "",
 })
 
+watch(
+  () => route.params.locale,
+  () => {
+    resetNews()
+  }
+);
+
 setMetaInfo(
   {
     title: t("common.news") + " - " + t("common.projectName"),
@@ -87,10 +96,10 @@ loadNews()
 function onClearName() {
   filter.value.name = ''
 
-  onSearch()
+  resetNews()
 }
 
-function onSearch() {
+function resetNews() {
   pageNumber.value = 1
   news.value = []
   visibleCount.value = 0
