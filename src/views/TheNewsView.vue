@@ -23,14 +23,17 @@
 <script setup>
 import HeroClient from "@/api/HeroClient";
 import RowLoading from "@/components/RowLoading.vue";
-import { ref, watch } from "vue";
+import { onServerPrefetch, ref, watch } from "vue";
 import { useRoute } from "vue-router";
 import { fromCurrentDate } from "@/helpers/formatter";
 import HttpError from "@/exceptions/HttpError";
 import { useI18n } from "vue-i18n";
+import { setMetaInfo } from "@/services/page-meta";
+import { useSSRContext } from "vue";
 
 const { t } = useI18n();
 const route = useRoute();
+const ssrContext = import.meta.env.SSR ? useSSRContext() : null;
 
 const slug = route.params.slug;
 
@@ -54,21 +57,55 @@ watch(
   }
 );
 
+onServerPrefetch(async () => {
+  const oneNews = await loadOneNews(slug);
+  setPageInfo(oneNews);
+});
+
 loadOneNews()
 
-function loadOneNews() {
-  client.news
-    .get(slug)
-    .then((responseOneNews) => {
-      oneNews.value = responseOneNews
-    })
-    .catch((error) => {
-      if (error instanceof HttpError && error.statusCode === 404) {
-        errorMessage.value = t("common.pageNotFound");
-      } else {
-        throw error
-      }
-    })
-    .finally(() => (loading.value = false));
+async function loadOneNews() {
+  loading.value = true
+  try {
+    oneNews.value = await client.news.get(slug)
+  } catch (error) {
+    if (error instanceof HttpError && error.statusCode === 404) {
+      errorMessage.value = t("common.pageNotFound");
+    } else {
+      throw error
+    }
+  }
+  finally {
+    if (!import.meta.env.SSR) {
+      loading.value = false;
+    }
+  }
+
+  return oneNews.value
+}
+
+/**
+ * @param {Object|null} oneNews
+ */
+function setPageInfo(oneNews) {
+  if (oneNews) {
+    setMetaInfo(
+      {
+        title: oneNews.pageTitle,
+        description: oneNews.pageDescription,
+        keywords: oneNews.pageKeywords,
+      },
+      ssrContext
+    );
+  } else {
+    setMetaInfo(
+      {
+        title: t("common.news"),
+        description: t("common.news"),
+        keywords: t("common.news"),
+      },
+      ssrContext
+    );
+  }
 }
 </script>

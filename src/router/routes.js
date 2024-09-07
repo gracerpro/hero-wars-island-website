@@ -38,7 +38,7 @@ export default [
         component: () => import("../views/TheNews.vue"),
       },
       {
-        path: "news/:slug(\\[a-zA-Z0-9\-]+)",
+        path: "news/:slug([a-zA-Z0-9\\-]+)",
         name: "newsView",
         component: () => import("../views/TheNewsView.vue"),
       },
