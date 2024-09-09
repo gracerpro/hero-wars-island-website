@@ -71,7 +71,11 @@
     <h2 class="mt-4">{{ t("common.news") }}</h2>
 
     <div v-if="newsLoading">
-      <div v-for="i in visibleNewsMax" :key="i" class="mb-3">
+      <div
+        v-for="i in visibleNewsMax"
+        :key="i"
+        class="mb-3"
+      >
         <div class="placeholder-glow">
           <div class="placeholder col-6"></div>
         </div>
@@ -81,16 +85,25 @@
       </div>
     </div>
     <p v-else-if="!news.length">
-      {{ t('common.noData') }}
+      {{ t("common.noData") }}
     </p>
     <div>
-      <div v-for="oneNews in news" :key="oneNews.id" class="mb-2">
+      <div
+        v-for="oneNews in news"
+        :key="oneNews.id"
+        class="mb-2"
+      >
         <h4>
           <router-link
-           :to="createI18nRouteTo({ name: 'newsView', params: { slug: oneNews.slug } })"
-          >{{ oneNews.name }}</router-link>
+            :to="createI18nRouteTo({ name: 'newsView', params: { slug: oneNews.slug } })"
+            >{{ oneNews.name }}</router-link
+          >
         </h4>
-        <div v-html="oneNews.snippet" class="news-item"></div>
+        <div class="fst-italic">{{ fromCurrentDate(oneNews.createdAt, locale) }}</div>
+        <div
+          v-html="oneNews.snippet"
+          class="news-item"
+        ></div>
       </div>
     </div>
   </div>
@@ -105,7 +118,7 @@ import { createI18nRouteTo } from "@/i18n/translation";
 import { useRoute } from "vue-router";
 import { useSSRContext } from "vue";
 
-const visibleNewsMax = 3
+const visibleNewsMax = 5;
 
 const { t, locale } = useI18n();
 const route = useRoute();
@@ -141,8 +154,8 @@ onMounted(() => {
 });
 
 function load() {
-  loadIslands()
-  loadNews()
+  loadIslands();
+  loadNews();
 }
 
 function loadIslands() {
@@ -164,7 +177,7 @@ function loadNews() {
     .getList(3)
     .then((list) => {
       news.value = list.items;
-      newsTotalCount.value = list.totalCount
+      newsTotalCount.value = list.totalCount;
     })
     .finally(() => (newsLoading.value = false));
 }
@@ -182,7 +195,7 @@ function getIslandHint(island) {
       dateTo: fromCurrentDate(island.eventEndAt, locale.value),
     });
   } else {
-    const toEndHours = (island.eventEndAt - now) / 1000 / 60 / 60
+    const toEndHours = (island.eventEndAt - now) / 1000 / 60 / 60;
 
     if (toEndHours >= 24) {
       result = t("page.home.toDateDaysCount", {
@@ -190,7 +203,7 @@ function getIslandHint(island) {
         daysCount: Math.ceil(toEndHours / 24),
       });
     } else if (toEndHours < 1) {
-      const toEndMinutes = ((island.eventEndAt - now) / 1000 / 60) % 60
+      const toEndMinutes = ((island.eventEndAt - now) / 1000 / 60) % 60;
       result = t("page.home.toDateMinutesCount", {
         toDate: fromCurrentDate(island.eventEndAt, locale.value),
         minutesCount: Math.ceil(toEndMinutes),

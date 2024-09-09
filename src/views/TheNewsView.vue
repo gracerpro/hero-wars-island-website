@@ -7,16 +7,22 @@
       <div class="placeholder-glow">
         <span class="placeholder col-1"></span>
       </div>
-      <row-loading  />
+      <row-loading />
     </div>
-    <div v-else-if="errorMessage" class="alert alert-danger mt-3">
+    <div
+      v-else-if="errorMessage"
+      class="alert alert-danger mt-3"
+    >
       {{ errorMessage }}
     </div>
     <div v-else>
       <h1>{{ oneNews.name }}</h1>
-      <div class="fst-italic">{{ fromCurrentDate(oneNews.createdAt) }}</div>
+      <div class="fst-italic">{{ fromCurrentDate(oneNews.createdAt, locale) }}</div>
 
-      <div v-html="oneNews.content" class="mt-4"></div>
+      <div
+        v-html="oneNews.content"
+        class="mt-4"
+      ></div>
     </div>
   </div>
 </template>
@@ -31,7 +37,7 @@ import { useI18n } from "vue-i18n";
 import { setMetaInfo } from "@/services/page-meta";
 import { useSSRContext } from "vue";
 
-const { t } = useI18n();
+const { t, locale } = useI18n();
 const route = useRoute();
 const ssrContext = import.meta.env.SSR ? useSSRContext() : null;
 
@@ -48,12 +54,12 @@ const oneNews = ref({
   slug: "",
   name: "",
   content: "",
-})
+});
 
 watch(
   () => route.params.locale,
   () => {
-    loadOneNews()
+    loadOneNews();
   }
 );
 
@@ -62,26 +68,25 @@ onServerPrefetch(async () => {
   setPageInfo(oneNews);
 });
 
-loadOneNews()
+loadOneNews();
 
 async function loadOneNews() {
-  loading.value = true
+  loading.value = true;
   try {
-    oneNews.value = await client.news.get(slug)
+    oneNews.value = await client.news.get(slug);
   } catch (error) {
     if (error instanceof HttpError && error.statusCode === 404) {
       errorMessage.value = t("common.pageNotFound");
     } else {
-      throw error
+      throw error;
     }
-  }
-  finally {
+  } finally {
     if (!import.meta.env.SSR) {
       loading.value = false;
     }
   }
 
-  return oneNews.value
+  return oneNews.value;
 }
 
 /**

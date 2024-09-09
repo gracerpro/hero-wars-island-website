@@ -22,7 +22,11 @@ export default class News {
       params += "&pageNumber=" + pageNumber;
     }
     if (filter && Object.keys(filter).length) {
-      params += "&" + Object.keys(filter).map(key => `filter[${key}]=${encodeURIComponent(filter[key])}`).join('&')
+      params +=
+        "&" +
+        Object.keys(filter)
+          .map((key) => `filter[${key}]=${encodeURIComponent(filter[key])}`)
+          .join("&");
     }
 
     const list = await this._apiRequest.get("/news", params);
@@ -39,11 +43,11 @@ export default class News {
    * @returns {Promise<Object>}
    */
   async get(slug) {
-    let oneNews = await this._apiRequest.get("/news/view?slug=" + slug)
+    let oneNews = await this._apiRequest.get("/news/view?slug=" + slug);
 
-    this.modifyOneNews(oneNews)
+    this.modifyOneNews(oneNews);
 
-    return oneNews
+    return oneNews;
   }
 
   /**
