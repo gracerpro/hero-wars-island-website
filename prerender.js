@@ -12,9 +12,13 @@ const manifest = JSON.parse(
 const template = fs.readFileSync('./dist/static/index.html', 'utf-8')
 const { render } = await import('./dist/server/entry-server.js')
 
+const NAME_ISLAND = "island";
+const NAME_NEWS = "news";
+
 const enLocale = "en";
 const dynamicNamesMap = {
-  "island": true
+  [NAME_ISLAND]: true,
+  [NAME_NEWS]: true,
 };
 const urls = await getUrls(dynamicNamesMap);
 
@@ -118,6 +122,14 @@ function initDirectories() {
   if (!fs.existsSync(enIslandsDirectory)) {
     fs.mkdirSync(enIslandsDirectory);
   }
+  const newsDirectory = "./dist/static/news";
+  if (!fs.existsSync(newsDirectory)) {
+    fs.mkdirSync(newsDirectory);
+  }
+  const enNewsDirectory = `./dist/static/${enLocale}/news`;
+  if (!fs.existsSync(enNewsDirectory)) {
+    fs.mkdirSync(enNewsDirectory);
+  }
 }
 
 function getUrlName(fileName) {
@@ -138,7 +150,7 @@ function camelToKebab(text) {
 }
 
 async function getDynamicNames(name) {
-  if (name === "island") {
+  if (name === NAME_ISLAND) {
     const pageSize = 100;
     const url = `${env.VITE_BACKEND_API_URL}/islands/?pageSize=${pageSize}`;
     console.log(`fetch ${url}`)
@@ -151,6 +163,22 @@ async function getDynamicNames(name) {
     }
 
     return list.items.map((island) => `islands/${island.id}`);
+  }
+  if (name === NAME_NEWS) {
+    const pageSize = 50;
+    const url = `${env.VITE_BACKEND_API_URL}/news/?pageSize=${pageSize}`;
+    console.log(`fetch ${url}`)
+    const response = await fetch(url);
+    const list = await response.json();
+    console.log(`ok, ${list.totalCount}`)
+
+    if (list.totalCount > pageSize) {
+      throw new Error("The total page size more than limit.");
+    }
+
+    console.log(list.items)
+
+    return list.items.map((oneNews) => `news/${oneNews.slug}`);
   }
 
   throw new Error(`Unknown dynamic name ${name}!`);

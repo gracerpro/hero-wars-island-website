@@ -81,9 +81,7 @@ async function loadOneNews() {
       throw error;
     }
   } finally {
-    if (!import.meta.env.SSR) {
-      loading.value = false;
-    }
+    loading.value = false;
   }
 
   return oneNews.value;
