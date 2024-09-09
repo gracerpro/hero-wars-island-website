@@ -89,7 +89,7 @@ const { t, locale } = useI18n();
 const ssrContext = import.meta.env.SSR ? useSSRContext() : null;
 const route = useRoute();
 
-const PAGE_SIZE = 2;
+const PAGE_SIZE = 6;
 const filterNameMinCharsCount = 3;
 
 const client = new HeroClient();
