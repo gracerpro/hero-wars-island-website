@@ -1,5 +1,12 @@
 # History
 
+## v1.5.1 at 2024-09-09
+
+What has been done
+
+* Add news
+
+
 ## v1.4.1 at 2024-08-30
 
 What has been done
