@@ -174,7 +174,7 @@ function loadIslands() {
 function loadNews() {
   newsLoading.value = true;
   client.news
-    .getList(3)
+    .getList(visibleNewsMax)
     .then((list) => {
       news.value = list.items;
       newsTotalCount.value = list.totalCount;
