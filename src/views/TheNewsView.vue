@@ -64,8 +64,7 @@ watch(
 );
 
 onServerPrefetch(async () => {
-  const oneNews = await loadOneNews(slug);
-  setPageInfo(oneNews);
+  return loadOneNews(slug);
 });
 
 loadOneNews();
@@ -83,6 +82,8 @@ async function loadOneNews() {
   } finally {
     loading.value = false;
   }
+
+  setPageInfo(oneNews.value);
 
   return oneNews.value;
 }

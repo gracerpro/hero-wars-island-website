@@ -61,8 +61,7 @@ const islandDescription = computed(() => currentIsland.value?.description);
 const islandId = parseInt(route.params.id);
 
 onServerPrefetch(async () => {
-  const island = await loadIsland(islandId);
-  setPageInfo(island);
+  return loadIsland(islandId);
 });
 
 onMounted(() => {
@@ -84,14 +83,16 @@ onMounted(() => {
     }
   );
 
-  loadIsland(islandId).then((island) => setPageInfo(island));
+  loadIsland(islandId);
 });
 
 function setPageInfo(island) {
+  const defaultTitle = t("common.islandMap")
+
   if (island) {
     setMetaInfo(
       {
-        title: island.pageTitle,
+        title: island.pageTitle ? island.pageTitle : defaultTitle,
         description: island.pageDescription,
         keywords: island.pageKeywords,
       },
@@ -100,7 +101,7 @@ function setPageInfo(island) {
   } else {
     setMetaInfo(
       {
-        title: t("common.islandMap"),
+        title: defaultTitle,
         description: t("seo.island.description"),
         keywords: t("seo.island.keywords"),
       },
@@ -146,6 +147,8 @@ async function loadIsland(id) {
       islandLoading.value = false;
     }
   }
+
+  setPageInfo(currentIsland.value)
 
   return currentIsland.value;
 }
