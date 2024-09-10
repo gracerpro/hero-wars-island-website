@@ -91,9 +91,9 @@ function setPageInfo(island) {
   if (island) {
     setMetaInfo(
       {
-        title: island.name + " - " + t("common.projectName"),
-        description: t("seo.island.description") + " " + island.name,
-        keywords: t("seo.island.keywords") + ", " + island.name,
+        title: island.pageTitle,
+        description: island.pageDescription,
+        keywords: island.pageKeywords,
       },
       ssrContext
     );
