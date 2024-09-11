@@ -3,7 +3,7 @@
  * @param {Object} manifest
  * @param {String} template
  * @param {Function} render
- * @returns {String}
+ * @returns {Promise<Object>}
  */
 export async function getHtml(url, manifest, template, render) {
   // 4. render the app HTML. This assumes entry-server.js's exported

@@ -16,14 +16,9 @@ const NAME_ISLAND = "island";
 const NAME_NEWS_VIEW = "news-view";
 
 const enLocale = "en";
-const dynamicNamesMap = {
-  [NAME_ISLAND]: true,
-  [NAME_NEWS_VIEW]: true,
-};
-const urls = await getUrls(dynamicNamesMap);
 
 initDirectories();
-
+const urls = await readUrlsFromView();
 await createFiles(urls);
 
 // done, delete .vite directory including ssr manifest
@@ -36,7 +31,11 @@ fs.rmSync('./dist/static/.vite', { recursive: true })
  * @param {String[]} urls
  */
 async function createFiles(urls) {
+  console.log("Create a files...")
+
   const enUrl = `/${enLocale}`;
+  const basePath = "./dist/static"
+  console.log("base path", basePath);
 
   for (const url of urls) {
     const { html } = await getHtml(url, manifest, template, render);
@@ -50,20 +49,25 @@ async function createFiles(urls) {
     } else {
       path = url;
     }
-    const filePath = `./dist/static${path}.html`
+    const pathName = path + ".html"
+    const filePath = basePath + pathName
     fs.writeFileSync(filePath, html)
 
-    console.log('pre-rendered:', filePath, "size", html.length);
+    console.log('pre-rendered:', pathName, "size", html.length);
   }
 }
 
 /**
- * @param {Object} dynamicNamesMap
- * @returns {String[]}
+ * @returns {Promise<String[]>}
  */
-async function getUrls(dynamicNamesMap) {
-  let urls = [];
+async function readUrlsFromView() {
+  console.log("Read urls from view...");
 
+  const dynamicNamesMap = {
+    [NAME_ISLAND]: true,
+    [NAME_NEWS_VIEW]: true,
+  };
+  let urls = [];
   const files = fs.readdirSync("./src/views", { withFileTypes: true, recursive: false });
 
   for (let i = 0; i < files.length; ++i) {
@@ -76,14 +80,17 @@ async function getUrls(dynamicNamesMap) {
     let name = getUrlName(file.name);
 
     if (dynamicNamesMap[name]) {
-      const list = await getDynamicNames(name);
-      list.forEach((dynamicName) => {
-        console.log(dynamicName);
+      console.log(`- dynamic name! "${name}", get names...`)
+      const names = await getDynamicNames(name);
+      console.log("found", names.length)
+
+      names.forEach((dynamicName) => {
+        console.log("--", dynamicName);
         urls.push(`/${dynamicName}`);
         urls.push(`/${enLocale}/${dynamicName}`);
       })
     } else {
-      console.log(name);
+      console.log("-", name);
       if (name === "home") {
         urls.push("/");
         urls.push(`/${enLocale}`);
@@ -101,7 +108,7 @@ async function getUrls(dynamicNamesMap) {
       }
 
       let name = getUrlName(file.name);
-      console.log(name);
+      console.log("-", name);
 
       urls.push(`/${name}`);
     })
@@ -110,26 +117,24 @@ async function getUrls(dynamicNamesMap) {
 }
 
 function initDirectories() {
-  const enDirectory = `./dist/static/${enLocale}`;
-  if (!fs.existsSync(enDirectory)) {
-    fs.mkdirSync(enDirectory);
-  }
-  const islandsDirectory = "./dist/static/islands";
-  if (!fs.existsSync(islandsDirectory)) {
-    fs.mkdirSync(islandsDirectory);
-  }
-  const enIslandsDirectory = `./dist/static/${enLocale}/islands`;
-  if (!fs.existsSync(enIslandsDirectory)) {
-    fs.mkdirSync(enIslandsDirectory);
-  }
-  const newsDirectory = "./dist/static/news";
-  if (!fs.existsSync(newsDirectory)) {
-    fs.mkdirSync(newsDirectory);
-  }
-  const enNewsDirectory = `./dist/static/${enLocale}/news`;
-  if (!fs.existsSync(enNewsDirectory)) {
-    fs.mkdirSync(enNewsDirectory);
-  }
+  console.log("Init directories...")
+
+  const basePath = "./dist/static/"
+  const directories = [
+    enLocale,
+    "islands",
+    enLocale + "/islands",
+    "news",
+    enLocale + "/news"
+  ];
+
+  directories.forEach((path) => {
+    console.log("- ", path);
+    const directory = basePath + path;
+    if (!fs.existsSync(directory)) {
+      fs.mkdirSync(directory);
+    }
+  })
 }
 
 function getUrlName(fileName) {
@@ -149,35 +154,85 @@ function camelToKebab(text) {
   }).join('');
 }
 
+/**
+ * @param {String} name 
+ * @returns {Promise<String[]>}
+ */
 async function getDynamicNames(name) {
+  const pageSize = 50;
+
   if (name === NAME_ISLAND) {
-    const pageSize = 100;
-    const url = `${env.VITE_BACKEND_API_URL}/islands/?pageSize=${pageSize}`;
-    console.log(`fetch ${url}`)
-    const response = await fetch(url);
-    const list = await response.json();
-    console.log(`ok, ${list.totalCount}`)
-
-    if (list.totalCount > pageSize) {
-      throw new Error("The total page size more than limit.");
-    }
-
-    return list.items.map((island) => `islands/${island.id}`);
+    return await loadListNames(
+      loadIslands,
+      pageSize,
+      (island) => `islands/${island.id}`
+    )
   }
   if (name === NAME_NEWS_VIEW) {
-    const pageSize = 50;
-    const url = `${env.VITE_BACKEND_API_URL}/news/?pageSize=${pageSize}`;
-    console.log(`fetch ${url}`)
-    const response = await fetch(url);
-    const list = await response.json();
-    console.log(`ok, ${list.totalCount}`)
-
-    if (list.totalCount > pageSize) {
-      throw new Error("The total page size more than limit.");
-    }
-
-    return list.items.map((oneNews) => `news/${oneNews.slug}`);
+    return await loadListNames(
+      loadNews,
+      pageSize,
+      (oneNews) => `news/${oneNews.slug}`
+    )
   }
 
   throw new Error(`Unknown dynamic name ${name}!`);
+}
+
+/**
+ * @param {Function} loadItems
+ * @param {Number} pageSize
+ * @param {Function} modifyItem
+ * @returns {Promise<String[]>}
+ */
+async function loadListNames(loadItems, pageSize, modifyItem) {
+  let pageNumber = 1
+  let resultNames = [];
+
+  while (true) {
+    console.log(`load items by number ${pageNumber} and size ${pageSize}...`)
+    const list = await loadItems(pageNumber, pageSize);
+    console.log(`ok, items size ${list.items.length}`)
+
+    if (!list.items.length) {
+      break;
+    }
+
+    const names = list.items.map(modifyItem)
+    resultNames.push(...names)
+
+    if (pageNumber * pageSize >= list.totalCount) {
+      break;
+    }
+
+    pageNumber++;
+  }
+
+  return resultNames;
+}
+
+/**
+ * @param {Number} pageNumber
+ * @param {Number} pageSize
+ * @returns {Promise<Object>}
+ */
+async function loadIslands(pageNumber, pageSize = 100) {
+  const url = `${env.VITE_BACKEND_API_URL}/islands/?pageNumber=${pageNumber}&pageSize=${pageSize}`;
+  const response = await fetch(url);
+  const list = await response.json();
+
+  return list;
+}
+
+/**
+ * @param {Number} pageNumber
+ * @param {Number} pageSize
+ * @returns {Promise<Object>}
+ */
+async function loadNews(pageNumber, pageSize = 50) {
+  const url = `${env.VITE_BACKEND_API_URL}/news/?pageNumber=${pageNumber}&pageSize=${pageSize}`;
+  const response = await fetch(url);
+  const list = await response.json();
+
+  return list;
 }
