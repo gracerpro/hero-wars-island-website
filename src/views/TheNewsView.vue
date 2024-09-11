@@ -67,6 +67,7 @@ onServerPrefetch(async () => {
   return loadOneNews(slug);
 });
 
+setDefaultPageInfo()
 loadOneNews();
 
 async function loadOneNews() {
@@ -77,6 +78,8 @@ async function loadOneNews() {
     if (error instanceof HttpError && error.statusCode === 404) {
       errorMessage.value = t("common.pageNotFound");
     } else {
+      // on update a page
+      // TODO: FetchError: request to http://backend-hero-wars.local:8080/news/view?slug=xxx failed, reason: connect ECONNREFUSED 127.0.0.1:8080
       throw error;
     }
   } finally {
@@ -102,14 +105,18 @@ function setPageInfo(oneNews) {
       ssrContext
     );
   } else {
-    setMetaInfo(
-      {
-        title: t("common.news"),
-        description: t("common.news"),
-        keywords: t("common.news"),
-      },
-      ssrContext
-    );
+    setDefaultPageInfo()
   }
+}
+
+function setDefaultPageInfo() {
+  setMetaInfo(
+    {
+      title: t("common.news"),
+      description: t("common.news"),
+      keywords: t("common.news"),
+    },
+    ssrContext
+  );
 }
 </script>
