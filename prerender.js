@@ -13,12 +13,12 @@ const template = fs.readFileSync('./dist/static/index.html', 'utf-8')
 const { render } = await import('./dist/server/entry-server.js')
 
 const NAME_ISLAND = "island";
-const NAME_NEWS = "news";
+const NAME_NEWS_VIEW = "news-view";
 
 const enLocale = "en";
 const dynamicNamesMap = {
   [NAME_ISLAND]: true,
-  [NAME_NEWS]: true,
+  [NAME_NEWS_VIEW]: true,
 };
 const urls = await getUrls(dynamicNamesMap);
 
@@ -164,7 +164,7 @@ async function getDynamicNames(name) {
 
     return list.items.map((island) => `islands/${island.id}`);
   }
-  if (name === NAME_NEWS) {
+  if (name === NAME_NEWS_VIEW) {
     const pageSize = 50;
     const url = `${env.VITE_BACKEND_API_URL}/news/?pageSize=${pageSize}`;
     console.log(`fetch ${url}`)
@@ -175,8 +175,6 @@ async function getDynamicNames(name) {
     if (list.totalCount > pageSize) {
       throw new Error("The total page size more than limit.");
     }
-
-    console.log(list.items)
 
     return list.items.map((oneNews) => `news/${oneNews.slug}`);
   }
