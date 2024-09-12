@@ -5,7 +5,8 @@ import { getHtml } from './common.js'
 import fetch from "node-fetch";
 import { loadEnv } from 'vite';
 
-const env = loadEnv("production", process.cwd());
+const envName = process.env.NODE_ENV ? process.env.NODE_ENV : "production"
+const env = loadEnv(envName, process.cwd());
 const manifest = JSON.parse(
   fs.readFileSync('./dist/static/.vite/ssr-manifest.json', 'utf-8'),
 )
@@ -218,6 +219,7 @@ async function loadListNames(loadItems, pageSize, modifyItem) {
  */
 async function loadIslands(pageNumber, pageSize = 100) {
   const url = `${env.VITE_BACKEND_API_URL}/islands/?pageNumber=${pageNumber}&pageSize=${pageSize}`;
+  console.log("fetch", url)
   const response = await fetch(url);
   const list = await response.json();
 
@@ -231,6 +233,7 @@ async function loadIslands(pageNumber, pageSize = 100) {
  */
 async function loadNews(pageNumber, pageSize = 50) {
   const url = `${env.VITE_BACKEND_API_URL}/news/?pageNumber=${pageNumber}&pageSize=${pageSize}`;
+  console.log("fetch", url)
   const response = await fetch(url);
   const list = await response.json();
 

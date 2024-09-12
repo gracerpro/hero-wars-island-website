@@ -78,7 +78,7 @@ async function loadOneNews() {
     if (error instanceof HttpError && error.statusCode === 404) {
       errorMessage.value = t("common.pageNotFound");
     } else {
-      // on update a page
+      // on update a page, local docker
       // TODO: FetchError: request to http://backend-hero-wars.local:8080/news/view?slug=xxx failed, reason: connect ECONNREFUSED 127.0.0.1:8080
       throw error;
     }
