@@ -187,10 +187,10 @@ async function getDynamicNames(name) {
  * @returns {Promise<String[]>}
  */
 async function loadListNames(loadItems, pageSize, modifyItem) {
-  let pageNumber = 1
   let resultNames = [];
+  const maxIteration = 50;
 
-  while (true) {
+  for (let pageNumber = 1; ; ++pageNumber) {
     console.log(`load items by number ${pageNumber} and size ${pageSize}...`)
     const list = await loadItems(pageNumber, pageSize);
     console.log(`ok, items size ${list.items.length}`)
@@ -205,8 +205,9 @@ async function loadListNames(loadItems, pageSize, modifyItem) {
     if (pageNumber * pageSize >= list.totalCount) {
       break;
     }
-
-    pageNumber++;
+    if (pageNumber > maxIteration) {
+      break;
+    }
   }
 
   return resultNames;
