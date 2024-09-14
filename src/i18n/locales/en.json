@@ -127,6 +127,7 @@
       "downloadMapInFormat": "Download map in {format} format",
       "downloadMapSize": "Map size {mapSize} points",
       "downloadVerticalAndHorizontalCount": "Vertical cells quantity {verticalCount}, horizontal cells quantity {horizontalCount}",
+      "gameVersionWhenSyncCells": "The version of the game when syncing cells",
       "going": "Going",
       "failNodesLoading": "Failed to load map nodes",
       "helpFullscreenExit": "Esc - exit fullscreen mode.",
@@ -138,15 +139,16 @@
       "isShowQuantity": "Is show quantity?",
       "quantityHint": "The default is 1. If there are several names, then the first number corresponds to the first name, etc.",
       "myExplorersMoves": "My explorer's moves",
-      "oneResource": "One resource",
-      "planning": "Planing",
-      "resourcesOnMap": "Map resources",
-      "selectedResources": "Selected resources",
       "namesByComma": "Several names are separated by a comma.",
       "notFoundNodeAdmin": "The node was not found. Contact the administrators.",
       "notFoundStartNodeAdmin": "The entry node was not found. Contact the administrators.",
       "notLinkedImage": "image is not linked",
-      "notLinkedResource": "Resources are not linked"
+      "notLinkedResource": "Resources are not linked",
+      "oneResource": "One resource",
+      "planning": "Planing",
+      "resourcesOnMap": "Map resources",
+      "selectedResources": "Selected resources",
+      "whenWasCellSynchronization": "When was cell synchronization"
     }
   },
   "seo": {

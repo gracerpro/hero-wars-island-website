@@ -127,6 +127,7 @@
       "downloadMapInFormat": "Скачать карту в формате {format}",
       "downloadMapSize": "Размер изображения {mapSize} точек",
       "downloadVerticalAndHorizontalCount": "Количество ячеек по вертикали {verticalCount}, по горизонтали - {horizontalCount}",
+      "gameVersionWhenSyncCells": "Версия игры при синхронизации ячеек",
       "going": "Хожу",
       "failNodesLoading": "Не удалось загрузить узлы карты.",
       "helpFullscreenExit": "Esc - выйти из полноэкранного режима.",
@@ -138,15 +139,16 @@
       "isShowQuantity": "Показывать количество?",
       "quantityHint": "По-умолчанию 1. Если названий несколько, то первое количество соответствует первому названию и т. д.",
       "myExplorersMoves": "Мои ходы",
-      "oneResource": "Один ресурс",
-      "planning": "Планирование",
-      "resourcesOnMap": "Ресурсы на карте",
-      "selectedResources": "Выбранные ресурсы",
       "namesByComma": "Несколько названий разделяется запятой.",
       "notFoundNodeAdmin": "Узел не найден. Обратитесь к администраторам.",
       "notFoundStartNodeAdmin": "Не найден узел входа. Обратитесь к администраторам.",
       "notLinkedImage": "изображение не привязано",
-      "notLinkedResource": "Ресурсы не привязаны"
+      "notLinkedResource": "Ресурсы не привязаны",
+      "oneResource": "Один ресурс",
+      "planning": "Планирование",
+      "resourcesOnMap": "Ресурсы на карте",
+      "selectedResources": "Выбранные ресурсы",
+      "whenWasCellSynchronization": "Когда была синхронизация ячеек"
     }
   },
   "seo": {

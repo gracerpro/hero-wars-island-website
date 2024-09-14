@@ -67,7 +67,7 @@ onServerPrefetch(async () => {
   return loadOneNews(slug);
 });
 
-setDefaultPageInfo()
+setDefaultPageInfo();
 loadOneNews();
 
 async function loadOneNews() {
@@ -105,7 +105,7 @@ function setPageInfo(oneNews) {
       ssrContext
     );
   } else {
-    setDefaultPageInfo()
+    setDefaultPageInfo();
   }
 }
 

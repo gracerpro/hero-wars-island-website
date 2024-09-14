@@ -1,6 +1,24 @@
 <template>
   <div class="container">
-    <h1>{{ islandName }}</h1>
+    <div class="d-flex justify-content-between align-items-center">
+      <h1>{{ islandName }}</h1>
+      <span
+        v-if="currentIsland"
+        class="fst-italic"
+      >
+        <span
+          v-if="currentIsland.syncGameVersion"
+          :title="t('page.island.gameVersionWhenSyncCells')"
+          >{{ currentIsland.syncGameVersion }}</span
+        >
+        <span
+          v-if="currentIsland.syncAt"
+          :title="t('page.island.whenWasCellSynchronization')"
+          class="ms-2"
+          >{{ currentIsland.syncAt }}</span
+        >
+      </span>
+    </div>
 
     <island-map-loading v-if="islandLoading" />
     <div
@@ -87,7 +105,7 @@ onMounted(() => {
 });
 
 function setPageInfo(island) {
-  const defaultTitle = t("common.islandMap")
+  const defaultTitle = t("common.islandMap");
 
   if (island) {
     setMetaInfo(
@@ -148,7 +166,7 @@ async function loadIsland(id) {
     }
   }
 
-  setPageInfo(currentIsland.value)
+  setPageInfo(currentIsland.value);
 
   return currentIsland.value;
 }
