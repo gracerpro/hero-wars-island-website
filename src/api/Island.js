@@ -30,15 +30,13 @@ export default class Island {
   }
 
   /**
-   * @param {Boolean} isWithDescription
    * @returns {Promise<Object|null>}
    */
-  async getActual(isWithDescription) {
-    let params = undefined;
-
-    if (isWithDescription) {
-      params = { isWithDescription: isWithDescription ? 1 : 0 };
-    }
+  async getActual() {
+    const params = {
+      isWithSeo: 0,
+      isWithDescription: 0
+    };
     let island = await this._apiRequest.get("/islands/actual", params);
 
     if (island) {
@@ -54,7 +52,11 @@ export default class Island {
    * @returns {Promise<Object|null>}
    */
   async getList(pageSize, pageNumber = 1) {
-    const params = { pageSize };
+    const params = {
+      pageSize,
+      "fields[isWithDescription]": 0,
+      "fields[isWithSeo]": 0,
+    };
 
     if (pageNumber > 1) {
       params.pageNumber = pageNumber;
