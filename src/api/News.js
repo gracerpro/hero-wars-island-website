@@ -16,7 +16,7 @@ export default class News {
    * @returns {Promise<Object|null>}
    */
   async getList(pageSize, pageNumber = 1, filter = null) {
-    let params = "pageSize=" + pageSize;
+    let params = `pageSize=${pageSize}&fields[isWithSeo]=0&fields[isWithContent]=0`;
 
     if (pageNumber > 1) {
       params += "&pageNumber=" + pageNumber;
