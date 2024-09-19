@@ -35,7 +35,7 @@ export default class Island {
   async getActual() {
     const params = {
       isWithSeo: 0,
-      isWithDescription: 0
+      isWithDescription: 0,
     };
     let island = await this._apiRequest.get("/islands/actual", params);
 

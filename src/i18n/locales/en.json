@@ -88,13 +88,14 @@
     },
     "contact": {
       "canBeEmpty": "Can be empty",
+      "ctrlF5": "If something doesn't work, then maybe a magic page refresh will help, Ctrl+F5.",
       "email": "Email",
+      "fillFieldsForContact": "If you have any interesting ideas or questions, please fill in the following fields on the contact form. Thanks!",
       "message": "Message",
       "messageWasCreated": "The message was successfully created.",
+      "messagesDisplayedByAdministrator": "Messages verified by the administrator are displayed.",
       "theme": "Theme",
-      "username": "Username",
-      "fillFieldsForContact": "If you have any interesting ideas or questions, please fill in the following fields on the contact form. Thanks!",
-      "ctrlF5": "If something doesn't work, then maybe a magic page refresh will help, Ctrl+F5."
+      "username": "Username"
     },
     "help": {
       "helpToProject": "Project's help",
