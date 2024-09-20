@@ -165,7 +165,8 @@ function loadIslands() {
     .then((list) => {
       islands.value = list.items;
     })
-    .catch(() => {
+    .catch((error) => {
+      console.error(error);
       errorMessage.value = t("common.loadingFailDeveloperShow");
     })
     .finally(() => (islandsLoading.value = false));
@@ -178,6 +179,9 @@ function loadNews() {
     .then((list) => {
       news.value = list.items;
       newsTotalCount.value = list.totalCount;
+    })
+    .catch((error) => {
+      console.error(error);
     })
     .finally(() => (newsLoading.value = false));
 }

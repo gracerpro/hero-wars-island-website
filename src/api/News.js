@@ -12,7 +12,7 @@ export default class News {
   /**
    * @param {Number} pageSize
    * @param {Number} pageNumber
-   * @param {Object} filter
+   * @param {Object|null} filter
    * @returns {Promise<Object|null>}
    */
   async getList(pageSize, pageNumber = 1, filter = null) {
