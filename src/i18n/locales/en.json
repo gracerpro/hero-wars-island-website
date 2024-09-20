@@ -101,11 +101,10 @@
       "helpToProject": "Project's help",
       "paragraph1": "Anyone who wants to help, I will be glad.",
       "help1": "Frontend developers, the site code is open! {link}",
-      "help2": "Make normal resource icons, without artifacts.",
-      "help4": "Suggest ideas.",
-      "todo1": "Add news.",
-      "todo2": "Make a button \"show the whole island\".",
-      "todo4": "Add autotests."
+      "help2": "Solve the problem from the feedback",
+      "help3": "Suggest an ideas",
+      "help4": "To optimize something",
+      "help5": "Something to improve"
     },
     "home": {
       "actual": "Actual",

@@ -23,14 +23,9 @@
         </ul>
       </li>
       <li>{{ t("page.help.help2") }}</li>
+      <li>{{ t("page.help.help3") }}</li>
       <li>{{ t("page.help.help4") }}</li>
-    </ul>
-
-    <h2>TODO</h2>
-    <ul>
-      <li>{{ t("page.help.todo1") }}</li>
-      <li>{{ t("page.help.todo2") }}</li>
-      <li>TypeScript</li>
+      <li>{{ t("page.help.help5") }}</li>
     </ul>
   </div>
 </template>
