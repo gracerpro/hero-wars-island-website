@@ -190,7 +190,7 @@ const helpDialogComponent = shallowRef(null);
 
 const isShowReloadMap = computed(() => {
   return import.meta.env.DEV;
-})
+});
 
 function onResetTranslate() {
   emit(EVENT_RESET_TRANSLATE);
