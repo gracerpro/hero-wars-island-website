@@ -104,6 +104,7 @@ import {
 import { getIconsItems, getDrawedNodes, SIDE } from "./map";
 import { useI18n } from "vue-i18n";
 import IslandMapInfoDialog from "./IslandMapInfoDialog.vue";
+import { GAME_ID_WOOD } from "@/api/Item";
 
 const { t } = useI18n();
 
@@ -176,6 +177,9 @@ function getNodeClass(node) {
 
   if (node.statusId == STATUS_NOT_SURE) {
     nodeClass += " -warning";
+  }
+  if (node.cost?.gameItemId === GAME_ID_WOOD) {
+    nodeClass += " node-cost-wood";
   }
 
   return nodeClass;
@@ -389,6 +393,14 @@ function getItemName(item) {
 }
 .node-blocker:hover {
   fill: #9c8e8e;
+}
+.node-cost-wood {
+  fill: #fff;
+  stroke-width: 5;
+  stroke: #773e23;
+}
+.node-cost-wood:hover {
+  fill: #f1f1f1;
 }
 .-warning {
   fill: #ffff00;

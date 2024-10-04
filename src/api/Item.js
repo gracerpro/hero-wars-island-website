@@ -16,6 +16,8 @@ export const TYPE_UNKNOWN = 12;
 
 // TODO: const TYPE_BANNER_STONE = 4;
 
+export const GAME_ID_WOOD = 53;
+
 export default class Item {
   constructor() {
     this._apiRequest = new ApiRequest();
