@@ -17,6 +17,7 @@
         @change-translate="onChangeTranslate"
         @fullscreen-on="onFullscreen"
         @begin-download="onBeginDownload"
+        @reload-map="forceReloadMap"
       />
       <island-map-container
         :scale="scale"
@@ -245,11 +246,7 @@ const totalNodesCount = computed(() => {
 });
 
 onMounted(() => {
-  loadNodes().then((responseNodes) => {
-    nodes.value = responseNodes;
-    items.value = calculateItems(responseNodes);
-    userNodesMap.value = initUserNodes(responseNodes);
-  });
+  reloadMap();
 });
 onUnmounted(() => {
   saveState();
@@ -257,12 +254,15 @@ onUnmounted(() => {
 
 loadState();
 
-async function loadNodes() {
+/**
+ * @param {Boolean} isForce
+ */
+async function loadNodes(isForce) {
   let nodes = {};
 
   loadingNodes.value = true;
   try {
-    nodes = await getNodesMap(props.island);
+    nodes = await getNodesMap(props.island, isForce);
   } catch (error) {
     errorMessage.value = t("page.island.failNodesLoading");
   } finally {
@@ -422,6 +422,22 @@ function onFullscreen() {
 
 function onBeginDownload() {
   downloadDialogComponent.value = IslandMapDownloadDialog;
+}
+
+function forceReloadMap() {
+  saveState();
+  reloadMap(true);
+}
+
+/**
+ * @param {Boolean} isForce
+ */
+function reloadMap(isForce = false) {
+  loadNodes(isForce).then((responseNodes) => {
+    nodes.value = responseNodes;
+    items.value = calculateItems(responseNodes);
+    userNodesMap.value = initUserNodes(responseNodes);
+  });
 }
 
 function onMountedDownloadDialog() {

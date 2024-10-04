@@ -5,9 +5,10 @@ const client = new HeroClient();
 
 /**
  * @param {Object} island
+ * @param {Boolean} isForce
  * @returns {Promise<Object>}
  */
-export async function getNodesMap(island) {
+export async function getNodesMap(island, isForce = false) {
   let nodesMap;
 
   try {
@@ -15,7 +16,7 @@ export async function getNodesMap(island) {
 
     if (!previosUpdatedAt || previosUpdatedAt < island.nodesLastUpdatedAt) {
       nodesMap = null;
-    } else {
+    } else if (!isForce) {
       nodesMap = await getNodesFromCache(island);
     }
   } catch (error) {
@@ -23,7 +24,7 @@ export async function getNodesMap(island) {
     nodesMap = null;
   }
 
-  if (nodesMap === null || nodesMap === undefined) {
+  if (nodesMap === null || nodesMap === undefined || isForce) {
     nodesMap = {};
     const list = await client.node.getList(island.id);
     list.items.forEach((node) => {

@@ -125,6 +125,20 @@
         ?
       </button>
     </div>
+    <div
+      v-if="isShowReloadMap"
+      class="btn-group-vertical w-100 mt-2"
+      role="group"
+    >
+      <button
+        type="button"
+        class="btn btn-secondary"
+        @click="emit(EVENT_RELOAD_MAP)"
+        title="Reload"
+      >
+        L
+      </button>
+    </div>
 
     <component
       :is="helpDialogComponent"
@@ -139,6 +153,7 @@ const EVENT_RESET_SCALE = "reset-scale";
 const EVENT_CHANGE_IS_SHOW_QUANTITY = "update:is-show-quantity";
 const EVENT_FULLSCREEN_ON = "fullscreen-on";
 const EVENT_BEGIN_DOWNLOAD = "begin-download";
+const EVENT_RELOAD_MAP = "reload-map";
 </script>
 <script setup>
 import HelpDialog from "./IslandMapHelpDialog.vue";
@@ -151,6 +166,7 @@ import {
   EVENT_CHANGE_SCALE,
 } from "@/services/island-map";
 import { useI18n } from "vue-i18n";
+import { computed } from "vue";
 
 const { t } = useI18n();
 
@@ -166,10 +182,15 @@ const emit = defineEmits([
   EVENT_CHANGE_IS_SHOW_QUANTITY,
   EVENT_FULLSCREEN_ON,
   EVENT_BEGIN_DOWNLOAD,
+  EVENT_RELOAD_MAP,
 ]);
 
 const helpDialog = ref(null);
 const helpDialogComponent = shallowRef(null);
+
+const isShowReloadMap = computed(() => {
+  return import.meta.env.DEV;
+})
 
 function onResetTranslate() {
   emit(EVENT_RESET_TRANSLATE);
@@ -187,7 +208,7 @@ function onChangeTranslate(dx, dy, event) {
     }
   }
   if (dy !== 0) {
-    y = dy * TRANSLATE_Y;
+    y = 5 * dy * TRANSLATE_Y;
     if (event.ctrlKey) {
       y /= 10;
     } else if (event.shiftKey) {
