@@ -7,11 +7,11 @@
         >{{ t("page.contact.theme") }}</label
       >
       <input
+        :id="formId + '__subject'"
+        ref="formSubject"
         v-model.trim="feedback.subject"
         :disabled="submiting"
         class="form-control"
-        :id="formId + '__subject'"
-        ref="formSubject"
         required
       />
     </div>
@@ -22,9 +22,9 @@
         >{{ t("page.contact.message") }}</label
       >
       <textarea
+        :id="formId + '__message'"
         v-model.trim="feedback.message"
         class="form-control"
-        :id="formId + '__message'"
         rows="3"
         :disabled="submiting"
         required
@@ -38,10 +38,10 @@
           >{{ t("page.contact.username") }}</label
         >
         <input
+          :id="formId + '__username'"
           v-model.trim="feedback.username"
           :disabled="submiting"
           class="form-control"
-          :id="formId + '__username'"
           :aria-describedby="formId + '__username__help'"
         />
         <div
@@ -58,11 +58,11 @@
           >{{ t("page.contact.email") }}</label
         >
         <input
+          :id="formId + '__email'"
           v-model.trim="feedback.email"
           :disabled="submiting"
           type="email"
           class="form-control"
-          :id="formId + '__email'"
           :aria-describedby="formId + '__email__help'"
         />
         <div
@@ -74,8 +74,8 @@
       </div>
     </div>
     <div
-      class="mb-3"
       v-show="errorMessage.length"
+      class="mb-3"
     >
       <div
         class="alert alert-danger mb-0"

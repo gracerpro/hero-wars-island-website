@@ -91,3 +91,10 @@ npm run generate
 build the `swagger.json` and move it to `/dist/static/backend-api`
 
 copy `dist/static/*` to `/public` on server
+
+
+##
+
+`npm update` warnings
+
+npm warn deprecated @humanwhocodes/config-array@0.13.0: Use @eslint/config-array instead

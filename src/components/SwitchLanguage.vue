@@ -8,8 +8,8 @@
         'btn ms-2',
         language.locale === currentLocale ? 'btn-success fw-bold' : 'btn-outline-success',
       ]"
-      @click="onChangeLanguage(language.locale)"
       type="button"
+      @click="onChangeLanguage(language.locale)"
     >
       {{ language.locale }}
     </button>

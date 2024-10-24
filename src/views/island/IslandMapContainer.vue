@@ -1,6 +1,7 @@
 <template>
   <div class="map">
     <svg
+      ref="svgMap"
       height="600"
       class="canvas"
       width="100%"
@@ -10,7 +11,6 @@
       @mouseup="onMouseUp"
       @mousemove="onMouseMove"
       @wheel="onMouseWheel"
-      ref="svgMap"
     >
       <g :transform="'translate(' + translateX + ' ' + translateY + ')'">
         <polygon

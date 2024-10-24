@@ -2,8 +2,8 @@
   <div class="input-group">
     <select
       :id="inputId"
-      @change="onChange"
       class="form-select"
+      @change="onChange"
     >
       <option value=""></option>
       <option

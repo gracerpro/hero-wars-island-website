@@ -13,8 +13,8 @@
           <td colspan="3">{{ t("common.noData") }}</td>
         </tr>
         <tr
-          v-else
           v-for="item in items"
+          v-else
           :key="item.uniqueId"
         >
           <td>

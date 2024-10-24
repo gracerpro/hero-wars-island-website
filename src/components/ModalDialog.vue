@@ -1,8 +1,8 @@
 <template>
   <div
+    :id="elementId"
     class="modal fade"
     tabindex="-1"
-    :id="elementId"
     aria-hidden="true"
   >
     <div

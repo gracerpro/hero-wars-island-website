@@ -9,9 +9,9 @@
       <div class="col-lg-3 mb-3">
         <div class="input-group">
           <input
+            id="filter__name"
             v-model.trim="filter.name"
             class="form-control"
-            id="filter__name"
             :placeholder="t('common.name')"
           />
           <button

@@ -1,12 +1,12 @@
 <template>
   <suspense>
     <modal-dialog
+      ref="dialog"
       element-id="island-map-download-dialog"
       :form-id="formId"
       :header="t('common.download')"
       :saving="loading"
       :submit-button-text="t('common.download')"
-      ref="dialog"
       @vue:mounted="onMountedDialog"
     >
       <p>{{ t("page.island.downloadMapInFormat", { format: "PNG" }) }}</p>
@@ -22,8 +22,8 @@
       <div>{{ t("page.island.downloadMapSize", { mapSize: mapSize }) }}</div>
 
       <form
-        @submit.prevent="downloadAsPng"
         :id="formId"
+        @submit.prevent="downloadAsPng"
       ></form>
     </modal-dialog>
   </suspense>

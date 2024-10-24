@@ -1,10 +1,10 @@
 <template>
   <suspense>
     <modal-dialog
+      ref="dialog"
       element-id="island-map-help-dialog"
       :is-show-submit="false"
       :header="t('common.map')"
-      ref="dialog"
       @vue:mounted="onMountedDialog"
     >
       <p>

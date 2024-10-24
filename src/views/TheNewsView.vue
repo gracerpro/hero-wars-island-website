@@ -20,8 +20,8 @@
       <div class="fst-italic">{{ fromCurrentDate(oneNews.createdAt, locale) }}</div>
 
       <div
-        v-html="oneNews.content"
         class="mt-4"
+        v-html="oneNews.content"
       ></div>
     </div>
   </div>

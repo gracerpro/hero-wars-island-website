@@ -1,10 +1,10 @@
 <template>
   <suspense>
     <modal-dialog
+      ref="dialog"
       element-id="island-map-info-dialog"
       :is-show-submit="false"
       :header="t('common.cell')"
-      ref="dialog"
       @vue:mounted="onMountedDialog"
     >
       <div>ID = {{ drawedNode.node.id }}</div>

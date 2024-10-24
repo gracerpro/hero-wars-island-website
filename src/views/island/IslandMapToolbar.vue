@@ -93,8 +93,8 @@
       <button
         type="button"
         class="btn btn-secondary"
-        @click="emit(EVENT_BEGIN_DOWNLOAD)"
         :title="t('common.download')"
+        @click="emit(EVENT_BEGIN_DOWNLOAD)"
       >
         D
       </button>
@@ -119,8 +119,8 @@
       <button
         type="button"
         class="btn btn-secondary"
-        @click="onHelpClick"
         :title="t('common.help')"
+        @click="onHelpClick"
       >
         ?
       </button>
@@ -133,8 +133,8 @@
       <button
         type="button"
         class="btn btn-secondary"
-        @click="emit(EVENT_RELOAD_MAP)"
         title="Reload"
+        @click="emit(EVENT_RELOAD_MAP)"
       >
         L
       </button>

@@ -7,8 +7,8 @@
         >{{ t("common.resource") }}</label
       >
       <text-input
-        :modelValue="itemName"
-        :modelModifiers="{ trim: true }"
+        :model-value="itemName"
+        :model-modifiers="{ trim: true }"
         :input-id="formId + '__itemName'"
         @update:model-value="onUpdateName"
       />
@@ -23,7 +23,7 @@
         >{{ t("common.type") }}</label
       >
       <clear-select
-        :modelValue="typeId"
+        :model-value="typeId"
         :input-id="formId + '__typeId'"
         :select-values="visibleTypes"
         @update:model-value="onChangeType"
@@ -32,9 +32,9 @@
     <div class="col-md-6 mt-3">
       <div class="form-check form-check-inline">
         <input
+          :id="formId + '__nodeTypeTower'"
           class="form-check-input"
           type="checkbox"
-          :id="formId + '__nodeTypeTower'"
           :value="TYPE_TOWER"
           :checked="isNodeTypeTower"
           @change="onChangeNodeType"
@@ -47,9 +47,9 @@
       </div>
       <div class="form-check form-check-inline">
         <input
+          :id="formId + '__nodeTypeChest'"
           class="form-check-input"
           type="checkbox"
-          :id="formId + '__nodeTypeChest'"
           :value="TYPE_CHEST"
           :checked="isNodeTypeChest"
           @change="onChangeNodeType"

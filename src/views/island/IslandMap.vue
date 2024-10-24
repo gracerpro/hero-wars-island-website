@@ -20,6 +20,7 @@
         @reload-map="forceReloadMap"
       />
       <island-map-container
+        ref="mapContainer"
         :scale="scale"
         :translate-x="translateX"
         :translate-y="translateY"
@@ -32,16 +33,15 @@
         @change-scale="onChangeScale"
         @change-node="onChangeNode"
         @select-node="onSelectNode"
-        ref="mapContainer"
       />
       <div class="row mt-3">
         <div class="col-lg-6">
           <island-map-filter
-            :items="items"
             v-model:item-name="filter.itemName"
             v-model:type-id="filter.typeId"
             v-model:is-node-type-tower="filter.isNodeTypeTower"
             v-model:is-node-type-chest="filter.isNodeTypeChest"
+            :items="items"
             :min-chars-count="minCharsCount"
           />
         </div>

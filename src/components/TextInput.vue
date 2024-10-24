@@ -1,8 +1,8 @@
 <template>
   <div class="input-group">
     <input
-      :value="modelValue"
       :id="inputId"
+      :value="modelValue"
       type="text"
       class="form-control"
       @input="onInput"
@@ -26,6 +26,7 @@ const props = defineProps({
   inputId: { type: String, required: true },
   modelValue: { type: String, default: "" },
   modelModifiers: {
+    type: Object,
     default: () => ({}),
   },
 });

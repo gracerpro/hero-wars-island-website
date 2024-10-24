@@ -7,8 +7,8 @@
       {{ t("common.noData") }}
     </p>
     <div
-      v-else
       v-for="item in feedbackItems"
+      v-else
       :key="item.id"
       class="mb-4"
     >

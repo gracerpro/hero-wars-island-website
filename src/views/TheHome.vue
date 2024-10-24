@@ -101,8 +101,8 @@
         </h4>
         <div class="fst-italic">{{ fromCurrentDate(oneNews.createdAt, locale) }}</div>
         <div
-          v-html="oneNews.snippet"
           class="news-item"
+          v-html="oneNews.snippet"
         ></div>
       </div>
     </div>

@@ -49,8 +49,8 @@
 
     <div
       v-if="islandDescription"
-      v-html="islandDescription"
       class="description mt-4"
+      v-html="islandDescription"
     ></div>
   </div>
 </template>
