@@ -8,17 +8,12 @@ docker compose up --detach
 docker compose up --detach --build --force-recreate
 
 # Log in to the container
-docker exec -it hero-wars-website__vite bash
-docker exec -it --user "$(id -u):$(id -g)" hero-wars-website__vite bash
-
+docker exec -it hero-wars-website__node bash
 npm run dev
-```
 
-Run a command, without log in to the container
-
-```
-docker exec hero-wars-website__vite npm run build
-docker exec hero-wars-website__vite npm run lint --fix
+# Run a command, without log in to the container
+docker exec hero-wars-website__node npm run lint
+docker exec hero-wars-website__node npm run format
 ```
 
 
@@ -27,8 +22,7 @@ docker exec hero-wars-website__vite npm run lint --fix
 Add to `/etc/hosts` file on host computer this text
 
 ```
-127.0.0.1 hero-wars.vyacheslaff.local
-127.0.0.1 prod-hero-wars.vyacheslaff.local
+127.0.0.1 hero-wars.local
 ```
 
 [Install docker](https://docs.docker.com/engine/install/)
@@ -44,7 +38,8 @@ git clone git@github.com:gracerpro/hero-wars-island-website.git
 Copy `docker-compose.dist.yml` into `docker-compose.yml` and configure it. Change a port 8082 etc.
 
 Configre an environments by `.env` file.
-For variable VITE_BACKEND_API_URL need backend server, mock all client methods.
+
+TODO: For variable VITE_BACKEND_API_URL need a backend server, mock all client methods.
 
 Up the docker containers
 
@@ -55,16 +50,16 @@ docker-compose up --detach --build --force-recreate
 Install the dependencies
 
 ```bash
-docker exec hero-wars-website__vite npm install
+docker exec hero-wars-website__node npm install
 ```
 
 And run the dev server
 
 ```
-docker exec hero-wars-website__vite npm run dev
+docker exec hero-wars-website__node npm run dev
 ```
 
-Go to `http://hero-wars.vyacheslaff.local:8082`
+Go to `http://hero-wars.local:8082`
 
 The end.
 
@@ -93,6 +88,6 @@ npm run build
 npm run generate
 ```
 
-build the swagger.json and move it to /dist/static/backend-api
+build the `swagger.json` and move it to `/dist/static/backend-api`
 
-copy /dist/static/* to /public on server
+copy `dist/static/*` to `/public` on server
