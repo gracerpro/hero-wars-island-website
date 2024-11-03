@@ -41,8 +41,10 @@
             v-model:type-id="filter.typeId"
             v-model:is-node-type-tower="filter.isNodeTypeTower"
             v-model:is-node-type-chest="filter.isNodeTypeChest"
+            v-model:region-number="filter.regionNumber"
             :items="items"
             :min-chars-count="minCharsCount"
+            :regions="island.regions"
           />
         </div>
         <div class="col-lg-6">
@@ -169,6 +171,7 @@ const filter = shallowReactive({
   typeId: null,
   isNodeTypeTower: false,
   isNodeTypeChest: false,
+  regionNumber: null,
 });
 const mapContainer = ref(null);
 const downloadDialog = ref(null);
@@ -189,14 +192,23 @@ const visibleItems = computed(() => {
   if (filter.typeId > 0) {
     resultItems = resultItems.filter((item) => item.item.typeId === filter.typeId);
   }
-  if (filter.isNodeTypeChest && filter.isNodeTypeTower) {
+  if (filter.isNodeTypeChest || filter.isNodeTypeTower) {
+    const typeMap = {};
+    if (filter.isNodeTypeChest) {
+      typeMap[TYPE_CHEST] = true;
+    }
+    if (filter.isNodeTypeTower) {
+      typeMap[TYPE_TOWER] = true;
+    }
+
     resultItems = resultItems.filter((item) => {
-      return item.node.typeId === TYPE_CHEST || item.node.typeId === TYPE_TOWER;
+      return typeMap[item.node.typeId] !== undefined;
     });
-  } else if (filter.isNodeTypeChest) {
-    resultItems = resultItems.filter((item) => item.node.typeId === TYPE_CHEST);
-  } else if (filter.isNodeTypeTower) {
-    resultItems = resultItems.filter((item) => item.node.typeId === TYPE_TOWER);
+  }
+  if (filter.regionNumber) {
+    resultItems = resultItems.filter((item) => {
+      return item.node.regionNumber === filter.regionNumber;
+    });
   }
 
   return resultItems;

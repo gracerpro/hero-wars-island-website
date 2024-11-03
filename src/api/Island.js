@@ -85,5 +85,8 @@ export default class Island {
     if (island.nodesLastUpdatedAt) {
       island.nodesLastUpdatedAt = new Date(island.nodesLastUpdatedAt);
     }
+    if (island.regions === undefined) {
+      island.regions = [];
+    }
   }
 }

@@ -16,6 +16,7 @@ export const TYPE_UNKNOWN = 12;
 
 // TODO: const TYPE_BANNER_STONE = 4;
 
+export const GAME_ID_EXPLORER_MOVE = 41;
 export const GAME_ID_WOOD = 53;
 
 export default class Item {

@@ -61,6 +61,22 @@
         >
       </div>
     </div>
+    <div
+      v-if="regions.length"
+      class="col-md-6"
+    >
+      <label
+        :for="formId + '__regionNumber'"
+        class="form-label"
+        >{{ t("common.regionNumber") }}</label
+      >
+      <clear-select
+        :model-value="regionNumber"
+        :input-id="formId + '__regionNumber'"
+        :select-values="visibleRegions"
+        @update:model-value="onChangeRegionNumber"
+      />
+    </div>
   </div>
 </template>
 <script>
@@ -68,6 +84,7 @@ const EVENT_UPDATE_ITEM_NAME = "update:item-name";
 const EVENT_UPDATE_TYPE = "update:type-id";
 const EVENT_UPDATE_IS_NODE_TYPE_TOWER = "update:is-node-type-tower";
 const EVENT_UPDATE_IS_NODE_TYPE_CHEST = "update:is-node-type-chest";
+const EVENT_UPDATE_REGION_NUMBER = "update:region-number";
 </script>
 <script setup>
 import TextInput from "@/components/TextInput.vue";
@@ -88,12 +105,15 @@ const props = defineProps({
   isNodeTypeTower: { type: Boolean, required: true },
   isNodeTypeChest: { type: Boolean, required: true },
   minCharsCount: { type: Number, required: true },
+  regionNumber: { type: [Number, null], required: false, default: () => 0 },
+  regions: { type: Array, required: false, default: () => [] },
 });
 const emit = defineEmits([
   EVENT_UPDATE_ITEM_NAME,
   EVENT_UPDATE_TYPE,
   EVENT_UPDATE_IS_NODE_TYPE_TOWER,
   EVENT_UPDATE_IS_NODE_TYPE_CHEST,
+  EVENT_UPDATE_REGION_NUMBER,
 ]);
 
 const visibleTypes = computed(() => {
@@ -113,6 +133,15 @@ const visibleTypes = computed(() => {
 
   return types;
 });
+const visibleRegions = computed(() => {
+  let result = {};
+
+  props.regions.forEach((region) => {
+    result[region.number] = region.number;
+  });
+
+  return result;
+});
 
 const onUpdateName = (name) => {
   emit(EVENT_UPDATE_ITEM_NAME, name);
@@ -130,4 +159,7 @@ const onChangeNodeType = (event) => {
     emit(EVENT_UPDATE_IS_NODE_TYPE_CHEST, event.target.checked);
   }
 };
+function onChangeRegionNumber(regionNumber) {
+  emit(EVENT_UPDATE_REGION_NUMBER, regionNumber);
+}
 </script>
