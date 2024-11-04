@@ -104,7 +104,7 @@ import {
 import { getIconsItems, getDrawedNodes, SIDE } from "./map";
 import { useI18n } from "vue-i18n";
 import IslandMapInfoDialog from "./IslandMapInfoDialog.vue";
-import { GAME_ID_EXPLORER_MOVE, GAME_ID_WOOD } from "@/api/Item";
+import { GAME_ID_WOOD } from "@/api/Item";
 
 const { t } = useI18n();
 
@@ -154,10 +154,6 @@ const totalNodes = computed(() => {
     const drawedNode = drawedNodes[id];
     drawedNode.nodeClass = getNodeClass(drawedNode.node);
     drawedNode.points = getPoints(drawedNode.coordinates);
-
-    if (drawedNode.node.cost && drawedNode.node.cost.gameItemId != GAME_ID_EXPLORER_MOVE) {
-      console.log(id, drawedNode.node);
-    }
   }
 
   return drawedNodes;

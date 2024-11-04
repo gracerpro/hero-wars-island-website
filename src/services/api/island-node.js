@@ -8,31 +8,33 @@ const client = new HeroClient();
  * @param {Boolean} isForce
  * @returns {Promise<Object>}
  */
-export async function getNodesMap(island, isForce = false) {
-  let nodesMap;
+export async function getNodesMap(island, isForce = false, filter = null) {
+  let nodesMap = null;
+  const isEmptyFilter = !filter || Object.keys(filter).length === 0;
+  const previosUpdatedAt = loadPreviousUpdatedAt(island);
+  const isLoadFromServer =
+    !previosUpdatedAt || previosUpdatedAt < island.nodesLastUpdatedAt || isForce || !isEmptyFilter;
 
   try {
-    let previosUpdatedAt = loadPreviousUpdatedAt(island);
-
-    if (!previosUpdatedAt || previosUpdatedAt < island.nodesLastUpdatedAt) {
-      nodesMap = null;
-    } else if (!isForce) {
+    if (!isLoadFromServer) {
       nodesMap = await getNodesFromCache(island);
     }
   } catch (error) {
     console.error(error);
-    nodesMap = null;
   }
 
-  if (nodesMap === null || nodesMap === undefined || isForce) {
+  if (nodesMap === null || nodesMap === undefined) {
     nodesMap = {};
-    const list = await client.node.getList(island.id);
+    const list = await client.node.getList(island.id, filter);
     list.items.forEach((node) => {
       nodesMap[node.id] = node;
     });
 
-    writeNodesToCache(island, nodesMap);
-    savePreviousUpdatedAt(island);
+    if (isEmptyFilter) {
+      console.log("write to cache");
+      writeNodesToCache(island, nodesMap);
+      savePreviousUpdatedAt(island);
+    }
   }
 
   return nodesMap;

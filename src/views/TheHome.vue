@@ -54,11 +54,11 @@
         >
         <br />
         <span
-          v-for="i in island.regionsCount"
-          :key="i"
-          class="badge text-bg-secondary me-2"
-          :title="t('page.home.thePartNumber', { n: i })"
-          >{{ i }}</span
+          v-for="region in island.regions"
+          :key="region.number"
+          :class="['badge me-2', region.isVisible ? 'text-bg-secondary' : 'bg-secondary-subtle']"
+          :title="t('page.home.thePartNumber', { n: region.number })"
+          >{{ region.number }}</span
         >
       </li>
     </ol>

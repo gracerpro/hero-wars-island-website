@@ -8,6 +8,35 @@
       {{ errorMessage }}
     </div>
     <div v-else>
+      <div
+        v-if="island.regions?.length"
+        class="btn-group mb-2 ms-1"
+        role="group"
+      >
+        <button
+          v-for="region in island.regions"
+          :key="region.number"
+          :class="[
+            'btn',
+            regionNumbers.includes(region.number) ? 'btn-primary' : 'btn-outline-primary',
+          ]"
+          :disabled="loading || !region.isVisible"
+          :title="t('page.home.thePartNumber', { n: region.number })"
+          type="button"
+          @click="onChangeRegionNumber(region)"
+        >
+          {{ region.number }}
+        </button>
+        <button
+          type="button"
+          class="btn btn-outline-primary"
+          :disabled="loading || regionNumbers.length === 0"
+          :title="t('common.reset')"
+          @click="resetRegionNumbers"
+        >
+          <span class="btn-close"></span>
+        </button>
+      </div>
       <island-map-toolbar
         :is-show-quantity="isShowQuantity"
         @update:is-show-quantity="onChangeIsShowQuantity"
@@ -41,10 +70,8 @@
             v-model:type-id="filter.typeId"
             v-model:is-node-type-tower="filter.isNodeTypeTower"
             v-model:is-node-type-chest="filter.isNodeTypeChest"
-            v-model:region-number="filter.regionNumber"
             :items="items"
             :min-chars-count="minCharsCount"
-            :regions="island.regions"
           />
         </div>
         <div class="col-lg-6">
@@ -136,6 +163,7 @@ import { isObject } from "@/helpers/core";
 import { getNodesMap } from "@/services/api/island-node";
 import { SELECT_MODE_PLAN } from "./select-mode";
 import { shallowRef } from "vue";
+import UserError from "@/exceptions/UserError";
 
 const { t } = useI18n();
 
@@ -154,6 +182,7 @@ const componentId = props.parentPageId + "__map";
 const loadingNodes = ref(true);
 const calculatingItems = ref(false);
 const errorMessage = ref("");
+const regionNumbers = ref([]);
 const nodes = ref({});
 const items = ref([]);
 const userNodesMap = ref({});
@@ -171,7 +200,6 @@ const filter = shallowReactive({
   typeId: null,
   isNodeTypeTower: false,
   isNodeTypeChest: false,
-  regionNumber: null,
 });
 const mapContainer = ref(null);
 const downloadDialog = ref(null);
@@ -203,11 +231,6 @@ const visibleItems = computed(() => {
 
     resultItems = resultItems.filter((item) => {
       return typeMap[item.node.typeId] !== undefined;
-    });
-  }
-  if (filter.regionNumber) {
-    resultItems = resultItems.filter((item) => {
-      return item.node.regionNumber === filter.regionNumber;
     });
   }
 
@@ -257,26 +280,37 @@ const totalNodesCount = computed(() => {
   return length > 0 ? length - 1 : 0; // "-1" it means subtract an entry node
 });
 
-onMounted(() => {
-  reloadMap();
-});
-onUnmounted(() => {
-  saveState();
-});
-
 loadState();
+
+onMounted(() => reloadMap());
+onUnmounted(() => saveState());
 
 /**
  * @param {Boolean} isForce
  */
 async function loadNodes(isForce) {
   let nodes = {};
+  let filter = {};
+
+  const visibleRegions = props.island.regions
+    ? props.island.regions.filter((region) => region.isVisible)
+    : [];
+  const isAllNumbersSelect = visibleRegions.length === regionNumbers.value.length;
+
+  if (regionNumbers.value.length && !isAllNumbersSelect) {
+    filter.regionNumbers = regionNumbers.value;
+  }
 
   loadingNodes.value = true;
   try {
-    nodes = await getNodesMap(props.island, isForce);
+    nodes = await getNodesMap(props.island, isForce, filter);
   } catch (error) {
-    errorMessage.value = t("page.island.failNodesLoading");
+    if (error instanceof UserError) {
+      errorMessage.value = error.message;
+    } else {
+      errorMessage.value = t("page.island.failNodesLoading");
+      throw error;
+    }
   } finally {
     loadingNodes.value = false;
   }
@@ -458,6 +492,29 @@ function onMountedDownloadDialog() {
   });
 }
 
+function resetRegionNumbers() {
+  regionNumbers.value = [];
+  reloadMap();
+}
+
+function onChangeRegionNumber(region) {
+  if (!region.isVisible) {
+    return;
+  }
+  const index = regionNumbers.value.indexOf(region.number);
+
+  if (index >= 0) {
+    regionNumbers.value.splice(index, 1);
+  } else {
+    regionNumbers.value.push(region.number);
+  }
+
+  const isFullIsland = regionNumbers.value.length === 0;
+  const isForse = isFullIsland ? false : true;
+
+  reloadMap(isForse);
+}
+
 function loadState() {
   let state;
 
@@ -475,6 +532,7 @@ function loadState() {
       isShowItemsBlock: true,
       isShowUserItemsBlock: true,
       isShowGroupItems: false,
+      regionNumbers: [],
     };
   }
   if (!state.filter) {
@@ -511,11 +569,12 @@ function loadState() {
   byIslandState = state.byIsland;
 
   const byIsland = byIslandState[props.island.id] ? byIslandState[props.island.id] : {};
-  scale.value = byIsland.scale !== undefined ? byIsland.scale : 1;
-  translateX.value = byIsland.translateX !== undefined ? byIsland.translateX : 0;
-  translateY.value = byIsland.translateY !== undefined ? byIsland.translateY : 0;
-  userNodesIds = byIsland.userNodesIds ? byIsland.userNodesIds : [];
-  userNodesGoingIds = byIsland.userNodesGoingIds ? byIsland.userNodesGoingIds : [];
+  scale.value = byIsland.scale || 1;
+  translateX.value = byIsland.translateX || 0;
+  translateY.value = byIsland.translateY || 0;
+  userNodesIds = byIsland.userNodesIds || [];
+  userNodesGoingIds = byIsland.userNodesGoingIds || [];
+  regionNumbers.value = byIsland.regionNumbers || [];
 
   filter.value = state.filter;
   isShowQuantity.value = state.isShowQuantity;
@@ -543,6 +602,7 @@ function saveState() {
     scale: scale.value,
     translateX: translateX.value,
     translateY: translateY.value,
+    regionNumbers: regionNumbers.value,
   };
   state.byIsland = byIslandState;
 

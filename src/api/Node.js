@@ -22,10 +22,19 @@ export default class Node {
 
   /**
    * @param {Number} islandId
+   * @param {Object|null} filter
    * @returns {Promise<Object>}
    */
-  async getList(islandId) {
-    const list = await this._apiRequest.get(`/island-nodes?islandId=${islandId}`);
+  async getList(islandId, filter = null) {
+    let params = {
+      islandId,
+    };
+    console.log("api get list", filter, filter?.regionNumbers);
+    if (filter?.regionNumbers) {
+      params.regionNumbers = filter.regionNumbers.join(",");
+    }
+
+    const list = await this._apiRequest.get("/island-nodes", params);
 
     if (list.items) {
       list.items.forEach((node) => this.modifyNode(node));
