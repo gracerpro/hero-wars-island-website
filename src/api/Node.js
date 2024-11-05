@@ -29,7 +29,7 @@ export default class Node {
     let params = {
       islandId,
     };
-    console.log("api get list", filter, filter?.regionNumbers);
+
     if (filter?.regionNumbers) {
       params.regionNumbers = filter.regionNumbers.join(",");
     }

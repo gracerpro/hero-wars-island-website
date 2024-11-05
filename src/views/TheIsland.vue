@@ -20,7 +20,12 @@
       </span>
     </div>
 
-    <island-map-loading v-if="islandLoading" />
+    <div v-if="islandLoading">
+      <h1>
+        <span class="placeholder placeholder-lg col-4"></span>
+      </h1>
+      <row-loading class="my-5" />
+    </div>
     <div
       v-else-if="errorMessage"
       class="alert alert-danger mt-3"
@@ -57,7 +62,7 @@
 <script setup>
 import HeroClient from "@/api/HeroClient";
 import IslandMap from "./island/IslandMap.vue";
-import IslandMapLoading from "./island/IslandMapLoading.vue";
+import RowLoading from "@/components/RowLoading.vue";
 import HttpError from "@/exceptions/HttpError";
 import { setMetaInfo } from "@/services/page-meta";
 import { ref, watch, onMounted, onServerPrefetch, computed } from "vue";

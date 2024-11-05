@@ -57,7 +57,7 @@
           v-for="region in island.regions"
           :key="region.number"
           :class="['badge me-2', region.isVisible ? 'text-bg-secondary' : 'bg-secondary-subtle']"
-          :title="t('page.home.thePartNumber', { n: region.number })"
+          :title="region.isVisible ? t('page.home.thePartNumber', { n: region.number }) : t('common.partTemporalyUnavailable')"
           >{{ region.number }}</span
         >
       </li>

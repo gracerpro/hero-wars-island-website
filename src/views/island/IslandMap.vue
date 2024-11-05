@@ -1,5 +1,26 @@
 <template>
   <div>
+    <island-map-regions
+      :regions="island.regions"
+      :region-numbers="regionNumbers"
+      :loading="loading"
+      @update:region-numbers="onChangeRegionNumbers"
+      @reset-region-numbers="onResetRegionNumbers"
+    />
+    <island-map-toolbar
+      v-if="!errorMessage"
+      :is-show-quantity="isShowQuantity"
+      :loading="loading"
+      @update:is-show-quantity="onChangeIsShowQuantity"
+      @reset-scale="onResetScale"
+      @reset-translate="onResetTranslate"
+      @change-scale="onChangeScale"
+      @change-translate="onChangeTranslate"
+      @fullscreen-on="onFullscreen"
+      @begin-download="onBeginDownload"
+      @reload-map="forceReloadMap"
+    />
+
     <island-map-loading v-if="loading" />
     <div
       v-else-if="errorMessage"
@@ -8,46 +29,6 @@
       {{ errorMessage }}
     </div>
     <div v-else>
-      <div
-        v-if="island.regions?.length"
-        class="btn-group mb-2 ms-1"
-        role="group"
-      >
-        <button
-          v-for="region in island.regions"
-          :key="region.number"
-          :class="[
-            'btn',
-            regionNumbers.includes(region.number) ? 'btn-primary' : 'btn-outline-primary',
-          ]"
-          :disabled="loading || !region.isVisible"
-          :title="t('page.home.thePartNumber', { n: region.number })"
-          type="button"
-          @click="onChangeRegionNumber(region)"
-        >
-          {{ region.number }}
-        </button>
-        <button
-          type="button"
-          class="btn btn-outline-primary"
-          :disabled="loading || regionNumbers.length === 0"
-          :title="t('common.reset')"
-          @click="resetRegionNumbers"
-        >
-          <span class="btn-close"></span>
-        </button>
-      </div>
-      <island-map-toolbar
-        :is-show-quantity="isShowQuantity"
-        @update:is-show-quantity="onChangeIsShowQuantity"
-        @reset-scale="onResetScale"
-        @reset-translate="onResetTranslate"
-        @change-scale="onChangeScale"
-        @change-translate="onChangeTranslate"
-        @fullscreen-on="onFullscreen"
-        @begin-download="onBeginDownload"
-        @reload-map="forceReloadMap"
-      />
       <island-map-container
         ref="mapContainer"
         :scale="scale"
@@ -152,6 +133,7 @@ import IslandMapContainer from "./IslandMapContainer.vue";
 import IslandMapDownloadDialog from "./IslandMapDownloadDialog.vue";
 import IslandMapFilter from "./IslandMapFilter.vue";
 import IslandMapTable from "./IslandMapTable.vue";
+import IslandMapRegions from "./IslandMapRegions.vue";
 import { canSelectNode } from "@/services/island-map";
 import { onMounted, onUnmounted, ref, computed, shallowReactive } from "vue";
 import { getHumanQuantity } from "@/helpers/formatter";
@@ -492,24 +474,14 @@ function onMountedDownloadDialog() {
   });
 }
 
-function resetRegionNumbers() {
+function onResetRegionNumbers() {
   regionNumbers.value = [];
   reloadMap();
 }
 
-function onChangeRegionNumber(region) {
-  if (!region.isVisible) {
-    return;
-  }
-  const index = regionNumbers.value.indexOf(region.number);
-
-  if (index >= 0) {
-    regionNumbers.value.splice(index, 1);
-  } else {
-    regionNumbers.value.push(region.number);
-  }
-
-  const isFullIsland = regionNumbers.value.length === 0;
+function onChangeRegionNumbers(newNumbers) {
+  regionNumbers.value = newNumbers;
+  const isFullIsland = newNumbers.length === 0;
   const isForse = isFullIsland ? false : true;
 
   reloadMap(isForse);

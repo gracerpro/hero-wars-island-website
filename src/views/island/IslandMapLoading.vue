@@ -1,55 +1,46 @@
 <template>
   <div>
-    <row-loading class="map" />
-    <div class="row mb-4">
-      <div
-        v-for="i in 2"
-        :key="i"
-        class="col-lg-3"
-      >
+    <div class="map">
+      <div class="map-svg d-flex justify-content-center align-items-center">
+        <row-loading />
+      </div>
+    </div>
+    <div class="placeholder-glow my-4">
+      <span class="placeholder placeholder-lg col-12"></span>
+    </div>
+    <div class="row">
+      <div class="col-lg-6">
+        <h3>Ресурсы на карте</h3>
         <div class="placeholder-glow">
-          <span class="placeholder col-6"></span>
-        </div>
-        <div class="placeholder-glow">
-          <span class="placeholder placeholder-lg col-12"></span>
+          <span class="placeholder placeholder-lg col-4"></span>
         </div>
       </div>
-      <div class="col-lg-3">
+      <div class="col-lg-6">
+        <h3>Выбранные ресурсы</h3>
         <div class="placeholder-glow">
-          <span class="placeholder col-6"></span>
-        </div>
-        <div class="placeholder-glow">
-          <span class="placeholder placeholder-lg col-6"></span>
+          <span class="placeholder placeholder-lg col-4"></span>
         </div>
       </div>
     </div>
     <div class="row">
-      <div
-        v-for="i in 2"
-        :key="i"
-        class="col-lg-6"
-      >
-        <div class="placeholder-glow text-end">
-          <span class="placeholder col-3"></span>
-          <span class="placeholder col-3 ms-2"></span>
-          <span class="placeholder col-3 ms-2"></span>
-        </div>
-        <div
-          v-for="j in 5"
-          :key="i + '-' + j"
-          class="placeholder-glow"
-        >
-          <span class="placeholder col-12"></span>
+      <div class="col-lg-6">
+        <h3>Сгруппированные данные</h3>
+        <div class="placeholder-glow">
+          <span class="placeholder placeholder-lg col-4"></span>
         </div>
       </div>
     </div>
   </div>
 </template>
 <script setup>
-import RowLoading from "@/components/RowLoading.vue";
+import RowLoading from '@/components/RowLoading.vue';
 </script>
 <style scoped>
 .map {
-  padding: 100px;
+  margin-left: 45px;
+}
+.map-svg {
+  height: 600px;
+  outline: 1px solid #dddddd;
 }
 </style>

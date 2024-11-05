@@ -10,6 +10,7 @@
       <button
         type="button"
         class="btn btn-secondary"
+        :disabled="loading"
         :title="t('common.zoomOut')"
         @click="onChangeScale(1, $event)"
       >
@@ -18,6 +19,7 @@
       <button
         type="button"
         class="btn btn-secondary"
+        :disabled="loading"
         :title="t('common.zoomIn')"
         @click="onChangeScale(-1, $event)"
       >
@@ -26,6 +28,7 @@
       <button
         type="button"
         class="btn btn-secondary"
+        :disabled="loading"
         :title="t('common.reset')"
         @click="onResetScale()"
       >
@@ -39,6 +42,7 @@
       <button
         type="button"
         class="btn btn-secondary"
+        :disabled="loading"
         @click="onChangeTranslate(-1, 0, $event)"
       >
         &larr;
@@ -46,6 +50,7 @@
       <button
         type="button"
         class="btn btn-secondary"
+        :disabled="loading"
         @click="onChangeTranslate(1, 0, $event)"
       >
         &rarr;
@@ -53,6 +58,7 @@
       <button
         type="button"
         class="btn btn-secondary"
+        :disabled="loading"
         @click="onChangeTranslate(0, -1, $event)"
       >
         &uarr;
@@ -60,6 +66,7 @@
       <button
         type="button"
         class="btn btn-secondary"
+        :disabled="loading"
         @click="onChangeTranslate(0, 1, $event)"
       >
         &darr;
@@ -68,6 +75,7 @@
         type="button"
         class="btn btn-secondary"
         :title="t('common.reset')"
+        :disabled="loading"
         @click="onResetTranslate()"
       >
         0
@@ -79,6 +87,7 @@
     >
       <button
         type="button"
+        :disabled="loading"
         :title="t('page.island.isShowQuantity')"
         :class="['btn', isShowQuantity ? 'btn-secondary' : 'btn-outline-secondary']"
         @click="onChangeIsShowQuantity"
@@ -93,6 +102,7 @@
       <button
         type="button"
         class="btn btn-secondary"
+        :disabled="loading"
         :title="t('common.download')"
         @click="emit(EVENT_BEGIN_DOWNLOAD)"
       >
@@ -106,6 +116,7 @@
       <button
         type="button"
         class="btn btn-secondary fullscreen-btn"
+        :disabled="loading"
         :title="t('common.fullscreenMode')"
         @click="emit(EVENT_FULLSCREEN_ON)"
       >
@@ -134,6 +145,7 @@
         type="button"
         class="btn btn-secondary"
         title="Reload"
+        :disabled="loading"
         @click="emit(EVENT_RELOAD_MAP)"
       >
         L
@@ -172,6 +184,7 @@ const { t } = useI18n();
 
 defineProps({
   isShowQuantity: { type: Boolean, required: true },
+  loading: { type: Boolean, required: true },
 });
 
 const emit = defineEmits([
