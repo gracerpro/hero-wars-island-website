@@ -167,6 +167,7 @@ async function loadImages() {
       }
     }
   });
+
   const promises = Object.keys(urlMap).map((url) => {
     return new Promise((resolve, reject) => {
       const image = new Image();
@@ -175,12 +176,18 @@ async function loadImages() {
         imagesByUrls[url] = image;
         resolve();
       };
-      image.onerror = reject;
+      image.onerror = () => {
+        reject(new Error('Could not load an image.'))
+      };
       image.src = url;
     });
   });
 
-  await Promise.all(promises);
+  try {
+    await Promise.all(promises);
+  } catch (error) {
+    console.error(error);
+  }
 
   return imagesByUrls;
 }
