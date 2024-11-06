@@ -4,12 +4,14 @@
       <label
         :for="formId + '__itemName'"
         class="form-label"
-        >{{ t("common.resource") }}</label
-      >
+        >{{ t("common.resource") }}
+        <span v-if="itemName" class="badge rounded-pill text-bg-warning">&nbsp;</span>
+      </label>
       <text-input
         :model-value="itemName"
         :model-modifiers="{ trim: true }"
         :input-id="formId + '__itemName'"
+        :class="{ 'not-empty': itemName }"
         @update:model-value="onUpdateName"
       />
       <div class="form-text fw-normal">
@@ -29,7 +31,7 @@
         @update:model-value="onChangeType"
       />
     </div>
-    <div class="col-md-6 mt-3">
+    <div class="col-md-12 mt-3">
       <div class="form-check form-check-inline">
         <input
           :id="formId + '__nodeTypeTower'"
@@ -60,6 +62,9 @@
           >{{ t("common.chest") }}</label
         >
       </div>
+      <button type="button" class="btn btn-secondary float-end">
+        {{ t("common.reset") }}
+      </button>
     </div>
   </div>
 </template>

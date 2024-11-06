@@ -45,3 +45,8 @@ const onClear = () => {
   emit(EVENT_UPDATE_VALUE, "");
 };
 </script>
+<style>
+.not-empty .form-control {
+  border-color: var(--bs-warning);
+}
+</style>
