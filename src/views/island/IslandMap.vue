@@ -44,8 +44,8 @@
         @change-node="onChangeNode"
         @select-node="onSelectNode"
       />
-      <div class="row mt-3">
-        <div class="col-lg-6">
+      <div class="row">
+        <div class="col-lg-6 mt-3">
           <island-map-filter
             v-model:item-name="filter.itemName"
             v-model:type-id="filter.typeId"
@@ -55,7 +55,7 @@
             :min-chars-count="minCharsCount"
           />
         </div>
-        <div class="col-lg-6">
+        <div class="col-lg-6 mt-3">
           <island-map-steps
             v-model:is-select-any-node="isSelectAnyNode"
             v-model:select-mode="selectMode"
@@ -67,53 +67,32 @@
       </div>
       <div class="row">
         <div class="col-lg-6 mt-4">
-          <h3>
-            {{ t("page.island.resourcesOnMap") }}
-          </h3>
-          <a
-            href="#"
-            @click.prevent="isShowItemsBlock = !isShowItemsBlock"
-          >
-            {{ t(isShowItemsBlock ? "common.hide" : "common.show") }}
-          </a>
-          <span class="badge text-bg-secondary ms-2">{{ visibleItemsCount }}</span>
           <island-map-table
-            v-if="isShowItemsBlock"
+            v-model:is-show-block="isShowItemsBlock"
+            :header="t('page.island.resourcesOnMap')"
             :items="visibleItems"
+            :visible-items-count="visibleItemsCount"
           />
         </div>
         <div class="col-lg-6 mt-4">
-          <h3>{{ t("page.island.selectedResources") }}</h3>
-          <a
-            href="#"
-            @click.prevent="isShowUserItemsBlock = !isShowUserItemsBlock"
-          >
-            {{ t(isShowUserItemsBlock ? "common.hide" : "common.show") }}
-          </a>
-          <span class="badge text-bg-secondary ms-2">{{ userItemsCount }}</span>
           <island-map-table
-            v-if="isShowUserItemsBlock"
+            v-model:is-show-block="isShowUserItemsBlock"
+            :header="t('page.island.selectedResources')"
             :items="userItems"
+            :visible-items-count="userItemsCount"
           />
         </div>
-      </div>
-      <div class="row">
         <div class="col-lg-6 mt-4">
-          <h3 class="mt-2">{{ t("common.groupData") }}</h3>
-          <a
-            href="#"
-            @click.prevent="isShowGroupItems = !isShowGroupItems"
-          >
-            {{ t(isShowGroupItems ? "common.hide" : "common.show") }}
-          </a>
-          <span class="badge text-bg-secondary ms-2">{{ groupItemsCount }}</span>
           <island-map-table
-            v-if="isShowGroupItems"
+            v-model:is-show-block="isShowGroupItems"
+            :header="t('common.groupData')"
             :items="groupItems"
+            :visible-items-count="groupItemsCount"
           />
         </div>
       </div>
     </div>
+
     <component
       :is="downloadDialogComponent"
       ref="downloadDialog"
