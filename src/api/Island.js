@@ -88,5 +88,10 @@ export default class Island {
     if (island.regions === undefined) {
       island.regions = [];
     }
+    island.regions.forEach((region) => {
+      if (region.startAt) {
+        region.startAt = new Date(region.startAt);
+      }
+    })
   }
 }

@@ -12,7 +12,7 @@
         regionNumbers.includes(region.number) ? 'btn-primary' : 'btn-outline-primary',
       ]"
       :disabled="loading || !region.isVisible"
-      :title="region.isVisible ? t('page.home.thePartNumber', { n: region.number }) : t('common.partTemporalyUnavailable')"
+      :title="getRegionTitle(region)"
       type="button"
       @click="onChangeNumber(region)"
     >
@@ -35,6 +35,7 @@ const EVENT_RESET_REGION_NUMBERS = 'resetRegionNumbers'
 </script>
 <script setup>
 import { useI18n } from "vue-i18n";
+import { getRegionTitle } from "./island";
 
 const { t } = useI18n()
 

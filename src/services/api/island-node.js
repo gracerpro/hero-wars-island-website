@@ -31,7 +31,6 @@ export async function getNodesMap(island, isForce = false, filter = null) {
     });
 
     if (isEmptyFilter) {
-      console.log("write to cache");
       writeNodesToCache(island, nodesMap);
       savePreviousUpdatedAt(island);
     }

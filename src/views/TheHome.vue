@@ -57,7 +57,7 @@
           v-for="region in island.regions"
           :key="region.number"
           :class="['badge me-2', region.isVisible ? 'text-bg-secondary' : 'bg-secondary-subtle']"
-          :title="region.isVisible ? t('page.home.thePartNumber', { n: region.number }) : t('common.partTemporalyUnavailable')"
+          :title="getRegionTitle(region)"
           >{{ region.number }}</span
         >
       </li>
@@ -117,6 +117,7 @@ import { useI18n } from "vue-i18n";
 import { createI18nRouteTo } from "@/i18n/translation";
 import { useRoute } from "vue-router";
 import { useSSRContext } from "vue";
+import { getRegionTitle } from "./island/island";
 
 const visibleNewsMax = 5;
 
