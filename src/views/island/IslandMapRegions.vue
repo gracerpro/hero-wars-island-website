@@ -10,8 +10,9 @@
       :class="[
         'btn',
         regionNumbers.includes(region.number) ? 'btn-primary' : 'btn-outline-primary',
+        region.isVisible ? '' : 'text-secondary',
       ]"
-      :disabled="loading || !region.isVisible"
+      :disabled="loading"
       :title="getRegionTitle(region)"
       type="button"
       @click="onChangeNumber(region)"
