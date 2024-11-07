@@ -1,7 +1,7 @@
 <template>
   <suspense>
     <modal-dialog
-      ref="dialog"
+      ref="dialogRef"
       element-id="island-map-download-dialog"
       :form-id="formId"
       :header="t('common.download')"
@@ -51,9 +51,9 @@ const { t } = useI18n();
 
 const formId = "download-map-form";
 
-const dialog = ref(null);
+const dialogRef = ref(null);
 
-const { show, onMountedDialog } = useShow(dialog);
+const { show, onMountedDialog } = useShow(dialogRef);
 
 const props = defineProps({
   island: { type: Object, required: true },
@@ -133,7 +133,6 @@ async function downloadAsPng() {
   const canvasElem = document.createElement("canvas");
 
   try {
-    // TODO: max size!
     canvasElem.width = canvasWidth.value;
     canvasElem.height = canvasHeight.value;
 
@@ -151,7 +150,7 @@ async function downloadAsPng() {
     loading.value = false;
   }
 
-  dialog.value.hide();
+  dialogRef.value.hide();
 }
 
 async function loadImages() {
