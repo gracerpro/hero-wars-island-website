@@ -3,7 +3,7 @@
     <div class="col-md-6">
       <label
         :for="formId + '__itemName'"
-        class="form-label"
+        :class="['form-label', itemName.length > 0 ? 'not-empty' : '']"
         >{{ t("common.resource") }}
         <span v-if="itemName" class="badge rounded-pill text-bg-warning">&nbsp;</span>
       </label>
@@ -11,7 +11,7 @@
         :model-value="itemName"
         :model-modifiers="{ trim: true }"
         :input-id="formId + '__itemName'"
-        :class="{ 'not-empty': itemName }"
+        :class="{ 'not-empty': itemName.length > 0 }"
         @update:model-value="onUpdateName"
       />
       <div class="form-text fw-normal">
@@ -21,13 +21,16 @@
     <div class="col-md-6">
       <label
         :for="formId + '__typeId'"
-        class="form-label"
-        >{{ t("common.type") }}</label
-      >
+        :class="['form-label', typeId != null ? 'not-empty' : '']"
+        >
+        {{ t("common.type") }}
+        <span v-if="typeId != null" class="badge rounded-pill text-bg-warning">&nbsp;</span>
+      </label>
       <clear-select
         :model-value="typeId"
         :input-id="formId + '__typeId'"
         :select-values="visibleTypes"
+        :class="{ 'not-empty': typeId != null }"
         @update:model-value="onChangeType"
       />
     </div>
@@ -62,7 +65,13 @@
           >{{ t("common.chest") }}</label
         >
       </div>
-      <button type="button" class="btn btn-secondary float-end">
+      <span v-if="isCheckedFlags" class="badge rounded-pill text-bg-warning form-check-not-empty">&nbsp;</span>
+      <button
+        type="button"
+        class="btn btn-secondary float-end"
+        :disabled="filledFilterCount === 0"
+        @click="onReset"
+      >
         {{ t("common.reset") }}
       </button>
     </div>
@@ -118,14 +127,32 @@ const visibleTypes = computed(() => {
 
   return types;
 });
+const isCheckedFlags = computed(() => {
+  return props.isNodeTypeTower || props.isNodeTypeChest;
+})
+const filledFilterCount = computed(() => {
+  let count = 0;
 
-const onUpdateName = (name) => {
+  if (props.typeId !== null) {
+    ++count
+  }
+  if (props.itemName !== "") {
+    ++count
+  }
+  if (isCheckedFlags.value) {
+    ++count
+  }
+
+  return count
+})
+
+function onUpdateName(name) {
   emit(EVENT_UPDATE_ITEM_NAME, name);
 };
-const onChangeType = (typeId) => {
+function onChangeType(typeId) {
   emit(EVENT_UPDATE_TYPE, typeId);
 };
-const onChangeNodeType = (event) => {
+function onChangeNodeType(event) {
   const typeId = parseInt(event.target.value);
 
   if (typeId === TYPE_TOWER) {
@@ -135,4 +162,32 @@ const onChangeNodeType = (event) => {
     emit(EVENT_UPDATE_IS_NODE_TYPE_CHEST, event.target.checked);
   }
 };
+function onReset() {
+  if (props.typeId !== null) {
+    emit(EVENT_UPDATE_TYPE, null)
+  }
+  if (props.itemName !== "") {
+    emit(EVENT_UPDATE_ITEM_NAME, "")
+  }
+  if (props.isNodeTypeTower) {
+    emit(EVENT_UPDATE_IS_NODE_TYPE_TOWER, false)
+  }
+  if (props.isNodeTypeChest) {
+    emit(EVENT_UPDATE_IS_NODE_TYPE_CHEST, false)
+  }
+}
 </script>
+<style>
+.not-empty .badge {
+  font-size: 0.5em;
+  vertical-align: middle;
+}
+.form-check-not-empty {
+  font-size: 0.6em;
+  vertical-align: middle;
+}
+.not-empty .form-control,
+.not-empty .form-select {
+  border-color: var(--bs-warning);
+}
+</style>
