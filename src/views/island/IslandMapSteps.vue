@@ -17,13 +17,25 @@
     <div>
       {{ t("page.island.myExplorersMoves") }}
     </div>
-    <div class="mt-2">
-      <span class="fs-4 me-2 align-middle">
-        <b>{{ userNodesCount }}</b> / {{ totalNodesCount }}
-      </span>
+    <div class="d-flex align-items-center mt-2">
+      <div class="me-3">
+        <span class="d-inline-block mb-1">
+          <span class="tmp-icon" :title="t('item.explorerMove')"></span>
+          <span class="fs-4 align-middle">
+            <b>{{ explorerMoveCount }}</b> / {{ totalExplorerMoveCount }}
+          </span>
+        </span>
+        <br>
+        <span class="d-inline-block">
+          <span class="tmp-icon" :title="t('item.wood')"></span>
+          <span class="fs-4 align-middle">
+            <b>{{ woodMoveCount }}</b> / {{ totalWoodMoveCount }}
+          </span>
+        </span>
+      </div>
       <button
         type="button"
-        :class="['btn btn-secondary align-middle', userNodesCount > 0 ? '' : 'disabled']"
+        :class="['btn btn-secondary', explorerMoveCount > 0 ? '' : 'disabled']"
         @click="emit(EVENT_RESET_USER_NODES)"
       >
         {{ t("common.reset") }}
@@ -63,8 +75,10 @@ const { t } = useI18n();
 const props = defineProps({
   selectMode: { type: String, required: true },
   isSelectAnyNode: { type: Boolean, required: true },
-  userNodesCount: { type: Number, required: true },
-  totalNodesCount: { type: Number, required: true },
+  explorerMoveCount: { type: Number, required: true },
+  totalExplorerMoveCount: { type: Number, required: true },
+  woodMoveCount: { type: Number, required: true },
+  totalWoodMoveCount: { type: Number, required: true },
 });
 
 const emit = defineEmits([
@@ -93,3 +107,13 @@ function onChangeSelectMode(event) {
   emit(EVENT_UPDATE_SELECT_MODE, event.target.value);
 }
 </script>
+<style scoped>
+.tmp-icon {
+  display: inline-block;
+  width: 32px;
+  height: 32px;
+  outline: 1px solid #ddd;
+  margin-right: 8px;
+  vertical-align: middle;
+}
+</style>

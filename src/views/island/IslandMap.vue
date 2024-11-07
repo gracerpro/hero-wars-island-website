@@ -59,8 +59,10 @@
           <island-map-steps
             v-model:is-select-any-node="isSelectAnyNode"
             v-model:select-mode="selectMode"
-            :user-nodes-count="userNodesCount"
-            :total-nodes-count="totalNodesCount"
+            :explorer-move-count="userExplorerMoveCount"
+            :total-explorer-move-count="totalExplorerMoveCount"
+            :wood-move-count="userWoodMoveCount"
+            :total-wood-move-count="totalWoodMoveCount"
             @reset-user-nodes="onResetUserNodes"
           />
         </div>
@@ -118,8 +120,8 @@ import { onMounted, onUnmounted, ref, computed, shallowReactive } from "vue";
 import { getHumanQuantity } from "@/helpers/formatter";
 import { useI18n } from "vue-i18n";
 import { fullscreenElement } from "@/core/fullscreen";
-import { TYPE_CHEST, TYPE_TOWER } from "@/api/Node";
-import { TYPE_UNKNOWN } from "@/api/Item";
+import { TYPE_BLOCKER, TYPE_CHEST, TYPE_START, TYPE_TOWER } from "@/api/Node";
+import { GAME_ID_EXPLORER_MOVE, GAME_ID_WOOD, TYPE_UNKNOWN } from "@/api/Item";
 import { isObject } from "@/helpers/core";
 import { getNodesMap } from "@/services/api/island-node";
 import { SELECT_MODE_PLAN } from "./select-mode";
@@ -235,10 +237,50 @@ const groupItems = computed(() => {
 });
 const groupItemsCount = computed(() => Object.keys(groupItems.value).length);
 
-const userNodesCount = computed(() => Object.keys(userNodesMap.value).length);
-const totalNodesCount = computed(() => {
-  const length = Object.keys(nodes.value).length;
-  return length > 0 ? length - 1 : 0; // "-1" it means subtract an entry node
+const userWoodMoveCount = computed(() => {
+  let result = 0;
+
+  for (const nodeId in userNodesMap.value) {
+    const node = userNodesMap.value[nodeId];
+    if (node.cost?.gameItemId == GAME_ID_WOOD) {
+      ++result;
+    }
+  }
+
+  return result;
+})
+const userExplorerMoveCount = computed(() => {
+  return Object.keys(userNodesMap.value).length - userWoodMoveCount.value;
+})
+const totalExplorerMoveCount = computed(() => {
+  let result = 0;
+
+  for (const nodeId in nodes.value) {
+    const node = nodes.value[nodeId];
+
+    if (!node.cost) {
+      if (!(node.typeId === TYPE_START || node.typeId === TYPE_BLOCKER)) {
+        ++result;
+      }
+    } else if (node.cost.gameItemId == GAME_ID_EXPLORER_MOVE) {
+      ++result;
+    }
+  }
+
+  return result;
+});
+const totalWoodMoveCount = computed(() => {
+  let result = 0;
+
+  for (const nodeId in nodes.value) {
+    const node = nodes.value[nodeId];
+
+    if (node.cost?.gameItemId == GAME_ID_WOOD) {
+      ++result;
+    }
+  }
+
+  return result;
 });
 
 loadState();

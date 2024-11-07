@@ -78,6 +78,10 @@
     "en": "English",
     "ru": "Russian"
   },
+  "item": {
+    "explorerMove": "Explorer's move",
+    "wood": "Wood"
+  },
   "page": {
     "about": {
       "coolHelpProject": "If someone wants to help the project",
