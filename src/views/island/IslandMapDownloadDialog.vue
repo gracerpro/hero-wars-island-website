@@ -176,7 +176,7 @@ async function loadImages() {
         resolve();
       };
       image.onerror = () => {
-        reject(new Error('Could not load an image.'))
+        reject(new Error("Could not load an image."));
       };
       image.src = url;
     });

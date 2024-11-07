@@ -8,7 +8,10 @@
       {{ t(isShowBlock ? "common.hide" : "common.show") }}
     </a>
     <span class="badge text-bg-secondary ms-2">{{ visibleItemsCount }}</span>
-    <div v-if="isShowBlock" class="heightable">
+    <div
+      v-if="isShowBlock"
+      class="heightable"
+    >
       <table class="table table-striped table-hover table-sm">
         <thead>
           <tr>
@@ -44,7 +47,7 @@
   </div>
 </template>
 <script>
-const EVENT_UPDATE_IS_SHOW_BLOCK = 'update:isShowBlock'
+const EVENT_UPDATE_IS_SHOW_BLOCK = "update:isShowBlock";
 </script>
 <script setup>
 import { useI18n } from "vue-i18n";
@@ -55,9 +58,7 @@ defineProps({
   isShowBlock: { type: Boolean, required: true },
   visibleItemsCount: { type: Number, required: true },
 });
-const emit = defineEmits([
-  EVENT_UPDATE_IS_SHOW_BLOCK
-])
+const emit = defineEmits([EVENT_UPDATE_IS_SHOW_BLOCK]);
 
 const { t } = useI18n();
 

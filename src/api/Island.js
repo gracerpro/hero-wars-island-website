@@ -92,6 +92,6 @@ export default class Island {
       if (region.startAt) {
         region.startAt = new Date(region.startAt);
       }
-    })
+    });
   }
 }

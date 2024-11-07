@@ -31,24 +31,21 @@
   </div>
 </template>
 <script>
-const EVENT_UPDATE_REGION_NUMBERS = 'update:regionNumbers'
-const EVENT_RESET_REGION_NUMBERS = 'resetRegionNumbers'
+const EVENT_UPDATE_REGION_NUMBERS = "update:regionNumbers";
+const EVENT_RESET_REGION_NUMBERS = "resetRegionNumbers";
 </script>
 <script setup>
 import { useI18n } from "vue-i18n";
 import { getRegionTitle } from "./island";
 
-const { t } = useI18n()
+const { t } = useI18n();
 
 const props = defineProps({
   regions: { type: Array, required: true },
   regionNumbers: { type: Array, required: true },
-  loading: { type: Boolean, required: true }
-})
-const emit = defineEmits([
-  EVENT_UPDATE_REGION_NUMBERS,
-  EVENT_RESET_REGION_NUMBERS,
-])
+  loading: { type: Boolean, required: true },
+});
+const emit = defineEmits([EVENT_UPDATE_REGION_NUMBERS, EVENT_RESET_REGION_NUMBERS]);
 
 function onChangeNumber(region) {
   if (!region.isVisible) {
@@ -63,6 +60,6 @@ function onChangeNumber(region) {
     numbers.push(region.number);
   }
 
-  emit(EVENT_UPDATE_REGION_NUMBERS, numbers)
+  emit(EVENT_UPDATE_REGION_NUMBERS, numbers);
 }
 </script>

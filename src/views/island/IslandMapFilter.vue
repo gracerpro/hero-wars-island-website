@@ -5,7 +5,11 @@
         :for="formId + '__itemName'"
         :class="['form-label', itemName.length > 0 ? 'not-empty' : '']"
         >{{ t("common.resource") }}
-        <span v-if="itemName" class="badge rounded-pill text-bg-warning">&nbsp;</span>
+        <span
+          v-if="itemName"
+          class="badge rounded-pill text-bg-warning"
+          >&nbsp;</span
+        >
       </label>
       <text-input
         :model-value="itemName"
@@ -22,9 +26,13 @@
       <label
         :for="formId + '__typeId'"
         :class="['form-label', typeId != null ? 'not-empty' : '']"
-        >
+      >
         {{ t("common.type") }}
-        <span v-if="typeId != null" class="badge rounded-pill text-bg-warning">&nbsp;</span>
+        <span
+          v-if="typeId != null"
+          class="badge rounded-pill text-bg-warning"
+          >&nbsp;</span
+        >
       </label>
       <clear-select
         :model-value="typeId"
@@ -65,7 +73,11 @@
           >{{ t("common.chest") }}</label
         >
       </div>
-      <span v-if="isCheckedFlags" class="badge rounded-pill text-bg-warning form-check-not-empty">&nbsp;</span>
+      <span
+        v-if="isCheckedFlags"
+        class="badge rounded-pill text-bg-warning form-check-not-empty"
+        >&nbsp;</span
+      >
       <button
         type="button"
         class="btn btn-secondary float-end"
@@ -129,29 +141,29 @@ const visibleTypes = computed(() => {
 });
 const isCheckedFlags = computed(() => {
   return props.isNodeTypeTower || props.isNodeTypeChest;
-})
+});
 const filledFilterCount = computed(() => {
   let count = 0;
 
   if (props.typeId !== null) {
-    ++count
+    ++count;
   }
   if (props.itemName !== "") {
-    ++count
+    ++count;
   }
   if (isCheckedFlags.value) {
-    ++count
+    ++count;
   }
 
-  return count
-})
+  return count;
+});
 
 function onUpdateName(name) {
   emit(EVENT_UPDATE_ITEM_NAME, name);
-};
+}
 function onChangeType(typeId) {
   emit(EVENT_UPDATE_TYPE, typeId);
-};
+}
 function onChangeNodeType(event) {
   const typeId = parseInt(event.target.value);
 
@@ -161,19 +173,19 @@ function onChangeNodeType(event) {
   if (typeId === TYPE_CHEST) {
     emit(EVENT_UPDATE_IS_NODE_TYPE_CHEST, event.target.checked);
   }
-};
+}
 function onReset() {
   if (props.typeId !== null) {
-    emit(EVENT_UPDATE_TYPE, null)
+    emit(EVENT_UPDATE_TYPE, null);
   }
   if (props.itemName !== "") {
-    emit(EVENT_UPDATE_ITEM_NAME, "")
+    emit(EVENT_UPDATE_ITEM_NAME, "");
   }
   if (props.isNodeTypeTower) {
-    emit(EVENT_UPDATE_IS_NODE_TYPE_TOWER, false)
+    emit(EVENT_UPDATE_IS_NODE_TYPE_TOWER, false);
   }
   if (props.isNodeTypeChest) {
-    emit(EVENT_UPDATE_IS_NODE_TYPE_CHEST, false)
+    emit(EVENT_UPDATE_IS_NODE_TYPE_CHEST, false);
   }
 }
 </script>
