@@ -128,7 +128,8 @@ const props = defineProps({
   isShowQuantity: { type: Boolean, required: true },
   items: { type: Array, required: true },
   nodes: { type: Object, required: true },
-  userNodesMap: { type: Object, required: true },
+  userNodesIdsMap: { type: Object, required: true },
+  userNodesGoingIdsMap: { type: Object, required: true },
   isSelectAnyNode: { type: Boolean, default: true },
 });
 
@@ -229,7 +230,7 @@ function selectNode(drawedNode) {
   }
   if (!isUserNode(drawedNode.node)) {
     if (!props.isSelectAnyNode) {
-      const message = canSelectNextNode(totalNodes.value, props.userNodesMap, drawedNode);
+      const message = canSelectNextNode(totalNodes.value, props.userNodesIdsMap, drawedNode);
       if (message) {
         toast.value.show(message, TYPE_DANGER);
         return;
@@ -323,7 +324,7 @@ function onMountedInfoDialog() {
  * @returns {Boolean}
  */
 function isUserNode(node) {
-  return props.userNodesMap[node.id] !== undefined;
+  return props.userNodesIdsMap[node.id] !== undefined;
 }
 
 /**
@@ -331,8 +332,9 @@ function isUserNode(node) {
  * @returns {String}
  */
 function getUserNodeClass(drawedNode) {
-  if (props.userNodesMap[drawedNode.node.id] !== undefined) {
-    return props.userNodesMap[drawedNode.node.id].isGoingChecked ? "user-node-going" : "user-node";
+  const nodeId = drawedNode.node.id;
+  if (props.userNodesIdsMap[nodeId]) {
+    return props.userNodesGoingIdsMap[nodeId] ? "user-node-going" : "user-node";
   }
   return "";
 }

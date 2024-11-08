@@ -18,11 +18,11 @@ export function canSelectNode(node) {
 
 /**
  * @param {Object} drawedNodes
- * @param {Object} selectedNodes
+ * @param {Object} userNodesIdsMap
  * @param {Object} node
  * @returns {String|null}
  */
-export function canSelectNextNode(drawedNodes, selectedNodes, nextDrawedNode) {
+export function canSelectNextNode(drawedNodes, userNodesIdsMap, nextDrawedNode) {
   const { t } = useI18n();
   let result = null;
 
@@ -33,7 +33,7 @@ export function canSelectNextNode(drawedNodes, selectedNodes, nextDrawedNode) {
   // if no link to selected or started node
   // then cancel
 
-  if (Object.keys(selectedNodes).length === 0) {
+  if (Object.keys(userNodesIdsMap).length === 0) {
     let isFound = false;
     let isNearStart = false;
     for (const id in drawedNodes) {
@@ -65,7 +65,7 @@ export function canSelectNextNode(drawedNodes, selectedNodes, nextDrawedNode) {
           isFound = true;
           break;
         }
-        if (selectedNodes[drawedNode.node.id]) {
+        if (userNodesIdsMap[drawedNode.node.id]) {
           isFound = true;
           break;
         }

@@ -38,7 +38,8 @@
         :is-select-any-node="isSelectAnyNode"
         :items="visibleItems"
         :nodes="nodes"
-        :user-nodes-map="userNodesMap"
+        :user-nodes-ids-map="userNodesIdsMap"
+        :user-nodes-going-ids-map="userNodesGoingIdsMap"
         @change-translate="onChangeTranslate"
         @change-scale="onChangeScale"
         @change-node="onChangeNode"
@@ -135,8 +136,6 @@ const props = defineProps({
   parentPageId: { type: String, required: true },
 });
 
-let userNodesIds = [];
-let userNodesGoingIds = [];
 let byIslandState = {};
 
 const minCharsCount = 3;
@@ -148,7 +147,8 @@ const errorMessage = ref("");
 const regionNumbers = ref([]);
 const nodes = ref({});
 const items = ref([]);
-const userNodesMap = ref({});
+const userNodesIdsMap = ref({});
+const userNodesGoingIdsMap = ref({});
 const scale = ref(1);
 const translateX = ref(0);
 const translateY = ref(0);
@@ -202,7 +202,7 @@ const visibleItems = computed(() => {
 const visibleItemsCount = computed(() => visibleItems.value.length);
 const userItems = computed(() => {
   return items.value.filter((item) => {
-    return userNodesMap.value[item.node.id] !== undefined;
+    return nodes.value[item.node.id] && userNodesIdsMap.value[item.node.id];
   });
 });
 const userItemsCount = computed(() => userItems.value.length);
@@ -240,9 +240,9 @@ const groupItemsCount = computed(() => Object.keys(groupItems.value).length);
 const userWoodMoveCount = computed(() => {
   let result = 0;
 
-  for (const nodeId in userNodesMap.value) {
-    const node = userNodesMap.value[nodeId];
-    if (node.cost?.gameItemId == GAME_ID_WOOD) {
+  for (const nodeId in userNodesIdsMap.value) {
+    const node = nodes.value[nodeId];
+    if (node?.cost?.gameItemId == GAME_ID_WOOD) {
       ++result;
     }
   }
@@ -250,7 +250,16 @@ const userWoodMoveCount = computed(() => {
   return result;
 })
 const userExplorerMoveCount = computed(() => {
-  return Object.keys(userNodesMap.value).length - userWoodMoveCount.value;
+  let totalUserNodeCount = 0;
+
+  for (const nodeId in userNodesIdsMap.value) {
+    const node = nodes.value[nodeId];
+    if (node) {
+      ++totalUserNodeCount;
+    }
+  }
+
+  return totalUserNodeCount - userWoodMoveCount.value;
 })
 const totalExplorerMoveCount = computed(() => {
   let result = 0;
@@ -319,27 +328,6 @@ async function loadNodes(isForce) {
   }
 
   return nodes;
-}
-
-/**
- * @param {Object} nodes
- */
-function initUserNodes(nodes) {
-  let nodesMap = {};
-
-  userNodesIds.forEach((id) => {
-    const node = nodes[id];
-    if (node) {
-      if (canSelectNode(node)) {
-        nodesMap[id] = node;
-      }
-      if (userNodesGoingIds.includes(id)) {
-        node.isGoingChecked = true;
-      }
-    }
-  });
-
-  return nodesMap;
 }
 
 /**
@@ -444,25 +432,29 @@ function onSelectNode(nodeId) {
       throw new Error(t("page.island.notFoundNodeAdmin"));
     }
 
-    if (userNodesMap.value[nodeId] !== undefined) {
-      delete userNodesMap.value[nodeId];
-      nodes.value[nodeId].isGoingChecked = false;
+    if (userNodesIdsMap.value[nodeId]) {
+      delete userNodesIdsMap.value[nodeId];
     } else {
-      userNodesMap.value[nodeId] = nodes.value[nodeId];
+      userNodesIdsMap.value[nodeId] = true;
+    }
+    if (userNodesGoingIdsMap.value[nodeId]) {
+      delete userNodesGoingIdsMap.value[nodeId];
     }
   } else {
-    if (userNodesMap.value[nodeId] !== undefined) {
-      userNodesMap.value[nodeId].isGoingChecked = !userNodesMap.value[nodeId].isGoingChecked;
+    if (userNodesIdsMap.value[nodeId]) {
+      if (userNodesGoingIdsMap.value[nodeId]) {
+        delete userNodesGoingIdsMap.value[nodeId];
+      } else {
+        userNodesGoingIdsMap.value[nodeId] = true;
+      }
     }
   }
 }
 
 function onResetUserNodes() {
-  userNodesMap.value = {};
+  userNodesGoingIdsMap.value = {}
+  userNodesIdsMap.value = {};
   selectMode.value = SELECT_MODE_PLAN;
-  for (let id in nodes.value) {
-    delete nodes.value[id].isGoingChecked;
-  }
 }
 
 function onFullscreen() {
@@ -485,7 +477,13 @@ function reloadMap(isForce = false) {
   loadNodes(isForce).then((responseNodes) => {
     nodes.value = responseNodes;
     items.value = calculateItems(responseNodes);
-    userNodesMap.value = initUserNodes(responseNodes);
+
+    for (const nodeId in userNodesIdsMap.value) {
+      const node = nodes.value[nodeId];
+      if (node && !canSelectNode(node)) {
+        delete userNodesIdsMap.value[nodeId]
+      }
+    }
   });
 }
 
@@ -565,9 +563,18 @@ function loadState() {
   scale.value = byIsland.scale || 1;
   translateX.value = byIsland.translateX || 0;
   translateY.value = byIsland.translateY || 0;
-  userNodesIds = byIsland.userNodesIds || [];
-  userNodesGoingIds = byIsland.userNodesGoingIds || [];
   regionNumbers.value = byIsland.regionNumbers || [];
+
+  if (byIsland.userNodesIds) {
+    byIsland.userNodesIds.forEach((id) => {
+      userNodesIdsMap.value[id] = true;
+    })
+  }
+  if (byIsland.userNodesGoingIds) {
+    byIsland.userNodesGoingIds.forEach((id) => {
+      userNodesGoingIdsMap.value[id] = true;
+    })
+  }
 
   filter.value = state.filter;
   isShowQuantity.value = state.isShowQuantity;
@@ -588,10 +595,8 @@ function saveState() {
     isShowUserItemsBlock: isShowUserItemsBlock.value,
   };
   byIslandState[props.island.id] = {
-    userNodesIds: Object.keys(userNodesMap.value).map((id) => parseInt(id)),
-    userNodesGoingIds: Object.values(userNodesMap.value)
-      .filter((node) => node.isGoingChecked)
-      .map((node) => parseInt(node.id)),
+    userNodesIds: Object.keys(userNodesIdsMap.value).map((id) => parseInt(id)),
+    userNodesGoingIds: Object.keys(userNodesGoingIdsMap.value).map((id) => parseInt(id)),
     scale: scale.value,
     translateX: translateX.value,
     translateY: translateY.value,
