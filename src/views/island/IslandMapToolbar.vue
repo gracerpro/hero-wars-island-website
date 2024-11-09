@@ -101,12 +101,12 @@
     >
       <button
         type="button"
-        class="btn btn-secondary"
+        class="btn btn-secondary download-btn"
         :disabled="loading"
         :title="t('common.download')"
         @click="emit(EVENT_BEGIN_DOWNLOAD)"
       >
-        D
+        <span class="hero-icon hero-download align-middle" />
       </button>
     </div>
     <div
@@ -270,6 +270,9 @@ function onMountedHelpDialog() {
 }
 </style>
 <style>
+.download-btn {
+  padding: 4px;
+}
 .fullscreen-btn {
   padding: 5px;
   line-height: 10px;

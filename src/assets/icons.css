@@ -5,8 +5,15 @@
   background-size: 24px 24px;
 }
 .item-wood {
-  background-image: url('/icons/wood.svg');
+  background-image: url('/icons/items/wood.svg');
 }
 .item-explorer-move {
-  background-image: url('/icons/exporer-move.svg');
+  background-image: url('/icons/items/exporer-move.svg');
+}
+
+.hero-download {
+  background-color: #ffffff;
+  mask-size: cover;
+  mask-image: url('/icons/download.svg');
+  mask-repeat: no-repeat;
 }
