@@ -20,14 +20,20 @@
     <div class="d-flex align-items-center mt-2">
       <div class="me-3">
         <span class="d-inline-block mb-1">
-          <span class="hero-icon item-explorer-move align-middle me-3" :title="t('item.explorerMove')" />
+          <span
+            class="hero-icon item-explorer-move align-middle me-3"
+            :title="t('item.explorerMove')"
+          />
           <span class="fs-4 align-middle">
             <b>{{ explorerMoveCount }}</b> / {{ totalExplorerMoveCount }}
           </span>
         </span>
-        <br>
+        <br />
         <span class="d-inline-block">
-          <span class="hero-icon item-wood align-middle me-3" :title="t('item.wood')"></span>
+          <span
+            class="hero-icon item-wood align-middle me-3"
+            :title="t('item.wood')"
+          ></span>
           <span class="fs-4 align-middle">
             <b>{{ woodMoveCount }}</b> / {{ totalWoodMoveCount }}
           </span>

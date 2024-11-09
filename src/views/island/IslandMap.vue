@@ -248,7 +248,7 @@ const userWoodMoveCount = computed(() => {
   }
 
   return result;
-})
+});
 const userExplorerMoveCount = computed(() => {
   let totalUserNodeCount = 0;
 
@@ -260,7 +260,7 @@ const userExplorerMoveCount = computed(() => {
   }
 
   return totalUserNodeCount - userWoodMoveCount.value;
-})
+});
 const totalExplorerMoveCount = computed(() => {
   let result = 0;
 
@@ -452,7 +452,7 @@ function onSelectNode(nodeId) {
 }
 
 function onResetUserNodes() {
-  userNodesGoingIdsMap.value = {}
+  userNodesGoingIdsMap.value = {};
   userNodesIdsMap.value = {};
   selectMode.value = SELECT_MODE_PLAN;
 }
@@ -481,7 +481,7 @@ function reloadMap(isForce = false) {
     for (const nodeId in userNodesIdsMap.value) {
       const node = nodes.value[nodeId];
       if (node && !canSelectNode(node)) {
-        delete userNodesIdsMap.value[nodeId]
+        delete userNodesIdsMap.value[nodeId];
       }
     }
   });
@@ -568,12 +568,12 @@ function loadState() {
   if (byIsland.userNodesIds) {
     byIsland.userNodesIds.forEach((id) => {
       userNodesIdsMap.value[id] = true;
-    })
+    });
   }
   if (byIsland.userNodesGoingIds) {
     byIsland.userNodesGoingIds.forEach((id) => {
       userNodesGoingIdsMap.value[id] = true;
-    })
+    });
   }
 
   filter.value = state.filter;
