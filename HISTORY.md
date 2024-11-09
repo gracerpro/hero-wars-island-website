@@ -1,5 +1,37 @@
 # History
 
+## v1.6.4 at 2024-11-09
+
+What has been done
+
+* Add cells loading by regions
+* Add second move: wood
+* Add filter warning state on island page
+* Add start at time to regions numbers
+* Add some icons
+* Show the game version when syncing cells
+* Add admin message near a feedback
+
+Technical part
+
+* Migrate eslint to flat config
+* Refactoring: change user node ids state
+* Refactoring: change table items component
+* Remove the sentry dependency
+* Update dependencies
+* Update docker
+* Add test for news page
+* Update the home tests
+* Optimize the news request
+* Optimize the islands request
+* Update static site generation
+
+Fix bugs
+
+* Fix: page not found in news
+* Fix: change page title on locale switch
+
+
 ## v1.5.1 at 2024-09-09
 
 What has been done
