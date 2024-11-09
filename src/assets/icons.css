@@ -1,0 +1,12 @@
+.hero-icon {
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+  background-size: 24px 24px;
+}
+.item-wood {
+  background-image: url('/icons/wood.svg');
+}
+.item-explorer-move {
+  background-image: url('/icons/exporer-move.svg');
+}
