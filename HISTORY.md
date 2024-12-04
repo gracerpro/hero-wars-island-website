@@ -1,5 +1,20 @@
 # History
 
+## v1.6.5 at 2024-12-04
+
+What has been done
+
+* Use keyboard on island map
+* To offset a map use left mouse button
+* Reset map scale and translate state by server
+* Hide regions buttons if it is one
+
+Technical part
+
+* Update the dependencies
+* Update docker
+
+
 ## v1.6.4 at 2024-11-09
 
 What has been done
