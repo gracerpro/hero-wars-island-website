@@ -5,6 +5,7 @@
       height="600"
       class="canvas"
       width="100%"
+      tabindex="0"
       :viewBox="viewBox"
       xmlns="http://www.w3.org/2000/svg"
       @mousedown="onMouseDown"
@@ -77,7 +78,7 @@
   </div>
 </template>
 <script>
-const EVENT_SELECT_NODE = "select-node";
+const EVENT_SELECT_NODE = "selectNode";
 </script>
 <script setup>
 import { TYPE_DANGER } from "@/components/ToastMessage.vue";
@@ -91,7 +92,7 @@ import {
   TYPE_WOOD,
   TYPE_BUBBLE,
 } from "@/api/Node";
-import { ref, shallowRef, computed, defineAsyncComponent } from "vue";
+import { ref, shallowRef, computed, defineAsyncComponent, onMounted, onUnmounted } from "vue";
 import {
   TRANSLATE_X,
   TRANSLATE_Y,
@@ -112,7 +113,7 @@ const ToastMessage = import.meta.env.SSR
   ? null
   : defineAsyncComponent(() => import("@/components/ToastMessage.vue"));
 
-const MIDDLE_BUTTON = 1;
+const BUTTON_MAIN = 0;
 
 const mouse = {
   isDown: false,
@@ -120,7 +121,11 @@ const mouse = {
   preventY: null,
 };
 
-const emit = defineEmits([EVENT_CHANGE_TRANSLATE, EVENT_CHANGE_SCALE, EVENT_SELECT_NODE]);
+const emit = defineEmits([
+  EVENT_CHANGE_TRANSLATE,
+  EVENT_CHANGE_SCALE,
+  EVENT_SELECT_NODE
+]);
 const props = defineProps({
   scale: { type: Number, required: true },
   translateX: { type: Number, required: true },
@@ -138,11 +143,11 @@ const infoDialog = ref(null);
 const infoDialogComponent = shallowRef(null);
 const infoDialogDrawedNode = ref(null);
 
+const toast = ref(null);
+
 defineExpose({
   svgMap,
 });
-
-const toast = ref(null);
 
 const viewBox = computed(() => {
   const side = SIDE * 5 * props.scale;
@@ -163,6 +168,65 @@ const totalNodes = computed(() => {
 const iconsItems = computed(() =>
   getIconsItems(props.items, totalNodes.value, props.isShowQuantity)
 );
+
+onMounted(() => {
+  window.addEventListener("keydown", onKeyDownMap);
+})
+onUnmounted(() => {
+  window.removeEventListener("keydown", onKeyDownMap);
+})
+
+function onKeyDownMap(event) {
+  if (event.defaultPrevented) {
+    return;
+  }
+  if (event.target != svgMap.value) {
+    return;
+  }
+
+  if (event.key === "PageDown") {
+    emitNewScale(event, -DELTA_SCALE);
+    event.preventDefault()
+    return;
+  }
+  if (event.key === "PageUp") {
+    emitNewScale(event, DELTA_SCALE);
+    event.preventDefault()
+    return;
+  }
+
+  let x = 0
+  let y = 0
+
+  switch (event.key) {
+    case "ArrowLeft":
+      x = -TRANSLATE_X * 5;
+      break;
+    case "ArrowRight":
+      x = TRANSLATE_X * 5;
+      break;
+    case "ArrowUp":
+      y = -TRANSLATE_Y * 5;
+      break;
+    case "ArrowDown":
+      y = TRANSLATE_Y * 5;
+      break;
+    default:
+      return;
+  }
+
+  if (x != 0 || y != 0) {
+    if (event.ctrlKey) {
+      x /= 10;
+      y /= 10;
+    } else if (event.shiftKey) {
+      x /= 2;
+      y /= 2;
+    }
+    emit(EVENT_CHANGE_TRANSLATE, x, y);
+    event.preventDefault()
+  }
+}
 
 function getNodeClass(node) {
   const classes = {
@@ -245,7 +309,7 @@ function selectNode(drawedNode) {
  * @param {Object} button
  */
 function onMouseDown(event) {
-  if (event.button === MIDDLE_BUTTON) {
+  if (event.button === BUTTON_MAIN) {
     mouse.preventX = event.pageX;
     mouse.preventY = event.pageY;
     mouse.isDown = true;
@@ -294,14 +358,22 @@ function onMouseMove(button) {
 }
 
 function onMouseUp(event) {
-  if (event.button === MIDDLE_BUTTON) {
+  if (event.button === BUTTON_MAIN) {
     mouse.isDown = false;
   }
 }
 
 function onMouseWheel(event) {
   let value = event.deltaY > 0 ? DELTA_SCALE : -DELTA_SCALE;
+  emitNewScale(event, value)
+  event.preventDefault();
+}
 
+/**
+ * @param {Object} event
+ * @param {Number} value
+ */
+function emitNewScale(event, value) {
   if (event.ctrlKey) {
     value /= 10;
   } else if (event.shiftKey) {
@@ -309,7 +381,6 @@ function onMouseWheel(event) {
   }
 
   emit(EVENT_CHANGE_SCALE, value);
-  event.preventDefault();
 }
 
 function onMountedInfoDialog() {
