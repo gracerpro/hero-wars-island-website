@@ -1,6 +1,7 @@
 <template>
   <div>
     <island-map-regions
+      v-if="island.regions.length > 1"
       :regions="island.regions"
       :region-numbers="regionNumbers"
       :loading="loading"
