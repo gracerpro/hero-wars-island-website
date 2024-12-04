@@ -44,8 +44,16 @@
         @change-node="onChangeNode"
         @select-node="onSelectNode"
       />
-      <div v-if="isShowMapState" class="text-end" style="font-size: 0.9em;">
-        <span title="Zoom" class="me-4">{{ scale }}</span>
+      <div
+        v-if="isShowMapState"
+        class="text-end"
+        style="font-size: 0.9em"
+      >
+        <span
+          title="Zoom"
+          class="me-4"
+          >{{ scale }}</span
+        >
         <span title="Offset">{{ translateX }}, {{ translateY }}</span>
       </div>
       <div class="row">
@@ -172,7 +180,7 @@ const downloadDialog = ref(null);
 const downloadDialogComponent = shallowRef(null);
 
 const loading = computed(() => loadingNodes.value || calculatingItems.value);
-const isShowMapState = computed(() => import.meta.env.DEV)
+const isShowMapState = computed(() => import.meta.env.DEV);
 const visibleItems = computed(() => {
   let resultItems = items.value;
 
@@ -576,30 +584,30 @@ function loadState() {
 
   if (byIsland.scale === undefined) {
     if (props.island.initMap?.scale !== undefined) {
-      scale.value = props.island.initMap.scale
+      scale.value = props.island.initMap.scale;
     } else {
       scale.value = 1;
     }
   } else {
-    scale.value = byIsland.scale
+    scale.value = byIsland.scale;
   }
   if (byIsland.translateX === undefined) {
     if (props.island.initMap?.offsetX !== undefined) {
-      translateX.value = props.island.initMap.offsetX
+      translateX.value = props.island.initMap.offsetX;
     } else {
       translateX.value = 0;
     }
   } else {
-    translateX.value = byIsland.translateX
+    translateX.value = byIsland.translateX;
   }
   if (byIsland.translateY === undefined) {
     if (props.island.initMap?.offsetY !== undefined) {
-      translateY.value = props.island.initMap.offsetY
+      translateY.value = props.island.initMap.offsetY;
     } else {
       translateY.value = 0;
     }
   } else {
-    translateY.value = byIsland.translateY
+    translateY.value = byIsland.translateY;
   }
   regionNumbers.value = byIsland.regionNumbers || [];
 

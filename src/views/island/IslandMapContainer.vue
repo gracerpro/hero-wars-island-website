@@ -121,11 +121,7 @@ const mouse = {
   preventY: null,
 };
 
-const emit = defineEmits([
-  EVENT_CHANGE_TRANSLATE,
-  EVENT_CHANGE_SCALE,
-  EVENT_SELECT_NODE
-]);
+const emit = defineEmits([EVENT_CHANGE_TRANSLATE, EVENT_CHANGE_SCALE, EVENT_SELECT_NODE]);
 const props = defineProps({
   scale: { type: Number, required: true },
   translateX: { type: Number, required: true },
@@ -171,10 +167,10 @@ const iconsItems = computed(() =>
 
 onMounted(() => {
   window.addEventListener("keydown", onKeyDownMap);
-})
+});
 onUnmounted(() => {
   window.removeEventListener("keydown", onKeyDownMap);
-})
+});
 
 function onKeyDownMap(event) {
   if (event.defaultPrevented) {
@@ -186,17 +182,17 @@ function onKeyDownMap(event) {
 
   if (event.key === "PageDown") {
     emitNewScale(event, -DELTA_SCALE);
-    event.preventDefault()
+    event.preventDefault();
     return;
   }
   if (event.key === "PageUp") {
     emitNewScale(event, DELTA_SCALE);
-    event.preventDefault()
+    event.preventDefault();
     return;
   }
 
-  let x = 0
-  let y = 0
+  let x = 0;
+  let y = 0;
 
   switch (event.key) {
     case "ArrowLeft":
@@ -224,7 +220,7 @@ function onKeyDownMap(event) {
       y /= 2;
     }
     emit(EVENT_CHANGE_TRANSLATE, x, y);
-    event.preventDefault()
+    event.preventDefault();
   }
 }
 
@@ -365,7 +361,7 @@ function onMouseUp(event) {
 
 function onMouseWheel(event) {
   let value = event.deltaY > 0 ? DELTA_SCALE : -DELTA_SCALE;
-  emitNewScale(event, value)
+  emitNewScale(event, value);
   event.preventDefault();
 }
 
