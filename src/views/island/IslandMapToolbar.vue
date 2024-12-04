@@ -29,20 +29,6 @@
         type="button"
         class="btn btn-secondary"
         :disabled="loading"
-        :title="t('common.reset')"
-        @click="onResetScale()"
-      >
-        0
-      </button>
-    </div>
-    <div
-      class="btn-group-vertical w-100 mt-2"
-      role="group"
-    >
-      <button
-        type="button"
-        class="btn btn-secondary"
-        :disabled="loading"
         @click="onChangeTranslate(-1, 0, $event)"
       >
         &larr;
@@ -76,7 +62,7 @@
         class="btn btn-secondary"
         :title="t('common.reset')"
         :disabled="loading"
-        @click="onResetTranslate()"
+        @click="emit(EVENT_RESET)"
       >
         0
       </button>
@@ -160,8 +146,7 @@
   </div>
 </template>
 <script>
-const EVENT_RESET_TRANSLATE = "reset-translate";
-const EVENT_RESET_SCALE = "reset-scale";
+const EVENT_RESET = "reset";
 const EVENT_CHANGE_IS_SHOW_QUANTITY = "update:is-show-quantity";
 const EVENT_FULLSCREEN_ON = "fullscreen-on";
 const EVENT_BEGIN_DOWNLOAD = "begin-download";
@@ -188,9 +173,8 @@ defineProps({
 });
 
 const emit = defineEmits([
-  EVENT_RESET_TRANSLATE,
+  EVENT_RESET,
   EVENT_CHANGE_TRANSLATE,
-  EVENT_RESET_SCALE,
   EVENT_CHANGE_SCALE,
   EVENT_CHANGE_IS_SHOW_QUANTITY,
   EVENT_FULLSCREEN_ON,
@@ -206,9 +190,6 @@ const isShowReloadMap = computed(() => {
   return import.meta.env.DEV;
 });
 
-function onResetTranslate() {
-  emit(EVENT_RESET_TRANSLATE);
-}
 function onChangeTranslate(dx, dy, event) {
   let x = 0,
     y = 0;
@@ -231,10 +212,6 @@ function onChangeTranslate(dx, dy, event) {
   }
 
   emit(EVENT_CHANGE_TRANSLATE, x, y);
-}
-
-function onResetScale() {
-  emit(EVENT_RESET_SCALE);
 }
 
 function onChangeScale(zoom, event) {

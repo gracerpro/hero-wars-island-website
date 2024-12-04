@@ -12,8 +12,7 @@
       :is-show-quantity="isShowQuantity"
       :loading="loading"
       @update:is-show-quantity="onChangeIsShowQuantity"
-      @reset-scale="onResetScale"
-      @reset-translate="onResetTranslate"
+      @reset="onResetMap"
       @change-scale="onChangeScale"
       @change-translate="onChangeTranslate"
       @fullscreen-on="onFullscreen"
@@ -45,6 +44,10 @@
         @change-node="onChangeNode"
         @select-node="onSelectNode"
       />
+      <div v-if="isShowMapState" class="text-end" style="font-size: 0.9em;">
+        <span title="Zoom" class="me-4">{{ scale }}</span>
+        <span title="Offset">{{ translateX }}, {{ translateY }}</span>
+      </div>
       <div class="row">
         <div class="col-lg-6 mt-3">
           <island-map-filter
@@ -169,6 +172,7 @@ const downloadDialog = ref(null);
 const downloadDialogComponent = shallowRef(null);
 
 const loading = computed(() => loadingNodes.value || calculatingItems.value);
+const isShowMapState = computed(() => import.meta.env.DEV)
 const visibleItems = computed(() => {
   let resultItems = items.value;
 
@@ -397,8 +401,22 @@ function onChangeScale(value) {
   }
 }
 
-function onResetScale() {
-  scale.value = 1;
+function onResetMap() {
+  if (props.island.initMap?.scale !== undefined) {
+    scale.value = props.island.initMap.scale;
+  } else {
+    scale.value = 1;
+  }
+  if (props.island.initMap?.offsetX !== undefined) {
+    translateX.value = props.island.initMap.offsetX;
+  } else {
+    translateX.value = 0;
+  }
+  if (props.island.initMap?.offsetY !== undefined) {
+    translateY.value = props.island.initMap.offsetY;
+  } else {
+    translateY.value = 0;
+  }
 }
 
 function onChangeTranslate(dx, dy) {
@@ -408,11 +426,6 @@ function onChangeTranslate(dx, dy) {
   if (dy !== 0) {
     translateY.value += dy;
   }
-}
-
-function onResetTranslate() {
-  translateX.value = 0;
-  translateY.value = 0;
 }
 
 function onChangeIsShowQuantity() {
@@ -560,9 +573,34 @@ function loadState() {
   byIslandState = state.byIsland;
 
   const byIsland = byIslandState[props.island.id] ? byIslandState[props.island.id] : {};
-  scale.value = byIsland.scale || 1;
-  translateX.value = byIsland.translateX || 0;
-  translateY.value = byIsland.translateY || 0;
+
+  if (byIsland.scale === undefined) {
+    if (props.island.initMap?.scale !== undefined) {
+      scale.value = props.island.initMap.scale
+    } else {
+      scale.value = 1;
+    }
+  } else {
+    scale.value = byIsland.scale
+  }
+  if (byIsland.translateX === undefined) {
+    if (props.island.initMap?.offsetX !== undefined) {
+      translateX.value = props.island.initMap.offsetX
+    } else {
+      translateX.value = 0;
+    }
+  } else {
+    translateX.value = byIsland.translateX
+  }
+  if (byIsland.translateY === undefined) {
+    if (props.island.initMap?.offsetY !== undefined) {
+      translateY.value = props.island.initMap.offsetY
+    } else {
+      translateY.value = 0;
+    }
+  } else {
+    translateY.value = byIsland.translateY
+  }
   regionNumbers.value = byIsland.regionNumbers || [];
 
   if (byIsland.userNodesIds) {
