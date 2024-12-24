@@ -12,6 +12,8 @@
       v-if="!errorMessage"
       :is-show-quantity="isShowQuantity"
       :loading="loading"
+      :translate-x="translateX"
+      :translate-y="translateY"
       @update:is-show-quantity="onChangeIsShowQuantity"
       @reset="onResetMap"
       @change-scale="onChangeScale"
@@ -428,12 +430,16 @@ function onResetMap() {
   }
 }
 
-function onChangeTranslate(dx, dy) {
-  if (dx !== 0) {
-    translateX.value += dx;
+/**
+ * @param {Number|null} x
+ * @param {Number|null} y
+ */
+function onChangeTranslate(x, y) {
+  if (x !== null) {
+    translateX.value = x;
   }
-  if (dy !== 0) {
-    translateY.value += dy;
+  if (y !== null) {
+    translateY.value = y;
   }
 }
 

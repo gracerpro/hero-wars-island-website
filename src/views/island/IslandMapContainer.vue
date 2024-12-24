@@ -117,8 +117,10 @@ const BUTTON_MAIN = 0;
 
 const mouse = {
   isDown: false,
-  preventX: null,
-  preventY: null,
+  x0: null,
+  y0: null,
+  tx0: null,
+  ty0: null,
 };
 
 const emit = defineEmits([EVENT_CHANGE_TRANSLATE, EVENT_CHANGE_SCALE, EVENT_SELECT_NODE]);
@@ -145,9 +147,11 @@ defineExpose({
   svgMap,
 });
 
+const viewSide = computed(() => SIDE * 5 * props.scale);
+const viewWidth = computed(() => viewSide.value * 2);
+const viewHeight = computed(() => viewSide.value * 2);
 const viewBox = computed(() => {
-  const side = SIDE * 5 * props.scale;
-  return `-${side} -${side} ${side * 2} ${side * 2}`;
+  return `-${viewSide.value} -${viewSide.value} ${viewSide.value * 2} ${viewSide.value * 2}`;
 });
 const totalNodes = computed(() => {
   let drawedNodes = getDrawedNodes(props.nodes);
@@ -306,9 +310,11 @@ function selectNode(drawedNode) {
  */
 function onMouseDown(event) {
   if (event.button === BUTTON_MAIN) {
-    mouse.preventX = event.pageX;
-    mouse.preventY = event.pageY;
     mouse.isDown = true;
+    mouse.x0 = event.pageX;
+    mouse.y0 = event.pageY;
+    mouse.tx0 = props.translateX;
+    mouse.ty0 = props.translateY;
   }
 }
 
@@ -320,37 +326,23 @@ function onMouseMove(button) {
     return;
   }
 
-  if (mouse.preventX === null) {
-    mouse.preventX = button.pageX;
-  }
-  if (mouse.preventY === null) {
-    mouse.preventY = button.pageY;
-  }
+  let resultX = null;
+  let resultY = null;
 
-  const isLeft = button.pageX < mouse.preventX;
-  const isRight = button.pageX > mouse.preventX;
-  const isTop = button.pageY < mouse.preventY;
-  const isBottom = button.pageY > mouse.preventY;
-
-  let x = 0,
-    y = 0;
-  const halfScale = props.scale / 2;
-
-  if (isLeft) {
-    x = -TRANSLATE_X * halfScale;
-  } else if (isRight) {
-    x = TRANSLATE_X * halfScale;
+  if (mouse.x0 !== null && mouse.tx0 !== null) {
+    const pxWidth = viewWidth.value / svgMap.value.clientWidth;
+    const dx = button.pageX - mouse.x0;
+    resultX = mouse.tx0 + dx * pxWidth;
   }
-  if (isTop) {
-    y = -TRANSLATE_Y * halfScale;
-  } else if (isBottom) {
-    y = TRANSLATE_Y * halfScale;
+  if (mouse.y0 !== null && mouse.ty0 !== null) {
+    const pxHeight = viewHeight.value / svgMap.value.clientHeight;
+    const dy = button.pageY - mouse.y0;
+    resultY = mouse.ty0 + dy * pxHeight;
   }
 
-  emit(EVENT_CHANGE_TRANSLATE, x, y);
-
-  mouse.preventX = button.pageX;
-  mouse.preventY = button.pageY;
+  if (resultX !== null || resultY !== null) {
+    emit(EVENT_CHANGE_TRANSLATE, resultX, resultY);
+  }
 }
 
 function onMouseUp(event) {

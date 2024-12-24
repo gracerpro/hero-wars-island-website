@@ -167,9 +167,11 @@ import { computed } from "vue";
 
 const { t } = useI18n();
 
-defineProps({
+const props = defineProps({
   isShowQuantity: { type: Boolean, required: true },
   loading: { type: Boolean, required: true },
+  translateX: { type: Number, required: true },
+  translateY: { type: Number, required: true },
 });
 
 const emit = defineEmits([
@@ -192,28 +194,28 @@ const isShowReloadMap = computed(() => {
   return import.meta.env.DEV;
 });
 
-function onChangeTranslate(dx, dy, event) {
-  let x = 0,
-    y = 0;
+function onChangeTranslate(xDirection, yDirection, event) {
+  let dx = 0,
+    dy = 0;
 
-  if (dx !== 0) {
-    x = 5 * dx * TRANSLATE_X;
+  if (xDirection !== 0) {
+    dx = 5 * xDirection * TRANSLATE_X;
     if (event.ctrlKey) {
-      x /= 10;
+      dx /= 10;
     } else if (event.shiftKey) {
-      x /= 2;
+      dx /= 2;
     }
   }
-  if (dy !== 0) {
-    y = 5 * dy * TRANSLATE_Y;
+  if (yDirection !== 0) {
+    dy = 5 * yDirection * TRANSLATE_Y;
     if (event.ctrlKey) {
-      y /= 10;
+      dy /= 10;
     } else if (event.shiftKey) {
-      y /= 2;
+      dy /= 2;
     }
   }
 
-  emit(EVENT_CHANGE_TRANSLATE, x, y);
+  emit(EVENT_CHANGE_TRANSLATE, props.translateX + dx, props.translateY + dy);
 }
 
 function onChangeScale(zoom, event) {

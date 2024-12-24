@@ -9,12 +9,13 @@
         <span
           v-if="currentIsland.syncGameVersion"
           :title="t('page.island.gameVersionWhenSyncCells')"
+          class="game-version"
           >{{ currentIsland.syncGameVersion }}</span
         >
         <span
           v-if="currentIsland.syncAt"
           :title="t('page.island.whenWasCellSynchronization')"
-          class="ms-2"
+          class="sync-at ms-2"
           >{{ currentIsland.syncAt }}</span
         >
       </span>
@@ -180,5 +181,14 @@ async function loadIsland(id) {
 .description {
   border-top: 1px solid #ccc;
   padding-top: 10px;
+}
+.game-version {
+  display: inline-block;
+  max-width: 5em;
+  overflow: hidden;
+  vertical-align: middle;
+}
+.sync-at {
+  vertical-align: middle;
 }
 </style>
