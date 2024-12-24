@@ -78,3 +78,16 @@ const island = libData.seasonAdventure.list[i]
 * `island.map.regions` - массив, это части карты
 * `island.map.regions[i].levels` - ?
 * `island.map.regions[i].initLevels` - это доступные ячейки в начале (когда ни разу не открывали ячейки), по ним можно кликать
+
+
+## Assets
+
+asset_url = https://heroesru-a.akamaihd.net/mg/assets/
+
+Consumable icons
+
+asset_url + ["inventory_icons/consumable.png"]["path"]
+
+asset_url + inventory_icons/consumable.1c359a5f8ceb3390297be434dee897e9.png
+
+asset_url + inventory_icons/consumable.e597eb9e5edcac7b08db7078a0bcc855.xml
