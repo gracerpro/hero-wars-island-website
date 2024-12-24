@@ -11,6 +11,7 @@
       @mousedown="onMouseDown"
       @mouseup="onMouseUp"
       @mousemove="onMouseMove"
+      @mouseenter="onMouseEnter"
       @wheel="onMouseWheel"
     >
       <g :transform="'translate(' + translateX + ' ' + translateY + ')'">
@@ -316,6 +317,10 @@ function onMouseDown(event) {
     mouse.tx0 = props.translateX;
     mouse.ty0 = props.translateY;
   }
+}
+
+function onMouseEnter() {
+  mouse.isDown = false;
 }
 
 /**

@@ -55,9 +55,9 @@
         <span
           title="Zoom"
           class="me-4"
-          >{{ scale }}</span
+          >{{ scale.toFixed(2) }}</span
         >
-        <span title="Offset">{{ translateX }}, {{ translateY }}</span>
+        <span title="Offset">{{ translateX.toFixed(1) }} {{ translateY.toFixed(1) }}</span>
       </div>
       <div class="row">
         <div class="col-lg-6 mt-3">
