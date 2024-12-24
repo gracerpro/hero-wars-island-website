@@ -3,7 +3,7 @@
     <svg
       ref="svgMap"
       height="600"
-      class="canvas"
+      class="canvas prevent-select"
       width="100%"
       tabindex="0"
       :viewBox="viewBox"

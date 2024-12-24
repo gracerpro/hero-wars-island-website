@@ -187,6 +187,8 @@ const helpDialogComponent = shallowRef(null);
 
 const isShowReloadMap = computed(() => {
   console.log("dev", import.meta.env.DEV);
+  console.log("mode", import.meta.env.MODE);
+
   return import.meta.env.DEV;
 });
 

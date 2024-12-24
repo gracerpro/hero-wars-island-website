@@ -6,6 +6,7 @@ import { createI18n } from "@/i18n";
 
 import "bootstrap/dist/css/bootstrap.min.css";
 import "@/assets/icons.css";
+import "@/assets/main.css";
 
 export default function createApp() {
   const app = createSSRApp(App);
