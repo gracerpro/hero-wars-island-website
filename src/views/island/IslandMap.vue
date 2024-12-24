@@ -352,7 +352,7 @@ async function loadNodes(isForce) {
 function calculateRewards(nodes) {
   calculatingRewards.value = true;
 
-  const tmpMap = {}
+  const tmpMap = {};
   const rewards = [];
   let index = 0;
 
@@ -617,9 +617,12 @@ function loadState() {
 
   filter.value = state.filter;
   isShowQuantity.value = state.isShowQuantity === undefined ? true : state.isShowQuantity;
-  isShowRewardsBlock.value = state.isShowRewardsBlock === undefined ? true : state.isShowRewardsBlock;
-  isShowUserRewardsBlock.value = state.isShowUserRewardsBlock === undefined ? true : state.isShowUserRewardsBlock;
-  isShowGroupRewards.value = state.isShowGroupRewards === undefined ? false : state.isShowGroupRewards;
+  isShowRewardsBlock.value =
+    state.isShowRewardsBlock === undefined ? true : state.isShowRewardsBlock;
+  isShowUserRewardsBlock.value =
+    state.isShowUserRewardsBlock === undefined ? true : state.isShowUserRewardsBlock;
+  isShowGroupRewards.value =
+    state.isShowGroupRewards === undefined ? false : state.isShowGroupRewards;
 
   isSelectAnyNode.value = typeof state.isSelectAnyNode === "boolean" ? state.isSelectAnyNode : true;
 }

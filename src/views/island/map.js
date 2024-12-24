@@ -39,7 +39,7 @@ export function getIconsItems(dataItems, drawedNodes) {
       nodeId,
       isSmallText: false,
       humanQuantity: item.humanQuantity,
-    }
+    };
 
     if (count === 1) {
       item.iconWidth = IMAGE_SIDE * 2.2;
@@ -50,7 +50,7 @@ export function getIconsItems(dataItems, drawedNodes) {
       if (isShowText) {
         itemQuantity.x = item.iconX + item.iconWidth * 0.02;
         itemQuantity.y = drawedNode.y + HEIGHT - 3;
-        itemQuantity.uid = nodeId + "_0"
+        itemQuantity.uid = nodeId + "_0";
       }
     } else {
       if (!indexesByNode[nodeId]) {
@@ -72,7 +72,7 @@ export function getIconsItems(dataItems, drawedNodes) {
           itemQuantity.x = srartX + cx * index;
           itemQuantity.y = drawedNode.y + HEIGHT - fontSize * 0.7;
           itemQuantity.isSmallText = true;
-          itemQuantity.uid = nodeId + "_" + index
+          itemQuantity.uid = nodeId + "_" + index;
         }
       } else if (index <= 3) {
         // 0,0   1,0
@@ -105,7 +105,7 @@ export function getIconsItems(dataItems, drawedNodes) {
   return {
     icons: resultItems,
     quantities: rewardQuantities,
-  }
+  };
 }
 
 function getCountsByNode(items) {

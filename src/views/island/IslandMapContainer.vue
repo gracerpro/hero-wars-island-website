@@ -56,7 +56,8 @@
           </rect>
         </template>
         <text
-          v-for="item in rewardQuantities" :key="item.uid"
+          v-for="item in rewardQuantities"
+          :key="item.uid"
           :x="item.x"
           :y="item.y"
           :class="['text', item.isSmallText ? 'text-small' : '']"
@@ -172,7 +173,7 @@ const iconItems = computed(() => {
   return getIconsItems(props.rewards, totalNodes.value);
 });
 const rewardIcons = computed(() => {
-  return iconItems.value.icons
+  return iconItems.value.icons;
 });
 const rewardQuantities = computed(() => {
   return props.isShowQuantity ? iconItems.value.quantities : [];
