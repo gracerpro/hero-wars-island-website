@@ -7,7 +7,7 @@
     >
       {{ t(isShowBlock ? "common.hide" : "common.show") }}
     </a>
-    <span class="badge text-bg-secondary ms-2">{{ visibleItemsCount }}</span>
+    <span class="badge text-bg-secondary ms-2">{{ visibleRewardsCount }}</span>
     <div
       v-if="isShowBlock"
       class="heightable"
@@ -21,11 +21,11 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-if="!items.length">
+          <tr v-if="!rewards.length">
             <td colspan="3">{{ t("common.noData") }}</td>
           </tr>
           <tr
-            v-for="item in items"
+            v-for="item in rewards"
             v-else
             :key="item.uniqueId"
           >
@@ -54,9 +54,9 @@ import { useI18n } from "vue-i18n";
 
 defineProps({
   header: { type: String, required: true },
-  items: { type: Array, required: true },
   isShowBlock: { type: Boolean, required: true },
-  visibleItemsCount: { type: Number, required: true },
+  rewards: { type: Array, required: true },
+  visibleRewardsCount: { type: Number, required: true },
 });
 const emit = defineEmits([EVENT_UPDATE_IS_SHOW_BLOCK]);
 

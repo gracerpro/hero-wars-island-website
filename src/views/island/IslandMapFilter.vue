@@ -108,7 +108,7 @@ const { t } = useI18n();
 const formId = "nodesForm";
 
 const props = defineProps({
-  items: { type: Object, required: true },
+  rewards: { type: Object, required: true },
   itemName: { type: String, required: true },
   typeId: { type: [Number, null], required: true },
   isNodeTypeTower: { type: Boolean, required: true },
@@ -126,7 +126,7 @@ const visibleTypes = computed(() => {
   const map = {};
   const labels = getLabelsByTypes(t);
 
-  props.items.forEach((item) => {
+  props.rewards.forEach((item) => {
     map[item.item.typeId] = true;
   });
 
