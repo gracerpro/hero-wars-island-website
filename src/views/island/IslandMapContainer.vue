@@ -11,7 +11,9 @@
       @mousedown="onMouseDown"
       @mouseup="onMouseUp"
       @mousemove="onMouseMove"
+      @mouseenter="onMouseEnter"
       @wheel="onMouseWheel"
+      @mousewheel="onMouseWheel"
     >
       <g :transform="'translate(' + translateX + ' ' + translateY + ')'">
         <polygon
@@ -22,7 +24,7 @@
           @click="onNodeClick(node, $event)"
         />
         <template
-          v-for="item in iconsItems"
+          v-for="item in rewardIcons"
           :key="item.uniqueId"
         >
           <image
@@ -44,6 +46,7 @@
             :width="item.iconWidth"
             :height="item.iconHeight"
             class="item-empty-image"
+            :class="item.uniqueId"
             @click="onItemClick(item, $event)"
           >
             <title>
@@ -51,16 +54,17 @@
               {{ t("page.island.notLinkedImage") }}
             </title>
           </rect>
-          <text
-            v-if="item.textX && item.textY"
-            :x="item.textX"
-            :y="item.textY"
-            :class="['text', item.isSmallText ? 'text-small' : '']"
-            @click="onItemClick(item, $event)"
-          >
-            {{ item.humanQuantity }}
-          </text>
         </template>
+        <text
+          v-for="item in rewardQuantities"
+          :key="item.uid"
+          :x="item.x"
+          :y="item.y"
+          :class="['text', item.isSmallText ? 'text-small' : '']"
+          @click="onItemClick(item, $event)"
+        >
+          {{ item.humanQuantity }}
+        </text>
       </g>
     </svg>
 
@@ -129,7 +133,7 @@ const props = defineProps({
   translateX: { type: Number, required: true },
   translateY: { type: Number, required: true },
   isShowQuantity: { type: Boolean, required: true },
-  items: { type: Array, required: true },
+  rewards: { type: Array, required: true },
   nodes: { type: Object, required: true },
   userNodesIdsMap: { type: Object, required: true },
   userNodesGoingIdsMap: { type: Object, required: true },
@@ -165,9 +169,15 @@ const totalNodes = computed(() => {
   return drawedNodes;
 });
 
-const iconsItems = computed(() =>
-  getIconsItems(props.items, totalNodes.value, props.isShowQuantity)
-);
+const iconItems = computed(() => {
+  return getIconsItems(props.rewards, totalNodes.value);
+});
+const rewardIcons = computed(() => {
+  return iconItems.value.icons;
+});
+const rewardQuantities = computed(() => {
+  return props.isShowQuantity ? iconItems.value.quantities : [];
+});
 
 onMounted(() => {
   window.addEventListener("keydown", onKeyDownMap);
@@ -275,7 +285,8 @@ function onNodeClick(drawedNode, event) {
  * @param {Object} event
  */
 function onItemClick(item, event) {
-  const drawedNode = totalNodes.value[item.node.id];
+  const nodeId = item.nodeId ? item.nodeId : item.node.id;
+  const drawedNode = totalNodes.value[nodeId];
 
   if (event.ctrlKey) {
     infoDialogDrawedNode.value = drawedNode;
@@ -318,6 +329,10 @@ function onMouseDown(event) {
   }
 }
 
+function onMouseEnter() {
+  mouse.isDown = false;
+}
+
 /**
  * @param {Object} button
  */
@@ -352,7 +367,7 @@ function onMouseUp(event) {
 }
 
 function onMouseWheel(event) {
-  let value = event.deltaY > 0 ? DELTA_SCALE : -DELTA_SCALE;
+  const value = event.deltaY > 0 ? DELTA_SCALE : -DELTA_SCALE;
   emitNewScale(event, value);
   event.preventDefault();
 }
@@ -467,13 +482,17 @@ function getItemName(item) {
   fill: #ffff00;
 }
 .text {
-  font-size: 20px;
-  fill: #000;
+  font-size: 26px;
+  fill: #ffff00;
   font-weight: bold;
   cursor: pointer;
+  stroke: black;
+  stroke-width: 3;
+  stroke-linejoin: round;
+  paint-order: stroke fill;
 }
 .text-small {
-  font-size: 16px;
+  font-size: 18px;
 }
 .item-image {
   cursor: pointer;

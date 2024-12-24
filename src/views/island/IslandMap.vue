@@ -38,7 +38,7 @@
         :translate-y="translateY"
         :is-show-quantity="isShowQuantity"
         :is-select-any-node="isSelectAnyNode"
-        :items="visibleItems"
+        :rewards="visibleRewards"
         :nodes="nodes"
         :user-nodes-ids-map="userNodesIdsMap"
         :user-nodes-going-ids-map="userNodesGoingIdsMap"
@@ -55,9 +55,9 @@
         <span
           title="Zoom"
           class="me-4"
-          >{{ scale }}</span
+          >{{ scale.toFixed(2) }}</span
         >
-        <span title="Offset">{{ translateX }}, {{ translateY }}</span>
+        <span title="Offset">{{ translateX.toFixed(1) }} {{ translateY.toFixed(1) }}</span>
       </div>
       <div class="row">
         <div class="col-lg-6 mt-3">
@@ -66,7 +66,7 @@
             v-model:type-id="filter.typeId"
             v-model:is-node-type-tower="filter.isNodeTypeTower"
             v-model:is-node-type-chest="filter.isNodeTypeChest"
-            :items="items"
+            :rewards="rewards"
             :min-chars-count="minCharsCount"
           />
         </div>
@@ -85,26 +85,26 @@
       <div class="row">
         <div class="col-lg-6 mt-4">
           <island-map-table
-            v-model:is-show-block="isShowItemsBlock"
+            v-model:is-show-block="isShowRewardsBlock"
             :header="t('page.island.resourcesOnMap')"
-            :items="visibleItems"
-            :visible-items-count="visibleItemsCount"
+            :rewards="visibleRewards"
+            :visible-rewards-count="visibleRewardsCount"
           />
         </div>
         <div class="col-lg-6 mt-4">
           <island-map-table
-            v-model:is-show-block="isShowUserItemsBlock"
+            v-model:is-show-block="isShowUserRewardsBlock"
             :header="t('page.island.selectedResources')"
-            :items="userItems"
-            :visible-items-count="userItemsCount"
+            :rewards="userRewards"
+            :visible-rewards-count="userRewardsCount"
           />
         </div>
         <div class="col-lg-6 mt-4">
           <island-map-table
-            v-model:is-show-block="isShowGroupItems"
+            v-model:is-show-block="isShowGroupRewards"
             :header="t('common.groupData')"
-            :items="groupItems"
-            :visible-items-count="groupItemsCount"
+            :rewards="groupRewards"
+            :visible-rewards-count="groupRewardsCount"
           />
         </div>
       </div>
@@ -115,7 +115,7 @@
       ref="downloadDialog"
       :island="island"
       :nodes="nodes"
-      :rewards="visibleItems"
+      :rewards="visibleRewards"
       :is-show-quantity="isShowQuantity"
       @vue:mounted="onMountedDownloadDialog"
     />
@@ -136,7 +136,7 @@ import { getHumanQuantity } from "@/helpers/formatter";
 import { useI18n } from "vue-i18n";
 import { fullscreenElement } from "@/core/fullscreen";
 import { TYPE_BLOCKER, TYPE_CHEST, TYPE_START, TYPE_TOWER } from "@/api/Node";
-import { GAME_ID_EXPLORER_MOVE, GAME_ID_WOOD, TYPE_UNKNOWN } from "@/api/Item";
+import { GAME_ID_EXPLORER_MOVE, GAME_ID_WOOD } from "@/api/Item";
 import { isObject } from "@/helpers/core";
 import { getNodesMap } from "@/services/api/island-node";
 import { SELECT_MODE_PLAN } from "./select-mode";
@@ -156,11 +156,11 @@ const minCharsCount = 3;
 const componentId = props.parentPageId + "__map";
 
 const loadingNodes = ref(true);
-const calculatingItems = ref(false);
+const calculatingRewards = ref(false);
 const errorMessage = ref("");
 const regionNumbers = ref([]);
 const nodes = ref({});
-const items = ref([]);
+const rewards = ref([]);
 const userNodesIdsMap = ref({});
 const userNodesGoingIdsMap = ref({});
 const scale = ref(1);
@@ -169,9 +169,9 @@ const translateY = ref(0);
 const isSelectAnyNode = ref(true);
 const selectMode = ref(SELECT_MODE_PLAN);
 const isShowQuantity = ref(true);
-const isShowGroupItems = ref(false);
-const isShowItemsBlock = ref(true);
-const isShowUserItemsBlock = ref(true);
+const isShowGroupRewards = ref(false);
+const isShowRewardsBlock = ref(true);
+const isShowUserRewardsBlock = ref(true);
 const filter = shallowReactive({
   itemName: "",
   typeId: null,
@@ -182,13 +182,14 @@ const mapContainer = ref(null);
 const downloadDialog = ref(null);
 const downloadDialogComponent = shallowRef(null);
 
-const loading = computed(() => loadingNodes.value || calculatingItems.value);
+const loading = computed(() => loadingNodes.value || calculatingRewards.value);
 const isShowMapState = computed(() => import.meta.env.DEV);
-const visibleItems = computed(() => {
-  let resultItems = items.value;
+
+const visibleRewards = computed(() => {
+  let resultRewards = rewards.value;
 
   if (filter.itemName.length >= minCharsCount) {
-    resultItems = resultItems.filter((item) => {
+    resultRewards = resultRewards.filter((item) => {
       if (!item.item.name) {
         return false;
       }
@@ -196,7 +197,7 @@ const visibleItems = computed(() => {
     });
   }
   if (filter.typeId > 0) {
-    resultItems = resultItems.filter((item) => item.item.typeId === filter.typeId);
+    resultRewards = resultRewards.filter((item) => item.item.typeId === filter.typeId);
   }
   if (filter.isNodeTypeChest || filter.isNodeTypeTower) {
     const typeMap = {};
@@ -207,24 +208,24 @@ const visibleItems = computed(() => {
       typeMap[TYPE_TOWER] = true;
     }
 
-    resultItems = resultItems.filter((item) => {
+    resultRewards = resultRewards.filter((item) => {
       return typeMap[item.node.typeId] !== undefined;
     });
   }
 
-  return resultItems;
+  return resultRewards;
 });
-const visibleItemsCount = computed(() => visibleItems.value.length);
-const userItems = computed(() => {
-  return items.value.filter((item) => {
+const visibleRewardsCount = computed(() => visibleRewards.value.length);
+const userRewards = computed(() => {
+  return rewards.value.filter((item) => {
     return nodes.value[item.node.id] && userNodesIdsMap.value[item.node.id];
   });
 });
-const userItemsCount = computed(() => userItems.value.length);
-const groupItems = computed(() => {
+const userRewardsCount = computed(() => userRewards.value.length);
+const groupRewards = computed(() => {
   let map = {};
 
-  items.value.forEach(({ item }) => {
+  rewards.value.forEach(({ item }) => {
     if (!map[item.id]) {
       map[item.id] = {
         id: item.id,
@@ -250,7 +251,7 @@ const groupItems = computed(() => {
 
   return arr;
 });
-const groupItemsCount = computed(() => Object.keys(groupItems.value).length);
+const groupRewardsCount = computed(() => Object.keys(groupRewards.value).length);
 
 const userWoodMoveCount = computed(() => {
   let result = 0;
@@ -348,10 +349,11 @@ async function loadNodes(isForce) {
 /**
  * @param {Array} nodes
  */
-function calculateItems(nodes) {
-  calculatingItems.value = true;
+function calculateRewards(nodes) {
+  calculatingRewards.value = true;
 
-  let items = [];
+  const tmpMap = {};
+  const rewards = [];
   let index = 0;
 
   for (const id in nodes) {
@@ -362,8 +364,14 @@ function calculateItems(nodes) {
     }
 
     node.items.forEach((item) => {
-      items.push({
-        uniqueId: getUniqueId(node, item, index),
+      const uid = getUniqueId(node, item, index);
+      if (tmpMap[uid]) {
+        throw new Error("UID exists " + uid);
+      }
+      tmpMap[uid] = true;
+
+      rewards.push({
+        uniqueId: uid,
         iconUrl: item.iconUrl,
         humanQuantity: getHumanQuantity(item.quantity),
         emeraldCost: item.emeraldCost !== null ? item.emeraldCost * item.quantity : null,
@@ -375,9 +383,9 @@ function calculateItems(nodes) {
     });
   }
 
-  calculatingItems.value = false;
+  calculatingRewards.value = false;
 
-  return items;
+  return rewards;
 }
 
 /**
@@ -387,13 +395,7 @@ function calculateItems(nodes) {
  * @returns {String}
  */
 function getUniqueId(node, reward, index) {
-  let rewardId = reward.id;
-
-  if (reward.typeId === TYPE_UNKNOWN) {
-    rewardId += "_" + index;
-  }
-
-  return node.mx + "_" + node.my + "_" + rewardId;
+  return "mx" + node.mx + "_my" + node.my + "_id" + reward.id + "_i" + index;
 }
 
 /**
@@ -504,7 +506,7 @@ function forceReloadMap() {
 function reloadMap(isForce = false) {
   loadNodes(isForce).then((responseNodes) => {
     nodes.value = responseNodes;
-    items.value = calculateItems(responseNodes);
+    rewards.value = calculateRewards(responseNodes);
 
     for (const nodeId in userNodesIdsMap.value) {
       const node = nodes.value[nodeId];
@@ -545,12 +547,8 @@ function loadState() {
 
   if (!state) {
     state = {
-      isShowQuantity: true,
       byIsland: {},
       filter: {},
-      isShowItemsBlock: true,
-      isShowUserItemsBlock: true,
-      isShowGroupItems: false,
       regionNumbers: [],
     };
   }
@@ -568,18 +566,6 @@ function loadState() {
   }
   if (typeof state.filter.isNodeTypeTower !== "boolean") {
     state.filter.isNodeTypeTower = false;
-  }
-  if (state.isShowQuantity === undefined) {
-    state.isShowQuantity = true;
-  }
-  if (state.isShowItemsBlock === undefined) {
-    state.isShowItemsBlock = true;
-  }
-  if (state.isShowUserItemsBlock === undefined) {
-    state.isShowUserItemsBlock = true;
-  }
-  if (state.isShowGroupItems === undefined) {
-    state.isShowGroupItems = false;
   }
 
   if (!state.byIsland || !isObject(state.byIsland)) {
@@ -630,10 +616,13 @@ function loadState() {
   }
 
   filter.value = state.filter;
-  isShowQuantity.value = state.isShowQuantity;
-  isShowItemsBlock.value = state.isShowItemsBlock;
-  isShowUserItemsBlock.value = state.isShowUserItemsBlock;
-  isShowGroupItems.value = state.isShowGroupItems;
+  isShowQuantity.value = state.isShowQuantity === undefined ? true : state.isShowQuantity;
+  isShowRewardsBlock.value =
+    state.isShowRewardsBlock === undefined ? true : state.isShowRewardsBlock;
+  isShowUserRewardsBlock.value =
+    state.isShowUserRewardsBlock === undefined ? true : state.isShowUserRewardsBlock;
+  isShowGroupRewards.value =
+    state.isShowGroupRewards === undefined ? false : state.isShowGroupRewards;
 
   isSelectAnyNode.value = typeof state.isSelectAnyNode === "boolean" ? state.isSelectAnyNode : true;
 }
@@ -643,9 +632,9 @@ function saveState() {
     filter: filter.value,
     isShowQuantity: isShowQuantity.value,
     isSelectAnyNode: isSelectAnyNode.value,
-    isShowGroupItems: isShowGroupItems.value,
-    isShowItemsBlock: isShowItemsBlock.value,
-    isShowUserItemsBlock: isShowUserItemsBlock.value,
+    isShowGroupRewards: isShowGroupRewards.value,
+    isShowRewardsBlock: isShowRewardsBlock.value,
+    isShowUserRewardsBlock: isShowUserRewardsBlock.value,
   };
   byIslandState[props.island.id] = {
     userNodesIds: Object.keys(userNodesIdsMap.value).map((id) => parseInt(id)),

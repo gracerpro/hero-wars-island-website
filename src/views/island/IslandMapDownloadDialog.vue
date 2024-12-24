@@ -65,9 +65,14 @@ const props = defineProps({
 const loading = ref(false);
 
 const drawedNodes = computed(() => getDrawedNodes(props.nodes));
-const iconModifyRewards = computed(() =>
+const iconItems = computed(() =>
   getIconsItems(props.rewards, drawedNodes.value, props.isShowQuantity)
 );
+const iconModifyRewards = computed(() => iconItems.value.icons);
+const rewardQuantities = computed(() => {
+  return props.isShowQuantity ? iconItems.value.quantities : [];
+});
+
 const minMaxNodeCoordinates = computed(() => {
   let minX = null;
   let minY = null;
@@ -199,8 +204,8 @@ function drawMap(context, imagesByUrls) {
     -(minMaxNodeCoordinates.value.minY - 1) * getVerticalStep()
   );
 
-  const FONT_SIZE = 16;
-  const FONT_SIZE_SMALL = 13;
+  const FONT_SIZE = 20;
+  const FONT_SIZE_SMALL = 15;
   const colors = {
     [TYPE_NODE]: "#9da7c9",
     [TYPE_START]: "#94fdfe",
@@ -264,13 +269,13 @@ function drawMap(context, imagesByUrls) {
     } else {
       drawEmptyImage(context, modifyReward);
     }
+  });
 
-    if (modifyReward.textX && modifyReward.textY) {
-      const fontSize = modifyReward.isSmallText ? FONT_SIZE_SMALL : FONT_SIZE;
-      context.font = `bold ${fontSize}px sans-serif`;
-      context.fillStyle = "#000";
-      context.fillText(modifyReward.humanQuantity, modifyReward.textX, modifyReward.textY);
-    }
+  rewardQuantities.value.forEach((item) => {
+    const fontSize = item.isSmallText ? FONT_SIZE_SMALL : FONT_SIZE;
+    context.font = `bold ${fontSize}px sans-serif`;
+    context.fillStyle = "#000";
+    context.fillText(item.humanQuantity, item.x, item.y);
   });
 
   context.restore();

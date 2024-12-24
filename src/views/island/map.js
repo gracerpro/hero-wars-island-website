@@ -21,33 +21,36 @@ export function getDrawedNodes(nodes) {
 /**
  * @param {Array} dataItems
  * @param {Object} drawedNodes
- * @param {Boolean} isShowQuantity
  * @returns {Array}
  */
-export function getIconsItems(dataItems, drawedNodes, isShowQuantity) {
-  let countsByNode = getCountsByNode(dataItems);
-  let resultItems = [];
-  let indexesByNode = {};
+export function getIconsItems(dataItems, drawedNodes) {
+  const countsByNode = getCountsByNode(dataItems);
+  const resultItems = [];
+  const indexesByNode = {};
+  const rewardQuantities = [];
 
   dataItems.forEach((item) => {
     const nodeId = item.node.id;
     const drawedNode = drawedNodes[item.node.id];
     const count = countsByNode[nodeId];
-    const isShowText = item.item.quantity > 1 && isShowQuantity;
+    const isShowText = item.item.quantity > 1;
 
-    item.textX = null;
-    item.textY = null;
-    item.isSmallText = null;
+    let itemQuantity = {
+      nodeId,
+      isSmallText: false,
+      humanQuantity: item.humanQuantity,
+    };
 
     if (count === 1) {
-      const fontSize = 20;
-      item.iconWidth = IMAGE_SIDE * (isShowText ? 1.9 : 2.2);
-      item.iconHeight = IMAGE_SIDE * (isShowText ? 1.9 : 2.2);
+      item.iconWidth = IMAGE_SIDE * 2.2;
+      item.iconHeight = IMAGE_SIDE * 2.2;
       item.iconX = drawedNode.x - item.iconWidth / 2;
-      item.iconY = drawedNode.y - item.iconHeight / 2 - (isShowText ? fontSize / 2 : 0);
+      item.iconY = drawedNode.y - item.iconHeight / 2;
+
       if (isShowText) {
-        item.textX = item.iconX + item.iconWidth * 0.05;
-        item.textY = drawedNode.y + HEIGHT - 3;
+        itemQuantity.x = item.iconX + item.iconWidth * 0.02;
+        itemQuantity.y = drawedNode.y + HEIGHT - 3;
+        itemQuantity.uid = nodeId + "_0";
       }
     } else {
       if (!indexesByNode[nodeId]) {
@@ -57,21 +60,21 @@ export function getIconsItems(dataItems, drawedNodes, isShowQuantity) {
       const borderWidth = 2;
 
       if (count === 2) {
-        const fontSize = 16;
-        item.iconWidth = IMAGE_SIDE * (isShowText ? 1.3 : 1.4);
-        item.iconHeight = IMAGE_SIDE * (isShowText ? 1.3 : 1.4);
+        item.iconWidth = IMAGE_SIDE * 1.4;
+        item.iconHeight = IMAGE_SIDE * 1.4;
         const cx = item.iconWidth + borderWidth;
         const srartX = drawedNode.x - cx + borderWidth / 2;
         item.iconX = srartX + cx * index;
-        item.iconY = drawedNode.y - item.iconHeight / 2 - (isShowText ? fontSize / 2 : 0);
+        item.iconY = drawedNode.y - item.iconHeight / 2;
 
         if (isShowText) {
-          item.textX = srartX + cx * index;
-          item.textY = drawedNode.y + HEIGHT - fontSize * 0.7;
-          item.isSmallText = true;
+          const fontSize = 16;
+          itemQuantity.x = srartX + cx * index;
+          itemQuantity.y = drawedNode.y + HEIGHT - fontSize * 0.7;
+          itemQuantity.isSmallText = true;
+          itemQuantity.uid = nodeId + "_" + index;
         }
       } else if (index <= 3) {
-        // count >= 3
         // 0,0   1,0
         //     *
         // 0,1   1,1
@@ -84,7 +87,8 @@ export function getIconsItems(dataItems, drawedNodes, isShowQuantity) {
         const srartY = drawedNode.y - cy + borderWidth / 2;
         item.iconY = srartY + (index < 2 ? 0 : cy);
       } else {
-        item = false;
+        item = null;
+        itemQuantity = null;
       }
 
       indexesByNode[nodeId]++;
@@ -93,9 +97,15 @@ export function getIconsItems(dataItems, drawedNodes, isShowQuantity) {
     if (item) {
       resultItems.push(item);
     }
+    if (isShowText && itemQuantity) {
+      rewardQuantities.push(itemQuantity);
+    }
   });
 
-  return resultItems;
+  return {
+    icons: resultItems,
+    quantities: rewardQuantities,
+  };
 }
 
 function getCountsByNode(items) {
