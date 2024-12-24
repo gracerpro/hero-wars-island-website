@@ -13,6 +13,7 @@
       @mousemove="onMouseMove"
       @mouseenter="onMouseEnter"
       @wheel="onMouseWheel"
+      @mousewheel="onMouseWheel"
     >
       <g :transform="'translate(' + translateX + ' ' + translateY + ')'">
         <polygon
@@ -357,7 +358,7 @@ function onMouseUp(event) {
 }
 
 function onMouseWheel(event) {
-  let value = event.deltaY > 0 ? DELTA_SCALE : -DELTA_SCALE;
+  const value = event.deltaY > 0 ? DELTA_SCALE : -DELTA_SCALE;
   emitNewScale(event, value);
   event.preventDefault();
 }
