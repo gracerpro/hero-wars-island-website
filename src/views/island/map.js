@@ -21,24 +21,19 @@ export function getDrawedNodes(nodes) {
 /**
  * @param {Array} dataItems
  * @param {Object} drawedNodes
- * @param {Boolean} isShowQuantity
  * @returns {Array}
  */
-export function getIconsItems(dataItems, drawedNodes, isShowQuantity) {
-  let countsByNode = getCountsByNode(dataItems);
-  let resultItems = [];
-  let indexesByNode = {};
+export function getIconsItems(dataItems, drawedNodes) {
+  const countsByNode = getCountsByNode(dataItems);
+  const resultItems = [];
+  const indexesByNode = {};
   const rewardQuantities = [];
 
   dataItems.forEach((item) => {
     const nodeId = item.node.id;
     const drawedNode = drawedNodes[item.node.id];
     const count = countsByNode[nodeId];
-    const isShowText = item.item.quantity > 1 && isShowQuantity;
-
-    item.textX = null;
-    item.textY = null;
-    item.isSmallText = false;
+    const isShowText = item.item.quantity > 1;
 
     let itemQuantity = {
       nodeId,
@@ -53,10 +48,7 @@ export function getIconsItems(dataItems, drawedNodes, isShowQuantity) {
       item.iconY = drawedNode.y - item.iconHeight / 2;
 
       if (isShowText) {
-        item.textX = item.iconX + item.iconWidth * 0.05;
-        item.textY = drawedNode.y + HEIGHT - 3;
-
-        itemQuantity.x = item.iconX + item.iconWidth * 0.05;
+        itemQuantity.x = item.iconX + item.iconWidth * 0.02;
         itemQuantity.y = drawedNode.y + HEIGHT - 3;
         itemQuantity.uid = nodeId + "_0"
       }
@@ -77,10 +69,6 @@ export function getIconsItems(dataItems, drawedNodes, isShowQuantity) {
 
         if (isShowText) {
           const fontSize = 16;
-          item.textX = srartX + cx * index;
-          item.textY = drawedNode.y + HEIGHT - fontSize * 0.7;
-          item.isSmallText = true;
-
           itemQuantity.x = srartX + cx * index;
           itemQuantity.y = drawedNode.y + HEIGHT - fontSize * 0.7;
           itemQuantity.isSmallText = true;

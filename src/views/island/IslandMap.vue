@@ -38,7 +38,7 @@
         :translate-y="translateY"
         :is-show-quantity="isShowQuantity"
         :is-select-any-node="isSelectAnyNode"
-        :items="visibleItems"
+        :rewards="visibleItems"
         :nodes="nodes"
         :user-nodes-ids-map="userNodesIdsMap"
         :user-nodes-going-ids-map="userNodesGoingIdsMap"
@@ -136,7 +136,7 @@ import { getHumanQuantity } from "@/helpers/formatter";
 import { useI18n } from "vue-i18n";
 import { fullscreenElement } from "@/core/fullscreen";
 import { TYPE_BLOCKER, TYPE_CHEST, TYPE_START, TYPE_TOWER } from "@/api/Node";
-import { GAME_ID_EXPLORER_MOVE, GAME_ID_WOOD, TYPE_UNKNOWN } from "@/api/Item";
+import { GAME_ID_EXPLORER_MOVE, GAME_ID_WOOD } from "@/api/Item";
 import { isObject } from "@/helpers/core";
 import { getNodesMap } from "@/services/api/island-node";
 import { SELECT_MODE_PLAN } from "./select-mode";
@@ -184,6 +184,7 @@ const downloadDialogComponent = shallowRef(null);
 
 const loading = computed(() => loadingNodes.value || calculatingItems.value);
 const isShowMapState = computed(() => import.meta.env.DEV);
+
 const visibleItems = computed(() => {
   let resultItems = items.value;
 
@@ -353,6 +354,7 @@ function calculateItems(nodes) {
 
   let items = [];
   let index = 0;
+  const tmpMap = {}
 
   for (const id in nodes) {
     const node = nodes[id];
@@ -362,8 +364,14 @@ function calculateItems(nodes) {
     }
 
     node.items.forEach((item) => {
+      const uid = getUniqueId(node, item, index);
+      if (tmpMap[uid]) {
+        throw new Error("UID exists " + uid);
+      }
+      tmpMap[uid] = true;
+
       items.push({
-        uniqueId: getUniqueId(node, item, index),
+        uniqueId: uid,
         iconUrl: item.iconUrl,
         humanQuantity: getHumanQuantity(item.quantity),
         emeraldCost: item.emeraldCost !== null ? item.emeraldCost * item.quantity : null,
@@ -387,13 +395,7 @@ function calculateItems(nodes) {
  * @returns {String}
  */
 function getUniqueId(node, reward, index) {
-  let rewardId = reward.id;
-
-  if (reward.typeId === TYPE_UNKNOWN) {
-    rewardId += "_" + index;
-  }
-
-  return node.mx + "_" + node.my + "_" + rewardId;
+  return "mx" + node.mx + "_my" + node.my + "_id" + reward.id + "_i" + index;
 }
 
 /**

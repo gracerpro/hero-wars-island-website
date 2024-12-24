@@ -46,6 +46,7 @@
             :width="item.iconWidth"
             :height="item.iconHeight"
             class="item-empty-image"
+            :class="item.uniqueId"
             @click="onItemClick(item, $event)"
           >
             <title>
@@ -131,7 +132,7 @@ const props = defineProps({
   translateX: { type: Number, required: true },
   translateY: { type: Number, required: true },
   isShowQuantity: { type: Boolean, required: true },
-  items: { type: Array, required: true },
+  rewards: { type: Array, required: true },
   nodes: { type: Object, required: true },
   userNodesIdsMap: { type: Object, required: true },
   userNodesGoingIdsMap: { type: Object, required: true },
@@ -167,11 +168,15 @@ const totalNodes = computed(() => {
   return drawedNodes;
 });
 
-const iconsItems = computed(() => {
-  return getIconsItems(props.items, totalNodes.value, props.isShowQuantity);
+const iconItems = computed(() => {
+  return getIconsItems(props.rewards, totalNodes.value);
 });
-const rewardIcons = computed(() => iconsItems.value.icons)
-const rewardQuantities = computed(() => iconsItems.value.quantities)
+const rewardIcons = computed(() => {
+  return iconItems.value.icons
+});
+const rewardQuantities = computed(() => {
+  return props.isShowQuantity ? iconItems.value.quantities : [];
+});
 
 onMounted(() => {
   window.addEventListener("keydown", onKeyDownMap);
@@ -476,17 +481,17 @@ function getItemName(item) {
   fill: #ffff00;
 }
 .text {
-  font-size: 20px;
+  font-size: 26px;
   fill: #ffff00;
   font-weight: bold;
   cursor: pointer;
   stroke: black;
-  stroke-width: 2;
+  stroke-width: 3;
   stroke-linejoin: round;
   paint-order: stroke fill;
 }
 .text-small {
-  font-size: 16px;
+  font-size: 18px;
 }
 .item-image {
   cursor: pointer;
