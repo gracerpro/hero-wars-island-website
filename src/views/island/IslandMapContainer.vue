@@ -24,7 +24,7 @@
           @click="onNodeClick(node, $event)"
         />
         <template
-          v-for="item in iconsItems"
+          v-for="item in rewardIcons"
           :key="item.uniqueId"
         >
           <image
@@ -53,16 +53,16 @@
               {{ t("page.island.notLinkedImage") }}
             </title>
           </rect>
-          <text
-            v-if="item.textX && item.textY"
-            :x="item.textX"
-            :y="item.textY"
-            :class="['text', item.isSmallText ? 'text-small' : '']"
-            @click="onItemClick(item, $event)"
-          >
-            {{ item.humanQuantity }}
-          </text>
         </template>
+        <text
+          v-for="item in rewardQuantities" :key="item.uid"
+          :x="item.x"
+          :y="item.y"
+          :class="['text', item.isSmallText ? 'text-small' : '']"
+          @click="onItemClick(item, $event)"
+        >
+          {{ item.humanQuantity }}
+        </text>
       </g>
     </svg>
 
@@ -167,9 +167,11 @@ const totalNodes = computed(() => {
   return drawedNodes;
 });
 
-const iconsItems = computed(() =>
-  getIconsItems(props.items, totalNodes.value, props.isShowQuantity)
-);
+const iconsItems = computed(() => {
+  return getIconsItems(props.items, totalNodes.value, props.isShowQuantity);
+});
+const rewardIcons = computed(() => iconsItems.value.icons)
+const rewardQuantities = computed(() => iconsItems.value.quantities)
 
 onMounted(() => {
   window.addEventListener("keydown", onKeyDownMap);
@@ -277,7 +279,8 @@ function onNodeClick(drawedNode, event) {
  * @param {Object} event
  */
 function onItemClick(item, event) {
-  const drawedNode = totalNodes.value[item.node.id];
+  const nodeId = item.nodeId ? item.nodeId : item.node.id;
+  const drawedNode = totalNodes.value[nodeId];
 
   if (event.ctrlKey) {
     infoDialogDrawedNode.value = drawedNode;
@@ -474,9 +477,13 @@ function getItemName(item) {
 }
 .text {
   font-size: 20px;
-  fill: #000;
+  fill: #ffff00;
   font-weight: bold;
   cursor: pointer;
+  stroke: black;
+  stroke-width: 2;
+  stroke-linejoin: round;
+  paint-order: stroke fill;
 }
 .text-small {
   font-size: 16px;

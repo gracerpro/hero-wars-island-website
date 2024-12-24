@@ -65,9 +65,11 @@ const props = defineProps({
 const loading = ref(false);
 
 const drawedNodes = computed(() => getDrawedNodes(props.nodes));
-const iconModifyRewards = computed(() =>
-  getIconsItems(props.rewards, drawedNodes.value, props.isShowQuantity)
-);
+const iconModifyRewards = computed(() => {
+  const data = getIconsItems(props.rewards, drawedNodes.value, props.isShowQuantity)
+
+  return data.icons;
+});
 const minMaxNodeCoordinates = computed(() => {
   let minX = null;
   let minY = null;
