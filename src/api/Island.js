@@ -14,11 +14,14 @@ export default class Island {
    * @param {Boolean} isWithDescription
    * @returns {Promise<Object|null>}
    */
-  async get(id, isWithDescription) {
-    let params = undefined;
+  async get(id, fields) {
+    let params = {};
 
-    if (isWithDescription) {
-      params = { isWithDescription: isWithDescription ? 1 : 0 };
+    if (fields.isWithDescription) {
+      params.isWithDescription = 1;
+    }
+    if (fields.isWithBackgroundImage) {
+      params.isWithBackgroundImage = 1;
     }
     const island = await this._apiRequest.get("/islands/" + id, params);
 

@@ -158,8 +158,11 @@ async function loadIsland(id) {
   currentIsland.value = null;
   islandLoading.value = true;
   try {
-    const isWithDescription = true;
-    currentIsland.value = await client.island.get(id, isWithDescription);
+    const fields = {
+      isWithDescription: true,
+      isWithBackgroundImage: true,
+    };
+    currentIsland.value = await client.island.get(id, fields);
   } catch (error) {
     if (error instanceof HttpError && error.statusCode === 404) {
       errorMessage.value = t("page.island.islandNotFound");

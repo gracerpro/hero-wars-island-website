@@ -7,6 +7,7 @@
       width="100%"
       tabindex="0"
       :viewBox="viewBox"
+      :style="{ 'background-image': backgroundImageUrl ? 'url(' + backgroundImageUrl + ')' : '' }"
       xmlns="http://www.w3.org/2000/svg"
       @mousedown="onMouseDown"
       @mouseup="onMouseUp"
@@ -138,6 +139,7 @@ const props = defineProps({
   userNodesIdsMap: { type: Object, required: true },
   userNodesGoingIdsMap: { type: Object, required: true },
   isSelectAnyNode: { type: Boolean, default: true },
+  backgroundImage: { type: [Object, null], required: false, default: null },
 });
 
 const svgMap = ref(null);
@@ -167,6 +169,9 @@ const totalNodes = computed(() => {
   }
 
   return drawedNodes;
+});
+const backgroundImageUrl = computed(() => {
+  return props.backgroundImage ? props.backgroundImage.url : "";
 });
 
 const iconItems = computed(() => {
@@ -515,6 +520,8 @@ function getItemName(item) {
 }
 .canvas {
   outline: 1px solid #dddddd;
+  background-repeat: no-repeat;
+  background-size: cover;
 }
 .canvas:fullscreen {
   background-color: #fff;

@@ -42,6 +42,7 @@
         :nodes="nodes"
         :user-nodes-ids-map="userNodesIdsMap"
         :user-nodes-going-ids-map="userNodesGoingIdsMap"
+        :background-image="island.backgroundImage"
         @change-translate="onChangeTranslate"
         @change-scale="onChangeScale"
         @change-node="onChangeNode"
