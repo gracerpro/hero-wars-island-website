@@ -1,5 +1,24 @@
 # History
 
+## v1.6.6 at 2024-12-25
+
+What has been done
+
+* Change map translate by mouse
+* Add background image to map
+
+Technical part
+
+* Refactoring: rename rewards
+* Add consumable icons to documentation
+* Disable scroll on mouse wheel
+
+Fix errors
+
+* Fix: unique id for reward
+* Fix: translate map by keyboard
+
+
 ## v1.6.5 at 2024-12-04
 
 What has been done
