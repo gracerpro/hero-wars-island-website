@@ -210,35 +210,35 @@ function onKeyDownMap(event) {
     return;
   }
 
-  let x = 0;
-  let y = 0;
+  let dx = 0;
+  let dy = 0;
 
   switch (event.key) {
     case "ArrowLeft":
-      x = -TRANSLATE_X * 5;
+      dx = -TRANSLATE_X * 5;
       break;
     case "ArrowRight":
-      x = TRANSLATE_X * 5;
+      dx = TRANSLATE_X * 5;
       break;
     case "ArrowUp":
-      y = -TRANSLATE_Y * 5;
+      dy = -TRANSLATE_Y * 5;
       break;
     case "ArrowDown":
-      y = TRANSLATE_Y * 5;
+      dy = TRANSLATE_Y * 5;
       break;
     default:
       return;
   }
 
-  if (x != 0 || y != 0) {
+  if (dx != 0 || dy != 0) {
     if (event.ctrlKey) {
-      x /= 10;
-      y /= 10;
+      dx /= 10;
+      dy /= 10;
     } else if (event.shiftKey) {
-      x /= 2;
-      y /= 2;
+      dx /= 2;
+      dy /= 2;
     }
-    emit(EVENT_CHANGE_TRANSLATE, x, y);
+    emit(EVENT_CHANGE_TRANSLATE, props.translateX + dx, props.translateY + dy);
     event.preventDefault();
   }
 }
