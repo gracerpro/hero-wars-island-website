@@ -1,127 +1,3 @@
-<template>
-  <div>
-    <island-map-regions
-      v-if="island.regions.length > 1"
-      :regions="island.regions"
-      :region-numbers="regionNumbers"
-      :loading="loading"
-      @update:region-numbers="onChangeRegionNumbers"
-      @reset-region-numbers="onResetRegionNumbers"
-    />
-    <island-map-toolbar
-      v-if="!errorMessage"
-      :is-show-quantity="isShowQuantity"
-      :loading="loading"
-      :translate-x="translateX"
-      :translate-y="translateY"
-      @update:is-show-quantity="onChangeIsShowQuantity"
-      @reset="onResetMap"
-      @change-scale="onChangeScale"
-      @change-translate="onChangeTranslate"
-      @fullscreen-on="onFullscreen"
-      @begin-download="onBeginDownload"
-      @reload-map="forceReloadMap"
-    />
-
-    <island-map-loading v-if="loading" />
-    <div
-      v-else-if="errorMessage"
-      class="alert alert-danger"
-    >
-      {{ errorMessage }}
-    </div>
-    <div v-else>
-      <island-map-container
-        ref="mapContainer"
-        :scale="scale"
-        :translate-x="translateX"
-        :translate-y="translateY"
-        :is-show-quantity="isShowQuantity"
-        :is-select-any-node="isSelectAnyNode"
-        :rewards="visibleRewards"
-        :nodes="nodes"
-        :user-nodes-ids-map="userNodesIdsMap"
-        :user-nodes-going-ids-map="userNodesGoingIdsMap"
-        :background-image="island.backgroundImage"
-        @change-translate="onChangeTranslate"
-        @change-scale="onChangeScale"
-        @change-node="onChangeNode"
-        @select-node="onSelectNode"
-      />
-      <div
-        v-if="isShowMapState"
-        class="text-end"
-        style="font-size: 0.9em"
-      >
-        <span
-          title="Zoom"
-          class="me-4"
-          >{{ scale.toFixed(2) }}</span
-        >
-        <span title="Offset">{{ translateX.toFixed(1) }} {{ translateY.toFixed(1) }}</span>
-      </div>
-      <div class="row">
-        <div class="col-lg-6 mt-3">
-          <island-map-filter
-            v-model:item-name="filter.itemName"
-            v-model:type-id="filter.typeId"
-            v-model:is-node-type-tower="filter.isNodeTypeTower"
-            v-model:is-node-type-chest="filter.isNodeTypeChest"
-            :rewards="rewards"
-            :min-chars-count="minCharsCount"
-          />
-        </div>
-        <div class="col-lg-6 mt-3">
-          <island-map-steps
-            v-model:is-select-any-node="isSelectAnyNode"
-            v-model:select-mode="selectMode"
-            :explorer-move-count="userExplorerMoveCount"
-            :total-explorer-move-count="totalExplorerMoveCount"
-            :wood-move-count="userWoodMoveCount"
-            :total-wood-move-count="totalWoodMoveCount"
-            @reset-user-nodes="onResetUserNodes"
-          />
-        </div>
-      </div>
-      <div class="row">
-        <div class="col-lg-6 mt-4">
-          <island-map-table
-            v-model:is-show-block="isShowRewardsBlock"
-            :header="t('page.island.resourcesOnMap')"
-            :rewards="visibleRewards"
-            :visible-rewards-count="visibleRewardsCount"
-          />
-        </div>
-        <div class="col-lg-6 mt-4">
-          <island-map-table
-            v-model:is-show-block="isShowUserRewardsBlock"
-            :header="t('page.island.selectedResources')"
-            :rewards="userRewards"
-            :visible-rewards-count="userRewardsCount"
-          />
-        </div>
-        <div class="col-lg-6 mt-4">
-          <island-map-table
-            v-model:is-show-block="isShowGroupRewards"
-            :header="t('common.groupData')"
-            :rewards="groupRewards"
-            :visible-rewards-count="groupRewardsCount"
-          />
-        </div>
-      </div>
-    </div>
-
-    <component
-      :is="downloadDialogComponent"
-      ref="downloadDialog"
-      :island="island"
-      :nodes="nodes"
-      :rewards="visibleRewards"
-      :is-show-quantity="isShowQuantity"
-      @vue:mounted="onMountedDownloadDialog"
-    />
-  </div>
-</template>
 <script setup>
 import IslandMapLoading from "./IslandMapLoading.vue";
 import IslandMapToolbar from "./IslandMapToolbar.vue";
@@ -130,7 +6,6 @@ import IslandMapContainer from "./IslandMapContainer.vue";
 import IslandMapDownloadDialog from "./IslandMapDownloadDialog.vue";
 import IslandMapFilter from "./IslandMapFilter.vue";
 import IslandMapTable from "./IslandMapTable.vue";
-import IslandMapRegions from "./IslandMapRegions.vue";
 import { canSelectNode } from "@/services/island-map";
 import { onMounted, onUnmounted, ref, computed, shallowReactive } from "vue";
 import { getHumanQuantity } from "@/helpers/formatter";
@@ -184,7 +59,6 @@ const downloadDialog = ref(null);
 const downloadDialogComponent = shallowRef(null);
 
 const loading = computed(() => loadingNodes.value || calculatingRewards.value);
-const isShowMapState = computed(() => import.meta.env.DEV);
 
 const visibleRewards = computed(() => {
   let resultRewards = rewards.value;
@@ -438,6 +312,7 @@ function onResetMap() {
  * @param {Number|null} y
  */
 function onChangeTranslate(x, y) {
+  console.log(x, y);
   if (x !== null) {
     translateX.value = x;
   }
@@ -650,3 +525,123 @@ function saveState() {
   localStorage.setItem(componentId, JSON.stringify(state));
 }
 </script>
+
+<template>
+  <div>
+    <island-map-toolbar
+      v-if="!errorMessage"
+      :is-show-quantity="isShowQuantity"
+      :loading="loading"
+      :translate-x="translateX"
+      :translate-y="translateY"
+      :regions="island.regions"
+      :region-numbers="regionNumbers"
+      @update:is-show-quantity="onChangeIsShowQuantity"
+      @reset="onResetMap"
+      @change-scale="onChangeScale"
+      @change-translate="onChangeTranslate"
+      @fullscreen-on="onFullscreen"
+      @begin-download="onBeginDownload"
+      @reload-map="forceReloadMap"
+      @update:region-numbers="onChangeRegionNumbers"
+      @reset-region-numbers="onResetRegionNumbers"
+    />
+
+    <island-map-loading v-if="loading" />
+    <div
+      v-else-if="errorMessage"
+      class="alert alert-danger"
+    >
+      {{ errorMessage }}
+    </div>
+    <div v-else>
+      <island-map-container
+        ref="mapContainer"
+        :scale="scale"
+        :translate-x="translateX"
+        :translate-y="translateY"
+        :is-show-quantity="isShowQuantity"
+        :is-select-any-node="isSelectAnyNode"
+        :rewards="visibleRewards"
+        :nodes="nodes"
+        :user-nodes-ids-map="userNodesIdsMap"
+        :user-nodes-going-ids-map="userNodesGoingIdsMap"
+        :background-image="island.backgroundImage"
+        @change-translate="onChangeTranslate"
+        @change-scale="onChangeScale"
+        @change-node="onChangeNode"
+        @select-node="onSelectNode"
+      />
+      <div
+        class="text-end"
+        style="font-size: 0.9em"
+      >
+        <span
+          title="Zoom"
+          class="me-4"
+          >{{ scale.toFixed(2) }}</span
+        >
+        <span title="Offset">{{ translateX.toFixed(1) }} {{ translateY.toFixed(1) }}</span>
+      </div>
+      <div class="row">
+        <div class="col-lg-6 mt-3">
+          <island-map-filter
+            v-model:item-name="filter.itemName"
+            v-model:type-id="filter.typeId"
+            v-model:is-node-type-tower="filter.isNodeTypeTower"
+            v-model:is-node-type-chest="filter.isNodeTypeChest"
+            :rewards="rewards"
+            :min-chars-count="minCharsCount"
+          />
+        </div>
+        <div class="col-lg-6 mt-3">
+          <island-map-steps
+            v-model:is-select-any-node="isSelectAnyNode"
+            v-model:select-mode="selectMode"
+            :explorer-move-count="userExplorerMoveCount"
+            :total-explorer-move-count="totalExplorerMoveCount"
+            :wood-move-count="userWoodMoveCount"
+            :total-wood-move-count="totalWoodMoveCount"
+            @reset-user-nodes="onResetUserNodes"
+          />
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-lg-6 mt-4">
+          <island-map-table
+            v-model:is-show-block="isShowRewardsBlock"
+            :header="t('page.island.resourcesOnMap')"
+            :rewards="visibleRewards"
+            :visible-rewards-count="visibleRewardsCount"
+          />
+        </div>
+        <div class="col-lg-6 mt-4">
+          <island-map-table
+            v-model:is-show-block="isShowUserRewardsBlock"
+            :header="t('page.island.selectedResources')"
+            :rewards="userRewards"
+            :visible-rewards-count="userRewardsCount"
+          />
+        </div>
+        <div class="col-lg-6 mt-4">
+          <island-map-table
+            v-model:is-show-block="isShowGroupRewards"
+            :header="t('common.groupData')"
+            :rewards="groupRewards"
+            :visible-rewards-count="groupRewardsCount"
+          />
+        </div>
+      </div>
+    </div>
+
+    <component
+      :is="downloadDialogComponent"
+      ref="downloadDialog"
+      :island="island"
+      :nodes="nodes"
+      :rewards="visibleRewards"
+      :is-show-quantity="isShowQuantity"
+      @vue:mounted="onMountedDownloadDialog"
+    />
+  </div>
+</template>

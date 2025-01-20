@@ -1,24 +1,28 @@
 <template>
   <div class="container">
-    <div class="d-flex justify-content-between align-items-center">
-      <h1>{{ islandName }}</h1>
-      <span
-        v-if="currentIsland"
-        class="fst-italic"
-      >
+    <div class="row">
+      <div class="col-lg-6 mb-3">
+        <h1 class="mb-0">{{ islandName }}</h1>
+      </div>
+      <div class="col-lg-6 mb-3 d-flex align-items-center">
         <span
-          v-if="currentIsland.syncGameVersion"
-          :title="t('page.island.gameVersionWhenSyncCells')"
-          class="game-version"
-          >{{ currentIsland.syncGameVersion }}</span
+          v-if="currentIsland"
+          class="fst-italic"
         >
-        <span
-          v-if="currentIsland.syncAt"
-          :title="t('page.island.whenWasCellSynchronization')"
-          class="sync-at ms-2"
-          >{{ currentIsland.syncAt }}</span
-        >
-      </span>
+          <span
+            v-if="currentIsland.syncGameVersion"
+            :title="t('page.island.gameVersionWhenSyncCells')"
+            class="game-version"
+            >{{ currentIsland.syncGameVersion }}</span
+          >
+          <span
+            v-if="currentIsland.syncAt"
+            :title="t('page.island.whenWasCellSynchronization')"
+            class="sync-at ms-2"
+            >{{ currentIsland.syncAt }}</span
+          >
+        </span>
+      </div>
     </div>
 
     <div v-if="islandLoading">

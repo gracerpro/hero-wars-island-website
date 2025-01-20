@@ -1,5 +1,5 @@
 <template>
-  <div class="map">
+  <div>
     <svg
       ref="svgMap"
       height="600"
@@ -515,9 +515,6 @@ function getItemName(item) {
 }
 </style>
 <style scoped>
-.map {
-  margin-left: 45px;
-}
 .canvas {
   outline: 1px solid #dddddd;
   background-repeat: no-repeat;

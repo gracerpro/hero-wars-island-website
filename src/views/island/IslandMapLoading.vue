@@ -1,9 +1,7 @@
 <template>
   <div>
-    <div class="map">
-      <div class="map-svg d-flex justify-content-center align-items-center">
-        <row-loading />
-      </div>
+    <div class="map-svg d-flex justify-content-center align-items-center">
+      <row-loading />
     </div>
     <div class="placeholder-glow my-4">
       <span class="placeholder placeholder-lg col-12"></span>
@@ -36,9 +34,6 @@
 import RowLoading from "@/components/RowLoading.vue";
 </script>
 <style scoped>
-.map {
-  margin-left: 45px;
-}
 .map-svg {
   height: 600px;
   outline: 1px solid #dddddd;
