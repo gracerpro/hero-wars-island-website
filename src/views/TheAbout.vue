@@ -1,5 +1,5 @@
 <template>
-  <div class="container">
+  <div class="container text-container">
     <h1>{{ t("common.about") }}</h1>
     <p>{{ t("page.about.paragraph1") }}</p>
     <p>{{ t("page.about.reasons") }}</p>

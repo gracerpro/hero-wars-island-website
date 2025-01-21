@@ -1,6 +1,9 @@
 <template>
-  <form @submit.prevent="onSubmit">
-    <div class="mb-3 mt-2">
+  <form
+    class="p-2 border border-secondary-subtle rounded-3"
+    @submit.prevent="onSubmit"
+  >
+    <div class="mb-3">
       <label
         class="form-label"
         :for="formId + '__subject'"
@@ -87,7 +90,7 @@
     <div>
       <button
         type="submit"
-        class="btn btn-primary mb-3 w-100"
+        class="btn btn-primary w-100"
         :disabled="submiting"
       >
         <span

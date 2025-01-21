@@ -1,6 +1,6 @@
 <template>
   <div class="row">
-    <div class="col-md-6">
+    <div class="col-md-6 mb-3">
       <label
         :for="formId + '__itemName'"
         :class="['form-label', itemName.length > 0 ? 'not-empty' : '']"
@@ -22,7 +22,7 @@
         {{ t("common.needEnterAtLeastCharacters", { n: minCharsCount }) }}
       </div>
     </div>
-    <div class="col-md-6">
+    <div class="col-md-6 mb-3">
       <label
         :for="formId + '__typeId'"
         :class="['form-label', typeId != null ? 'not-empty' : '']"
@@ -42,7 +42,7 @@
         @update:model-value="onChangeType"
       />
     </div>
-    <div class="col-md-12 mt-3">
+    <div class="col-md-6 mb-3">
       <div class="form-check form-check-inline">
         <input
           :id="formId + '__nodeTypeTower'"
@@ -78,9 +78,11 @@
         class="badge rounded-pill text-bg-warning form-check-not-empty"
         >&nbsp;</span
       >
+    </div>
+    <div class="col-md-6 mb-3">
       <button
         type="button"
-        class="btn btn-secondary float-end"
+        class="btn btn-secondary"
         :disabled="filledFilterCount === 0"
         @click="onReset"
       >

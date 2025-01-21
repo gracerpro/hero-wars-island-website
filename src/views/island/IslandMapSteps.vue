@@ -1,24 +1,10 @@
 <template>
-  <div>
-    <div class="float-end">
-      <router-link :to="createI18nRouteTo({ name: 'contact' })">{{
-        t("common.haveErrosOrProposal")
-      }}</router-link
-      ><br />
-      <label class="mt-2">
-        <input
-          type="checkbox"
-          :checked="isSelectAnyNode"
-          @change="onChangeIsSelectAnyNode"
-        />
-        {{ t("common.selectAnyNodeQuestion") }}
-      </label>
-    </div>
-    <div>
-      {{ t("page.island.myExplorersMoves") }}
-    </div>
-    <div class="d-flex align-items-center mt-2">
-      <div class="me-3">
+  <div class="row">
+    <div class="col-sm-6 mb-3">
+      <div>
+        {{ t("page.island.myExplorersMoves") }}
+      </div>
+      <div>
         <span class="d-inline-block mb-1">
           <span
             class="hero-icon item-explorer-move align-middle me-3"
@@ -41,13 +27,13 @@
       </div>
       <button
         type="button"
-        :class="['btn btn-secondary', explorerMoveCount > 0 ? '' : 'disabled']"
+        :class="['btn btn-secondary mt-1', explorerMoveCount > 0 ? '' : 'disabled']"
         @click="emit(EVENT_RESET_USER_NODES)"
       >
         {{ t("common.reset") }}
       </button>
     </div>
-    <div class="mt-2">
+    <div class="col-sm-6 mb-3">
       <label
         v-for="mode in selectModes"
         :key="mode.value"
@@ -61,8 +47,25 @@
         />
         {{ mode.label }}
       </label>
+      <div class="fst-italic text-secondary small">{{ selectModeHint }}</div>
     </div>
-    <div class="fst-italic text-secondary small">{{ selectModeHint }}</div>
+    <div class="col-sm-6">
+      <label class="d-block mb-3">
+        <input
+          type="checkbox"
+          :checked="isSelectAnyNode"
+          @change="onChangeIsSelectAnyNode"
+        />
+        {{ t("common.selectAnyNodeQuestion") }}
+      </label>
+    </div>
+    <div class="col-sm-6 text-end">
+      <router-link
+        :to="createI18nRouteTo({ name: 'contact' })"
+        class="d-block mb-3"
+        >{{ t("common.haveErrosOrProposal") }}</router-link
+      >
+    </div>
   </div>
 </template>
 <script>

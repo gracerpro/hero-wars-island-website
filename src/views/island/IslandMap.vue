@@ -312,7 +312,6 @@ function onResetMap() {
  * @param {Number|null} y
  */
 function onChangeTranslate(x, y) {
-  console.log(x, y);
   if (x !== null) {
     translateX.value = x;
   }

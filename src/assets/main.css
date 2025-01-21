@@ -3,3 +3,11 @@
   -ms-user-select: none; /* IE 10 and IE 11 */
   user-select: none; /* Standard syntax */
 }
+
+.app-container {
+  max-width: 1000px;
+}
+
+.text-container {
+  max-width: 860px;
+}

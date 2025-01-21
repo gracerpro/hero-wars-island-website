@@ -1,10 +1,10 @@
 <template>
-  <div class="container">
+  <div class="container app-container">
     <h1>{{ t("common.contacts") }}</h1>
     <p>{{ t("page.contact.fillFieldsForContact") }}</p>
     <p>{{ t("page.contact.ctrlF5") }}</p>
     <div class="row">
-      <div class="col-lg-8 offset-lg-2 border border-primary rounded-3">
+      <div class="col-lg-8 offset-lg-2">
         <contact-form />
       </div>
     </div>

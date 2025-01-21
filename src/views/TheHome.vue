@@ -1,5 +1,5 @@
 <template>
-  <div class="container">
+  <div class="container app-container">
     <h1>
       {{ t("page.home.adventureIsland", 2) }} -
       {{ t("common.heroWarsDominionEra") }}
@@ -63,12 +63,16 @@
       </li>
     </ol>
 
-    <router-link
-      class="float-end mt-4"
-      :to="createI18nRouteTo({ name: 'news' })"
-      >{{ t("page.home.readAllNews") }}</router-link
-    >
-    <h2 class="mt-4">{{ t("common.news") }}</h2>
+    <div class="row">
+      <div class="col-lg-6">
+        <h2>{{ t("common.news") }}</h2>
+      </div>
+      <div class="col-lg-6 text-end">
+        <router-link :to="createI18nRouteTo({ name: 'news' })">{{
+          t("page.home.readAllNews")
+        }}</router-link>
+      </div>
+    </div>
 
     <div v-if="newsLoading">
       <div
@@ -162,7 +166,7 @@ function load() {
 function loadIslands() {
   islandsLoading.value = true;
   client.island
-    .getList(5)
+    .getList(10)
     .then((list) => {
       islands.value = list.items;
     })

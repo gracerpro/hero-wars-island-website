@@ -1,5 +1,5 @@
 <template>
-  <div class="container">
+  <div class="container app-container">
     <div v-if="loading">
       <div class="placeholder-glow">
         <span class="placeholder col-3"></span>

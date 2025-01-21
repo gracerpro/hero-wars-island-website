@@ -1,5 +1,5 @@
 <template>
-  <div class="container">
+  <div class="container app-container">
     <h1>{{ t("page.help.helpToProject") }}</h1>
 
     <p>{{ t("page.help.paragraph1") }}</p>

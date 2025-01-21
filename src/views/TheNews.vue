@@ -1,5 +1,5 @@
 <template>
-  <div class="container">
+  <div class="container app-container">
     <h1>{{ t("common.news") }}</h1>
 
     <form
