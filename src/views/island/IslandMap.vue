@@ -576,11 +576,11 @@ function saveState() {
         style="font-size: 0.9em"
       >
         <span
-          title="Zoom"
+          :title="t('common.zoom')"
           class="me-4"
           >{{ scale.toFixed(2) }}</span
         >
-        <span title="Offset">{{ translateX.toFixed(1) }} {{ translateY.toFixed(1) }}</span>
+        <span :title="t('common.offset')">{{ translateX.toFixed(1) }} {{ translateY.toFixed(1) }}</span>
       </div>
       <div class="row">
         <div class="col-lg-6 mt-3">

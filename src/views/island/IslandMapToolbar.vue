@@ -41,7 +41,7 @@ const helpDialog = ref(null);
 const helpDialogComponent = shallowRef(null);
 
 const isShowReloadMap = computed(() => {
-  return import.meta.env.MODE === "production";
+  return import.meta.env.MODE === "development";
 });
 
 function onHelpClick() {
