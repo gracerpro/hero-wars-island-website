@@ -15,7 +15,7 @@ import { TYPE_BLOCKER, TYPE_CHEST, TYPE_START, TYPE_TOWER } from "@/api/Node";
 import { GAME_ID_EXPLORER_MOVE, GAME_ID_WOOD } from "@/api/Item";
 import { isObject } from "@/helpers/core";
 import { getNodesMap } from "@/services/api/island-node";
-import { SELECT_MODE_PLAN } from "./select-mode";
+import { SELECT_MODE_DISABLE, SELECT_MODE_GOING, SELECT_MODE_PLAN } from "./select-mode";
 import { shallowRef } from "vue";
 import UserError from "@/exceptions/UserError";
 
@@ -31,17 +31,21 @@ let byIslandState = {};
 const minCharsCount = 3;
 const componentId = props.parentPageId + "__map";
 
-const loadingNodes = ref(true);
 const calculatingRewards = ref(false);
 const errorMessage = ref("");
 const regionNumbers = ref([]);
+
+const loadingNodes = ref(true);
 const nodes = ref({});
 const rewards = ref([]);
 const userNodesIdsMap = ref({});
 const userNodesGoingIdsMap = ref({});
+const disableNodesIdsMap = ref({});
+
 const scale = ref(1);
 const translateX = ref(0);
 const translateY = ref(0);
+
 const isSelectAnyNode = ref(true);
 const selectMode = ref(SELECT_MODE_PLAN);
 const isShowQuantity = ref(true);
@@ -54,6 +58,7 @@ const filter = shallowReactive({
   isNodeTypeTower: false,
   isNodeTypeChest: false,
 });
+
 const mapContainer = ref(null);
 const downloadDialog = ref(null);
 const downloadDialogComponent = shallowRef(null);
@@ -61,7 +66,9 @@ const downloadDialogComponent = shallowRef(null);
 const loading = computed(() => loadingNodes.value || calculatingRewards.value);
 
 const visibleRewards = computed(() => {
-  let resultRewards = rewards.value;
+  let resultRewards = rewards.value.filter((reward) => {
+    return !disableNodesIdsMap.value[reward.node.id];
+  });
 
   if (filter.itemName.length >= minCharsCount) {
     resultRewards = resultRewards.filter((item) => {
@@ -92,24 +99,26 @@ const visibleRewards = computed(() => {
 });
 const visibleRewardsCount = computed(() => visibleRewards.value.length);
 const userRewards = computed(() => {
-  return rewards.value.filter((item) => {
-    return nodes.value[item.node.id] && userNodesIdsMap.value[item.node.id];
+  return rewards.value.filter((reward) => {
+    return nodes.value[reward.node.id] && userNodesIdsMap.value[reward.node.id];
   });
 });
 const userRewardsCount = computed(() => userRewards.value.length);
 const groupRewards = computed(() => {
-  let map = {};
+  const map = {};
 
-  rewards.value.forEach(({ item }) => {
-    if (!map[item.id]) {
-      map[item.id] = {
-        id: item.id,
-        quantity: 0,
-        item,
-      };
-    }
-    map[item.id].quantity += item.quantity;
-  });
+  rewards.value
+    .filter((reward) => !disableNodesIdsMap.value[reward.node.id])
+    .forEach(({ item }) => {
+      if (!map[item.id]) {
+        map[item.id] = {
+          id: item.id,
+          quantity: 0,
+          item,
+        };
+      }
+      map[item.id].quantity += item.quantity;
+    });
 
   let arr = Object.values(map);
 
@@ -182,6 +191,7 @@ const totalWoodMoveCount = computed(() => {
 
   return result;
 });
+const disableNodesCount = computed(() => Object.keys(disableNodesIdsMap.value).length);
 
 loadState();
 
@@ -332,27 +342,46 @@ function onChangeNode(node) {
 }
 
 function onSelectNode(nodeId) {
-  if (selectMode.value === SELECT_MODE_PLAN) {
-    if (!nodes.value[nodeId]) {
-      throw new Error(t("page.island.notFoundNodeAdmin"));
-    }
+  if (!nodes.value[nodeId]) {
+    throw new Error(t("page.island.notFoundNodeAdmin"));
+  }
 
-    if (userNodesIdsMap.value[nodeId]) {
-      delete userNodesIdsMap.value[nodeId];
-    } else {
-      userNodesIdsMap.value[nodeId] = true;
-    }
-    if (userNodesGoingIdsMap.value[nodeId]) {
-      delete userNodesGoingIdsMap.value[nodeId];
-    }
-  } else {
-    if (userNodesIdsMap.value[nodeId]) {
-      if (userNodesGoingIdsMap.value[nodeId]) {
-        delete userNodesGoingIdsMap.value[nodeId];
-      } else {
-        userNodesGoingIdsMap.value[nodeId] = true;
+  switch (selectMode.value) {
+    case SELECT_MODE_PLAN:
+      if (!disableNodesIdsMap.value[nodeId]) {
+        if (userNodesIdsMap.value[nodeId]) {
+          delete userNodesIdsMap.value[nodeId];
+        } else {
+          userNodesIdsMap.value[nodeId] = true;
+        }
+        if (userNodesGoingIdsMap.value[nodeId]) {
+          delete userNodesGoingIdsMap.value[nodeId];
+        }
       }
-    }
+      break;
+    case SELECT_MODE_GOING:
+      if (userNodesIdsMap.value[nodeId] && !disableNodesIdsMap.value[nodeId]) {
+        if (userNodesGoingIdsMap.value[nodeId]) {
+          delete userNodesGoingIdsMap.value[nodeId];
+        } else {
+          userNodesGoingIdsMap.value[nodeId] = true;
+        }
+      }
+      break;
+    case SELECT_MODE_DISABLE:
+      if (disableNodesIdsMap.value[nodeId]) {
+        delete disableNodesIdsMap.value[nodeId];
+      } else {
+        disableNodesIdsMap.value[nodeId] = true;
+
+        if (userNodesIdsMap.value[nodeId]) {
+          delete userNodesIdsMap.value[nodeId];
+        }
+        if (userNodesGoingIdsMap.value[nodeId]) {
+          delete userNodesGoingIdsMap.value[nodeId];
+        }
+      }
+      break;
   }
 }
 
@@ -360,6 +389,10 @@ function onResetUserNodes() {
   userNodesGoingIdsMap.value = {};
   userNodesIdsMap.value = {};
   selectMode.value = SELECT_MODE_PLAN;
+}
+
+function onResetDisableNodes() {
+  disableNodesIdsMap.value = {};
 }
 
 function onFullscreen() {
@@ -385,7 +418,7 @@ function reloadMap(isForce = false) {
 
     for (const nodeId in userNodesIdsMap.value) {
       const node = nodes.value[nodeId];
-      if (node && !canSelectNode(node)) {
+      if ((node && !canSelectNode(node)) || disableNodesIdsMap.value[nodeId]) {
         delete userNodesIdsMap.value[nodeId];
       }
     }
@@ -424,7 +457,6 @@ function loadState() {
     state = {
       byIsland: {},
       filter: {},
-      regionNumbers: [],
     };
   }
   if (!state.filter) {
@@ -448,7 +480,7 @@ function loadState() {
   }
   byIslandState = state.byIsland;
 
-  const byIsland = byIslandState[props.island.id] ? byIslandState[props.island.id] : {};
+  const byIsland = byIslandState[props.island.id] ?? {};
 
   if (byIsland.scale === undefined) {
     if (props.island.initMap?.scale !== undefined) {
@@ -480,14 +512,13 @@ function loadState() {
   regionNumbers.value = byIsland.regionNumbers || [];
 
   if (byIsland.userNodesIds) {
-    byIsland.userNodesIds.forEach((id) => {
-      userNodesIdsMap.value[id] = true;
-    });
+    byIsland.userNodesIds.forEach((id) => (userNodesIdsMap.value[id] = true));
   }
   if (byIsland.userNodesGoingIds) {
-    byIsland.userNodesGoingIds.forEach((id) => {
-      userNodesGoingIdsMap.value[id] = true;
-    });
+    byIsland.userNodesGoingIds.forEach((id) => (userNodesGoingIdsMap.value[id] = true));
+  }
+  if (byIsland.disableNodesIds) {
+    byIsland.disableNodesIds.forEach((id) => (disableNodesIdsMap.value[id] = true));
   }
 
   filter.value = state.filter;
@@ -513,6 +544,7 @@ function saveState() {
   };
   byIslandState[props.island.id] = {
     userNodesIds: Object.keys(userNodesIdsMap.value).map((id) => parseInt(id)),
+    disableNodesIds: Object.keys(disableNodesIdsMap.value).map((id) => parseInt(id)),
     userNodesGoingIds: Object.keys(userNodesGoingIdsMap.value).map((id) => parseInt(id)),
     scale: scale.value,
     translateX: translateX.value,
@@ -565,6 +597,7 @@ function saveState() {
         :nodes="nodes"
         :user-nodes-ids-map="userNodesIdsMap"
         :user-nodes-going-ids-map="userNodesGoingIdsMap"
+        :disable-nodes-ids-map="disableNodesIdsMap"
         :background-image="island.backgroundImage"
         @change-translate="onChangeTranslate"
         @change-scale="onChangeScale"
@@ -580,7 +613,9 @@ function saveState() {
           class="me-4"
           >{{ scale.toFixed(2) }}</span
         >
-        <span :title="t('common.offset')">{{ translateX.toFixed(1) }} {{ translateY.toFixed(1) }}</span>
+        <span :title="t('common.offset')"
+          >{{ translateX.toFixed(1) }} {{ translateY.toFixed(1) }}</span
+        >
       </div>
       <div class="row">
         <div class="col-lg-6 mt-3">
@@ -601,7 +636,9 @@ function saveState() {
             :total-explorer-move-count="totalExplorerMoveCount"
             :wood-move-count="userWoodMoveCount"
             :total-wood-move-count="totalWoodMoveCount"
+            :disable-nodes-count="disableNodesCount"
             @reset-user-nodes="onResetUserNodes"
+            @reset-disable-nodes="onResetDisableNodes"
           />
         </div>
       </div>

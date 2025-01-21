@@ -138,6 +138,7 @@ const props = defineProps({
   nodes: { type: Object, required: true },
   userNodesIdsMap: { type: Object, required: true },
   userNodesGoingIdsMap: { type: Object, required: true },
+  disableNodesIdsMap: { type: Object, required: true },
   isSelectAnyNode: { type: Boolean, default: true },
   backgroundImage: { type: [Object, null], required: false, default: null },
 });
