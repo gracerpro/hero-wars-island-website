@@ -1,5 +1,7 @@
 <template>
   <div class="container app-container">
+    <breadcrumb-row :links="breadcrumbs" />
+
     <div v-if="loading">
       <div class="placeholder-glow">
         <span class="placeholder col-3"></span>
@@ -29,7 +31,8 @@
 <script setup>
 import HeroClient from "@/api/HeroClient";
 import RowLoading from "@/components/RowLoading.vue";
-import { onServerPrefetch, ref, watch } from "vue";
+import BreadcrumbRow from "@/components/BreadcrumbRow.vue";
+import { computed, onServerPrefetch, ref, watch } from "vue";
 import { useRoute } from "vue-router";
 import { fromCurrentDate } from "@/helpers/formatter";
 import HttpError from "@/exceptions/HttpError";
@@ -54,6 +57,13 @@ const oneNews = ref({
   slug: "",
   name: "",
   content: "",
+});
+
+const breadcrumbs = computed(() => {
+  return [
+    { label: t("common.news"), url: "/news" },
+    { label: oneNews.value.name, isActive: true },
+  ];
 });
 
 watch(
