@@ -1,33 +1,3 @@
-<template>
-  <suspense>
-    <modal-dialog
-      ref="dialogRef"
-      element-id="island-map-download-dialog"
-      :form-id="formId"
-      :header="t('common.download')"
-      :saving="loading"
-      :submit-button-text="t('common.download')"
-      @vue:mounted="onMountedDialog"
-    >
-      <p>{{ t("page.island.downloadMapInFormat", { format: "PNG" }) }}</p>
-
-      <div>
-        {{
-          t("page.island.downloadVerticalAndHorizontalCount", {
-            verticalCount: verticalCellsCount,
-            horizontalCount: horizontalCellsCount,
-          })
-        }}
-      </div>
-      <div>{{ t("page.island.downloadMapSize", { mapSize: mapSize }) }}</div>
-
-      <form
-        :id="formId"
-        @submit.prevent="downloadAsPng"
-      ></form>
-    </modal-dialog>
-  </suspense>
-</template>
 <script setup>
 import ModalDialog from "@/components/ModalDialog.vue";
 import { ref } from "vue";
@@ -293,3 +263,34 @@ defineExpose({
   show,
 });
 </script>
+
+<template>
+  <suspense>
+    <modal-dialog
+      ref="dialogRef"
+      element-id="island-map-download-dialog"
+      :form-id="formId"
+      :header="t('common.download')"
+      :saving="loading"
+      :submit-button-text="t('common.download')"
+      @vue:mounted="onMountedDialog"
+    >
+      <p>{{ t("page.island.downloadMapInFormat", { format: "PNG" }) }}</p>
+
+      <div>
+        {{
+          t("page.island.downloadVerticalAndHorizontalCount", {
+            verticalCount: verticalCellsCount,
+            horizontalCount: horizontalCellsCount,
+          })
+        }}
+      </div>
+      <div>{{ t("page.island.downloadMapSize", { mapSize: mapSize }) }}</div>
+
+      <form
+        :id="formId"
+        @submit.prevent="downloadAsPng"
+      ></form>
+    </modal-dialog>
+  </suspense>
+</template>

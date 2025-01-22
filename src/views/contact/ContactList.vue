@@ -1,54 +1,3 @@
-<template>
-  <div>
-    <h2 class="mt-3">{{ t("common.feedback") }}</h2>
-    <p class="fst-italic">{{ t("page.contact.messagesDisplayedByAdministrator") }}</p>
-
-    <p v-if="isShowNoData">
-      {{ t("common.noData") }}
-    </p>
-    <div
-      v-for="item in feedbackItems"
-      v-else
-      :key="item.id"
-      class="mb-4"
-    >
-      <h5>{{ item.subject }}</h5>
-      <div>
-        <span class="fst-italic">{{ fromCurrentDate(item.createdAt) }}</span
-        >&nbsp;
-        <span :class="['badge', getStatusClass(item.status)]">{{
-          getStatusName(t, item.status)
-        }}</span>
-      </div>
-      <div class="mt-2">{{ item.message }}</div>
-      <div v-if="item.answer">
-        <span class="text-danger-emphasis">{{ t("common.administratorAnswer") }}:</span>
-        {{ item.answer }}
-      </div>
-    </div>
-
-    <row-loading v-if="loading" />
-    <div
-      v-else-if="errorMessage"
-      class="alert alert-danger"
-    >
-      {{ errorMessage }}
-    </div>
-    <div
-      v-else-if="hasMoreItems"
-      class="text-center"
-    >
-      <button
-        type="button"
-        class="btn btn-link"
-        :disabled="loading"
-        @click="loadFeedbackItems"
-      >
-        {{ t("common.showMore") }}
-      </button>
-    </div>
-  </div>
-</template>
 <script setup>
 import { useI18n } from "vue-i18n";
 import { ref, computed } from "vue";
@@ -115,3 +64,55 @@ function loadFeedbackItems() {
     });
 }
 </script>
+
+<template>
+  <div>
+    <h2 class="mt-3">{{ t("common.feedback") }}</h2>
+    <p class="fst-italic">{{ t("page.contact.messagesDisplayedByAdministrator") }}</p>
+
+    <p v-if="isShowNoData">
+      {{ t("common.noData") }}
+    </p>
+    <div
+      v-for="item in feedbackItems"
+      v-else
+      :key="item.id"
+      class="mb-4"
+    >
+      <h5>{{ item.subject }}</h5>
+      <div>
+        <span class="fst-italic">{{ fromCurrentDate(item.createdAt) }}</span
+        >&nbsp;
+        <span :class="['badge', getStatusClass(item.status)]">{{
+          getStatusName(t, item.status)
+        }}</span>
+      </div>
+      <div class="mt-2">{{ item.message }}</div>
+      <div v-if="item.answer">
+        <span class="text-danger-emphasis">{{ t("common.administratorAnswer") }}:</span>
+        {{ item.answer }}
+      </div>
+    </div>
+
+    <row-loading v-if="loading" />
+    <div
+      v-else-if="errorMessage"
+      class="alert alert-danger"
+    >
+      {{ errorMessage }}
+    </div>
+    <div
+      v-else-if="hasMoreItems"
+      class="text-center"
+    >
+      <button
+        type="button"
+        class="btn btn-link"
+        :disabled="loading"
+        @click="loadFeedbackItems"
+      >
+        {{ t("common.showMore") }}
+      </button>
+    </div>
+  </div>
+</template>

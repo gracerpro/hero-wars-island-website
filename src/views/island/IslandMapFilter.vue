@@ -1,96 +1,3 @@
-<template>
-  <div class="row">
-    <div class="col-md-6 mb-3">
-      <label
-        :for="formId + '__itemName'"
-        :class="['form-label', itemName.length > 0 ? 'not-empty' : '']"
-        >{{ t("common.resource") }}
-        <span
-          v-if="itemName"
-          class="badge rounded-pill text-bg-warning"
-          >&nbsp;</span
-        >
-      </label>
-      <text-input
-        :model-value="itemName"
-        :model-modifiers="{ trim: true }"
-        :input-id="formId + '__itemName'"
-        :class="{ 'not-empty': itemName.length > 0 }"
-        @update:model-value="onUpdateName"
-      />
-      <div class="form-text fw-normal">
-        {{ t("common.needEnterAtLeastCharacters", { n: minCharsCount }) }}
-      </div>
-    </div>
-    <div class="col-md-6 mb-3">
-      <label
-        :for="formId + '__typeId'"
-        :class="['form-label', typeId != null ? 'not-empty' : '']"
-      >
-        {{ t("common.type") }}
-        <span
-          v-if="typeId != null"
-          class="badge rounded-pill text-bg-warning"
-          >&nbsp;</span
-        >
-      </label>
-      <clear-select
-        :model-value="typeId"
-        :input-id="formId + '__typeId'"
-        :select-values="visibleTypes"
-        :class="{ 'not-empty': typeId != null }"
-        @update:model-value="onChangeType"
-      />
-    </div>
-    <div class="col-md-6 mb-3">
-      <div class="form-check form-check-inline">
-        <input
-          :id="formId + '__nodeTypeTower'"
-          class="form-check-input"
-          type="checkbox"
-          :value="TYPE_TOWER"
-          :checked="isNodeTypeTower"
-          @change="onChangeNodeType"
-        />
-        <label
-          class="form-check-label"
-          :for="formId + '__nodeTypeTower'"
-          >{{ t("common.tower") }}</label
-        >
-      </div>
-      <div class="form-check form-check-inline">
-        <input
-          :id="formId + '__nodeTypeChest'"
-          class="form-check-input"
-          type="checkbox"
-          :value="TYPE_CHEST"
-          :checked="isNodeTypeChest"
-          @change="onChangeNodeType"
-        />
-        <label
-          class="form-check-label"
-          :for="formId + '__nodeTypeChest'"
-          >{{ t("common.chest") }}</label
-        >
-      </div>
-      <span
-        v-if="isCheckedFlags"
-        class="badge rounded-pill text-bg-warning form-check-not-empty"
-        >&nbsp;</span
-      >
-    </div>
-    <div class="col-md-6 mb-3">
-      <button
-        type="button"
-        class="btn btn-secondary"
-        :disabled="filledFilterCount === 0"
-        @click="onReset"
-      >
-        {{ t("common.reset") }}
-      </button>
-    </div>
-  </div>
-</template>
 <script>
 const EVENT_UPDATE_ITEM_NAME = "update:item-name";
 const EVENT_UPDATE_TYPE = "update:type-id";
@@ -191,6 +98,101 @@ function onReset() {
   }
 }
 </script>
+
+<template>
+  <div class="row">
+    <div class="col-md-6 mb-3">
+      <label
+        :for="formId + '__itemName'"
+        :class="['form-label', itemName.length > 0 ? 'not-empty' : '']"
+        >{{ t("common.resource") }}
+        <span
+          v-if="itemName"
+          class="badge rounded-pill text-bg-warning"
+          >&nbsp;</span
+        >
+      </label>
+      <text-input
+        :model-value="itemName"
+        :model-modifiers="{ trim: true }"
+        :input-id="formId + '__itemName'"
+        :class="{ 'not-empty': itemName.length > 0 }"
+        @update:model-value="onUpdateName"
+      />
+      <div class="form-text fw-normal">
+        {{ t("common.needEnterAtLeastCharacters", { n: minCharsCount }) }}
+      </div>
+    </div>
+    <div class="col-md-6 mb-3">
+      <label
+        :for="formId + '__typeId'"
+        :class="['form-label', typeId != null ? 'not-empty' : '']"
+      >
+        {{ t("common.type") }}
+        <span
+          v-if="typeId != null"
+          class="badge rounded-pill text-bg-warning"
+          >&nbsp;</span
+        >
+      </label>
+      <clear-select
+        :model-value="typeId"
+        :input-id="formId + '__typeId'"
+        :select-values="visibleTypes"
+        :class="{ 'not-empty': typeId != null }"
+        @update:model-value="onChangeType"
+      />
+    </div>
+    <div class="col-md-6 mb-3">
+      <div class="form-check form-check-inline">
+        <input
+          :id="formId + '__nodeTypeTower'"
+          class="form-check-input"
+          type="checkbox"
+          :value="TYPE_TOWER"
+          :checked="isNodeTypeTower"
+          @change="onChangeNodeType"
+        />
+        <label
+          class="form-check-label"
+          :for="formId + '__nodeTypeTower'"
+          >{{ t("common.tower") }}</label
+        >
+      </div>
+      <div class="form-check form-check-inline">
+        <input
+          :id="formId + '__nodeTypeChest'"
+          class="form-check-input"
+          type="checkbox"
+          :value="TYPE_CHEST"
+          :checked="isNodeTypeChest"
+          @change="onChangeNodeType"
+        />
+        <label
+          class="form-check-label"
+          :for="formId + '__nodeTypeChest'"
+          >{{ t("common.chest") }}</label
+        >
+      </div>
+      <span
+        v-if="isCheckedFlags"
+        class="badge rounded-pill text-bg-warning form-check-not-empty"
+        >&nbsp;</span
+      >
+    </div>
+    <div class="col-md-6 mb-3">
+      <button
+        type="button"
+        class="btn btn-secondary"
+        :disabled="filledFilterCount === 0"
+        @click="onReset"
+      >
+        {{ t("common.reset") }}
+      </button>
+    </div>
+  </div>
+</template>
+
 <style>
 .not-empty .badge {
   font-size: 0.5em;

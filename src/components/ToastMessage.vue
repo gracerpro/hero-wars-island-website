@@ -1,24 +1,3 @@
-<template>
-  <div class="toast-container position-fixed bottom-0 end-0 p-3">
-    <div
-      :id="elementId"
-      :class="['toast align-items-center border-0', classType, isShow ? 'show' : '']"
-      role="alert"
-      aria-live="assertive"
-      aria-atomic="true"
-    >
-      <div class="d-flex">
-        <div class="toast-body">{{ toastMessage }}</div>
-        <button
-          type="button"
-          class="btn-close btn-close-white me-2 m-auto"
-          data-bs-dismiss="toast"
-          aria-label="Close"
-        ></button>
-      </div>
-    </div>
-  </div>
-</template>
 <script>
 export const TYPE_SUCCESS = "success";
 export const TYPE_DANGER = "danger";
@@ -77,3 +56,25 @@ defineExpose({
   show,
 });
 </script>
+
+<template>
+  <div class="toast-container position-fixed bottom-0 end-0 p-3">
+    <div
+      :id="elementId"
+      :class="['toast align-items-center border-0', classType, isShow ? 'show' : '']"
+      role="alert"
+      aria-live="assertive"
+      aria-atomic="true"
+    >
+      <div class="d-flex">
+        <div class="toast-body">{{ toastMessage }}</div>
+        <button
+          type="button"
+          class="btn-close btn-close-white me-2 m-auto"
+          data-bs-dismiss="toast"
+          aria-label="Close"
+        ></button>
+      </div>
+    </div>
+  </div>
+</template>

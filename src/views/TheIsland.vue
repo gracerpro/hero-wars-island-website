@@ -1,69 +1,3 @@
-<template>
-  <div class="container">
-    <div class="row">
-      <div class="col-lg-6 mb-3">
-        <h1 class="mb-0">{{ islandName }}</h1>
-      </div>
-      <div class="col-lg-6 mb-3 d-flex align-items-center">
-        <span
-          v-if="currentIsland"
-          class="fst-italic"
-        >
-          <span
-            v-if="currentIsland.syncGameVersion"
-            :title="t('page.island.gameVersionWhenSyncCells')"
-            class="game-version"
-            >{{ currentIsland.syncGameVersion }}</span
-          >
-          <span
-            v-if="currentIsland.syncAt"
-            :title="t('page.island.whenWasCellSynchronization')"
-            class="sync-at ms-2"
-            >{{ currentIsland.syncAt }}</span
-          >
-        </span>
-      </div>
-    </div>
-
-    <div v-if="islandLoading">
-      <h1>
-        <span class="placeholder placeholder-lg col-4"></span>
-      </h1>
-      <row-loading class="my-5" />
-    </div>
-    <div
-      v-else-if="errorMessage"
-      class="alert alert-danger mt-3"
-    >
-      {{ errorMessage }}
-    </div>
-    <div
-      v-else-if="!currentIsland"
-      class="position-relative"
-    >
-      <img
-        src="/images/map-not-found.svg"
-        width="440"
-        height="220"
-        class="d-block mx-auto"
-      />
-      <div class="text-center text-warning fw-bold">
-        {{ t("page.island.islandNotAvailable") }}
-      </div>
-    </div>
-    <island-map
-      v-else
-      :island="currentIsland"
-      parent-page-id="islandPage"
-    />
-
-    <div
-      v-if="islandDescription"
-      class="description mt-4"
-      v-html="islandDescription"
-    ></div>
-  </div>
-</template>
 <script setup>
 import HeroClient from "@/api/HeroClient";
 import IslandMap from "./island/IslandMap.vue";
@@ -184,6 +118,74 @@ async function loadIsland(id) {
   return currentIsland.value;
 }
 </script>
+
+<template>
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-6 mb-3">
+        <h1 class="mb-0">{{ islandName }}</h1>
+      </div>
+      <div class="col-lg-6 mb-3 d-flex align-items-center">
+        <span
+          v-if="currentIsland"
+          class="fst-italic"
+        >
+          <span
+            v-if="currentIsland.syncGameVersion"
+            :title="t('page.island.gameVersionWhenSyncCells')"
+            class="game-version"
+            >{{ currentIsland.syncGameVersion }}</span
+          >
+          <span
+            v-if="currentIsland.syncAt"
+            :title="t('page.island.whenWasCellSynchronization')"
+            class="sync-at ms-2"
+            >{{ currentIsland.syncAt }}</span
+          >
+        </span>
+      </div>
+    </div>
+
+    <div v-if="islandLoading">
+      <h1>
+        <span class="placeholder placeholder-lg col-4"></span>
+      </h1>
+      <row-loading class="my-5" />
+    </div>
+    <div
+      v-else-if="errorMessage"
+      class="alert alert-danger mt-3"
+    >
+      {{ errorMessage }}
+    </div>
+    <div
+      v-else-if="!currentIsland"
+      class="position-relative"
+    >
+      <img
+        src="/images/map-not-found.svg"
+        width="440"
+        height="220"
+        class="d-block mx-auto"
+      />
+      <div class="text-center text-warning fw-bold">
+        {{ t("page.island.islandNotAvailable") }}
+      </div>
+    </div>
+    <island-map
+      v-else
+      :island="currentIsland"
+      parent-page-id="islandPage"
+    />
+
+    <div
+      v-if="islandDescription"
+      class="description mt-4"
+      v-html="islandDescription"
+    ></div>
+  </div>
+</template>
+
 <style scoped>
 .description {
   border-top: 1px solid #ccc;

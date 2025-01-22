@@ -1,3 +1,29 @@
+<script setup>
+import { getCurrentLocale, isShowLocaleInRoute } from "@/i18n/translation";
+import { setMetaInfo } from "@/services/page-meta";
+import { computed } from "vue";
+import { useSSRContext } from "vue";
+import { useI18n } from "vue-i18n";
+
+const { t } = useI18n();
+const ssrContext = import.meta.env.SSR ? useSSRContext() : null;
+
+const currentLocale = computed(() => {
+  const locale = getCurrentLocale();
+
+  return isShowLocaleInRoute(locale) ? locale : "";
+});
+
+setMetaInfo(
+  {
+    title: t("seo.help.title") + " - " + t("common.projectName"),
+    description: t("seo.help.description"),
+    keywords: t("seo.help.keywords"),
+  },
+  ssrContext
+);
+</script>
+
 <template>
   <div class="container app-container">
     <h1>{{ t("page.help.helpToProject") }}</h1>
@@ -29,28 +55,3 @@
     </ul>
   </div>
 </template>
-<script setup>
-import { getCurrentLocale, isShowLocaleInRoute } from "@/i18n/translation";
-import { setMetaInfo } from "@/services/page-meta";
-import { computed } from "vue";
-import { useSSRContext } from "vue";
-import { useI18n } from "vue-i18n";
-
-const { t } = useI18n();
-const ssrContext = import.meta.env.SSR ? useSSRContext() : null;
-
-const currentLocale = computed(() => {
-  const locale = getCurrentLocale();
-
-  return isShowLocaleInRoute(locale) ? locale : "";
-});
-
-setMetaInfo(
-  {
-    title: t("seo.help.title") + " - " + t("common.projectName"),
-    description: t("seo.help.description"),
-    keywords: t("seo.help.keywords"),
-  },
-  ssrContext
-);
-</script>

@@ -1,3 +1,9 @@
+<script setup>
+defineProps({
+  links: { type: Array, default: () => [] },
+});
+</script>
+
 <template>
   <nav
     aria-label="breadcrumb"
@@ -21,8 +27,3 @@
     </ol>
   </nav>
 </template>
-<script setup>
-defineProps({
-  links: { type: Array, default: () => [] },
-});
-</script>

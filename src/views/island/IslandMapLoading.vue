@@ -1,3 +1,7 @@
+<script setup>
+import RowLoading from "@/components/RowLoading.vue";
+</script>
+
 <template>
   <div>
     <div class="map-svg d-flex justify-content-center align-items-center">
@@ -30,9 +34,7 @@
     </div>
   </div>
 </template>
-<script setup>
-import RowLoading from "@/components/RowLoading.vue";
-</script>
+
 <style scoped>
 .map-svg {
   height: 600px;

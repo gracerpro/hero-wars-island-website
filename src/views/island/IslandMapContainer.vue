@@ -1,87 +1,3 @@
-<template>
-  <div>
-    <svg
-      ref="svgMap"
-      height="600"
-      class="canvas prevent-select"
-      width="100%"
-      tabindex="0"
-      :viewBox="viewBox"
-      :style="{ 'background-image': backgroundImageUrl ? 'url(' + backgroundImageUrl + ')' : '' }"
-      xmlns="http://www.w3.org/2000/svg"
-      @mousedown="onMouseDown"
-      @mouseup="onMouseUp"
-      @mousemove="onMouseMove"
-      @mouseenter="onMouseEnter"
-      @wheel="onMouseWheel"
-      @mousewheel="onMouseWheel"
-    >
-      <g :transform="'translate(' + translateX + ' ' + translateY + ')'">
-        <polygon
-          v-for="node in totalNodes"
-          :key="node.xyId"
-          :points="node.points"
-          :class="['node', node.nodeClass, getUserNodeClass(node)]"
-          @click="onNodeClick(node, $event)"
-        />
-        <template
-          v-for="item in rewardIcons"
-          :key="item.uniqueId"
-        >
-          <image
-            v-if="item.item.iconUrl"
-            :x="item.iconX"
-            :y="item.iconY"
-            :width="item.iconWidth"
-            :height="item.iconHeight"
-            :href="item.item.iconUrl"
-            class="item-image"
-            @click="onItemClick(item, $event)"
-          >
-            <title>{{ getItemName(item) + getQuantity(item) }}</title>
-          </image>
-          <rect
-            v-else
-            :x="item.iconX"
-            :y="item.iconY"
-            :width="item.iconWidth"
-            :height="item.iconHeight"
-            class="item-empty-image"
-            :class="item.uniqueId"
-            @click="onItemClick(item, $event)"
-          >
-            <title>
-              {{ getItemName(item) + getQuantity(item) }},
-              {{ t("page.island.notLinkedImage") }}
-            </title>
-          </rect>
-        </template>
-        <text
-          v-for="item in rewardQuantities"
-          :key="item.uid"
-          :x="item.x"
-          :y="item.y"
-          :class="['text', item.isSmallText ? 'text-small' : '']"
-          @click="onItemClick(item, $event)"
-        >
-          {{ item.humanQuantity }}
-        </text>
-      </g>
-    </svg>
-
-    <component
-      :is="infoDialogComponent"
-      ref="infoDialog"
-      :drawed-node="infoDialogDrawedNode"
-      @vue:mounted="onMountedInfoDialog"
-    />
-
-    <toast-message
-      ref="toast"
-      element-id="mapContainerToast"
-    />
-  </div>
-</template>
 <script>
 const EVENT_SELECT_NODE = "selectNode";
 </script>
@@ -427,6 +343,92 @@ function getItemName(item) {
   return item.item.name ? item.item.name : t("common.noName");
 }
 </script>
+
+<template>
+  <div>
+    <svg
+      ref="svgMap"
+      height="600"
+      class="canvas prevent-select"
+      width="100%"
+      tabindex="0"
+      :viewBox="viewBox"
+      :style="{ 'background-image': backgroundImageUrl ? 'url(' + backgroundImageUrl + ')' : '' }"
+      xmlns="http://www.w3.org/2000/svg"
+      @mousedown="onMouseDown"
+      @mouseup="onMouseUp"
+      @mousemove="onMouseMove"
+      @mouseenter="onMouseEnter"
+      @wheel="onMouseWheel"
+      @mousewheel="onMouseWheel"
+    >
+      <g :transform="'translate(' + translateX + ' ' + translateY + ')'">
+        <polygon
+          v-for="node in totalNodes"
+          :key="node.xyId"
+          :points="node.points"
+          :class="['node', node.nodeClass, getUserNodeClass(node)]"
+          @click="onNodeClick(node, $event)"
+        />
+        <template
+          v-for="item in rewardIcons"
+          :key="item.uniqueId"
+        >
+          <image
+            v-if="item.item.iconUrl"
+            :x="item.iconX"
+            :y="item.iconY"
+            :width="item.iconWidth"
+            :height="item.iconHeight"
+            :href="item.item.iconUrl"
+            class="item-image"
+            @click="onItemClick(item, $event)"
+          >
+            <title>{{ getItemName(item) + getQuantity(item) }}</title>
+          </image>
+          <rect
+            v-else
+            :x="item.iconX"
+            :y="item.iconY"
+            :width="item.iconWidth"
+            :height="item.iconHeight"
+            class="item-empty-image"
+            :class="item.uniqueId"
+            @click="onItemClick(item, $event)"
+          >
+            <title>
+              {{ getItemName(item) + getQuantity(item) }},
+              {{ t("page.island.notLinkedImage") }}
+            </title>
+          </rect>
+        </template>
+        <text
+          v-for="item in rewardQuantities"
+          :key="item.uid"
+          :x="item.x"
+          :y="item.y"
+          :class="['text', item.isSmallText ? 'text-small' : '']"
+          @click="onItemClick(item, $event)"
+        >
+          {{ item.humanQuantity }}
+        </text>
+      </g>
+    </svg>
+
+    <component
+      :is="infoDialogComponent"
+      ref="infoDialog"
+      :drawed-node="infoDialogDrawedNode"
+      @vue:mounted="onMountedInfoDialog"
+    />
+
+    <toast-message
+      ref="toast"
+      element-id="mapContainerToast"
+    />
+  </div>
+</template>
+
 <style>
 .node {
   stroke-width: 1;

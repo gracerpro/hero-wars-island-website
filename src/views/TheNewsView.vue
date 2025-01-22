@@ -1,33 +1,3 @@
-<template>
-  <div class="container app-container">
-    <breadcrumb-row :links="breadcrumbs" />
-
-    <div v-if="loading">
-      <div class="placeholder-glow">
-        <span class="placeholder col-3"></span>
-      </div>
-      <div class="placeholder-glow">
-        <span class="placeholder col-1"></span>
-      </div>
-      <row-loading />
-    </div>
-    <div
-      v-else-if="errorMessage"
-      class="alert alert-danger mt-3"
-    >
-      {{ errorMessage }}
-    </div>
-    <div v-else>
-      <h1>{{ oneNews.name }}</h1>
-      <div class="fst-italic">{{ fromCurrentDate(oneNews.createdAt, locale) }}</div>
-
-      <div
-        class="mt-4"
-        v-html="oneNews.content"
-      ></div>
-    </div>
-  </div>
-</template>
 <script setup>
 import HeroClient from "@/api/HeroClient";
 import RowLoading from "@/components/RowLoading.vue";
@@ -131,3 +101,34 @@ function setDefaultPageInfo() {
   );
 }
 </script>
+
+<template>
+  <div class="container app-container">
+    <breadcrumb-row :links="breadcrumbs" />
+
+    <div v-if="loading">
+      <div class="placeholder-glow">
+        <span class="placeholder col-3"></span>
+      </div>
+      <div class="placeholder-glow">
+        <span class="placeholder col-1"></span>
+      </div>
+      <row-loading />
+    </div>
+    <div
+      v-else-if="errorMessage"
+      class="alert alert-danger mt-3"
+    >
+      {{ errorMessage }}
+    </div>
+    <div v-else>
+      <h1>{{ oneNews.name }}</h1>
+      <div class="fst-italic">{{ fromCurrentDate(oneNews.createdAt, locale) }}</div>
+
+      <div
+        class="mt-4"
+        v-html="oneNews.content"
+      ></div>
+    </div>
+  </div>
+</template>

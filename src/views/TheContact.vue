@@ -1,16 +1,3 @@
-<template>
-  <div class="container app-container">
-    <h1>{{ t("common.contacts") }}</h1>
-    <p>{{ t("page.contact.fillFieldsForContact") }}</p>
-    <p>{{ t("page.contact.ctrlF5") }}</p>
-    <div class="row">
-      <div class="col-lg-8 offset-lg-2">
-        <contact-form />
-      </div>
-    </div>
-    <contact-list />
-  </div>
-</template>
 <script setup>
 import { setMetaInfo } from "@/services/page-meta";
 import ContactForm from "./contact/ContactForm.vue";
@@ -30,3 +17,17 @@ setMetaInfo(
   ssrContext
 );
 </script>
+
+<template>
+  <div class="container app-container">
+    <h1>{{ t("common.contacts") }}</h1>
+    <p>{{ t("page.contact.fillFieldsForContact") }}</p>
+    <p>{{ t("page.contact.ctrlF5") }}</p>
+    <div class="row">
+      <div class="col-lg-8 offset-lg-2">
+        <contact-form />
+      </div>
+    </div>
+    <contact-list />
+  </div>
+</template>

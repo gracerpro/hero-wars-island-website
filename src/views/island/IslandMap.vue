@@ -605,7 +605,7 @@ function saveState() {
         @select-node="onSelectNode"
       />
       <div
-        class="text-end"
+        class="text-end mb-3"
         style="font-size: 0.9em"
       >
         <span
@@ -618,7 +618,7 @@ function saveState() {
         >
       </div>
       <div class="row">
-        <div class="col-lg-6 mt-3">
+        <div class="col-lg-6">
           <island-map-filter
             v-model:item-name="filter.itemName"
             v-model:type-id="filter.typeId"

@@ -1,3 +1,28 @@
+<script setup>
+import ModalDialog from "@/components/ModalDialog.vue";
+import { ref, computed } from "vue";
+import { useI18n } from "vue-i18n";
+import { useShow } from "@/components/modal-dialog";
+
+const { t } = useI18n();
+
+const dialog = ref(null);
+
+const { show, onMountedDialog } = useShow(dialog);
+
+const props = defineProps({
+  drawedNode: { type: Object, required: true },
+});
+
+const hasRewards = computed(
+  () => props.drawedNode.node.items && props.drawedNode.node.items.length > 0
+);
+
+defineExpose({
+  show,
+});
+</script>
+
 <template>
   <suspense>
     <modal-dialog
@@ -34,30 +59,7 @@
     </modal-dialog>
   </suspense>
 </template>
-<script setup>
-import ModalDialog from "@/components/ModalDialog.vue";
-import { ref, computed } from "vue";
-import { useI18n } from "vue-i18n";
-import { useShow } from "@/components/modal-dialog";
 
-const { t } = useI18n();
-
-const dialog = ref(null);
-
-const { show, onMountedDialog } = useShow(dialog);
-
-const props = defineProps({
-  drawedNode: { type: Object, required: true },
-});
-
-const hasRewards = computed(
-  () => props.drawedNode.node.items && props.drawedNode.node.items.length > 0
-);
-
-defineExpose({
-  show,
-});
-</script>
 <style scoped>
 .reward-item {
   margin-bottom: 8px;

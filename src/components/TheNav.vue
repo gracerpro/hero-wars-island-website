@@ -32,7 +32,10 @@ onMounted(() => {
       >
         <span class="navbar-toggler-icon"></span>
       </button>
-      <div id="mainMenu" class="collapse navbar-collapse">
+      <div
+        id="mainMenu"
+        class="collapse navbar-collapse"
+      >
         <div class="navbar-nav mt-2 mb-3">
           <router-link
             :to="createI18nRouteTo({ name: 'home' })"

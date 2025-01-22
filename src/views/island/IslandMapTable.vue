@@ -1,3 +1,24 @@
+<script>
+const EVENT_UPDATE_IS_SHOW_BLOCK = "update:isShowBlock";
+</script>
+<script setup>
+import { useI18n } from "vue-i18n";
+
+defineProps({
+  header: { type: String, required: true },
+  isShowBlock: { type: Boolean, required: true },
+  rewards: { type: Array, required: true },
+  visibleRewardsCount: { type: Number, required: true },
+});
+const emit = defineEmits([EVENT_UPDATE_IS_SHOW_BLOCK]);
+
+const { t } = useI18n();
+
+const getItemName = (item) => {
+  return item.item.name ? item.item.name : t("common.noName");
+};
+</script>
+
 <template>
   <div>
     <h3>{{ header }}</h3>
@@ -46,26 +67,7 @@
     </div>
   </div>
 </template>
-<script>
-const EVENT_UPDATE_IS_SHOW_BLOCK = "update:isShowBlock";
-</script>
-<script setup>
-import { useI18n } from "vue-i18n";
 
-defineProps({
-  header: { type: String, required: true },
-  isShowBlock: { type: Boolean, required: true },
-  rewards: { type: Array, required: true },
-  visibleRewardsCount: { type: Number, required: true },
-});
-const emit = defineEmits([EVENT_UPDATE_IS_SHOW_BLOCK]);
-
-const { t } = useI18n();
-
-const getItemName = (item) => {
-  return item.item.name ? item.item.name : t("common.noName");
-};
-</script>
 <style scoped>
 .icon {
   width: 24px;

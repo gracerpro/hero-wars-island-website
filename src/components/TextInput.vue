@@ -1,23 +1,3 @@
-<template>
-  <div class="input-group">
-    <input
-      :id="inputId"
-      :value="modelValue"
-      type="text"
-      class="form-control"
-      @input="onInput"
-    />
-    <span class="input-group-text">
-      <button
-        type="button"
-        class="btn-close"
-        aria-label="Close"
-        :disabled="modelValue === ''"
-        @click="onClear"
-      ></button>
-    </span>
-  </div>
-</template>
 <script>
 const EVENT_UPDATE_VALUE = "update:model-value";
 </script>
@@ -45,3 +25,24 @@ const onClear = () => {
   emit(EVENT_UPDATE_VALUE, "");
 };
 </script>
+
+<template>
+  <div class="input-group">
+    <input
+      :id="inputId"
+      :value="modelValue"
+      type="text"
+      class="form-control"
+      @input="onInput"
+    />
+    <span class="input-group-text">
+      <button
+        type="button"
+        class="btn-close"
+        aria-label="Close"
+        :disabled="modelValue === ''"
+        @click="onClear"
+      ></button>
+    </span>
+  </div>
+</template>

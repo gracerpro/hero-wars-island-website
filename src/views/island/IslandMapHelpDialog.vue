@@ -1,3 +1,20 @@
+<script setup>
+import ModalDialog from "@/components/ModalDialog.vue";
+import { ref } from "vue";
+import { useI18n } from "vue-i18n";
+import { useShow } from "@/components/modal-dialog";
+
+const { t } = useI18n();
+
+const dialog = ref(null);
+
+const { show, onMountedDialog } = useShow(dialog);
+
+defineExpose({
+  show,
+});
+</script>
+
 <template>
   <suspense>
     <modal-dialog
@@ -28,22 +45,7 @@
     </modal-dialog>
   </suspense>
 </template>
-<script setup>
-import ModalDialog from "@/components/ModalDialog.vue";
-import { ref } from "vue";
-import { useI18n } from "vue-i18n";
-import { useShow } from "@/components/modal-dialog";
 
-const { t } = useI18n();
-
-const dialog = ref(null);
-
-const { show, onMountedDialog } = useShow(dialog);
-
-defineExpose({
-  show,
-});
-</script>
 <style scoped>
 .node-box {
   display: inline-block;

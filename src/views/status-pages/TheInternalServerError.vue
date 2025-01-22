@@ -1,11 +1,3 @@
-<template>
-  <div class="container">
-    <h1>500 {{ t("common.internalServerError") }}</h1>
-    <p>
-      <a href="/">{{ t("common.goToHome") }}</a>
-    </p>
-  </div>
-</template>
 <script setup>
 import { setMetaInfo } from "@/services/page-meta";
 import { useSSRContext } from "vue";
@@ -24,3 +16,12 @@ setMetaInfo(
   ssrContext
 );
 </script>
+
+<template>
+  <div class="container">
+    <h1>500 {{ t("common.internalServerError") }}</h1>
+    <p>
+      <a href="/">{{ t("common.goToHome") }}</a>
+    </p>
+  </div>
+</template>

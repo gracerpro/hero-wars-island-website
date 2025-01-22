@@ -1,20 +1,3 @@
-<template>
-  <form role="language">
-    <button
-      v-for="language in languages"
-      :key="language.locale"
-      :title="language.label"
-      :class="[
-        'btn ms-2',
-        language.locale === currentLocale ? 'btn-success fw-bold' : 'btn-outline-success',
-      ]"
-      type="button"
-      @click="onChangeLanguage(language.locale)"
-    >
-      {{ language.locale }}
-    </button>
-  </form>
-</template>
 <script setup>
 import { setLanguage, getLocalesLabels, getCurrentLocale } from "@/i18n/translation";
 import { computed } from "vue";
@@ -43,3 +26,21 @@ const onChangeLanguage = async (locale) => {
   await router.replace({ params: { locale: routeLocale } });
 };
 </script>
+
+<template>
+  <form role="language">
+    <button
+      v-for="language in languages"
+      :key="language.locale"
+      :title="language.label"
+      :class="[
+        'btn ms-2',
+        language.locale === currentLocale ? 'btn-success fw-bold' : 'btn-outline-success',
+      ]"
+      type="button"
+      @click="onChangeLanguage(language.locale)"
+    >
+      {{ language.locale }}
+    </button>
+  </form>
+</template>

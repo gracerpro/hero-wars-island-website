@@ -1,12 +1,3 @@
-<template>
-  <div class="container">
-    <h1>404 {{ t("common.pageNotFound") }}</h1>
-    <p>{{ t("common.movedPageMayBe") }}</p>
-    <p>
-      <a href="/">{{ t("common.goToHome") }}</a>
-    </p>
-  </div>
-</template>
 <script setup>
 import { setMetaInfo } from "@/services/page-meta";
 import { useSSRContext } from "vue";
@@ -25,3 +16,13 @@ setMetaInfo(
   ssrContext
 );
 </script>
+
+<template>
+  <div class="container">
+    <h1>404 {{ t("common.pageNotFound") }}</h1>
+    <p>{{ t("common.movedPageMayBe") }}</p>
+    <p>
+      <a href="/">{{ t("common.goToHome") }}</a>
+    </p>
+  </div>
+</template>

@@ -1,3 +1,76 @@
+<script setup>
+import ClientOnly from "@/components/ClientOnly.vue";
+import UserError from "@/exceptions/UserError";
+import HeroClient from "@/api/HeroClient";
+import { ref, shallowReactive, onMounted } from "vue";
+import { useI18n } from "vue-i18n";
+import { TYPE_SUCCESS, TYPE_DANGER } from "@/components/ToastMessage.vue";
+import { defineAsyncComponent } from "vue";
+
+const { t } = useI18n();
+
+const submiting = ref(false);
+
+const client = new HeroClient();
+const createdDate = new Date();
+
+const ToastMessage = import.meta.env.SSR
+  ? null
+  : defineAsyncComponent(() => import("@/components/ToastMessage.vue"));
+
+const errorMessage = ref("");
+const feedback = shallowReactive({
+  username: "",
+  email: "",
+  subject: "",
+  message: "",
+});
+const toast = ref(null);
+const formSubject = ref(null);
+const formId = "contactForm";
+
+onMounted(() => {
+  setTimeout(() => {
+    if (formSubject.value) {
+      formSubject.value.focus();
+    }
+  }, 300);
+});
+
+const onSubmit = () => {
+  if (submiting.value) {
+    return;
+  }
+
+  submiting.value = true;
+
+  const data = { ...feedback };
+  data.contactEmail = "";
+  data.tempField = "1";
+  data.submitTimeInMs = new Date().getTime() - createdDate.getTime();
+  errorMessage.value = "";
+
+  client.feedback
+    .create(data)
+    .then(() => {
+      feedback.message = "";
+      feedback.subject = "";
+
+      toast.value.show(t("page.contact.messageWasCreated"), TYPE_SUCCESS);
+    })
+    .catch((error) => {
+      if (error instanceof UserError) {
+        errorMessage.value = error.message;
+        toast.value.show(error.message, TYPE_DANGER);
+      } else {
+        errorMessage.value = t("common.internalError");
+        throw error;
+      }
+    })
+    .finally(() => (submiting.value = false));
+};
+</script>
+
 <template>
   <form
     class="p-2 border border-secondary-subtle rounded-3"
@@ -110,75 +183,3 @@
     </client-only>
   </form>
 </template>
-<script setup>
-import ClientOnly from "@/components/ClientOnly.vue";
-import UserError from "@/exceptions/UserError";
-import HeroClient from "@/api/HeroClient";
-import { ref, shallowReactive, onMounted } from "vue";
-import { useI18n } from "vue-i18n";
-import { TYPE_SUCCESS, TYPE_DANGER } from "@/components/ToastMessage.vue";
-import { defineAsyncComponent } from "vue";
-
-const { t } = useI18n();
-
-const submiting = ref(false);
-
-const client = new HeroClient();
-const createdDate = new Date();
-
-const ToastMessage = import.meta.env.SSR
-  ? null
-  : defineAsyncComponent(() => import("@/components/ToastMessage.vue"));
-
-const errorMessage = ref("");
-const feedback = shallowReactive({
-  username: "",
-  email: "",
-  subject: "",
-  message: "",
-});
-const toast = ref(null);
-const formSubject = ref(null);
-const formId = "contactForm";
-
-onMounted(() => {
-  setTimeout(() => {
-    if (formSubject.value) {
-      formSubject.value.focus();
-    }
-  }, 300);
-});
-
-const onSubmit = () => {
-  if (submiting.value) {
-    return;
-  }
-
-  submiting.value = true;
-
-  const data = { ...feedback };
-  data.contactEmail = "";
-  data.tempField = "1";
-  data.submitTimeInMs = new Date().getTime() - createdDate.getTime();
-  errorMessage.value = "";
-
-  client.feedback
-    .create(data)
-    .then(() => {
-      feedback.message = "";
-      feedback.subject = "";
-
-      toast.value.show(t("page.contact.messageWasCreated"), TYPE_SUCCESS);
-    })
-    .catch((error) => {
-      if (error instanceof UserError) {
-        errorMessage.value = error.message;
-        toast.value.show(error.message, TYPE_DANGER);
-      } else {
-        errorMessage.value = t("common.internalError");
-        throw error;
-      }
-    })
-    .finally(() => (submiting.value = false));
-};
-</script>
