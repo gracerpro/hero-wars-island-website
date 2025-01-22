@@ -8,6 +8,12 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "@/assets/icons.css";
 import "@/assets/main.css";
 
+if (!import.meta.env.SSR) {
+  // Load bootstrap module asynchronously else get an error on SSR
+  // ReferenceError: document is not defined
+  await import("bootstrap");
+}
+
 export default function createApp() {
   const app = createSSRApp(App);
   const router = createRouter();

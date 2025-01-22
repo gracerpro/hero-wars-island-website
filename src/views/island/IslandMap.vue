@@ -289,7 +289,7 @@ function getUniqueId(node, reward, index) {
 function onChangeScale(value) {
   scale.value += value;
 
-  const MAX_SCALE = 6;
+  const MAX_SCALE = 8;
   const MIN_SCALE = 0.3;
 
   if (scale.value > MAX_SCALE) {
@@ -628,7 +628,7 @@ function saveState() {
             :min-chars-count="minCharsCount"
           />
         </div>
-        <div class="col-lg-6 mt-3">
+        <div class="col-lg-6">
           <island-map-steps
             v-model:is-select-any-node="isSelectAnyNode"
             v-model:select-mode="selectMode"
