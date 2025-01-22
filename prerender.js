@@ -4,6 +4,7 @@ import fs from 'node:fs'
 import { getHtml } from './common.js'
 import fetch from "node-fetch";
 import { loadEnv } from 'vite';
+import { gzip } from 'node-gzip';
 
 const envName = process.env.NODE_ENV ? process.env.NODE_ENV : "production"
 const env = loadEnv(envName, process.cwd());
@@ -53,6 +54,8 @@ async function createFiles(urls) {
     const pathName = path + ".html"
     const filePath = basePath + pathName
     fs.writeFileSync(filePath, html)
+    const compressedHtml = await gzip(html)
+    fs.writeFileSync(filePath + '.gz', compressedHtml);
 
     console.log('pre-rendered:', pathName, "size", html.length);
   }
