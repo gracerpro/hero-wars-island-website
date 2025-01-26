@@ -11,11 +11,13 @@ export default defineConfig(({mode}) => {
   return {
     server: {
       host: true,
+      allowedHosts: true,
       port: 8082,
       strictPort: true,
     },
     preview: {
       host: true,
+      allowedHosts: true,
       port: 4082,
       strictPort: true,
     },
