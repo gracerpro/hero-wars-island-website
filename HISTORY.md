@@ -1,5 +1,20 @@
 # History
 
+## v1.6.7 at 2025-01-26
+
+What has been done
+
+* Add disable cells
+* Optimize UI for mobile devices
+* Save map state on close tab
+* Toggle menu on mobile version
+
+Technical part
+
+* Compress static pages
+* Compress assests
+
+
 ## v1.6.6 at 2024-12-25
 
 What has been done
