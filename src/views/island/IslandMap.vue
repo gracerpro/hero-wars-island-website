@@ -19,12 +19,12 @@ import { SELECT_MODE_DISABLE, SELECT_MODE_GOING, SELECT_MODE_PLAN } from "./sele
 import { shallowRef } from "vue";
 import UserError from "@/exceptions/UserError";
 
-const { t } = useI18n();
-
 const props = defineProps({
   island: { type: Object, required: true },
   parentPageId: { type: String, required: true },
 });
+
+const { t } = useI18n();
 
 let byIslandState = {};
 
@@ -195,8 +195,25 @@ const disableNodesCount = computed(() => Object.keys(disableNodesIdsMap.value).l
 
 loadState();
 
-onMounted(() => reloadMap());
-onUnmounted(() => saveState());
+onMounted(() => {
+  window.addEventListener("beforeunload", onBeforeUnload);
+  reloadMap();
+});
+onUnmounted(() => {
+  window.removeEventListener("beforeunload", onBeforeUnload);
+  saveState();
+});
+
+/**
+ * @param {Event} event
+ */
+function onBeforeUnload(event) {
+  event.returnValue = "";
+
+  saveState();
+
+  return "";
+}
 
 /**
  * @param {Boolean} isForce
