@@ -35,6 +35,8 @@ const emit = defineEmits([
   EVENT_FULLSCREEN_ON,
   EVENT_BEGIN_DOWNLOAD,
   EVENT_RELOAD_MAP,
+  EVENT_UPDATE_REGION_NUMBERS,
+  EVENT_RESET_REGION_NUMBERS,
 ]);
 
 const helpDialog = ref(null);

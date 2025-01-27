@@ -1,27 +1,59 @@
 import { createStore as _createStore } from "vuex";
 
-import { IS_SHOW_MENU_MUTATION } from "./mutation-types";
+import { IS_SHOW_MENU_MUTATION, HIDE_GLOBAL_NOTIFY } from "./mutation-types";
 
 let isShowMenu = true;
+let globalNotifications = {};
 
-const GLOBAL_NAME = "global";
+const IS_SHOW_MENU_NAME = "isShowMenu";
+const NOTIFICATIONS_NAME = "notifications";
 
 if (!import.meta.env.SSR) {
-  const localIsShowMenu = localStorage.getItem(getName("isShowMenu")) ?? "1";
+  const localIsShowMenu = localStorage.getItem(getName(IS_SHOW_MENU_NAME)) ?? "1";
   isShowMenu = localIsShowMenu > 0;
+
+  const notifactionsJson = localStorage.getItem(getName(NOTIFICATIONS_NAME)) ?? "{}";
+  const notifications = JSON.parse(notifactionsJson);
+  for (const id in notifications) {
+    const notify = notifications[id];
+    if (notify.hideAt) {
+      notify.hideAt = new Date(notify.hideAt);
+    }
+    globalNotifications[id] = notify;
+  }
 }
 
 export function createStore() {
   return _createStore({
     state: {
       isShowMenu,
+      globalNotifications,
     },
     getters: {},
     mutations: {
       /** @param {Boolean} visible */
       [IS_SHOW_MENU_MUTATION](state, visible) {
         state.isShowMenu = visible;
-        localStorage.setItem(getName("isShowMenu"), visible ? "1" : "0");
+        localStorage.setItem(getName(IS_SHOW_MENU_NAME), visible ? "1" : "0");
+      },
+      /**
+       * @param {Object} payload
+       */
+      [HIDE_GLOBAL_NOTIFY](state, payload) {
+        state.globalNotifications[payload.id] = {
+          id: payload.id,
+          hideAt: new Date(),
+        };
+
+        const notifyData = {};
+        for (const id in state.globalNotifications) {
+          const notify = state.globalNotifications[id];
+          notifyData[id] = {
+            id,
+            hideAt: notify.hideAt.toISOString(),
+          };
+        }
+        localStorage.setItem(getName(NOTIFICATIONS_NAME), JSON.stringify(notifyData));
       },
     },
     actions: {},
@@ -30,5 +62,5 @@ export function createStore() {
 }
 
 function getName(name) {
-  return GLOBAL_NAME + "." + name;
+  return "global." + name;
 }
