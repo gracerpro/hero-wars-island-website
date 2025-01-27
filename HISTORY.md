@@ -12,7 +12,7 @@ What has been done
 Technical part
 
 * Compress static pages
-* Compress assests
+* Compress assets
 
 
 ## v1.6.6 at 2024-12-25

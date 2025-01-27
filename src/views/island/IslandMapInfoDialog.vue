@@ -3,20 +3,31 @@ import ModalDialog from "@/components/ModalDialog.vue";
 import { ref, computed } from "vue";
 import { useI18n } from "vue-i18n";
 import { useShow } from "@/components/modal-dialog";
-
-const { t } = useI18n();
-
-const dialog = ref(null);
-
-const { show, onMountedDialog } = useShow(dialog);
+import { getStatusName, getTypeName } from "@/api/Node";
+import { getLabelsByTypes } from "@/api/Item";
 
 const props = defineProps({
   drawedNode: { type: Object, required: true },
 });
 
+const { t } = useI18n();
+const labelsByTypes = getLabelsByTypes(t);
+
+const dialog = ref(null);
+
+const { show, onMountedDialog } = useShow(dialog);
+
 const hasRewards = computed(
   () => props.drawedNode.node.items && props.drawedNode.node.items.length > 0
 );
+
+/**
+ * @param {String} typeId
+ * @returns {String}
+ */
+function getRewardTypeName(typeId) {
+  return labelsByTypes[typeId] ?? "";
+}
 
 defineExpose({
   show,
@@ -34,8 +45,11 @@ defineExpose({
     >
       <div>ID = {{ drawedNode.node.id }}</div>
       <div>X = {{ drawedNode.node.mx }}, Y = {{ drawedNode.node.my }}</div>
-      <div>status: {{ drawedNode.node.statusId }}</div>
-      <div>type: {{ drawedNode.node.typeId }}</div>
+      <div>
+        status: {{ getStatusName(t, drawedNode.node.statusId) }}, id =
+        {{ drawedNode.node.statusId }}
+      </div>
+      <div>type: {{ getTypeName(drawedNode.node.typeId) }}, id = {{ drawedNode.node.typeId }}</div>
 
       <h4 class="mt-3 mb-0">Rewards</h4>
       <div v-if="!hasRewards">No</div>
@@ -48,12 +62,20 @@ defineExpose({
           :key="reward.id"
           class="reward-item"
         >
-          ID: {{ reward.id }}<br />
-          name: {{ reward.name }}<br />
-          type: {{ reward.typeId }}<br />
-          quantity: {{ reward.quantity }}<br />
-          game ID: {{ reward.gameId }}<br />
-          game type: {{ reward.gameType }}
+          <div class="row">
+            <div class="col-md-4">
+              <b>Server</b><br />
+              ID: {{ reward.id }}<br />
+              name: {{ reward.name }}<br />
+              type: {{ getRewardTypeName(reward.typeId) }}, id = {{ reward.typeId }}<br />
+              quantity: {{ reward.quantity }}<br />
+            </div>
+            <div class="col-md-4">
+              <b>Game</b><br />
+              ID: {{ reward.gameId }}<br />
+              type: {{ reward.gameType }}
+            </div>
+          </div>
         </li>
       </ul>
     </modal-dialog>

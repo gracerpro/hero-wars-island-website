@@ -13,6 +13,8 @@ export const TYPE_STARMONEY = 9;
 export const TYPE_AVATAR = 10;
 export const TYPE_BANNER = 11;
 export const TYPE_UNKNOWN = 12;
+export const TYPE_AVATAR_FRAME = 13;
+export const TYPE_STAMINA = 14;
 
 export const GAME_ID_EXPLORER_MOVE = 41;
 export const GAME_ID_WOOD = 53;
@@ -56,5 +58,8 @@ export function getLabelsByTypes(t) {
     [TYPE_STARMONEY]: t("common.starmoney"),
     [TYPE_AVATAR]: t("common.avatarType"),
     [TYPE_BANNER]: t("common.bannerType"),
+    [TYPE_UNKNOWN]: t("common.unknown"),
+    [TYPE_AVATAR_FRAME]: t("common.avatarFrame"),
+    [TYPE_STAMINA]: t("common.stamina"),
   };
 }

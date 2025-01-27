@@ -87,11 +87,34 @@ export default class Node {
   }
 }
 
+/**
+ * @param {Function} t
+ * @param {Number} statusId
+ * @returns {String}
+ */
 export function getStatusName(t, statusId) {
   const names = {
     [STATUS_CREATED]: t("common.created"),
     [STATUS_NOT_SURE]: t("common.haveDoubts"),
   };
 
-  return names[statusId] ? names[statusId] : t("common.unknownStatus");
+  return names[statusId] ?? t("common.unknownStatus");
+}
+
+/**
+ * @param {Number} typeId
+ * @returns {String}
+ */
+export function getTypeName(typeId) {
+  const map = {
+    [TYPE_NODE]: "TYPE_NODE",
+    [TYPE_START]: "TYPE_START",
+    [TYPE_TOWER]: "TYPE_TOWER",
+    [TYPE_CHEST]: "TYPE_CHEST",
+    [TYPE_BLOCKER]: "TYPE_BLOCKER",
+    [TYPE_WOOD]: "TYPE_WOOD",
+    [TYPE_BUBBLE]: "TYPE_BUBBLE",
+  };
+
+  return map[typeId] ?? "";
 }
