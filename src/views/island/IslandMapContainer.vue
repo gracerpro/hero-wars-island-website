@@ -59,7 +59,7 @@ const props = defineProps({
   backgroundImage: { type: [Object, null], required: false, default: null },
 });
 
-const svgMap = ref(null);
+const svgMapRef = ref(null);
 const infoDialog = ref(null);
 const infoDialogComponent = shallowRef(null);
 const infoDialogDrawedNode = ref(null);
@@ -67,7 +67,7 @@ const infoDialogDrawedNode = ref(null);
 const toast = ref(null);
 
 defineExpose({
-  svgMap,
+  svgMapRef,
 });
 
 const viewSide = computed(() => SIDE * 5 * props.scale);
@@ -112,7 +112,7 @@ function onKeyDownMap(event) {
   if (event.defaultPrevented) {
     return;
   }
-  if (event.target != svgMap.value) {
+  if (event.target != svgMapRef.value) {
     return;
   }
 
@@ -267,12 +267,12 @@ function onMouseMove(button) {
   let resultY = null;
 
   if (mouse.x0 !== null && mouse.tx0 !== null) {
-    const pxWidth = viewWidth.value / svgMap.value.clientWidth;
+    const pxWidth = viewWidth.value / svgMapRef.value.clientWidth;
     const dx = button.pageX - mouse.x0;
     resultX = mouse.tx0 + dx * pxWidth;
   }
   if (mouse.y0 !== null && mouse.ty0 !== null) {
-    const pxHeight = viewHeight.value / svgMap.value.clientHeight;
+    const pxHeight = viewHeight.value / svgMapRef.value.clientHeight;
     const dy = button.pageY - mouse.y0;
     resultY = mouse.ty0 + dy * pxHeight;
   }
@@ -347,7 +347,7 @@ function getItemName(item) {
 <template>
   <div>
     <svg
-      ref="svgMap"
+      ref="svgMapRef"
       height="600"
       class="canvas prevent-select"
       width="100%"
@@ -525,5 +525,10 @@ function getItemName(item) {
 }
 .canvas:fullscreen {
   background-color: #fff;
+}
+.canvas:focus {
+  border-color: #86b7fe;
+  outline: 0;
+  box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
 }
 </style>

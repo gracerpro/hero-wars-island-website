@@ -59,7 +59,7 @@ const filter = shallowReactive({
   isNodeTypeChest: false,
 });
 
-const mapContainer = ref(null);
+const mapContainerRef = ref(null);
 const downloadDialog = ref(null);
 const downloadDialogComponent = shallowRef(null);
 
@@ -413,7 +413,7 @@ function onResetDisableNodes() {
 }
 
 function onFullscreen() {
-  fullscreenElement(mapContainer.value.svgMap);
+  fullscreenElement(mapContainerRef.value.svgMapRef);
 }
 
 function onBeginDownload() {
@@ -604,7 +604,7 @@ function saveState() {
     </div>
     <div v-else>
       <island-map-container
-        ref="mapContainer"
+        ref="mapContainerRef"
         :scale="scale"
         :translate-x="translateX"
         :translate-y="translateY"
