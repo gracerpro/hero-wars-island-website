@@ -3,6 +3,7 @@ import Item from "./Item";
 import Node from "./Node";
 import Feedback from "./Feedback";
 import News from "./News";
+import { Notification } from "./Notification";
 
 export default class HeroClient {
   /** @var {Feedback} */
@@ -20,11 +21,15 @@ export default class HeroClient {
   /** @var {News} */
   news;
 
+  /** @var {Notification} */
+  notification;
+
   constructor() {
     this.feedback = new Feedback();
     this.island = new Island();
     this.item = new Item();
     this.node = new Node();
     this.news = new News();
+    this.notification = new Notification();
   }
 }

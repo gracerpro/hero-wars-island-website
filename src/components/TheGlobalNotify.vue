@@ -1,52 +1,65 @@
 <script setup>
 import { HIDE_GLOBAL_NOTIFY } from "@/store/mutation-types";
-import { ref } from "vue";
+import { computed } from "vue";
 import { useStore } from "vuex";
-import { NOTIFY_MAIN_SERVER } from "./notify";
+
+const props = defineProps({
+  notifications: { type: Array, required: true },
+});
 
 const store = useStore();
 
-const notifyContent = ref("");
-const isShow = ref(false);
+const visibleNotifications = computed(() => {
+  const notifications = [];
 
-load();
+  props.notifications.forEach((notification) => {
+    const notify = store.state.globalNotifications[notification.id];
+    console.log(notify);
 
-function load() {
-  if (import.meta.env.SSR) {
-    return;
-  }
+    if (!notify || !notify.hideAt || notification.contentUpdatedAt > notify.hideAt) {
+      notifications.push({
+        id: notification.id,
+        content: notification.content,
+      });
+    }
+  });
 
-  const notify = store.state.globalNotifications[NOTIFY_MAIN_SERVER];
+  return notifications;
+});
 
-  if (!notify || !notify.hideAt) {
-    isShow.value = true;
-  }
-
-  // TODO: load from server, notifyContent
-}
-
-function onHide() {
-  store.commit(HIDE_GLOBAL_NOTIFY, { id: NOTIFY_MAIN_SERVER });
+/**
+ * @param {Object} notification
+ */
+function onHide(notification) {
+  store.commit(HIDE_GLOBAL_NOTIFY, { id: notification.id });
 }
 </script>
 
 <template>
-  <div
-    v-if="isShow && notifyContent"
-    class="container"
-  >
+  <div class="container">
     <div
+      v-for="notification in visibleNotifications"
+      :key="notification.id"
       class="alert alert-warning mt-2 alert-dismissible fade show"
       role="alert"
     >
-      {{ notifyContent }}
+      <div
+        class="notification-content"
+        v-html="notification.content"
+      ></div>
       <button
         type="button"
         class="btn-close"
         data-bs-dismiss="alert"
         aria-label="Close"
-        @click="onHide"
+        @click="onHide(notification)"
       ></button>
     </div>
   </div>
 </template>
+
+<style>
+.notification-content p:last-child {
+  margin-bottom: 0;
+}
+</style>
