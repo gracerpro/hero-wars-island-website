@@ -14,7 +14,6 @@ const visibleNotifications = computed(() => {
 
   props.notifications.forEach((notification) => {
     const notify = store.state.globalNotifications[notification.id];
-    console.log(notify);
 
     if (!notify || !notify.hideAt || notification.contentUpdatedAt > notify.hideAt) {
       notifications.push({
@@ -40,7 +39,7 @@ function onHide(notification) {
     <div
       v-for="notification in visibleNotifications"
       :key="notification.id"
-      class="alert alert-warning mt-2 alert-dismissible fade show"
+      class="alert alert-warning mt-3 alert-dismissible fade show"
       role="alert"
     >
       <div

@@ -14,6 +14,7 @@ if (!import.meta.env.SSR) {
 
   const notifactionsJson = localStorage.getItem(getName(NOTIFICATIONS_NAME)) ?? "{}";
   const notifications = JSON.parse(notifactionsJson);
+
   for (const id in notifications) {
     const notify = notifications[id];
     if (notify.hideAt) {
@@ -44,15 +45,7 @@ export function createStore() {
           id: payload.id,
           hideAt: new Date(),
         };
-
-        const notifyData = {};
-        for (const id in state.globalNotifications) {
-          const notify = state.globalNotifications[id];
-          notifyData[id] = {
-            id,
-            hideAt: notify.hideAt.toISOString(),
-          };
-        }
+        const notifyData = getNotificationsData(state.globalNotifications);
         localStorage.setItem(getName(NOTIFICATIONS_NAME), JSON.stringify(notifyData));
       },
     },
@@ -61,6 +54,45 @@ export function createStore() {
   });
 }
 
+/**
+ * @param {Object} state
+ * @param {Array} notifications
+ */
+export function clearGlobalNotifications(state, notifications) {
+  for (const id in state.globalNotifications) {
+    const notification = state.globalNotifications[id];
+    const exists = notifications.find((item) => item.id === notification.id);
+
+    if (!exists) {
+      delete state.globalNotifications[id];
+    }
+  }
+
+  const notifyData = getNotificationsData(state.globalNotifications);
+  localStorage.setItem(getName(NOTIFICATIONS_NAME), JSON.stringify(notifyData));
+}
+
+/**
+ * @param {String} name
+ * @returns {String}
+ */
 function getName(name) {
   return "global." + name;
+}
+
+/**
+ * @param {Object} globalNotifications
+ * @returns {Object}
+ */
+function getNotificationsData(globalNotifications) {
+  const notifyData = {};
+  for (const id in globalNotifications) {
+    const notify = globalNotifications[id];
+    notifyData[id] = {
+      id: notify.id,
+      hideAt: notify.hideAt.toISOString(),
+    };
+  }
+
+  return notifyData;
 }
