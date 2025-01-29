@@ -92,8 +92,10 @@
     "about": {
       "coolHelpProject": "If someone wants to help the project",
       "coolHelpProjectLink": "it will be cool.",
+      "dbSize": "Database size",
       "feedbackQuestions": "What can be improved? What is superfluous? What should I redo? What doesn't work?",
       "iWillAcceptAnyFeedback": "I will accept any feedback.",
+      "localStorageSize": "Local storage size",
       "paragraph1": "Initially, there was a desire to make a functional where the available number of moves is entered and there is a button \"Find the best rewards\". When you click on the button, the path is calculated. A map is a set of nodes, similar to graphs. But when calculating, you need to take into account the human factor: it is more profitable for someone to take emeralds, and for someone to take stones of appearance. Therefore, I refused this functionality. Let the person build the path himself and receive the necessary rewards.",
       "reasons": "Reasons",
       "reason1": "On the first map of the island, when a large number of moves were scored, it was difficult to calculate the moves and rewards. The best rewards are in the towers. The towers are located far from the center. Will there be enough moves before them?... It is difficult to calculate, very difficult. It is easier to mark the path as on a piece of paper.",

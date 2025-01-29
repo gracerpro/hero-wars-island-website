@@ -56,11 +56,12 @@ if (!import.meta.env.SSR) {
     </p>
     <hr />
     <p>
-      Размер локального хранилища
+      {{ t("page.about.localStorageSize") }}
       <b>{{ localStorageSize > 0 ? getHumanSize(localStorageSize) : "_" }}</b>
     </p>
     <p>
-      Размер базы данных <b>{{ indexedDbSize > 0 ? getHumanSize(indexedDbSize) : "_" }}</b>
+      {{ t("page.about.dbSize") }}
+      <b>{{ indexedDbSize > 0 ? getHumanSize(indexedDbSize) : "_" }}</b>
     </p>
   </div>
 </template>
