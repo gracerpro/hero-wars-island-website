@@ -1,4 +1,5 @@
 import HeroClient from "@/api/HeroClient";
+import { INDEXED_DB_NAME } from "@/core/storage";
 import { isObject } from "@/helpers/core";
 
 const client = new HeroClient();
@@ -135,7 +136,7 @@ async function getNodesFromCache(island) {
 
 async function openDb() {
   return new Promise((resolve, reject) => {
-    const openRequest = window.indexedDB.open("app");
+    const openRequest = window.indexedDB.open(INDEXED_DB_NAME);
 
     openRequest.onerror = () => {
       reject(openRequest.error);

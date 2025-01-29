@@ -2,7 +2,9 @@
 import { setMetaInfo } from "@/services/page-meta";
 import { useI18n } from "vue-i18n";
 import { createI18nRouteTo } from "@/i18n/translation";
-import { useSSRContext } from "vue";
+import { onMounted, ref, useSSRContext } from "vue";
+import { getHumanSize } from "@/helpers/formatter";
+import { getIndexedDbSize, getLocalStorageSize } from "@/core/storage";
 
 const { t } = useI18n();
 const ssrContext = import.meta.env.SSR ? useSSRContext() : null;
@@ -16,6 +18,16 @@ setMetaInfo(
   },
   ssrContext
 );
+
+const localStorageSize = ref(0);
+const indexedDbSize = ref(0);
+
+if (!import.meta.env.SSR) {
+  onMounted(() => {
+    localStorageSize.value = getLocalStorageSize();
+    getIndexedDbSize().then((size) => (indexedDbSize.value = size));
+  });
+}
 </script>
 
 <template>
@@ -41,6 +53,14 @@ setMetaInfo(
     </p>
     <p :title="t('common.version')">
       <span class="badge text-bg-info">{{ version }}</span>
+    </p>
+    <hr />
+    <p>
+      Размер локального хранилища
+      <b>{{ localStorageSize > 0 ? getHumanSize(localStorageSize) : "_" }}</b>
+    </p>
+    <p>
+      Размер базы данных <b>{{ indexedDbSize > 0 ? getHumanSize(indexedDbSize) : "_" }}</b>
     </p>
   </div>
 </template>
