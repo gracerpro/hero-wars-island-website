@@ -68,8 +68,13 @@ export function clearGlobalNotifications(state, notifications) {
     }
   }
 
-  const notifyData = getNotificationsData(state.globalNotifications);
-  localStorage.setItem(getName(NOTIFICATIONS_NAME), JSON.stringify(notifyData));
+  const itemName = getName(NOTIFICATIONS_NAME);
+  if (Object.keys(state.globalNotifications).length === 0) {
+    localStorage.removeItem(itemName);
+  } else {
+    const notifyData = getNotificationsData(state.globalNotifications);
+    localStorage.setItem(itemName, JSON.stringify(notifyData));
+  }
 }
 
 /**

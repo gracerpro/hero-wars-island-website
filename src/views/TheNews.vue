@@ -44,7 +44,9 @@ setMetaInfo(
   ssrContext
 );
 
-loadNews();
+if (!import.meta.env.SSR) {
+  loadNews();
+}
 
 function resetNews() {
   pageNumber.value = 1;
