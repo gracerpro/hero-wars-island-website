@@ -1,34 +1,49 @@
-GET https://www.hero-wars.com/
+# Simple Hero Wars documentation
 
-Нужны свойства у глобального объекта window.NXFlashVars
+> GET https://www.hero-wars.com/
 
-- index_url: "https://heroesru-a.akamaihd.net/mg/index.v1161.json.gz"
-- static_url: "https://heroesru-a.akamaihd.net/mg/"
+Find two property in global object `window.NXFlashVars`
 
-Получаем json индексного файла, в котором нужны поля `lib/lib.json` или `lib/lib.json.gz`, `locale/ru.json`, `locale/en.json`
+1. index_url.lib_index, "https://heroesru-a.akamaihd.net/mg/lib/index.lib.b2cc48697f15d1a957263a708839645b.json.gz"
+2. static_url, "https://heroesru-a.akamaihd.net/mg/"
+
+Get json for index file
 
 ```js
-const indexData = fetch(window.NXFlashVars.index_url).json()
-const libUrl = window.NXFlashVars.static_url + indexData["lib/lib.json"].path
-const libData = fetch(libUrl).json();
+const indexData = fetch(window.NXFlashVars.index_url.lib_index).json()
 ```
 
-В `libData` лежат данные для всей игры.
+Get game data and localization
 
-- `libData.seasonAdventure` - это данные для острова приключений
-- `libData.seasonAdventure.level` - это все ячейки всех островов
-- `libData.seasonAdventure.list` - это список островов
+```js
+const staticUrl = window.NXFlashVars.static_url
+
+const libUrl =  staticUrl + "/lib/" + indexData["lib.json.gz"].path
+const libData = fetch(libUrl).json();
+
+const ruUrl = staticUrl + "/lib/" + indexData["ru.json.gz"].path
+const ruData = fetch(libUrl).json();
+
+const enUrl = staticUrl + "/lib/" + indexData["en.json.gz"].path
+const enData = fetch(libUrl).json();
+```
+
+In `libData` store the game data
+
+- `libData.seasonAdventure` this is adventure island data
+- `libData.seasonAdventure.level` this is all cells of all islands
+- `libData.seasonAdventure.list` this is list of islands, seasons
 
 
 ### libData.seasonAdventure.level
 
-объект
+object
 
-- key, имя свойства это ID ячейки
-- value, значение свойства это данные для ячейки, например
+- `key` this is cell`s ID
+- `value` this is cell`s data
 
 ```js
-{
+const cell = {
   id: 3159,
   level: 859,
   season: 4,
@@ -49,35 +64,35 @@ const libData = fetch(libUrl).json();
 }
 ```
 
-* `id` это уникальный ID
-* `level` - ?
-* `season` это номер острова или номер сезона, начинается с 1
-* `steps` это ходы с наградами за стоимость, как правило равную предмету id = 41
+* `id` this is cell`s ID
+* `level` level
+* `season` this is island number or season, start with 1
+* `steps` this is steps with rewards by cost
 
-`steps[i].reward` - награды, может быть несколько, объект где
+`steps[i].reward` - rewars array, may be some, object
 
-* ключ это тип предмета
-* значение это
-  * для типа gold, starmoney это количество
-  * для остальных типов это объект где ключ это ID предмета, значение это количество
+* `key` this is item type
+* `value` this is
+  * if types equals `gold`, `starmoney`, `stamina` this is a quantity
+  * else this is an object, where a key is an item id, value is a quantity
 
 
 ### libData.seasonAdventure.list
 
-Это список островов, объект
+This is island list, object
 
-* ключ это ID острова или номеро сезона или номер острова
-* значение это данные острова
+* `key` this is island ID or season
+* `value` this is island data
 
-```
+```js
 const island = libData.seasonAdventure.list[i]
 ```
 
-* `island.map.cells` - массив, это координаты ячеек, размер равен количеству ячеек умноденным на 2
-* `island.map.cells[i]` при четном индексе это координата X, при нечетном индексе это координата Y.
-* `island.map.regions` - массив, это части карты
+* `island.map.cells` - array, this is cell`s coordinates, length equals cells quantity * 2
+* `island.map.cells[i]` on even index this is X coordinate, else this is Y coordinate.
+* `island.map.regions` - array, this is island`s parts
 * `island.map.regions[i].levels` - ?
-* `island.map.regions[i].initLevels` - это доступные ячейки в начале (когда ни разу не открывали ячейки), по ним можно кликать
+* `island.map.regions[i].initLevels` - this is start visible cells
 
 
 ## Assets
@@ -87,7 +102,3 @@ asset_url = https://heroesru-a.akamaihd.net/mg/assets/
 Consumable icons
 
 asset_url + ["inventory_icons/consumable.png"]["path"]
-
-asset_url + inventory_icons/consumable.1c359a5f8ceb3390297be434dee897e9.png
-
-asset_url + inventory_icons/consumable.e597eb9e5edcac7b08db7078a0bcc855.xml
