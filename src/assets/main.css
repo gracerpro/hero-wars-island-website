@@ -11,3 +11,10 @@
 .text-container {
   max-width: 860px;
 }
+
+@media (max-width: 991px) {
+  #mainMenu {
+    margin-top: 10px;
+    margin-bottom: 15px;
+  }
+}

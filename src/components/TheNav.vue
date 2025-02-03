@@ -60,7 +60,7 @@ function toggleMenu() {
         id="mainMenu"
         class="navbar-collapse collapse"
       >
-        <div class="navbar-nav mt-2 mb-3">
+        <div class="navbar-nav">
           <router-link
             :to="createI18nRouteTo({ name: 'home' })"
             class="nav-link"
