@@ -267,14 +267,14 @@ function onMouseMove(button) {
   let resultY = null;
 
   if (mouse.x0 !== null && mouse.tx0 !== null) {
-    const pxWidth = viewWidth.value / svgMapRef.value.clientWidth;
+    const fx = viewWidth.value / svgMapRef.value.clientHeight;
     const dx = button.pageX - mouse.x0;
-    resultX = mouse.tx0 + dx * pxWidth;
+    resultX = mouse.tx0 + dx * fx;
   }
   if (mouse.y0 !== null && mouse.ty0 !== null) {
-    const pxHeight = viewHeight.value / svgMapRef.value.clientHeight;
+    const fy = viewHeight.value / svgMapRef.value.clientHeight;
     const dy = button.pageY - mouse.y0;
-    resultY = mouse.ty0 + dy * pxHeight;
+    resultY = mouse.ty0 + dy * fy;
   }
 
   if (resultX !== null || resultY !== null) {
