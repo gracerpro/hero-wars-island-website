@@ -66,7 +66,7 @@ function onChangeSelectMode(event) {
       <div>
         <span class="d-inline-block mb-1">
           <span
-            class="hero-icon item-explorer-move align-middle me-3"
+            class="hero-color-icon item-explorer-move align-middle me-3"
             :title="t('item.explorerMove')"
           />
           <span class="fs-4 align-middle">
@@ -76,7 +76,7 @@ function onChangeSelectMode(event) {
         <br />
         <span class="d-inline-block">
           <span
-            class="hero-icon item-wood align-middle me-3"
+            class="hero-color-icon item-wood align-middle me-3"
             :title="t('item.wood')"
           ></span>
           <span class="fs-4 align-middle">

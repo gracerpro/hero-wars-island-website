@@ -1,16 +1,24 @@
 import { createStore as _createStore } from "vuex";
 
-import { IS_SHOW_MENU_MUTATION, HIDE_GLOBAL_NOTIFY } from "./mutation-types";
+import { IS_SHOW_MENU_MUTATION, HIDE_GLOBAL_NOTIFY, UPDATE_THEME_MUTATION } from "./mutation-types";
+import { isValidTheme, THEME_LIGHT } from "@/core/theme";
 
+let theme = THEME_LIGHT
 let isShowMenu = true;
 let globalNotifications = {};
 
 const IS_SHOW_MENU_NAME = "isShowMenu";
 const NOTIFICATIONS_NAME = "notifications";
+const NAME_THEME = "theme"
 
 if (!import.meta.env.SSR) {
   const localIsShowMenu = localStorage.getItem(getName(IS_SHOW_MENU_NAME)) ?? "1";
   isShowMenu = localIsShowMenu > 0;
+
+  theme = localStorage.getItem(getName(NAME_THEME)) ?? THEME_LIGHT
+  if (!isValidTheme(theme)) {
+    theme = THEME_LIGHT
+  }
 
   const notifactionsJson = localStorage.getItem(getName(NOTIFICATIONS_NAME)) ?? "{}";
   const notifications = JSON.parse(notifactionsJson);
@@ -29,6 +37,7 @@ export function createStore() {
     state: {
       isShowMenu,
       globalNotifications,
+      theme,
     },
     getters: {},
     mutations: {
@@ -47,6 +56,13 @@ export function createStore() {
         };
         const notifyData = getNotificationsData(state.globalNotifications);
         localStorage.setItem(getName(NOTIFICATIONS_NAME), JSON.stringify(notifyData));
+      },
+      /**
+       * @param {String} theme
+       */
+      [UPDATE_THEME_MUTATION](state, theme) {
+        state.theme = theme;
+        localStorage.setItem(getName(NAME_THEME), theme);
       },
     },
     actions: {},

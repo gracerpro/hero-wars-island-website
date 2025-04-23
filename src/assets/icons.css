@@ -4,11 +4,25 @@
   height: 24px;
   background-size: 24px 24px;
 }
+.hero-color-icon {
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+  background-size: 24px 24px;
+
+  mask-repeat: no-repeat;
+  mask-size: contain;
+  background-color: #000000;
+}
+[data-bs-theme=dark] .hero-color-icon {
+  background-color: #ffffff;
+}
+
 .item-wood {
-  background-image: url("/icons/items/wood.svg");
+  mask-image: url("/icons/items/wood.svg");
 }
 .item-explorer-move {
-  background-image: url("/icons/items/exporer-move.svg");
+  mask-image: url("/icons/items/exporer-move.svg");
 }
 
 .hero-download {

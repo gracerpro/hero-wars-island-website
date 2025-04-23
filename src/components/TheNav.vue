@@ -5,29 +5,14 @@ import HeroClient from "@/api/HeroClient";
 import SwitchLanguage from "./SwitchLanguage.vue";
 import { createI18nRouteTo } from "@/i18n/translation";
 import { useStore } from "vuex";
+import SwitchTheme from "./SwitchTheme.vue";
 import { IS_SHOW_MENU_MUTATION } from "@/store/mutation-types";
 
 const { t } = useI18n();
 const store = useStore();
 
-/** @type {Collapse} */
-let collapseMenu = null;
-
 const actualIsland = ref(null);
-
-if (!import.meta.env.SSR) {
-  import("bootstrap").then(({ Collapse }) => {
-    const menu = document.getElementById("mainMenu");
-    menu.addEventListener("hide.bs.collapse", () => {
-      store.commit(IS_SHOW_MENU_MUTATION, false);
-    });
-    menu.addEventListener("show.bs.collapse", () => {
-      store.commit(IS_SHOW_MENU_MUTATION, true);
-    });
-
-    collapseMenu = new Collapse(menu, { toggle: store.state.isShowMenu });
-  });
-}
+const navbarNav = ref(null)
 
 onMounted(() => {
   const client = new HeroClient();
@@ -35,13 +20,20 @@ onMounted(() => {
   client.island.getActual().then((island) => {
     actualIsland.value = island;
   });
-});
 
-function toggleMenu() {
-  if (collapseMenu) {
-    collapseMenu.toggle();
+  if (!import.meta.env.SSR) {
+    import("bootstrap").then(({ Collapse }) => {
+      navbarNav.value.addEventListener("hide.bs.collapse", () => {
+        store.commit(IS_SHOW_MENU_MUTATION, false);
+      });
+      navbarNav.value.addEventListener("show.bs.collapse", () => {
+        store.commit(IS_SHOW_MENU_MUTATION, true);
+      });
+
+      new Collapse(navbarNav.value, { toggle: store.state.isShowMenu })
+    });
   }
-}
+});
 </script>
 
 <template>
@@ -50,17 +42,16 @@ function toggleMenu() {
       <button
         class="navbar-toggler"
         type="button"
+        data-bs-toggle="collapse"
+        data-bs-target="#navbarNav"
+        aria-controls="navbarNav"
         aria-expanded="false"
         aria-label="Toggle navigation"
-        @click="toggleMenu"
       >
         <span class="navbar-toggler-icon"></span>
       </button>
-      <div
-        id="mainMenu"
-        class="navbar-collapse collapse"
-      >
-        <div class="navbar-nav">
+      <div id="navbarNav" ref="navbarNav" class="collapse navbar-collapse">
+        <div class="navbar-nav app-navbar-nav">
           <router-link
             :to="createI18nRouteTo({ name: 'home' })"
             class="nav-link"
@@ -99,7 +90,28 @@ function toggleMenu() {
           >
         </div>
       </div>
+      <switch-theme class="swith-theme" />
       <switch-language />
     </div>
   </nav>
 </template>
+
+<style scoped>
+
+.swith-theme {
+  margin-left: 16px;
+  margin-right: 16px;
+}
+
+@media (max-width: 991px) {
+  .swith-theme {
+    margin-left: 0;
+    margin-top: 8px;
+  }
+
+  .app-navbar-nav {
+    margin-top: 8px;
+    margin-bottom: 8px;
+  }
+}
+</style>

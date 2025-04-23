@@ -5,6 +5,7 @@ import { loadGlobalData } from "./services/api/global-data";
 import { ref } from "vue";
 import { clearGlobalNotifications } from "./store";
 import { useStore } from "vuex";
+import { setTheme } from "./core/theme";
 
 const notifications = ref([]);
 const store = useStore();
@@ -19,6 +20,8 @@ if (!import.meta.env.SSR) {
       console.error(error);
       // log it...
     });
+
+  setTheme(store.state.theme)
 }
 </script>
 

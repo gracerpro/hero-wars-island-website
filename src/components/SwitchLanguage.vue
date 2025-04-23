@@ -30,11 +30,12 @@ const onChangeLanguage = async (locale) => {
 <template>
   <form role="language">
     <button
-      v-for="language in languages"
+      v-for="(language, index) in languages"
       :key="language.locale"
       :title="language.label"
       :class="[
-        'btn ms-2',
+        'btn',
+        index > 0 ? 'ms-3' : '',
         language.locale === currentLocale ? 'btn-success fw-bold' : 'btn-outline-success',
       ]"
       type="button"
