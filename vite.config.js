@@ -14,6 +14,11 @@ export default defineConfig(({mode}) => {
       allowedHosts: true,
       port: 8082,
       strictPort: true,
+      hmr: {
+        protocol: "ws",
+        host: '0.0.0.0',
+        port: 24679,
+      },
     },
     preview: {
       host: true,

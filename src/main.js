@@ -4,7 +4,7 @@ import { createRouter } from "./router";
 import { createStore } from "./store/index.js";
 import { createI18n } from "@/i18n";
 
-import "bootstrap/dist/css/bootstrap.min.css";
+import "@/assets/style.scss";
 import "@/assets/icons.css";
 import "@/assets/main.css";
 
