@@ -102,3 +102,70 @@ asset_url = https://heroesru-a.akamaihd.net/mg/assets/
 Consumable icons
 
 asset_url + ["inventory_icons/consumable.png"]["path"]
+
+
+## Lootbox
+
+1. Find item
+2. Find box content
+
+
+### Find item
+
+```js
+const item = libData.inventoryItem[type][id]
+```
+
+Where
+
+- `type` is type`s name, string
+- `id`, unique ID, int
+
+
+```js
+// "map_box_red"
+libData.inventoryItem["consumable"]["414"].effectDescription.lootBox
+```
+
+
+### Find box content
+
+The array of rewards stores in
+
+```js
+libData.lootBox[i].dropTable_client.drop[i].reward
+```
+
+For example, Epic Chest
+
+```js
+libData.lootBox.map_box_red.dropTable_client.drop
+```
+
+```json
+[
+  "reward": {
+    "gold": 150000
+  },
+  "reward": {
+    "coin": {
+      "45": 300
+    }
+  },
+  "reward": {
+    "bannerStone": {
+      "1": 1
+    }
+  },
+  "reward": {
+    "consumable": {
+      "55": 10
+    }
+  },
+  "reward": {
+    "consumable": {
+      "51": 1500
+    }
+  }
+]
+```
