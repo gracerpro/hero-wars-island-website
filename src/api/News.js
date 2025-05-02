@@ -1,7 +1,7 @@
 import { getCurrentLocale } from "@/i18n/translation";
 import ApiRequest from "../core/ApiRequest";
 
-export default class News {
+export class News {
   constructor() {
     this._apiRequest = new ApiRequest();
     this._apiRequest.setBeforeRequest((request) => {

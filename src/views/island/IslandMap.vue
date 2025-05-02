@@ -11,8 +11,7 @@ import { onMounted, onUnmounted, ref, computed, shallowReactive } from "vue";
 import { getHumanQuantity } from "@/helpers/formatter";
 import { useI18n } from "vue-i18n";
 import { fullscreenElement } from "@/core/fullscreen";
-import { TYPE_BLOCKER, TYPE_CHEST, TYPE_START, TYPE_TOWER } from "@/api/Node";
-import { GAME_ID_EXPLORER_MOVE, GAME_ID_WOOD } from "@/api/Item";
+import { TYPE_CHEST, TYPE_TOWER } from "@/api/Node";
 import { isObject } from "@/helpers/core";
 import { getNodesMap } from "@/services/api/island-node";
 import { SELECT_MODE_DISABLE, SELECT_MODE_GOING, SELECT_MODE_PLAN } from "./select-mode";
@@ -136,61 +135,6 @@ const groupRewards = computed(() => {
   return arr;
 });
 const groupRewardsCount = computed(() => Object.keys(groupRewards.value).length);
-
-const userWoodMoveCount = computed(() => {
-  let result = 0;
-
-  for (const nodeId in userNodesIdsMap.value) {
-    const node = nodes.value[nodeId];
-    if (node?.cost?.gameId == GAME_ID_WOOD) {
-      ++result;
-    }
-  }
-
-  return result;
-});
-const userExplorerMoveCount = computed(() => {
-  let totalUserNodeCount = 0;
-
-  for (const nodeId in userNodesIdsMap.value) {
-    const node = nodes.value[nodeId];
-    if (node) {
-      ++totalUserNodeCount;
-    }
-  }
-
-  return totalUserNodeCount - userWoodMoveCount.value;
-});
-const totalExplorerMoveCount = computed(() => {
-  let result = 0;
-
-  for (const nodeId in nodes.value) {
-    const node = nodes.value[nodeId];
-
-    if (!node.cost) {
-      if (!(node.typeId === TYPE_START || node.typeId === TYPE_BLOCKER)) {
-        ++result;
-      }
-    } else if (node.cost.gameId == GAME_ID_EXPLORER_MOVE) {
-      ++result;
-    }
-  }
-
-  return result;
-});
-const totalWoodMoveCount = computed(() => {
-  let result = 0;
-
-  for (const nodeId in nodes.value) {
-    const node = nodes.value[nodeId];
-
-    if (node.cost?.gameId == GAME_ID_WOOD) {
-      ++result;
-    }
-  }
-
-  return result;
-});
 const disableNodesCount = computed(() => Object.keys(disableNodesIdsMap.value).length);
 
 loadState();
@@ -651,9 +595,7 @@ function saveState() {
             v-model:select-mode="selectMode"
             :nodes="nodes"
             :user-nodes-ids-map="userNodesIdsMap"
-            :explorer-move-count="userExplorerMoveCount"
             :total-explorer-move-count="totalExplorerMoveCount"
-            :wood-move-count="userWoodMoveCount"
             :total-wood-move-count="totalWoodMoveCount"
             :disable-nodes-count="disableNodesCount"
             @reset-user-nodes="onResetUserNodes"

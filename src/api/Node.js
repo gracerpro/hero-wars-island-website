@@ -19,7 +19,7 @@ export const defaultCostItem = {
   count: 1,
 };
 
-export default class Node {
+export class Node {
   constructor() {
     this._apiRequest = new ApiRequest();
     this._apiRequest.setBeforeRequest((request) => {
@@ -127,4 +127,8 @@ export function getTypeName(typeId) {
   };
 
   return map[typeId] ?? "";
+}
+
+export function isStepType(typeId) {
+  return !(typeId === TYPE_START || typeId === TYPE_BLOCKER);
 }

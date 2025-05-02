@@ -1,8 +1,8 @@
-import Island from "./Island";
-import Item from "./Item";
-import Node from "./Node";
-import Feedback from "./Feedback";
-import News from "./News";
+import { Island } from "./Island";
+import { Item } from "./Item";
+import { Node } from "./Node";
+import { Feedback } from "./Feedback";
+import { News } from "./News";
 import { Notification } from "./Notification";
 
 export default class HeroClient {

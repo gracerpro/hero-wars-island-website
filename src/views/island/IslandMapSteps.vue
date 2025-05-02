@@ -9,7 +9,7 @@ import { createI18nRouteTo } from "@/i18n/translation";
 import { computed } from "vue";
 import { useI18n } from "vue-i18n";
 import { SELECT_MODE_DISABLE, SELECT_MODE_GOING, SELECT_MODE_PLAN } from "./select-mode";
-import { defaultCostItem } from "@/api/Node";
+import { defaultCostItem, isStepType } from "@/api/Node";
 import { GAME_ID_EXPLORER_MOVE, GAME_ID_WOOD, TYPE_COIN, TYPE_STARMONEY } from "@/api/Item";
 
 const { t } = useI18n();
@@ -17,12 +17,7 @@ const { t } = useI18n();
 const props = defineProps({
   selectMode: { type: String, required: true },
   isSelectAnyNode: { type: Boolean, required: true },
-  // explorerMoveCount: { type: Number, required: true },
-  totalExplorerMoveCount: { type: Number, required: true },
-  // woodMoveCount: { type: Number, required: true },
-  totalWoodMoveCount: { type: Number, required: true },
   disableNodesCount: { type: Number, required: true },
-
   nodes: { type: Object, required: true },
   userNodesIdsMap: { type: Object, required: true },
 });
@@ -107,6 +102,38 @@ const explorerMoveCount = computed(
 const woodMoveCount = computed(
   () => userStepCostItems.value[TYPE_COIN + "_" + GAME_ID_WOOD]?.count ?? 0
 );
+const totalWoodMoveCount = computed(() => {
+  let result = 0;
+
+  for (const nodeId in props.nodes) {
+    const node = props.nodes[nodeId];
+
+    if (node.cost) {
+      if (node.cost.typeId === TYPE_COIN && node.cost.gameId == GAME_ID_WOOD) {
+        ++result;
+      }
+    }
+  }
+
+  return result;
+});
+const totalExplorerMoveCount = computed(() => {
+  let result = 0;
+
+  for (const nodeId in props.nodes) {
+    const node = props.nodes[nodeId];
+
+    if (!node.cost) {
+      if (isStepType(node.typeId)) {
+        ++result;
+      }
+    } else if (node.cost.typeId === TYPE_COIN && node.cost.gameId == GAME_ID_EXPLORER_MOVE) {
+      ++result;
+    }
+  }
+
+  return result;
+});
 
 function onChangeIsSelectAnyNode(event) {
   emit(EVENT_UPDATE_IS_SELECT_ANY_NODE, event.target.checked);

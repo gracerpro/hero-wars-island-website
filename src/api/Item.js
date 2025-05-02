@@ -19,7 +19,7 @@ export const TYPE_STAMINA = 14;
 export const GAME_ID_EXPLORER_MOVE = 41;
 export const GAME_ID_WOOD = 53;
 
-export default class Item {
+export class Item {
   constructor() {
     this._apiRequest = new ApiRequest();
     this._apiRequest.setBeforeRequest((request) => {
