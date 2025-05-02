@@ -167,7 +167,8 @@
       "planning": "Планирование",
       "resourcesOnMap": "Ресурсы на карте",
       "selectedResources": "Выбранные ресурсы",
-      "whenWasCellSynchronization": "Когда была синхронизация ячеек"
+      "whenWasCellSynchronization": "Когда была синхронизация ячеек",
+      "unusualStepPrice": "Необычная цена шага"
     }
   },
   "seo": {

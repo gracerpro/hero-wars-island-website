@@ -9,7 +9,7 @@ import { createI18nRouteTo } from "@/i18n/translation";
 import { computed } from "vue";
 import { useI18n } from "vue-i18n";
 import { SELECT_MODE_DISABLE, SELECT_MODE_GOING, SELECT_MODE_PLAN } from "./select-mode";
-import { defaultCostItem, isStepType } from "@/api/Node";
+import { defaultCostItem, isCommonStep, isStepType } from "@/api/Node";
 import { GAME_ID_EXPLORER_MOVE, GAME_ID_WOOD, TYPE_COIN, TYPE_STARMONEY } from "@/api/Item";
 
 const { t } = useI18n();
@@ -76,15 +76,12 @@ const otherStepCostItems = computed(() => {
 
   for (const key in userStepCostItems.value) {
     const item = userStepCostItems.value[key];
-    const isExcept =
-      item.typeId === TYPE_COIN &&
-      (item.gameId === GAME_ID_EXPLORER_MOVE || item.gameId === GAME_ID_WOOD);
 
-    if (!isExcept) {
+    if (!isCommonStep(item)) {
       let icon = null;
 
       if (item.typeId === TYPE_STARMONEY) {
-        icon = null; // TODO: draw an icon
+        icon = "item-emerald";
       }
 
       result[key] = {

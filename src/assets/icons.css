@@ -24,6 +24,9 @@
 .item-explorer-move {
   mask-image: url("/icons/items/exporer-move.svg");
 }
+.item-emerald {
+  mask-image: url("/icons/items/emerald.svg");
+}
 
 .hero-download {
   background-color: #ffffff;

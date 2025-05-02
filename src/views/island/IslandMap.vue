@@ -595,8 +595,6 @@ function saveState() {
             v-model:select-mode="selectMode"
             :nodes="nodes"
             :user-nodes-ids-map="userNodesIdsMap"
-            :total-explorer-move-count="totalExplorerMoveCount"
-            :total-wood-move-count="totalWoodMoveCount"
             :disable-nodes-count="disableNodesCount"
             @reset-user-nodes="onResetUserNodes"
             @reset-disable-nodes="onResetDisableNodes"

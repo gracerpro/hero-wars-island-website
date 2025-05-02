@@ -1,6 +1,6 @@
 import { getCurrentLocale } from "@/i18n/translation";
 import ApiRequest from "../core/ApiRequest";
-import { GAME_ID_EXPLORER_MOVE, TYPE_COIN } from "./Item";
+import { GAME_ID_EXPLORER_MOVE, GAME_ID_WOOD, TYPE_COIN } from "./Item";
 
 export const TYPE_NODE = 0;
 export const TYPE_START = 1;
@@ -131,4 +131,11 @@ export function getTypeName(typeId) {
 
 export function isStepType(typeId) {
   return !(typeId === TYPE_START || typeId === TYPE_BLOCKER);
+}
+
+export function isCommonStep(costItem) {
+  return (
+    costItem.typeId === TYPE_COIN &&
+    (costItem.gameId === GAME_ID_EXPLORER_MOVE || costItem.gameId === GAME_ID_WOOD)
+  );
 }

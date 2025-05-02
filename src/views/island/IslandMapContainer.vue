@@ -94,9 +94,8 @@ const backgroundImageUrl = computed(() => {
 const iconItems = computed(() => {
   return getIconsItems(props.rewards, totalNodes.value);
 });
-const rewardIcons = computed(() => {
-  return iconItems.value.icons;
-});
+const rewardIcons = computed(() => iconItems.value.icons);
+const warningPoints = computed(() => iconItems.value.warningPoints);
 const rewardQuantities = computed(() => {
   return props.isShowQuantity ? iconItems.value.quantities : [];
 });
@@ -402,6 +401,17 @@ function getItemName(item) {
             </title>
           </rect>
         </template>
+        <circle
+          v-for="(point, nodeId) in warningPoints"
+          :key="nodeId"
+          :cx="point.x"
+          :cy="point.y"
+          r="10"
+          class="warning-point"
+          @click="onItemClick(point, $event)"
+        >
+          <title>{{ t("page.island.unusualStepPrice") }}</title>
+        </circle>
         <text
           v-for="item in rewardQuantities"
           :key="item.uid"
@@ -530,5 +540,10 @@ function getItemName(item) {
   border-color: #86b7fe;
   outline: 0;
   box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+}
+.warning-point {
+  fill: red;
+  stroke-width: 1;
+  stroke: #000;
 }
 </style>
