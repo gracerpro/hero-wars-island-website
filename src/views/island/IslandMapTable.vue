@@ -31,7 +31,7 @@ const getItemName = (item) => {
     <span class="badge text-bg-secondary ms-2">{{ visibleRewardsCount }}</span>
     <div
       v-if="isShowBlock"
-      class="heightable"
+      class="heightable pe-2"
     >
       <table class="table table-striped table-hover table-sm">
         <thead>

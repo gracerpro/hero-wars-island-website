@@ -115,8 +115,6 @@ export function getIconsItems(dataItems, drawedNodes) {
     }
   });
 
-  console.log(warningPoints);
-
   return {
     icons: resultItems,
     quantities: rewardQuantities,
