@@ -167,7 +167,8 @@
       "planning": "Planing",
       "resourcesOnMap": "Map resources",
       "selectedResources": "Selected resources",
-      "whenWasCellSynchronization": "When was cell synchronization"
+      "whenWasCellSynchronization": "When was cell synchronization",
+      "unusualStepPrice": "Unusual step price"
     }
   },
   "seo": {

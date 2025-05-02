@@ -21,7 +21,7 @@ if (!import.meta.env.SSR) {
       // log it...
     });
 
-  setTheme(store.state.theme)
+  setTheme(store.state.theme);
 }
 </script>
 

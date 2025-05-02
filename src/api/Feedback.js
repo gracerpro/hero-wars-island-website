@@ -8,7 +8,7 @@ export const STATUS_ABORT = "abort";
 export const STATUS_CLOSED = "closed";
 export const STATUS_QUEUE = "queue";
 
-export default class Feedback {
+export class Feedback {
   constructor() {
     this._apiRequest = new ApiRequest();
     this._apiRequest.setBeforeRequest((request) => {

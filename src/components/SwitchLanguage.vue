@@ -36,7 +36,7 @@ const onChangeLanguage = async (locale) => {
       :class="[
         'btn',
         index > 0 ? 'ms-3' : '',
-        language.locale === currentLocale ? 'btn-success fw-bold' : 'btn-outline-success',
+        language.locale === currentLocale ? 'btn-primary fw-bold' : 'btn-outline-primary',
       ]"
       type="button"
       @click="onChangeLanguage(language.locale)"

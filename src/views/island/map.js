@@ -1,3 +1,5 @@
+import { isCommonStep } from "@/api/Node";
+
 export const SIDE = 50;
 const HALF_SIDE = SIDE / 2;
 const HEIGHT = 34;
@@ -28,10 +30,11 @@ export function getIconsItems(dataItems, drawedNodes) {
   const resultItems = [];
   const indexesByNode = {};
   const rewardQuantities = [];
+  const warningPoints = {};
 
   dataItems.forEach((item) => {
     const nodeId = item.node.id;
-    const drawedNode = drawedNodes[item.node.id];
+    const drawedNode = drawedNodes[nodeId];
     const count = countsByNode[nodeId];
     const isShowText = item.item.quantity > 1;
 
@@ -100,11 +103,22 @@ export function getIconsItems(dataItems, drawedNodes) {
     if (isShowText && itemQuantity) {
       rewardQuantities.push(itemQuantity);
     }
+
+    if (item.node.cost) {
+      if (!isCommonStep(item.node.cost)) {
+        warningPoints[nodeId] = {
+          nodeId,
+          x: drawedNode.x + SIDE * 0.7,
+          y: drawedNode.y,
+        };
+      }
+    }
   });
 
   return {
     icons: resultItems,
     quantities: rewardQuantities,
+    warningPoints,
   };
 }
 

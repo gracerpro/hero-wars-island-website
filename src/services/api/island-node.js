@@ -25,8 +25,9 @@ export async function getNodesMap(island, isForce = false, filter = null) {
   }
 
   if (nodesMap === null || nodesMap === undefined) {
-    nodesMap = {};
     const list = await client.node.getList(island.id, filter);
+
+    nodesMap = {};
     list.items.forEach((node) => {
       nodesMap[node.id] = node;
     });

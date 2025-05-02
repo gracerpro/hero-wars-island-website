@@ -1,5 +1,6 @@
 import { getCurrentLocale } from "@/i18n/translation";
 import ApiRequest from "../core/ApiRequest";
+import { GAME_ID_EXPLORER_MOVE, GAME_ID_WOOD, TYPE_COIN } from "./Item";
 
 export const TYPE_NODE = 0;
 export const TYPE_START = 1;
@@ -12,7 +13,13 @@ export const TYPE_BUBBLE = 7;
 export const STATUS_CREATED = 0;
 export const STATUS_NOT_SURE = 3;
 
-export default class Node {
+export const defaultCostItem = {
+  typeId: TYPE_COIN,
+  gameId: GAME_ID_EXPLORER_MOVE,
+  count: 1,
+};
+
+export class Node {
   constructor() {
     this._apiRequest = new ApiRequest();
     this._apiRequest.setBeforeRequest((request) => {
@@ -84,6 +91,9 @@ export default class Node {
     } else {
       node.items = [];
     }
+    if (node.cost === undefined) {
+      node.cost = defaultCostItem;
+    }
   }
 }
 
@@ -117,4 +127,15 @@ export function getTypeName(typeId) {
   };
 
   return map[typeId] ?? "";
+}
+
+export function isStepType(typeId) {
+  return !(typeId === TYPE_START || typeId === TYPE_BLOCKER);
+}
+
+export function isCommonStep(costItem) {
+  return (
+    costItem.typeId === TYPE_COIN &&
+    (costItem.gameId === GAME_ID_EXPLORER_MOVE || costItem.gameId === GAME_ID_WOOD)
+  );
 }

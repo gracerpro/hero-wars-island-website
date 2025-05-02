@@ -1,7 +1,7 @@
 import { flushPromises, shallowMount } from '@vue/test-utils'
 import TheNews from '../../src/views/TheNews.vue'
 import { describe, it, expect, vi } from 'vitest'
-import News from '@/api/News'
+import { News } from '@/api/News'
 import { responseNews } from "../data/news"
 import { responseEmptyList } from "../data/common"
 

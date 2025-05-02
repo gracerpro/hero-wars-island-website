@@ -1,7 +1,7 @@
 import { getCurrentLocale } from "@/i18n/translation";
 import ApiRequest from "../core/ApiRequest";
 
-export default class Island {
+export class Island {
   constructor() {
     this._apiRequest = new ApiRequest();
     this._apiRequest.setBeforeRequest((request) => {
