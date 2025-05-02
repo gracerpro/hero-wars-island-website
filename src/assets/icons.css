@@ -14,7 +14,7 @@
   mask-size: contain;
   background-color: #000000;
 }
-[data-bs-theme=dark] .hero-color-icon {
+[data-bs-theme="dark"] .hero-color-icon {
   background-color: #ffffff;
 }
 

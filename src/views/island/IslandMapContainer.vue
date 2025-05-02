@@ -175,7 +175,7 @@ function getNodeClass(node) {
   if (node.statusId == STATUS_NOT_SURE) {
     nodeClass += " -warning";
   }
-  if (node.cost?.gameItemId === GAME_ID_WOOD) {
+  if (node.cost?.gameId === GAME_ID_WOOD) {
     nodeClass += " node-cost-wood";
   }
 

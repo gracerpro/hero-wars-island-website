@@ -12,7 +12,7 @@ const { t } = useI18n();
 const store = useStore();
 
 const actualIsland = ref(null);
-const navbarNav = ref(null)
+const navbarNav = ref(null);
 
 onMounted(() => {
   const client = new HeroClient();
@@ -30,7 +30,7 @@ onMounted(() => {
         store.commit(IS_SHOW_MENU_MUTATION, true);
       });
 
-      new Collapse(navbarNav.value, { toggle: store.state.isShowMenu })
+      new Collapse(navbarNav.value, { toggle: store.state.isShowMenu });
     });
   }
 });
@@ -50,7 +50,11 @@ onMounted(() => {
       >
         <span class="navbar-toggler-icon"></span>
       </button>
-      <div id="navbarNav" ref="navbarNav" class="collapse navbar-collapse">
+      <div
+        id="navbarNav"
+        ref="navbarNav"
+        class="collapse navbar-collapse"
+      >
         <div class="navbar-nav app-navbar-nav">
           <router-link
             :to="createI18nRouteTo({ name: 'home' })"
@@ -97,7 +101,6 @@ onMounted(() => {
 </template>
 
 <style scoped>
-
 .swith-theme {
   margin-left: 16px;
   margin-right: 16px;

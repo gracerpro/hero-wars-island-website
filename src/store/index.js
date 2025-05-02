@@ -3,21 +3,21 @@ import { createStore as _createStore } from "vuex";
 import { IS_SHOW_MENU_MUTATION, HIDE_GLOBAL_NOTIFY, UPDATE_THEME_MUTATION } from "./mutation-types";
 import { isValidTheme, THEME_LIGHT } from "@/core/theme";
 
-let theme = THEME_LIGHT
+let theme = THEME_LIGHT;
 let isShowMenu = true;
 let globalNotifications = {};
 
 const IS_SHOW_MENU_NAME = "isShowMenu";
 const NOTIFICATIONS_NAME = "notifications";
-const NAME_THEME = "theme"
+const NAME_THEME = "theme";
 
 if (!import.meta.env.SSR) {
   const localIsShowMenu = localStorage.getItem(getName(IS_SHOW_MENU_NAME)) ?? "1";
   isShowMenu = localIsShowMenu > 0;
 
-  theme = localStorage.getItem(getName(NAME_THEME)) ?? THEME_LIGHT
+  theme = localStorage.getItem(getName(NAME_THEME)) ?? THEME_LIGHT;
   if (!isValidTheme(theme)) {
-    theme = THEME_LIGHT
+    theme = THEME_LIGHT;
   }
 
   const notifactionsJson = localStorage.getItem(getName(NOTIFICATIONS_NAME)) ?? "{}";

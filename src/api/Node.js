@@ -1,5 +1,6 @@
 import { getCurrentLocale } from "@/i18n/translation";
 import ApiRequest from "../core/ApiRequest";
+import { GAME_ID_EXPLORER_MOVE, TYPE_COIN } from "./Item";
 
 export const TYPE_NODE = 0;
 export const TYPE_START = 1;
@@ -11,6 +12,12 @@ export const TYPE_BUBBLE = 7;
 
 export const STATUS_CREATED = 0;
 export const STATUS_NOT_SURE = 3;
+
+export const defaultCostItem = {
+  typeId: TYPE_COIN,
+  gameId: GAME_ID_EXPLORER_MOVE,
+  count: 1,
+};
 
 export default class Node {
   constructor() {
@@ -83,6 +90,9 @@ export default class Node {
       });
     } else {
       node.items = [];
+    }
+    if (node.cost === undefined) {
+      node.cost = defaultCostItem;
     }
   }
 }

@@ -142,7 +142,7 @@ const userWoodMoveCount = computed(() => {
 
   for (const nodeId in userNodesIdsMap.value) {
     const node = nodes.value[nodeId];
-    if (node?.cost?.gameItemId == GAME_ID_WOOD) {
+    if (node?.cost?.gameId == GAME_ID_WOOD) {
       ++result;
     }
   }
@@ -171,7 +171,7 @@ const totalExplorerMoveCount = computed(() => {
       if (!(node.typeId === TYPE_START || node.typeId === TYPE_BLOCKER)) {
         ++result;
       }
-    } else if (node.cost.gameItemId == GAME_ID_EXPLORER_MOVE) {
+    } else if (node.cost.gameId == GAME_ID_EXPLORER_MOVE) {
       ++result;
     }
   }
@@ -184,7 +184,7 @@ const totalWoodMoveCount = computed(() => {
   for (const nodeId in nodes.value) {
     const node = nodes.value[nodeId];
 
-    if (node.cost?.gameItemId == GAME_ID_WOOD) {
+    if (node.cost?.gameId == GAME_ID_WOOD) {
       ++result;
     }
   }
@@ -649,6 +649,8 @@ function saveState() {
           <island-map-steps
             v-model:is-select-any-node="isSelectAnyNode"
             v-model:select-mode="selectMode"
+            :nodes="nodes"
+            :user-nodes-ids-map="userNodesIdsMap"
             :explorer-move-count="userExplorerMoveCount"
             :total-explorer-move-count="totalExplorerMoveCount"
             :wood-move-count="userWoodMoveCount"
