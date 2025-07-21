@@ -7,11 +7,11 @@
   "scripts": {
     "dev": "node server",
     "dev-prod": "NODE_ENV=production node server",
-    "generate": "vite build --outDir dist/static --ssrManifest .vite/ssr-manifest.json && npm run build:server && NODE_ENV=production node prerender",
+    "generate": "tsc && vite build --outDir dist/static --ssrManifest .vite/ssr-manifest.json && npm run build:server && NODE_ENV=production node prerender",
     "generate-only": "NODE_ENV=production node prerender",
     "build": "npm run build:client && npm run build:server",
-    "build:client": "vite build --outDir dist/client --ssrManifest .vite/ssr-manifest.json",
-    "build:server": "vite build --outDir dist/server --ssr src/entry-server.js",
+    "build:client": "tsc && vite build --outDir dist/client --ssrManifest .vite/ssr-manifest.json",
+    "build:server": "tsc && vite build --outDir dist/server --ssr src/entry-server.js",
     "preview": "vite preview",
     "lint": "eslint . --fix",
     "format": "prettier --write src/",
@@ -33,6 +33,7 @@
     "vuex": "^4.0.0"
   },
   "devDependencies": {
+    "@types/node": "^24.0.15",
     "@vitejs/plugin-vue": "^5.1.4",
     "@vitest/coverage-v8": "^3.0.3",
     "@vue/eslint-config-prettier": "^10.1.0",

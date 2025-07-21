@@ -1,4 +1,4 @@
-import createApp from "./main.js";
+import createApp from "./main";
 
 const { app, router, store } = createApp();
 

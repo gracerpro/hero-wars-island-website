@@ -1,9 +1,9 @@
 /// <reference types="vitest" />
-import { fileURLToPath, URL } from 'node:url'
 import { defineConfig, loadEnv } from 'vite';
 import vue from '@vitejs/plugin-vue';
 import { ViteEjsPlugin } from "vite-plugin-ejs";
 import compression from 'vite-plugin-compression2';
+import path from 'path';
 
 // https://vite.dev/config/
 export default defineConfig(({mode}) => {
@@ -17,8 +17,7 @@ export default defineConfig(({mode}) => {
       strictPort: true,
       hmr: {
         protocol: "ws",
-        host: '0.0.0.0',
-        port: 24679,
+        host: '127.0.0.1',
       },
     },
     preview: {
@@ -37,7 +36,7 @@ export default defineConfig(({mode}) => {
     ],
     resolve: {
       alias: {
-        '@': fileURLToPath(new URL('./src', import.meta.url)),
+        '@': path.resolve(__dirname, './src'), // Maps @ to the absolute path of your src directory
       }
     },
     test: {

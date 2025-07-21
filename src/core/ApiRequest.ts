@@ -9,48 +9,34 @@ if (import.meta.env.SSR) {
   fetch = window.fetch;
 }
 
+type BeforeRequestCallback = (request: ApiRequest) => void;
+
 class ApiRequest {
-  /**
-   * @private
-   */
-  _locale = null;
+  private readonly backendUrl = import.meta.env.VITE_BACKEND_API_URL;
 
-  /**
-   * @private
-   */
-  _backendUrl = import.meta.env.VITE_BACKEND_API_URL;
+  private locale: string = "";
 
-  _beforeRequest = (/* request */) => {};
+  private beforeRequest: BeforeRequestCallback | null = null
 
-  /**
-   * @param {String} locale
-   */
-  setLocale(locale) {
-    this._locale = locale;
+  setLocale(locale: string) {
+    this.locale = locale;
   }
 
-  /**
-   * @param {Function} callable
-   */
-  setBeforeRequest(callable) {
-    this._beforeRequest = callable;
+  setBeforeRequest(callable: BeforeRequestCallback) {
+    this.beforeRequest = callable;
   }
 
-  /**
-   * @return {Promise<Object|Array>}
-   * @param {String} url
-   * @param {Object} params
-   */
-  async get(url, params) {
-    if (this._beforeRequest) {
-      this._beforeRequest(this);
+  async get(url: string, params: object) {
+    if (this.beforeRequest !== null) {
+      this.beforeRequest(this);
     }
 
     let searchParams = "";
+
     if (params) {
       searchParams = "?" + new URLSearchParams(params).toString();
     }
-    const response = await fetch(this._backendUrl + url + searchParams, this.getOptions("GET"));
+    const response = await fetch(this.backendUrl + url + searchParams, this.getOptions("GET"));
 
     if (!response.ok) {
       if (response.status >= 400) {
@@ -70,21 +56,16 @@ class ApiRequest {
     return await response.json();
   }
 
-  /**
-   * @param {String} url
-   * @param {Object} data
-   * @returns {Promise<Object>}
-   */
-  async post(url, data) {
-    if (this._beforeRequest) {
-      this._beforeRequest(this);
+  async post(url: string, data: object) {
+    if (this.beforeRequest !== null) {
+      this.beforeRequest(this);
     }
 
     const options = {
       ...this.getOptions("POST"),
       body: JSON.stringify(data),
     };
-    const response = await fetch(this._backendUrl + url, options);
+    const response = await fetch(this.backendUrl + url, options);
 
     if (!response.ok) {
       if (response.status >= 400) {
@@ -104,11 +85,7 @@ class ApiRequest {
     return await response.json();
   }
 
-  /**
-   * @private
-   * @param {String} method
-   */
-  getOptions(method) {
+  private getOptions(method: string) {
     const options = {
       method,
       redirect: "follow",
@@ -116,9 +93,9 @@ class ApiRequest {
         "Content-Type": "application/json; charset=UTF-8",
         Accept: "application/json",
       },
-    };
-    if (this._locale) {
-      options.headers["Accept-Language"] = this._locale;
+    }
+    if (this.locale !== "") {
+      options.headers["Accept-Language"] = this.locale;
     }
 
     return options;
