@@ -141,7 +141,7 @@
       "canSelectNearStart": "Выделить узел можно около входа.",
       "downloadMapInFormat": "Скачать карту в формате {format}",
       "downloadMapSize": "Размер изображения {mapSize} точек",
-      "downloadVerticalAndHorizontalCount": "Количество ячеек по вертикали {verticalCount}, по горизонтали - {horizontalCount}",
+      "downloadVerticalAndHorizontalCount": "Количество ячеек по вертикали {verticalCount}, по горизонтали {horizontalCount}",
       "gameVersionWhenSyncCells": "Версия игры при синхронизации ячеек",
       "exclusion": "Исключение",
       "excludedCells": "Исключено ячеек",
@@ -168,7 +168,7 @@
       "resourcesOnMap": "Ресурсы на карте",
       "selectedResources": "Выбранные ресурсы",
       "whenWasCellSynchronization": "Когда была синхронизация ячеек",
-      "unusualStepPrice": "Необычная цена шага"
+      "unusualStepPrice": "Необычная цена хода"
     }
   },
   "seo": {
