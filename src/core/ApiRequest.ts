@@ -1,10 +1,14 @@
 import HttpError from "@/exceptions/HttpError";
 import UserError from "@/exceptions/UserError";
 
-let fetch;
+type FetchFunction = (url: URL | RequestInfo, init?: RequestInit) => Promise<Response>
+
+let fetch: FetchFunction;
 
 if (import.meta.env.SSR) {
-  fetch = (...args) => import("node-fetch").then(({ default: _fetch }) => _fetch(...args));
+  //fetch = (...args) => import("node-fetch").then(({ default: _fetch }) => _fetch(...args));
+  fetch = (url: RequestInfo, init?: RequestInit) => import('node-fetch')
+  .then(module => module.default(url, init));
 } else {
   fetch = window.fetch;
 }
@@ -26,7 +30,7 @@ class ApiRequest {
     this.beforeRequest = callable;
   }
 
-  async get(url: string, params: object) {
+  async get(url: string, params: Record<string, string>) {
     if (this.beforeRequest !== null) {
       this.beforeRequest(this);
     }
@@ -85,20 +89,21 @@ class ApiRequest {
     return await response.json();
   }
 
-  private getOptions(method: string) {
-    const options = {
-      method,
-      redirect: "follow",
-      headers: {
-        "Content-Type": "application/json; charset=UTF-8",
-        Accept: "application/json",
-      },
-    }
+  private getOptions(method: string): RequestInit {
+    const headers = new Headers({
+      "Content-Type": "application/json; charset=UTF-8",
+      Accept: "application/json",
+    })
+
     if (this.locale !== "") {
-      options.headers["Accept-Language"] = this.locale;
+      headers.set("Accept-Language", this.locale);
     }
 
-    return options;
+    return {
+      method,
+      redirect: "follow",
+      headers,
+    }
   }
 }
 

@@ -1,9 +1,9 @@
 import ru from "./locales/ru.json";
 import { createI18n as _createI18n } from "vue-i18n";
 
-let i18n = null;
+let i18n: any = null;
 
-export function createI18n(locale, messages) {
+export function createI18n(locale: string, messages: any) {
   if (!locale) {
     locale = import.meta.env.VITE_DEFAULT_LOCALE;
   }

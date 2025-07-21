@@ -3,7 +3,7 @@ import { Item } from "./Item";
 import { Node } from "./Node";
 import { Feedback } from "./Feedback";
 import { News } from "./News";
-import { Notification } from "./Notification";
+import { Notification } from "./NotificationApi";
 
 export default class HeroClient {
   /** @var {Feedback} */

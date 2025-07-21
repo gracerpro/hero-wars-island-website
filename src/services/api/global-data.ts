@@ -1,4 +1,4 @@
-import { Notification } from "@/api/Notification";
+import { Notification } from "@/api/NotificationApi";
 
 export async function loadGlobalData() {
   const client = new Notification();
