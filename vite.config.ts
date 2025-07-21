@@ -5,6 +5,7 @@ import vue from '@vitejs/plugin-vue';
 import { ViteEjsPlugin } from "vite-plugin-ejs";
 import compression from 'vite-plugin-compression2';
 
+// https://vite.dev/config/
 export default defineConfig(({mode}) => {
   const env = loadEnv(mode, process.cwd());
 
