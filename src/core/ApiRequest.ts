@@ -18,7 +18,7 @@ class ApiRequest {
     this.beforeRequest = callable;
   }
 
-  async get(url: string, params?: URLSearchParams) {
+  async get(url: string, params?: URLSearchParams): Promise<any> {
     if (this.beforeRequest !== null) {
       this.beforeRequest(this);
     }
@@ -45,10 +45,10 @@ class ApiRequest {
       throw new Error("Server return a not success response.");
     }
 
-    return await response.json();
+    return response.json();
   }
 
-  async post(url: string, data: object) {
+  async post(url: string, data: object): Promise<any> {
     if (this.beforeRequest !== null) {
       this.beforeRequest(this);
     }
@@ -74,7 +74,7 @@ class ApiRequest {
       throw new Error("Server return a not success response.");
     }
 
-    return await response.json();
+    return response.json();
   }
 
   private getOptions(method: string): RequestInit {

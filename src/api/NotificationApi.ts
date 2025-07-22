@@ -1,7 +1,8 @@
 import ApiRequest from "@/core/ApiRequest";
 import { getCurrentLocale } from "@/i18n/translation";
+import { ApiList } from "./common"
 
-interface Notification {
+export interface Notification {
   id: number,
   createdAt: Date,
   contentUpdatedAt: Date | null,
@@ -18,14 +19,18 @@ export class NotificationApi {
     });
   }
 
-  async getList(): Promise<Notification[]> {
+  async getList(): Promise<ApiList<Notification>> {
     const response = await this.apiRequest.get("/notifications");
 
+    let items: Array<Notification> = []
+    let totalCount = 0
+
     if (response.items) {
-      return response.items.map((item: any) => this.modifyNotification(item));
+      items = response.items.map((item: any) => this.modifyNotification(item));
+      totalCount = response.totalCount
     }
 
-    return [];
+    return new ApiList<Notification>(items, totalCount);
   }
 
   private modifyNotification(notification: any): Notification {

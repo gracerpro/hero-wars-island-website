@@ -1,7 +1,11 @@
-import { Notification } from "@/api/NotificationApi";
+import { NotificationApi, type Notification } from "@/api/NotificationApi";
 
-export async function loadGlobalData() {
-  const client = new Notification();
+export type GlobalData = {
+  notifications: Array<Notification>
+}
+
+export async function loadGlobalData(): Promise<GlobalData> {
+  const client = new NotificationApi();
 
   const notificationList = await client.getList();
 

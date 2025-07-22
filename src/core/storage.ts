@@ -4,7 +4,7 @@ export function getLocalStorageSize() {
   return localStorage ? JSON.stringify(localStorage).length : 0;
 }
 
-export async function getIndexedDbSize() {
+export async function getIndexedDbSize(): Promise<number> {
   return new Promise((resolve, reject) => {
     if (!window.indexedDB) {
       return resolve(0);
@@ -29,13 +29,17 @@ export async function getIndexedDbSize() {
   });
 }
 
-async function getTableSize(db, tableName) {
+async function getTableSize(db: IDBDatabase, tableName: string): Promise<number> {
   return new Promise((resolve, reject) => {
     const transaction = db.transaction([tableName]).objectStore(tableName).openCursor();
 
     let size = 0;
-    transaction.onsuccess = function (event) {
-      const cursor = event.target.result;
+    transaction.onsuccess = function (event: Event) {
+      if (event.target === null) {
+        resolve(size);
+        return
+      }
+      const cursor = (event.target as IDBRequest<IDBCursorWithValue>).result;
       if (cursor) {
         const storedObject = cursor.value;
         const json = JSON.stringify(storedObject);
