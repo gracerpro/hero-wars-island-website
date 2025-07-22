@@ -10,7 +10,7 @@ import {
   STATUS_CLOSED,
   STATUS_QUEUE,
   getStatusName,
-} from "@/api/Feedback";
+} from "@/api/FeedbackApi";
 
 const { t } = useI18n();
 const client = new HeroClient();

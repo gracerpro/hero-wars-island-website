@@ -1,16 +1,14 @@
-import { Island } from "./Island";
+import { IslandApi } from "./IslandApi";
 import { Item } from "./Item";
 import { Node } from "./Node";
-import { Feedback } from "./Feedback";
+import { FeedbackApi } from "./FeedbackApi";
 import { News } from "./News";
-import { Notification } from "./NotificationApi";
+import { NotificationApi } from "./NotificationApi";
 
 export default class HeroClient {
-  /** @var {Feedback} */
-  feedback;
+  feedback: FeedbackApi;
 
-  /** @var {Island} */
-  island;
+  island: IslandApi;
 
   /** @var {Item} */
   item;
@@ -25,11 +23,11 @@ export default class HeroClient {
   notification;
 
   constructor() {
-    this.feedback = new Feedback();
-    this.island = new Island();
+    this.feedback = new FeedbackApi();
+    this.island = new IslandApi();
     this.item = new Item();
     this.node = new Node();
     this.news = new News();
-    this.notification = new Notification();
+    this.notification = new NotificationApi();
   }
 }
