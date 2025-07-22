@@ -1,22 +1,10 @@
-import HttpError from "@/exceptions/HttpError";
-import UserError from "@/exceptions/UserError";
-
-type FetchFunction = (url: URL | RequestInfo, init?: RequestInit) => Promise<Response>
-
-let fetch: FetchFunction;
-
-if (import.meta.env.SSR) {
-  //fetch = (...args) => import("node-fetch").then(({ default: _fetch }) => _fetch(...args));
-  fetch = (url: RequestInfo, init?: RequestInit) => import('node-fetch')
-  .then(module => module.default(url, init));
-} else {
-  fetch = window.fetch;
-}
+import { HttpError } from "@/exceptions/HttpError";
+import { UserError } from "@/exceptions/UserError";
 
 type BeforeRequestCallback = (request: ApiRequest) => void;
 
 class ApiRequest {
-  private readonly backendUrl = import.meta.env.VITE_BACKEND_API_URL;
+  private readonly backendUrl: string = import.meta.env.VITE_BACKEND_API_URL;
 
   private locale: string = "";
 
@@ -30,17 +18,17 @@ class ApiRequest {
     this.beforeRequest = callable;
   }
 
-  async get(url: string, params: Record<string, string>) {
+  async get(url: string, params?: URLSearchParams) {
     if (this.beforeRequest !== null) {
       this.beforeRequest(this);
     }
 
     let searchParams = "";
 
-    if (params) {
-      searchParams = "?" + new URLSearchParams(params).toString();
+    if (params !== undefined) {
+      searchParams = "?" + params.toString();
     }
-    const response = await fetch(this.backendUrl + url + searchParams, this.getOptions("GET"));
+    const response = await this.fetch(this.backendUrl + url + searchParams, this.getOptions("GET"));
 
     if (!response.ok) {
       if (response.status >= 400) {
@@ -69,7 +57,7 @@ class ApiRequest {
       ...this.getOptions("POST"),
       body: JSON.stringify(data),
     };
-    const response = await fetch(this.backendUrl + url, options);
+    const response = await this.fetch(this.backendUrl + url, options);
 
     if (!response.ok) {
       if (response.status >= 400) {
@@ -104,6 +92,20 @@ class ApiRequest {
       redirect: "follow",
       headers,
     }
+  }
+
+  private async fetch(url: string, init?: RequestInit): Promise<Response> {
+    let result: Response
+
+    if (import.meta.env.SSR) {
+      // const fetchModule = await import('node-fetch')
+      // result = await fetchModule.default(url, init)
+      throw new Error("TODO: fetch on server")
+    } else {
+      result = await window.fetch(url, init);
+    }
+
+    return result
   }
 }
 
