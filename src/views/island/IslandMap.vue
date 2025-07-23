@@ -11,7 +11,7 @@ import { onMounted, onUnmounted, ref, computed, shallowReactive } from "vue";
 import { getHumanQuantity } from "@/helpers/formatter";
 import { useI18n } from "vue-i18n";
 import { fullscreenElement } from "@/core/fullscreen";
-import { TYPE_CHEST, TYPE_TOWER } from "@/api/Node";
+import { TYPE_CHEST, TYPE_TOWER } from "@/api/NodeApi";
 import { isObject } from "@/helpers/core";
 import { getNodesMap } from "@/services/api/island-node";
 import { SELECT_MODE_DISABLE, SELECT_MODE_GOING, SELECT_MODE_PLAN } from "./select-mode";

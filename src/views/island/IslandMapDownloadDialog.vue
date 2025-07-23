@@ -15,7 +15,7 @@ import {
   TYPE_START,
   TYPE_TOWER,
   TYPE_WOOD,
-} from "@/api/Node";
+} from "@/api/NodeApi";
 
 const { t } = useI18n();
 

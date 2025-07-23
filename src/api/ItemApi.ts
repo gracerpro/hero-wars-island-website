@@ -1,5 +1,7 @@
 import { getCurrentLocale } from "@/i18n/translation";
 import ApiRequest from "../core/ApiRequest";
+import { ApiList } from "./common";
+import type { ComposerTranslation } from "vue-i18n";
 
 export const TYPE_RECIPES = 1;
 export const TYPE_CONSUMABLE = 2;
@@ -16,36 +18,66 @@ export const TYPE_UNKNOWN = 12;
 export const TYPE_AVATAR_FRAME = 13;
 export const TYPE_STAMINA = 14;
 
+export type Type = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14
+
 export const GAME_ID_EXPLORER_MOVE = 41;
 export const GAME_ID_WOOD = 53;
 
-export class Item {
+export interface Item {
+  id: number,
+  name: string,
+  gameId: number,
+  type: Type,
+}
+
+export type ItemFilter = {
+  name?: string
+}
+
+export class ItemApi {
+  apiRequest: ApiRequest
+
   constructor() {
-    this._apiRequest = new ApiRequest();
-    this._apiRequest.setBeforeRequest((request) => {
+    this.apiRequest = new ApiRequest();
+    this.apiRequest.setBeforeRequest((request) => {
       request.setLocale(getCurrentLocale());
     });
   }
 
-  /**
-   * @param {Object|null} filter
-   * @param {Number} limit
-   * @returns {Promise<Object>}
-   */
-  async getList(limit, filter = null) {
-    let params = { limit };
+  async getList(limit: number, filter?: ItemFilter): Promise<ApiList<Item>> {
+    let params = new URLSearchParams();
+    params.append("limit", limit.toString())
 
     if (filter) {
-      Object.keys(filter).forEach((key) => {
-        params[`filter[${key}]`] = filter[key];
-      });
+      if (filter.name) {
+        params.append("filter[${key}]", filter.name)
+      }
     }
 
-    return this._apiRequest.get("/items", params);
+    const response = await this.apiRequest.get("/items", params);
+
+    let items: Array<Item> = []
+    let totalCount: number = 0
+
+    if (response.items) {
+      items = response.items.map((item: any) => this.modifyItem(item))
+      totalCount = response.totalCount
+    }
+
+    return new ApiList<Item>(items, totalCount)
+  }
+
+  private modifyItem(response: any): Item {
+    return {
+      id: response.id,
+      name: response.name,
+      gameId: 0,
+      type: response.typeId,
+    }
   }
 }
 
-export function getLabelsByTypes(t) {
+export function getLabelsByTypes(t: ComposerTranslation) {
   return {
     [TYPE_EQUIPMENT]: t("common.equipment"),
     [TYPE_RECIPES]: t("common.recipes"),

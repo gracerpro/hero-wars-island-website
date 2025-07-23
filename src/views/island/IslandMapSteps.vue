@@ -9,8 +9,8 @@ import { createI18nRouteTo } from "@/i18n/translation";
 import { computed } from "vue";
 import { useI18n } from "vue-i18n";
 import { SELECT_MODE_DISABLE, SELECT_MODE_GOING, SELECT_MODE_PLAN } from "./select-mode";
-import { defaultCostItem, isCommonStep, isStepType } from "@/api/Node";
-import { GAME_ID_EXPLORER_MOVE, GAME_ID_WOOD, TYPE_COIN, TYPE_STARMONEY } from "@/api/Item";
+import { defaultCostItem, isCommonStep, isStepType } from "@/api/NodeApi";
+import { GAME_ID_EXPLORER_MOVE, GAME_ID_WOOD, TYPE_COIN, TYPE_STARMONEY } from "@/api/ItemApi";
 
 const { t } = useI18n();
 

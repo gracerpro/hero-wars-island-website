@@ -1,8 +1,8 @@
 import { IslandApi } from "./IslandApi";
-import { Item } from "./Item";
-import { Node } from "./Node";
+import { ItemApi } from "./ItemApi";
+import { NodeApi } from "./NodeApi";
 import { FeedbackApi } from "./FeedbackApi";
-import { News } from "./News";
+import { NewsApi } from "./NewsApi";
 import { NotificationApi } from "./NotificationApi";
 
 export default class HeroClient {
@@ -10,24 +10,20 @@ export default class HeroClient {
 
   island: IslandApi;
 
-  /** @var {Item} */
-  item;
+  item: ItemApi;
 
-  /** @var {Node} */
-  node;
+  node: NodeApi;
 
-  /** @var {News} */
-  news;
+  news: NewsApi;
 
-  /** @var {Notification} */
-  notification;
+  notification: NotificationApi;
 
   constructor() {
     this.feedback = new FeedbackApi();
     this.island = new IslandApi();
-    this.item = new Item();
-    this.node = new Node();
-    this.news = new News();
+    this.item = new ItemApi();
+    this.node = new NodeApi();
+    this.news = new NewsApi();
     this.notification = new NotificationApi();
   }
 }

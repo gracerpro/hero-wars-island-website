@@ -96,9 +96,6 @@ export class IslandApi {
     return island;
   }
 
-  /**
-   * @returns {Promise<Object|null>}
-   */
   async getList(pageSize: number, pageNumber: number = 1): Promise<ApiList<Island>> {
     const params = new URLSearchParams()
     params.append("pageSize", pageSize.toString())
@@ -110,6 +107,7 @@ export class IslandApi {
     }
 
     const response = await this.apiRequest.get("/islands", params);
+
     let items: Array<Island> = []
     let totalCount = 0
 

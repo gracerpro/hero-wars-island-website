@@ -12,7 +12,7 @@ import {
   STATUS_NOT_SURE,
   TYPE_WOOD,
   TYPE_BUBBLE,
-} from "@/api/Node";
+} from "@/api/NodeApi";
 import { ref, shallowRef, computed, defineAsyncComponent, onMounted, onUnmounted } from "vue";
 import {
   TRANSLATE_X,
@@ -26,7 +26,7 @@ import {
 import { getIconsItems, getDrawedNodes, SIDE } from "./map";
 import { useI18n } from "vue-i18n";
 import IslandMapInfoDialog from "./IslandMapInfoDialog.vue";
-import { GAME_ID_WOOD } from "@/api/Item";
+import { GAME_ID_WOOD } from "@/api/ItemApi";
 
 const { t } = useI18n();
 

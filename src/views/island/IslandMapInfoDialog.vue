@@ -3,8 +3,8 @@ import ModalDialog from "@/components/ModalDialog.vue";
 import { ref, computed } from "vue";
 import { useI18n } from "vue-i18n";
 import { useShow } from "@/components/modal-dialog";
-import { getStatusName, getTypeName } from "@/api/Node";
-import { getLabelsByTypes } from "@/api/Item";
+import { getStatusName, getTypeName } from "@/api/NodeApi";
+import { getLabelsByTypes } from "@/api/ItemApi";
 
 const props = defineProps({
   drawedNode: { type: Object, required: true },
