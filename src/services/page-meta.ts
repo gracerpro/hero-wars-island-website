@@ -1,15 +1,23 @@
-/**
- * @param {Object} info
- * @param {Object|null} ssrContext
- */
-export function setMetaInfo(info, ssrContext) {
+interface PageInfo {
+  title?: string,
+  description?: string,
+  keywords?: string,
+}
+
+interface SsrContext {
+  page: PageInfo
+}
+
+export function setMetaInfo(info: PageInfo, ssrContext?: SsrContext) {
   if (import.meta.env.SSR) {
     if (ssrContext) {
+      /* TODO: where is to read?
+
       ssrContext.page = {
-        title: info.title !== undefined ? info.title : null,
-        description: info.description !== undefined ? info.description : null,
-        keywords: info.keywords !== undefined ? info.keywords : null,
-      };
+        title: info.title ?? null,
+        description: info.description ?? null,
+        keywords: info.keywords ?? null,
+      };*/
     }
   } else {
     if (info.title !== undefined) {
@@ -36,7 +44,7 @@ export function setMetaInfo(info, ssrContext) {
   }
 }
 
-function createMeta(name, content) {
+function createMeta(name: string, content: string) {
   var meta = document.createElement("meta");
   meta.name = name;
   meta.content = content;

@@ -79,17 +79,16 @@ function saveLocale(locale: string) {
   localStorage.setItem("locale", locale);
 }
 
-/**
- * @returns {String|null}
- */
-function getSavedLocale() {
+function getSavedLocale(): string | null {
   if (import.meta.env.SSR) {
     return null;
   }
 
   const locale = localStorage.getItem("locale");
   if (locale !== null) {
-    return isSupportLocale(locale.toLowerCase());
+    if (isSupportLocale(locale.toLowerCase())) {
+      return locale.toLowerCase()
+    }
   }
 
   return null;
@@ -116,7 +115,7 @@ export async function setLanguage(locale: string) {
   }
 }
 
-export function guessDefaultLocale() {
+export function guessDefaultLocale(): string {
   const savedLocale = getSavedLocale();
   if (savedLocale) {
     return savedLocale;
@@ -130,7 +129,7 @@ export function guessDefaultLocale() {
   return getDefaultLocale();
 }
 
-function getUserLocale() {
+function getUserLocale(): string {
   let locale;
 
   if (!import.meta.env.SSR) {

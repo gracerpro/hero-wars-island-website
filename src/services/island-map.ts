@@ -1,4 +1,4 @@
-import { TYPE_BLOCKER, TYPE_START } from "@/api/Node";
+import { TYPE_BLOCKER, TYPE_START, type Node } from "@/api/NodeApi";
 import { useI18n } from "@/i18n";
 
 export const TRANSLATE_X = 20;
@@ -8,12 +8,8 @@ export const EVENT_CHANGE_TRANSLATE = "change-translate";
 export const DELTA_SCALE = 0.5;
 export const EVENT_CHANGE_SCALE = "change-scale";
 
-/**
- * @param {Object} node
- * @returns {Boolean}
- */
-export function canSelectNode(node) {
-  return node.typeId !== TYPE_START && node.typeId != TYPE_BLOCKER;
+export function canSelectNode(node: Node): boolean {
+  return node.type !== TYPE_START && node.type != TYPE_BLOCKER;
 }
 
 /**

@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import HeroClient from "@/api/HeroClient";
 import { fromCurrentDate } from "@/helpers/formatter";
 import { setMetaInfo } from "@/services/page-meta";

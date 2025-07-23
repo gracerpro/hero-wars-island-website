@@ -1,9 +1,9 @@
 export const THEME_LIGHT = "light";
 export const THEME_DARK = "dark";
 
-type Theme = "light" | "dark"
+export type Theme = "light" | "dark"
 
-export function isValidTheme(theme: Theme) {
+export function isValidTheme(theme: string) {
   return theme === THEME_LIGHT || theme === THEME_DARK;
 }
 

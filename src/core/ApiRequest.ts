@@ -25,7 +25,7 @@ class ApiRequest {
 
     let searchParams = "";
 
-    if (params !== undefined) {
+    if (params) {
       searchParams = "?" + params.toString();
     }
     const response = await this.fetch(this.backendUrl + url + searchParams, this.getOptions("GET"));

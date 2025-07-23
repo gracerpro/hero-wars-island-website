@@ -1,11 +1,25 @@
 import { createStore as _createStore } from "vuex";
 
 import { IS_SHOW_MENU_MUTATION, HIDE_GLOBAL_NOTIFY, UPDATE_THEME_MUTATION } from "./mutation-types";
-import { isValidTheme, THEME_LIGHT } from "@/core/theme";
+import { isValidTheme, THEME_LIGHT, type Theme } from "@/core/theme";
 
-let theme = THEME_LIGHT;
+type GlobalNotification = {
+  id: number,
+  hideAt: Date | null,
+}
+type GlobalNotificationsMap = { [key: string]: GlobalNotification }
+type GlobalNotificationData = {
+  id: number,
+  hideAt: string | null,
+}
+type GlobalNotificationsDataMap = { [key: string]: GlobalNotificationData }
+
+let globalNotifications: GlobalNotificationsMap  = {};
+
+let theme: Theme = THEME_LIGHT;
 let isShowMenu = true;
-let globalNotifications = {};
+
+
 
 const IS_SHOW_MENU_NAME = "isShowMenu";
 const NOTIFICATIONS_NAME = "notifications";
@@ -13,22 +27,25 @@ const NAME_THEME = "theme";
 
 if (!import.meta.env.SSR) {
   const localIsShowMenu = localStorage.getItem(getName(IS_SHOW_MENU_NAME)) ?? "1";
-  isShowMenu = localIsShowMenu > 0;
+  isShowMenu = localIsShowMenu === "1";
 
-  theme = localStorage.getItem(getName(NAME_THEME)) ?? THEME_LIGHT;
-  if (!isValidTheme(theme)) {
+  const localTheme = localStorage.getItem(getName(NAME_THEME)) ?? THEME_LIGHT;
+  if (!isValidTheme(localTheme)) {
     theme = THEME_LIGHT;
+  } else {
+    theme = localTheme
   }
 
   const notifactionsJson = localStorage.getItem(getName(NOTIFICATIONS_NAME)) ?? "{}";
   const notifications = JSON.parse(notifactionsJson);
 
   for (const id in notifications) {
-    const notify = notifications[id];
-    if (notify.hideAt) {
-      notify.hideAt = new Date(notify.hideAt);
-    }
-    globalNotifications[id] = notify;
+    const notifyData = notifications[id];
+
+    globalNotifications[id] = {
+      id: parseInt(id),
+      hideAt: notifyData.hideAt ? new Date(notifyData.hideAt) : null,
+    };
   }
 }
 
@@ -41,8 +58,7 @@ export function createStore() {
     },
     getters: {},
     mutations: {
-      /** @param {Boolean} visible */
-      [IS_SHOW_MENU_MUTATION](state, visible) {
+      [IS_SHOW_MENU_MUTATION](state, visible: boolean) {
         state.isShowMenu = visible;
         localStorage.setItem(getName(IS_SHOW_MENU_NAME), visible ? "1" : "0");
       },
@@ -60,7 +76,7 @@ export function createStore() {
       /**
        * @param {String} theme
        */
-      [UPDATE_THEME_MUTATION](state, theme) {
+      [UPDATE_THEME_MUTATION](state, theme: Theme) {
         state.theme = theme;
         localStorage.setItem(getName(NAME_THEME), theme);
       },
@@ -72,11 +88,10 @@ export function createStore() {
 
 /**
  * @param {Object} state
- * @param {Array} notifications
  */
-export function clearGlobalNotifications(state, notifications) {
+export function clearGlobalNotifications(state, notifications: Array<GlobalNotification>) {
   for (const id in state.globalNotifications) {
-    const notification = state.globalNotifications[id];
+    const notification = state.globalNotifications[id] as GlobalNotification;
     const exists = notifications.find((item) => item.id === notification.id);
 
     if (!exists) {
@@ -85,6 +100,7 @@ export function clearGlobalNotifications(state, notifications) {
   }
 
   const itemName = getName(NOTIFICATIONS_NAME);
+
   if (Object.keys(state.globalNotifications).length === 0) {
     localStorage.removeItem(itemName);
   } else {
@@ -93,25 +109,18 @@ export function clearGlobalNotifications(state, notifications) {
   }
 }
 
-/**
- * @param {String} name
- * @returns {String}
- */
-function getName(name) {
+function getName(name: string): string {
   return "global." + name;
 }
 
-/**
- * @param {Object} globalNotifications
- * @returns {Object}
- */
-function getNotificationsData(globalNotifications) {
-  const notifyData = {};
+function getNotificationsData(globalNotifications: Array<GlobalNotification>): GlobalNotificationsDataMap {
+  const notifyData: GlobalNotificationsDataMap = {};
+
   for (const id in globalNotifications) {
     const notify = globalNotifications[id];
     notifyData[id] = {
       id: notify.id,
-      hideAt: notify.hideAt.toISOString(),
+      hideAt: notify.hideAt ? notify.hideAt.toISOString() : null,
     };
   }
 

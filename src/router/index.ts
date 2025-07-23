@@ -1,4 +1,4 @@
-import { createMemoryHistory, createRouter as _createRouter, createWebHistory } from "vue-router";
+import { createMemoryHistory, createRouter as _createRouter, createWebHistory, type Router, type NavigationGuardNext, type RouteLocationNormalizedGeneric, type RouteLocationNormalizedLoadedGeneric } from "vue-router";
 import {
   getCurrentLocale,
   guessDefaultLocale,
@@ -24,7 +24,7 @@ export function createRouter() {
   return router;
 }
 
-function addBeforeEach(router) {
+function addBeforeEach(router: Router) {
   router.beforeEach(async (to, from, next) => {
     if (to.path.length > 1 && to.path.endsWith("/")) {
       const newTo = { ...to };
@@ -60,12 +60,11 @@ function addBeforeEach(router) {
   });
 }
 
-/**
- * @param {Function} next
- * @param {Function} from
- * @param {Object} to
- */
-function callNext(next, to, from) {
+function callNext(
+  next: NavigationGuardNext,
+  to: RouteLocationNormalizedGeneric,
+  from: RouteLocationNormalizedLoadedGeneric
+) {
   if (!import.meta.env.SSR && import.meta.env.VITE_YANDEX_METRIC_ID > 0) {
     window.ym(parseInt(import.meta.env.VITE_YANDEX_METRIC_ID), "hit", to.path, {
       params: {

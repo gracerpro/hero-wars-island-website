@@ -1,8 +1,4 @@
-/**
- * @param {Object} date
- * @returns {String}
- */
-export function formatDate(date) {
+export function formatDate(date: Date): string {
   if (!date) {
     return "";
   }
@@ -10,12 +6,7 @@ export function formatDate(date) {
   return date.toLocaleDateString("ru-RU");
 }
 
-/**
- * @param {Date} date
- * @param {String} locale
- * @returns {String}
- */
-export function fromCurrentDate(date, locale = null) {
+export function fromCurrentDate(date?: Date | null, locale = null): string {
   if (!date) {
     return "";
   }
@@ -31,9 +22,7 @@ export function fromCurrentDate(date, locale = null) {
   return result;
 }
 
-export function getHumanQuantity(quantity) {
-  // max 4 chars
-
+export function getHumanQuantity(quantity: number): string {
   if (quantity >= 1000000) {
     if (quantity % 100000 === 0) {
       return quantity / 1000000 + "M";
@@ -47,15 +36,10 @@ export function getHumanQuantity(quantity) {
     return Math.floor(quantity / 1000) + "K";
   }
 
-  return "" + quantity;
+  return quantity.toString();
 }
 
-/**
- * @param {Number} sizeInBytes
- * @param {Number} precision
- * @return {string}
- */
-export function getHumanSize(sizeInBytes, precision = 2) {
+export function getHumanSize(sizeInBytes: number, precision = 2): string {
   if (sizeInBytes < 1024) {
     return sizeInBytes + " b";
   }

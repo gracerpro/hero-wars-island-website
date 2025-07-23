@@ -1,8 +1,4 @@
-/**
- * @param {String} url
- * @param {String} fileName
- */
-export function download(url, fileName) {
+export function download(url: string, fileName: string) {
   const e = new MouseEvent("click", {
     view: window,
     bubbles: false,
