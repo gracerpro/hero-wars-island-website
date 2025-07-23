@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { useI18n } from "vue-i18n";
 import { ref, computed } from "vue";
 import RowLoading from "@/components/RowLoading.vue";
@@ -10,6 +10,8 @@ import {
   STATUS_CLOSED,
   STATUS_QUEUE,
   getStatusName,
+  type Status,
+  type Feedback
 } from "@/api/FeedbackApi";
 
 const { t } = useI18n();
@@ -17,7 +19,7 @@ const client = new HeroClient();
 
 const loaded = ref(false);
 const loading = ref(false);
-const feedbackItems = ref([]);
+const feedbackItems = ref<Array<Feedback>>([]);
 const feedbackTotalCount = ref(0);
 const errorMessage = ref("");
 const pageSize = 5;
@@ -30,15 +32,15 @@ const isShowNoData = computed(
 
 loadFeedbackItems();
 
-function getStatusClass(status) {
-  let classes = {
+function getStatusClass(status: Status) {
+  const classes = {
     [STATUS_CREATED]: "text-bg-primary",
     [STATUS_ABORT]: "text-bg-danger",
     [STATUS_CLOSED]: "text-bg-success",
     [STATUS_QUEUE]: "text-bg-secondary",
   };
 
-  return classes[status] ? classes[status] : "text-bg-info";
+  return status in classes ? classes[status] : "text-bg-info";
 }
 
 function loadFeedbackItems() {

@@ -1,10 +1,10 @@
-<script setup>
+<script setup lang="ts">
 import ClientOnly from "@/components/ClientOnly.vue";
-import UserError from "@/exceptions/UserError";
+import { UserError } from "@/exceptions/UserError";
 import HeroClient from "@/api/HeroClient";
 import { ref, shallowReactive, onMounted } from "vue";
 import { useI18n } from "vue-i18n";
-import { TYPE_SUCCESS, TYPE_DANGER } from "@/components/ToastMessage.vue";
+import { TYPE_SUCCESS, TYPE_DANGER } from "@/components/toast";
 import { defineAsyncComponent } from "vue";
 
 const { t } = useI18n();

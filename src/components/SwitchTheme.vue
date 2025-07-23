@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { setTheme, THEME_DARK, THEME_LIGHT } from "@/core/theme";
 import { UPDATE_THEME_MUTATION } from "@/store/mutation-types";
 import { computed } from "vue";

@@ -2,6 +2,7 @@ import { createStore as _createStore } from "vuex";
 
 import { IS_SHOW_MENU_MUTATION, HIDE_GLOBAL_NOTIFY, UPDATE_THEME_MUTATION } from "./mutation-types";
 import { isValidTheme, THEME_LIGHT, type Theme } from "@/core/theme";
+import type { Notification } from "@/api/NotificationApi";
 
 export type GlobalNotification = {
   id: number,
@@ -90,9 +91,9 @@ export function createStore() {
   });
 }
 
-export function clearGlobalNotifications(state: AppState, notifications: Array<GlobalNotification>) {
+export function clearGlobalNotifications(state: AppState, notifications: Array<Notification>) {
   for (const id in state.globalNotifications) {
-    const notification = state.globalNotifications[id] as GlobalNotification;
+    const notification = state.globalNotifications[id];
     const exists = notifications.find((item) => item.id === notification.id);
 
     if (!exists) {

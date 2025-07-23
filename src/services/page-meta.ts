@@ -1,23 +1,23 @@
+import type { SSRContext } from "@vue/server-renderer";
+
 interface PageInfo {
   title?: string,
   description?: string,
   keywords?: string,
 }
 
-interface SsrContext {
+interface AppSsrContext {
   page: PageInfo
 }
 
-export function setMetaInfo(info: PageInfo, ssrContext?: SsrContext) {
+export function setMetaInfo(info: PageInfo, ssrContext?: SSRContext) {
   if (import.meta.env.SSR) {
     if (ssrContext) {
-      /* TODO: where is to read?
-
       ssrContext.page = {
         title: info.title ?? null,
         description: info.description ?? null,
         keywords: info.keywords ?? null,
-      };*/
+      };
     }
   } else {
     if (info.title !== undefined) {

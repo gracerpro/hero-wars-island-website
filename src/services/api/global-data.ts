@@ -11,5 +11,5 @@ export async function loadGlobalData(): Promise<GlobalData> {
 
   return {
     notifications: notificationList.items,
-  };
+  }
 }

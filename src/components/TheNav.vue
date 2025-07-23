@@ -7,12 +7,13 @@ import { createI18nRouteTo } from "@/i18n/translation";
 import { useStore } from "vuex";
 import SwitchTheme from "./SwitchTheme.vue";
 import { IS_SHOW_MENU_MUTATION } from "@/store/mutation-types";
+import { type Island } from "@/api/IslandApi";
 
 const { t } = useI18n();
 const store = useStore();
 
-const actualIsland = ref(null);
-const navbarNav = ref(null);
+const actualIsland = ref<Island | null>(null);
+const navbarNav = ref<HTMLElement | null>(null);
 
 onMounted(() => {
   const client = new HeroClient();
@@ -23,10 +24,10 @@ onMounted(() => {
 
   if (!import.meta.env.SSR) {
     import("bootstrap").then(({ Collapse }) => {
-      navbarNav.value.addEventListener("hide.bs.collapse", () => {
+      (navbarNav.value as HTMLElement).addEventListener("hide.bs.collapse", () => {
         store.commit(IS_SHOW_MENU_MUTATION, false);
       });
-      navbarNav.value.addEventListener("show.bs.collapse", () => {
+      (navbarNav.value as HTMLElement).addEventListener("show.bs.collapse", () => {
         store.commit(IS_SHOW_MENU_MUTATION, true);
       });
 

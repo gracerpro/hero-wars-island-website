@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { setMetaInfo } from "@/services/page-meta";
 import ContactForm from "./contact/ContactForm.vue";
 import ContactList from "./contact/ContactList.vue";
@@ -6,7 +6,7 @@ import { useI18n } from "vue-i18n";
 import { useSSRContext } from "vue";
 
 const { t } = useI18n();
-const ssrContext = import.meta.env.SSR ? useSSRContext() : null;
+const ssrContext = import.meta.env.SSR ? useSSRContext() : undefined;
 
 setMetaInfo(
   {

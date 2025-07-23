@@ -12,7 +12,7 @@ export const STATUS_QUEUE = "queue";
 
 export type Status = "created" | "in_process" | "moderated" | "abort" | "closed" | "queue"
 
-interface Feedback {
+export interface Feedback {
   id: number,
   createdAt: Date,
   status: Status,

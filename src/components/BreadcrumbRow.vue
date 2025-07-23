@@ -1,7 +1,13 @@
-<script setup>
-defineProps({
-  links: { type: Array, default: () => [] },
-});
+<script setup lang="ts">
+import { type IBreadcrumbItem } from './breadcrumbs';
+
+interface Props {
+  links: Array<IBreadcrumbItem>
+}
+
+withDefaults(defineProps<Props>(), {
+  links: () => []
+})
 </script>
 
 <template>
@@ -14,7 +20,7 @@ defineProps({
         v-for="(link, i) in links"
         :key="i"
         :class="['breadcrumb-item', link.isActive ? 'active' : '']"
-        :aria-current="link.isActive ? 'page' : null"
+        :aria-current="link.isActive ? 'page' : undefined"
       >
         <router-link
           v-if="link.url"

@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { setMetaInfo } from "@/services/page-meta";
 import { useI18n } from "vue-i18n";
 import { createI18nRouteTo } from "@/i18n/translation";
@@ -7,7 +7,7 @@ import { getHumanSize } from "@/helpers/formatter";
 import { getIndexedDbSize, getLocalStorageSize } from "@/core/storage";
 
 const { t } = useI18n();
-const ssrContext = import.meta.env.SSR ? useSSRContext() : null;
+const ssrContext = import.meta.env.SSR ? useSSRContext() : undefined;
 const version = import.meta.env.VITE_VERSION;
 
 setMetaInfo(

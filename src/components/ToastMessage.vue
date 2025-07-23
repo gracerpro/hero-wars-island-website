@@ -1,22 +1,19 @@
-<script>
-export const TYPE_SUCCESS = "success";
-export const TYPE_DANGER = "danger";
-</script>
-<script setup>
+<script setup lang="ts">
 import { ref, computed } from "vue";
+import { type ToastType, TYPE_DANGER, TYPE_SUCCESS } from "./toast";
 
-let Toast;
+let Toast
 
 if (!import.meta.env.SSR) {
   import("bootstrap").then((module) => (Toast = module.Toast));
 }
 
-const props = defineProps({
-  elementId: { type: String, required: true },
-});
+const props = defineProps<{
+  elementId: string
+}>()
 
 const toastMessage = ref("");
-const toastType = ref(TYPE_SUCCESS);
+const toastType = ref<ToastType>(TYPE_SUCCESS);
 const isShow = ref(false);
 
 const classType = computed(() => {
@@ -33,13 +30,14 @@ const classType = computed(() => {
  * @param {String} message
  * @param {String|null} type
  */
-function show(message, type) {
+function show(message: string, type?: ToastType) {
   toastMessage.value = message;
+
   if (type) {
     toastType.value = type;
   }
 
-  const element = document.getElementById(props.elementId);
+  const element = document.getElementById(props.elementId) as HTMLElement;
   element.addEventListener("hide.bs.toast", () => (isShow.value = false), {
     once: true,
   });
