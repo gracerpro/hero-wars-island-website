@@ -1,15 +1,16 @@
 import HeroClient from "@/api/HeroClient";
+import type { Island } from "@/api/IslandApi";
 import { INDEXED_DB_NAME } from "@/core/storage";
 import { isObject } from "@/helpers/core";
+
+type DateByIslandMap = { [key: number]: string }
 
 const client = new HeroClient();
 
 /**
- * @param {Object} island
- * @param {Boolean} isForce
  * @returns {Promise<Object>}
  */
-export async function getNodesMap(island, isForce = false, filter = null) {
+export async function getNodesMap(island: Island, isForce = false, filter = null) {
   let nodesMap = null;
   const isEmptyFilter = !filter || Object.keys(filter).length === 0;
   const previosUpdatedAt = loadPreviousUpdatedAt(island);
@@ -21,7 +22,7 @@ export async function getNodesMap(island, isForce = false, filter = null) {
       nodesMap = await getNodesFromCache(island);
     }
   } catch (error) {
-    console.error(error);
+    console.error(error); // TODO: notify
   }
 
   if (nodesMap === null || nodesMap === undefined) {
@@ -47,15 +48,11 @@ export function resetCache() {
   localStorage.setItem(PREVIOUS_DATES_NAME, JSON.stringify({}));
 }
 
-/**
- * @param {Object} island
- * @returns Date|null
- */
-function loadPreviousUpdatedAt(island) {
-  let datesByIsland;
+function loadPreviousUpdatedAt(island: Island): Date | null {
+  let datesByIsland: DateByIslandMap = {};
 
   try {
-    datesByIsland = JSON.parse(localStorage.getItem(PREVIOUS_DATES_NAME));
+    datesByIsland = JSON.parse(localStorage.getItem(PREVIOUS_DATES_NAME) ?? "");
     if (!isObject(datesByIsland)) {
       datesByIsland = {};
     }
@@ -71,16 +68,18 @@ function loadPreviousUpdatedAt(island) {
   return null;
 }
 
-/**
- * @param {Object} island
- */
-function savePreviousUpdatedAt(island) {
-  let datesByIsland;
+function savePreviousUpdatedAt(island: Island) {
+  let datesByIsland: DateByIslandMap = {};
 
   try {
-    datesByIsland = JSON.parse(localStorage.getItem(PREVIOUS_DATES_NAME));
-    if (!isObject(datesByIsland)) {
-      datesByIsland = {};
+    const item = localStorage.getItem(PREVIOUS_DATES_NAME)
+
+    if (item !== null) {
+      datesByIsland = JSON.parse(item);
+
+      if (!isObject(datesByIsland)) {
+        datesByIsland = {};
+      }
     }
   } catch {
     datesByIsland = {};
@@ -114,10 +113,9 @@ async function writeNodesToCache(island, nodesMap) {
 }
 
 /**
- * @param {Object} island
  * @returns {Promise|null}
  */
-async function getNodesFromCache(island) {
+async function getNodesFromCache(island: Island) {
   const db = await openDb();
 
   return new Promise((resolve, reject) => {
@@ -135,7 +133,7 @@ async function getNodesFromCache(island) {
   });
 }
 
-async function openDb() {
+async function openDb(): Promise<IDBDatabase> {
   return new Promise((resolve, reject) => {
     const openRequest = window.indexedDB.open(INDEXED_DB_NAME);
 

@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { setLanguage, getLocalesLabels, getCurrentLocale } from "@/i18n/translation";
 import { computed } from "vue";
 import { useRouter } from "vue-router";

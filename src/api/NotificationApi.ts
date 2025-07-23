@@ -5,7 +5,7 @@ import { ApiList } from "./common"
 export interface Notification {
   id: number,
   createdAt: Date,
-  contentUpdatedAt: Date | null,
+  contentUpdatedAt: Date,
   content: string,
 }
 

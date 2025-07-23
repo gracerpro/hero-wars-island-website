@@ -1,19 +1,27 @@
-<script setup>
+<script setup lang="ts">
+import { type Notification } from "@/api/NotificationApi";
+import { type GlobalNotificationsMap } from "@/store";
 import { HIDE_GLOBAL_NOTIFY } from "@/store/mutation-types";
 import { computed } from "vue";
-import { useStore } from "vuex";
+import { useStore } from "vuex/types/index.js";
 
-const props = defineProps({
-  notifications: { type: Array, required: true },
-});
+interface VisibleNotification {
+  id: number,
+  content: string,
+}
+
+const props = defineProps<{
+  notifications: Array<Notification>
+}>()
 
 const store = useStore();
 
-const visibleNotifications = computed(() => {
-  const notifications = [];
+const visibleNotifications = computed<Array<VisibleNotification>>(() => {
+  const notifications: Array<VisibleNotification> = [];
+  const globalNotifications = store.state.globalNotifications as GlobalNotificationsMap
 
   props.notifications.forEach((notification) => {
-    const notify = store.state.globalNotifications[notification.id];
+    const notify = globalNotifications[notification.id];
 
     if (!notify || !notify.hideAt || notification.contentUpdatedAt > notify.hideAt) {
       notifications.push({
@@ -26,10 +34,7 @@ const visibleNotifications = computed(() => {
   return notifications;
 });
 
-/**
- * @param {Object} notification
- */
-function onHide(notification) {
+function onHide(notification: VisibleNotification) {
   store.commit(HIDE_GLOBAL_NOTIFY, { id: notification.id });
 }
 </script>

@@ -3,22 +3,32 @@ import { createStore as _createStore } from "vuex";
 import { IS_SHOW_MENU_MUTATION, HIDE_GLOBAL_NOTIFY, UPDATE_THEME_MUTATION } from "./mutation-types";
 import { isValidTheme, THEME_LIGHT, type Theme } from "@/core/theme";
 
-type GlobalNotification = {
+export type GlobalNotification = {
   id: number,
   hideAt: Date | null,
 }
-type GlobalNotificationsMap = { [key: string]: GlobalNotification }
+export type GlobalNotificationsMap = { [key: string]: GlobalNotification }
+
 type GlobalNotificationData = {
   id: number,
   hideAt: string | null,
 }
 type GlobalNotificationsDataMap = { [key: string]: GlobalNotificationData }
 
+interface NotificationPayload {
+  id: number
+}
+
+interface AppState {
+  isShowMenu: boolean,
+  globalNotifications: GlobalNotificationsMap,
+  theme: Theme,
+}
+
 let globalNotifications: GlobalNotificationsMap  = {};
 
 let theme: Theme = THEME_LIGHT;
 let isShowMenu = true;
-
 
 
 const IS_SHOW_MENU_NAME = "isShowMenu";
@@ -58,14 +68,11 @@ export function createStore() {
     },
     getters: {},
     mutations: {
-      [IS_SHOW_MENU_MUTATION](state, visible: boolean) {
+      [IS_SHOW_MENU_MUTATION](state: AppState, visible: boolean) {
         state.isShowMenu = visible;
         localStorage.setItem(getName(IS_SHOW_MENU_NAME), visible ? "1" : "0");
       },
-      /**
-       * @param {Object} payload
-       */
-      [HIDE_GLOBAL_NOTIFY](state, payload) {
+      [HIDE_GLOBAL_NOTIFY](state: AppState, payload: NotificationPayload) {
         state.globalNotifications[payload.id] = {
           id: payload.id,
           hideAt: new Date(),
@@ -73,10 +80,7 @@ export function createStore() {
         const notifyData = getNotificationsData(state.globalNotifications);
         localStorage.setItem(getName(NOTIFICATIONS_NAME), JSON.stringify(notifyData));
       },
-      /**
-       * @param {String} theme
-       */
-      [UPDATE_THEME_MUTATION](state, theme: Theme) {
+      [UPDATE_THEME_MUTATION](state: AppState, theme: Theme) {
         state.theme = theme;
         localStorage.setItem(getName(NAME_THEME), theme);
       },
@@ -86,10 +90,7 @@ export function createStore() {
   });
 }
 
-/**
- * @param {Object} state
- */
-export function clearGlobalNotifications(state, notifications: Array<GlobalNotification>) {
+export function clearGlobalNotifications(state: AppState, notifications: Array<GlobalNotification>) {
   for (const id in state.globalNotifications) {
     const notification = state.globalNotifications[id] as GlobalNotification;
     const exists = notifications.find((item) => item.id === notification.id);
@@ -113,7 +114,7 @@ function getName(name: string): string {
   return "global." + name;
 }
 
-function getNotificationsData(globalNotifications: Array<GlobalNotification>): GlobalNotificationsDataMap {
+function getNotificationsData(globalNotifications: GlobalNotificationsMap): GlobalNotificationsDataMap {
   const notifyData: GlobalNotificationsDataMap = {};
 
   for (const id in globalNotifications) {

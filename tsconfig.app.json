@@ -11,6 +11,8 @@
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true,
 
+    "isolatedModules": true,
+
     "paths": {
       "@/*": ["./src/*"],
     },
