@@ -1,5 +1,6 @@
 import HeroClient from "@/api/HeroClient";
 import type { Island } from "@/api/IslandApi";
+import type { NodeFilter } from "@/api/NodeApi";
 import { INDEXED_DB_NAME } from "@/core/storage";
 import { isObject } from "@/helpers/core";
 
@@ -7,12 +8,9 @@ type DateByIslandMap = { [key: number]: string }
 
 const client = new HeroClient();
 
-/**
- * @returns {Promise<Object>}
- */
-export async function getNodesMap(island: Island, isForce = false, filter = null) {
+export async function getNodesMap(island: Island, isForce = false, filter?: NodeFilter) {
   let nodesMap = null;
-  const isEmptyFilter = !filter || Object.keys(filter).length === 0;
+  const isEmptyFilter = filter === undefined /* TODO: or all fields is undefined */;
   const previosUpdatedAt = loadPreviousUpdatedAt(island);
   const isLoadFromServer =
     !previosUpdatedAt || previosUpdatedAt < island.nodesLastUpdatedAt || isForce || !isEmptyFilter;

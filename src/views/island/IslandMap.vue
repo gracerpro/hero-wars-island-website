@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import IslandMapLoading from "./IslandMapLoading.vue";
 import IslandMapToolbar from "./IslandMapToolbar.vue";
 import IslandMapSteps from "./IslandMapSteps.vue";
@@ -11,17 +11,47 @@ import { onMounted, onUnmounted, ref, computed, shallowReactive } from "vue";
 import { getHumanQuantity } from "@/helpers/formatter";
 import { useI18n } from "vue-i18n";
 import { fullscreenElement } from "@/core/fullscreen";
-import { TYPE_CHEST, TYPE_TOWER } from "@/api/NodeApi";
+import { TYPE_CHEST, TYPE_TOWER, type NodeFilter } from "@/api/NodeApi";
 import { isObject } from "@/helpers/core";
 import { getNodesMap } from "@/services/api/island-node";
 import { SELECT_MODE_DISABLE, SELECT_MODE_GOING, SELECT_MODE_PLAN } from "./select-mode";
+import type { SelectMode } from "./select-mode";
 import { shallowRef } from "vue";
-import UserError from "@/exceptions/UserError";
+import { UserError } from "@/exceptions/UserError";
+import type { Island } from "@/api/IslandApi";
+import type { UserNodeIdsMap } from "./map";
 
-const props = defineProps({
-  island: { type: Object, required: true },
-  parentPageId: { type: String, required: true },
-});
+const props = defineProps<{
+  island: Island,
+  parentPageId: string,
+}>();
+
+interface Filter {
+  itemName?: string,
+  typeId?: number | null,
+  isNodeTypeTower?: boolean,
+  isNodeTypeChest?: boolean,
+}
+
+type IslandState = {
+  scale: number,
+  translateX: number,
+  translateY: number,
+  regionNumbers: Array<number>,
+  userNodesIds: Array<number>,
+  userNodesGoingIds: Array<number>,
+  disableNodesIds: Array<number>,
+}
+type ByIslandState = {[key: number]: IslandState}
+type State = {
+  byIsland: ByIslandState,
+  filter: Filter,
+  isShowQuantity: boolean,
+  isSelectAnyNode: boolean,
+  isShowGroupRewards: boolean,
+  isShowRewardsBlock: boolean,
+  isShowUserRewardsBlock: boolean,
+};
 
 const { t } = useI18n();
 
@@ -32,37 +62,37 @@ const componentId = props.parentPageId + "__map";
 
 const calculatingRewards = ref(false);
 const errorMessage = ref("");
-const regionNumbers = ref([]);
+const regionNumbers = ref<Array<number>>([]);
 
-const loadingNodes = ref(true);
+const isLoadingNodes = ref(true);
 const nodes = ref({});
 const rewards = ref([]);
-const userNodesIdsMap = ref({});
-const userNodesGoingIdsMap = ref({});
-const disableNodesIdsMap = ref({});
+const userNodesIdsMap = ref<UserNodeIdsMap>({});
+const userNodesGoingIdsMap = ref<UserNodeIdsMap>({});
+const disableNodesIdsMap = ref<UserNodeIdsMap>({});
 
 const scale = ref(1);
 const translateX = ref(0);
 const translateY = ref(0);
 
 const isSelectAnyNode = ref(true);
-const selectMode = ref(SELECT_MODE_PLAN);
+const selectMode = ref<SelectMode>(SELECT_MODE_PLAN);
 const isShowQuantity = ref(true);
 const isShowGroupRewards = ref(false);
 const isShowRewardsBlock = ref(true);
 const isShowUserRewardsBlock = ref(true);
-const filter = shallowReactive({
+const filter = shallowReactive<Filter>({
   itemName: "",
   typeId: null,
   isNodeTypeTower: false,
   isNodeTypeChest: false,
 });
 
-const mapContainerRef = ref(null);
-const downloadDialog = ref(null);
-const downloadDialogComponent = shallowRef(null);
+const mapContainerRef = ref<HTMLElement|null>(null);
+const downloadDialog = ref<HTMLElement|null>(null);
+const downloadDialogComponent = shallowRef<IslandMapDownloadDialog|null>(null);
 
-const loading = computed(() => loadingNodes.value || calculatingRewards.value);
+const loading = computed(() => isLoadingNodes.value || calculatingRewards.value);
 
 const visibleRewards = computed(() => {
   let resultRewards = rewards.value.filter((reward) => {
@@ -77,11 +107,12 @@ const visibleRewards = computed(() => {
       return item.item.name.toLowerCase().includes(filter.itemName.toLowerCase());
     });
   }
-  if (filter.typeId > 0) {
+  if (filter.typeId !== null && filter.typeId > 0) {
     resultRewards = resultRewards.filter((item) => item.item.typeId === filter.typeId);
   }
   if (filter.isNodeTypeChest || filter.isNodeTypeTower) {
     const typeMap = {};
+
     if (filter.isNodeTypeChest) {
       typeMap[TYPE_CHEST] = true;
     }
@@ -159,12 +190,9 @@ function onBeforeUnload(event) {
   return "";
 }
 
-/**
- * @param {Boolean} isForce
- */
-async function loadNodes(isForce) {
+async function loadNodes(isForce: boolean) {
   let nodes = {};
-  let filter = {};
+  let filter: NodeFilter = {};
 
   const visibleRegions = props.island.regions
     ? props.island.regions.filter((region) => region.isVisible)
@@ -175,7 +203,7 @@ async function loadNodes(isForce) {
     filter.regionNumbers = regionNumbers.value;
   }
 
-  loadingNodes.value = true;
+  isLoadingNodes.value = true;
   try {
     nodes = await getNodesMap(props.island, isForce, filter);
   } catch (error) {
@@ -186,7 +214,7 @@ async function loadNodes(isForce) {
       throw error;
     }
   } finally {
-    loadingNodes.value = false;
+    isLoadingNodes.value = false;
   }
 
   return nodes;
@@ -397,7 +425,7 @@ function onResetRegionNumbers() {
   reloadMap();
 }
 
-function onChangeRegionNumbers(newNumbers) {
+function onChangeRegionNumbers(newNumbers: Array<number>) {
   regionNumbers.value = newNumbers;
   const isFullIsland = newNumbers.length === 0;
   const isForse = isFullIsland ? false : true;
@@ -406,18 +434,25 @@ function onChangeRegionNumbers(newNumbers) {
 }
 
 function loadState() {
-  let state;
+  let state: State | null = null
 
   try {
-    state = JSON.parse(localStorage.getItem(componentId));
+    const item = localStorage.getItem(componentId)
+
+    if (item !== null) {
+      state = JSON.parse(item);
+    }
   } catch (error) {
     console.error(error);
+    state = null
   }
 
-  if (!state) {
+  if (state === null) {
     state = {
       byIsland: {},
-      filter: {},
+      filter: {
+
+      },
     };
   }
   if (!state.filter) {
@@ -492,6 +527,11 @@ function loadState() {
     state.isShowGroupRewards === undefined ? false : state.isShowGroupRewards;
 
   isSelectAnyNode.value = typeof state.isSelectAnyNode === "boolean" ? state.isSelectAnyNode : true;
+
+
+  state = {
+    
+  }
 }
 
 function saveState() {

@@ -1,9 +1,11 @@
-import { isCommonStep } from "@/api/Node";
+import { isCommonStep } from "@/api/NodeApi";
 
 export const SIDE = 50;
 const HALF_SIDE = SIDE / 2;
 const HEIGHT = 34;
 const IMAGE_SIDE = 24;
+
+export type UserNodeIdsMap = { [key: number]: boolean }
 
 /**
  * @param {Object} nodes

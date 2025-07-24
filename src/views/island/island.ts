@@ -4,11 +4,7 @@ import { useI18n } from "@/i18n";
 
 const { t } = useI18n();
 
-/**
- * @param {Object} region
- * @returns {String}
- */
-export function getRegionTitle(region: Region) {
+export function getRegionTitle(region: Region): string {
   if (!region.isVisible) {
     return t("common.partTemporalyUnavailable");
   }
