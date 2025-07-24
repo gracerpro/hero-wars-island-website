@@ -2,14 +2,14 @@
 const EVENT_FIND = "find";
 const EVENT_UPDATE_NAME = "update:name";
 </script>
-<script setup>
+<script setup lang="ts">
 import { useI18n } from "vue-i18n";
 import { filterNameMinCharsCount } from "../news";
 
-defineProps({
-  loading: { type: Boolean, required: true },
-  name: { type: String, required: true },
-});
+defineProps<{
+  loading: boolean,
+  name: string,
+}>();
 const emit = defineEmits([EVENT_FIND, EVENT_UPDATE_NAME]);
 
 const { t } = useI18n();

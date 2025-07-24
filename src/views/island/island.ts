@@ -1,3 +1,4 @@
+import type { Region } from "@/api/IslandApi";
 import { fromCurrentDate } from "@/helpers/formatter";
 import { useI18n } from "@/i18n";
 
@@ -7,7 +8,7 @@ const { t } = useI18n();
  * @param {Object} region
  * @returns {String}
  */
-export function getRegionTitle(region) {
+export function getRegionTitle(region: Region) {
   if (!region.isVisible) {
     return t("common.partTemporalyUnavailable");
   }

@@ -6,11 +6,7 @@ export function formatDate(date: Date): string {
   return date.toLocaleDateString("ru-RU");
 }
 
-export function fromCurrentDate(date?: Date | null, locale = null): string {
-  if (!date) {
-    return "";
-  }
-
+export function fromCurrentDate(date: Date, locale?: string): string {
   const now = new Date();
   let result =
     date.getDate() + " " + date.toLocaleString(locale ? locale : "default", { month: "short" });

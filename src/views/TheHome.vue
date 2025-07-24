@@ -8,21 +8,23 @@ import { createI18nRouteTo } from "@/i18n/translation";
 import { useRoute } from "vue-router";
 import { useSSRContext } from "vue";
 import { getRegionTitle } from "./island/island";
+import type { OneNews } from "@/api/NewsApi";
+import type { Island } from "@/api/IslandApi";
 
 const visibleNewsMax = 5;
 
 const { t, locale } = useI18n();
 const route = useRoute();
-const ssrContext = import.meta.env.SSR ? useSSRContext() : null;
+const ssrContext = import.meta.env.SSR ? useSSRContext() : undefined;
 
 const client = new HeroClient();
 const now = new Date();
 
-const news = ref([]);
+const news = ref<Array<OneNews>>([]);
 const newsLoading = ref(true);
 const newsTotalCount = ref(0);
 
-const islands = ref([]);
+const islands = ref<Array<Island>>([]);
 const islandsLoading = ref(true);
 const errorMessage = ref("");
 
@@ -77,11 +79,11 @@ function loadNews() {
     .finally(() => (newsLoading.value = false));
 }
 
-function isActual(island) {
+function isActual(island: Island) {
   return island.eventEndAt > now;
 }
 
-function getIslandHint(island) {
+function getIslandHint(island: Island) {
   let result = "";
 
   if (island.eventEndAt < now) {
@@ -90,7 +92,7 @@ function getIslandHint(island) {
       dateTo: fromCurrentDate(island.eventEndAt, locale.value),
     });
   } else {
-    const toEndHours = (island.eventEndAt - now) / 1000 / 60 / 60;
+    const toEndHours = (island.eventEndAt.getTime() - now.getTime()) / 1000 / 60 / 60;
 
     if (toEndHours >= 24) {
       result = t("page.home.toDateDaysCount", {
@@ -98,7 +100,7 @@ function getIslandHint(island) {
         daysCount: Math.ceil(toEndHours / 24),
       });
     } else if (toEndHours < 1) {
-      const toEndMinutes = ((island.eventEndAt - now) / 1000 / 60) % 60;
+      const toEndMinutes = ((island.eventEndAt.getTime() - now.getTime()) / 1000 / 60) % 60;
       result = t("page.home.toDateMinutesCount", {
         toDate: fromCurrentDate(island.eventEndAt, locale.value),
         minutesCount: Math.ceil(toEndMinutes),

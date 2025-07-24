@@ -1,39 +1,34 @@
-<script setup>
+<script setup lang="ts">
 import HeroClient from "@/api/HeroClient";
 import RowLoading from "@/components/RowLoading.vue";
 import BreadcrumbRow from "@/components/BreadcrumbRow.vue";
 import { computed, onServerPrefetch, ref, watch } from "vue";
 import { useRoute } from "vue-router";
 import { fromCurrentDate } from "@/helpers/formatter";
-import HttpError from "@/exceptions/HttpError";
+import { HttpError } from "@/exceptions/HttpError";
 import { useI18n } from "vue-i18n";
 import { setMetaInfo } from "@/services/page-meta";
 import { useSSRContext } from "vue";
+import { type OneNews } from "@/api/NewsApi";
+import { type IBreadcrumbItem } from "@/components/breadcrumbs";
 
 const { t, locale } = useI18n();
 const route = useRoute();
-const ssrContext = import.meta.env.SSR ? useSSRContext() : null;
+const ssrContext = import.meta.env.SSR ? useSSRContext() : undefined;
 
-const slug = route.params.slug;
+const slug = route.params.slug as string;
 
 const client = new HeroClient();
 
 const errorMessage = ref("");
 const loading = ref(true);
-const oneNews = ref({
-  id: null,
-  createdAt: null,
-  updatedAt: null,
-  slug: "",
-  name: "",
-  content: "",
-});
+const oneNews = ref<OneNews|null>(null);
 
-const breadcrumbs = computed(() => {
+const breadcrumbs = computed<Array<IBreadcrumbItem>>(() => {
   return [
     { label: t("common.news"), url: "/news" },
-    { label: oneNews.value.name, isActive: true },
-  ];
+    { label: oneNews.value ? oneNews.value.name : "", isActive: true }
+  ]
 });
 
 watch(
@@ -44,7 +39,7 @@ watch(
 );
 
 onServerPrefetch(async () => {
-  return loadOneNews(slug);
+  return loadOneNews();
 });
 
 setDefaultPageInfo();
@@ -72,10 +67,7 @@ async function loadOneNews() {
   return oneNews.value;
 }
 
-/**
- * @param {Object|null} oneNews
- */
-function setPageInfo(oneNews) {
+function setPageInfo(oneNews: OneNews|null) {
   if (oneNews) {
     setMetaInfo(
       {
@@ -121,7 +113,7 @@ function setDefaultPageInfo() {
     >
       {{ errorMessage }}
     </div>
-    <div v-else>
+    <div v-else-if="oneNews">
       <h1>{{ oneNews.name }}</h1>
       <div class="fst-italic">{{ fromCurrentDate(oneNews.createdAt, locale) }}</div>
 

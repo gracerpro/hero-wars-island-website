@@ -2,14 +2,14 @@ import { getCurrentLocale } from "@/i18n/translation";
 import ApiRequest from "../core/ApiRequest";
 import { ApiList } from "./common";
 
-interface Image {
+export interface Image {
   url: string,
   width: number,
   height: number,
   size: number,
 }
 
-interface Region {
+export interface Region {
   number: number,
   startAt: Date | null,
   isVisible: boolean,

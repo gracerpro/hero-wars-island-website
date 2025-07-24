@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { useI18n } from "vue-i18n";
 import { ref, watch } from "vue";
 import RowLoading from "@/components/RowLoading.vue";
@@ -10,21 +10,26 @@ import { fromCurrentDate } from "@/helpers/formatter";
 import { useRoute } from "vue-router";
 import { filterNameMinCharsCount } from "./news";
 import NewsFilterForm from "./news/NewsFilterForm.vue";
+import type { NewsFilter, OneNews } from "@/api/NewsApi";
+
+interface Filter {
+  name: string
+}
 
 const { t, locale } = useI18n();
-const ssrContext = import.meta.env.SSR ? useSSRContext() : null;
+const ssrContext = import.meta.env.SSR ? useSSRContext() : undefined;
 const route = useRoute();
 
 const PAGE_SIZE = 6;
 
 const client = new HeroClient();
 
-const news = ref([]);
+const news = ref<Array<OneNews>>([]);
 const visibleCount = ref(0);
 const totalCount = ref(0);
 const loading = ref(true);
 const pageNumber = ref(1);
-const filter = ref({
+const filter = ref<Filter>({
   name: "",
 });
 
@@ -64,7 +69,7 @@ function showMore() {
 function loadNews() {
   loading.value = true;
 
-  let requestFilter = {};
+  let requestFilter: NewsFilter = {}
 
   if (filter.value.name.length >= filterNameMinCharsCount) {
     requestFilter.name = filter.value.name;

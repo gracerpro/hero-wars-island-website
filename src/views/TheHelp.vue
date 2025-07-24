@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { getCurrentLocale, isShowLocaleInRoute } from "@/i18n/translation";
 import { setMetaInfo } from "@/services/page-meta";
 import { computed } from "vue";
@@ -6,7 +6,7 @@ import { useSSRContext } from "vue";
 import { useI18n } from "vue-i18n";
 
 const { t } = useI18n();
-const ssrContext = import.meta.env.SSR ? useSSRContext() : null;
+const ssrContext = import.meta.env.SSR ? useSSRContext() : undefined;
 
 const currentLocale = computed(() => {
   const locale = getCurrentLocale();

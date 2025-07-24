@@ -4,9 +4,15 @@ import { ApiList } from "./common";
 
 export interface OneNews {
   id: number,
+  slug: string,
   name: string,
   createdAt: Date,
   updatedAt: Date,
+  snippet: string,
+  content?: string,
+  pageTitle?: string,
+  pageDescription?: string,
+  pageKeywords?: string,
 }
 
 export type NewsFilter = {
@@ -70,9 +76,11 @@ export class NewsApi {
   private modifyOneNews(response: any): OneNews {
     return {
       id: response.id,
+      slug: response.slug,
       name: response.name,
       createdAt: new Date(response.createdAt),
       updatedAt: new Date(response.updatedAt),
+      snippet: response.snippet,
     }
   }
 }

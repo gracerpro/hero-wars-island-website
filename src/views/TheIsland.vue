@@ -1,26 +1,27 @@
-<script setup>
+<script setup lang="ts">
 import HeroClient from "@/api/HeroClient";
 import IslandMap from "./island/IslandMap.vue";
 import RowLoading from "@/components/RowLoading.vue";
-import HttpError from "@/exceptions/HttpError";
+import { HttpError } from "@/exceptions/HttpError";
 import { setMetaInfo } from "@/services/page-meta";
 import { ref, watch, onMounted, onServerPrefetch, computed } from "vue";
 import { useRoute } from "vue-router";
 import { useI18n } from "vue-i18n";
 import { useSSRContext } from "vue";
+import type { Island } from "@/api/IslandApi";
 
 const { t } = useI18n();
 const route = useRoute();
-const ssrContext = import.meta.env.SSR ? useSSRContext() : null;
+const ssrContext = import.meta.env.SSR ? useSSRContext() : undefined;
 
-const currentIsland = ref(null);
+const currentIsland = ref<Island | null>(null);
 const islandLoading = ref(true);
 const errorMessage = ref("");
 
 const islandName = computed(() => currentIsland.value?.name);
 const islandDescription = computed(() => currentIsland.value?.description);
 
-const islandId = parseInt(route.params.id);
+const islandId = parseInt(route.params.id as string);
 
 onServerPrefetch(async () => {
   return loadIsland(islandId);
@@ -30,8 +31,8 @@ onMounted(() => {
   watch(
     () => route.params.id,
     (newId) => {
-      const id = queryId(newId);
-      if (id) {
+      const id = queryId(newId as string);
+      if (id > 0) {
         loadIsland(id);
       }
     }
@@ -48,7 +49,7 @@ onMounted(() => {
   loadIsland(islandId);
 });
 
-function setPageInfo(island) {
+function setPageInfo(island: Island | null) {
   const defaultTitle = t("common.islandMap");
 
   if (island) {
@@ -72,25 +73,18 @@ function setPageInfo(island) {
   }
 }
 
-/**
- * @param {String} sourceId
- * @returns {Number|null}
- */
-function queryId(sourceId) {
+function queryId(sourceId: string): number {
   let intId = parseInt(sourceId);
 
-  if (intId != sourceId) {
+  if (Number.isNaN(intId)) {
     errorMessage.value = t("page.island.islandNotFound");
-    intId = null;
+    intId = 0;
   }
 
   return intId;
 }
 
-/**
- * @param {Number} id
- */
-async function loadIsland(id) {
+async function loadIsland(id: number) {
   const client = new HeroClient();
 
   currentIsland.value = null;

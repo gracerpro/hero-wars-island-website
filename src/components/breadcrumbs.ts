@@ -1,7 +1,7 @@
 export interface IBreadcrumbItem {
   label: string
-  url: string
-  isActive: boolean
+  url?: string
+  isActive?: boolean
 }
 
 export class BreadcrumbItem implements IBreadcrumbItem {
