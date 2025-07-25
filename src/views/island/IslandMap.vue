@@ -27,10 +27,10 @@ const props = defineProps<{
 }>();
 
 interface Filter {
-  itemName?: string,
-  typeId?: number | null,
-  isNodeTypeTower?: boolean,
-  isNodeTypeChest?: boolean,
+  itemName: string,
+  typeId: number | null,
+  isNodeTypeTower: boolean,
+  isNodeTypeChest: boolean,
 }
 
 type IslandState = {
@@ -42,9 +42,9 @@ type IslandState = {
   userNodesGoingIds: Array<number>,
   disableNodesIds: Array<number>,
 }
-type ByIslandState = {[key: number]: IslandState}
+type IslandStateMap = {[key: number]: IslandState}
 type State = {
-  byIsland: ByIslandState,
+  byIsland: IslandStateMap,
   filter: Filter,
   isShowQuantity: boolean,
   isSelectAnyNode: boolean,
@@ -55,7 +55,7 @@ type State = {
 
 const { t } = useI18n();
 
-let byIslandState = {};
+let byIslandState: IslandStateMap = {};
 
 const minCharsCount = 3;
 const componentId = props.parentPageId + "__map";
@@ -81,7 +81,7 @@ const isShowQuantity = ref(true);
 const isShowGroupRewards = ref(false);
 const isShowRewardsBlock = ref(true);
 const isShowUserRewardsBlock = ref(true);
-const filter = shallowReactive<Filter>({
+let filter = shallowReactive<Filter>({
   itemName: "",
   typeId: null,
   isNodeTypeTower: false,
@@ -179,10 +179,7 @@ onUnmounted(() => {
   saveState();
 });
 
-/**
- * @param {Event} event
- */
-function onBeforeUnload(event) {
+function onBeforeUnload(event: Event) {
   event.returnValue = "";
 
   saveState();
@@ -434,47 +431,40 @@ function onChangeRegionNumbers(newNumbers: Array<number>) {
 }
 
 function loadState() {
-  let state: State | null = null
+  let stateData: any = {}
 
   try {
     const item = localStorage.getItem(componentId)
 
     if (item !== null) {
-      state = JSON.parse(item);
+      stateData = JSON.parse(item) || {};
     }
   } catch (error) {
     console.error(error);
-    state = null
+    stateData = {}
+  }
+  if (typeof stateData !== "object") {
+    stateData = {}
   }
 
-  if (state === null) {
-    state = {
-      byIsland: {},
-      filter: {
-
-      },
-    };
-  }
-  if (!state.filter) {
-    state.filter = {};
-  }
-  if (!state.filter.itemName) {
-    state.filter.itemName = "";
-  }
-  if (!state.filter.typeId) {
-    state.filter.typeId = null;
-  }
-  if (typeof state.filter.isNodeTypeChest !== "boolean") {
-    state.filter.isNodeTypeChest = false;
-  }
-  if (typeof state.filter.isNodeTypeTower !== "boolean") {
-    state.filter.isNodeTypeTower = false;
+  let tmpFilter: Filter = {
+    itemName: "",
+    typeId: null,
+    isNodeTypeTower: false,
+    isNodeTypeChest: false
   }
 
-  if (!state.byIsland || !isObject(state.byIsland)) {
-    state.byIsland = {};
+  if (stateData?.filter) {
+    tmpFilter.itemName = stateData.filter.itemName ?? "";
+    tmpFilter.typeId = stateData.filter.typeId ?? null;
+    tmpFilter.isNodeTypeChest = stateData.filter.isNodeTypeChest ?? false;
+    tmpFilter.isNodeTypeTower = stateData.filter.isNodeTypeTower ?? false;
   }
-  byIslandState = state.byIsland;
+
+  if (!stateData.byIsland || !isObject(stateData.byIsland)) {
+    stateData.byIsland = {};
+  }
+  byIslandState = stateData.byIsland;
 
   const byIsland = byIslandState[props.island.id] ?? {};
 
@@ -505,6 +495,7 @@ function loadState() {
   } else {
     translateY.value = byIsland.translateY;
   }
+
   regionNumbers.value = byIsland.regionNumbers || [];
 
   if (byIsland.userNodesIds) {
@@ -517,32 +508,15 @@ function loadState() {
     byIsland.disableNodesIds.forEach((id) => (disableNodesIdsMap.value[id] = true));
   }
 
-  filter.value = state.filter;
-  isShowQuantity.value = state.isShowQuantity === undefined ? true : state.isShowQuantity;
-  isShowRewardsBlock.value =
-    state.isShowRewardsBlock === undefined ? true : state.isShowRewardsBlock;
-  isShowUserRewardsBlock.value =
-    state.isShowUserRewardsBlock === undefined ? true : state.isShowUserRewardsBlock;
-  isShowGroupRewards.value =
-    state.isShowGroupRewards === undefined ? false : state.isShowGroupRewards;
-
-  isSelectAnyNode.value = typeof state.isSelectAnyNode === "boolean" ? state.isSelectAnyNode : true;
-
-
-  state = {
-    
-  }
+  filter = tmpFilter;
+  isShowQuantity.value = stateData.isShowQuantity ?? true;
+  isShowRewardsBlock.value = stateData.isShowRewardsBlock ?? true;
+  isShowUserRewardsBlock.value = stateData.isShowUserRewardsBlock ?? true;
+  isShowGroupRewards.value = stateData.isShowGroupRewards ?? false;
+  isSelectAnyNode.value = stateData ?? true;
 }
 
 function saveState() {
-  const state = {
-    filter: filter.value,
-    isShowQuantity: isShowQuantity.value,
-    isSelectAnyNode: isSelectAnyNode.value,
-    isShowGroupRewards: isShowGroupRewards.value,
-    isShowRewardsBlock: isShowRewardsBlock.value,
-    isShowUserRewardsBlock: isShowUserRewardsBlock.value,
-  };
   byIslandState[props.island.id] = {
     userNodesIds: Object.keys(userNodesIdsMap.value).map((id) => parseInt(id)),
     disableNodesIds: Object.keys(disableNodesIdsMap.value).map((id) => parseInt(id)),
@@ -552,7 +526,16 @@ function saveState() {
     translateY: translateY.value,
     regionNumbers: regionNumbers.value,
   };
-  state.byIsland = byIslandState;
+
+  const state: State = {
+    filter,
+    isShowQuantity: isShowQuantity.value,
+    isSelectAnyNode: isSelectAnyNode.value,
+    isShowGroupRewards: isShowGroupRewards.value,
+    isShowRewardsBlock: isShowRewardsBlock.value,
+    isShowUserRewardsBlock: isShowUserRewardsBlock.value,
+    byIsland: byIslandState,
+  };
 
   localStorage.setItem(componentId, JSON.stringify(state));
 }
