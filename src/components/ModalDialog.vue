@@ -1,6 +1,8 @@
-<script setup>
+<script setup lang="ts">
+import { Modal } from "bootstrap";
 import { computed } from "vue";
 import { useI18n } from "vue-i18n";
+import type { DialogResult } from "./modal-dialog";
 
 const { t } = useI18n();
 
@@ -9,43 +11,48 @@ defineExpose({
   hide,
 });
 
-let Modal;
-let moduleResolve = null;
-let modal = null;
-let dialogResult = null;
+let moduleResolve: (value: DialogResult) => void;
+let modal: Modal | null = null;
+let dialogResult: DialogResult = null;
 
 if (!import.meta.env.SSR) {
   // Load bootstrap module asynchronously else get an error on SSR
   // ReferenceError: document is not defined
-  Modal = (await import("bootstrap")).Modal;
+  (await import("bootstrap")).Modal;
 }
 
-const props = defineProps({
-  elementId: { type: String, required: true },
-  saving: { type: Boolean, default: false },
-  formId: { type: String, default: "" },
-  header: { type: String, default: "" },
-  submitButtonText: { type: String, default: "" },
-  size: { type: String, default: "lg" },
-  isShowSubmit: { type: Boolean, default: true },
-  initResult: {
-    type: [Object, Number, String, null, undefined],
-    default: null,
-  },
+interface Props {
+  elementId: string,
+  saving: boolean,
+  formId: string,
+  header: string,
+  submitButtonText: string,
+  size: string,
+  isShowSubmit: boolean,
+  initResult: object | number | string | null | undefined,
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  saving: false,
+  header: "",
+  submitButtonText: "",
+  size: "lg",
+  isShowSubmit: true,
+  initResult: null,
 });
 
 const sizeClass = computed(() => {
-  const sizes = {
+  const sizes: { [key: string] : string } = {
     sm: "modal-sm",
     lg: "modal-lg",
     xl: "modal-xl",
   };
 
-  return sizes[props.size] ? sizes[props.size] : "";
+  return sizes[props.size] ?? "";
 });
 
 const hideDialog = () => {
-  modal.dispose();
+  modal?.dispose();
   modal = null;
 
   moduleResolve(dialogResult);
@@ -60,9 +67,9 @@ function show() {
     moduleResolve = resolve;
   });
 
-  const modalElement = document.getElementById(props.elementId);
+  const modalElement = document.getElementById(props.elementId) as HTMLElement;
   modalElement.addEventListener(
-    "hidden.bs.modal",
+    Modal.Events.hidden,
     () => {
       hideDialog();
     },
@@ -77,9 +84,9 @@ function show() {
   return promise;
 }
 
-function hide(result) {
+function hide(result: DialogResult) {
   dialogResult = result;
-  modal.hide();
+  modal?.hide();
 }
 </script>
 

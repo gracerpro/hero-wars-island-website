@@ -4,26 +4,29 @@ const EVENT_UPDATE_TYPE = "update:type-id";
 const EVENT_UPDATE_IS_NODE_TYPE_TOWER = "update:is-node-type-tower";
 const EVENT_UPDATE_IS_NODE_TYPE_CHEST = "update:is-node-type-chest";
 </script>
-<script setup>
+<script setup lang="ts">
 import TextInput from "@/components/TextInput.vue";
 import ClearSelect from "@/components/ClearSelect.vue";
-import { getLabelsByTypes } from "@/api/ItemApi";
+import { getLabelsByTypes, type Item, type Type } from "@/api/ItemApi";
 import { useI18n } from "vue-i18n";
 import { TYPE_CHEST, TYPE_TOWER } from "@/api/NodeApi";
 import { computed } from "vue";
+import type { SelectItemMap } from "@/components/select";
 
 const { t } = useI18n();
 
 const formId = "nodesForm";
 
-const props = defineProps({
+interface Props {
   rewards: { type: Object, required: true },
-  itemName: { type: String, required: true },
-  typeId: { type: [Number, null], required: true },
-  isNodeTypeTower: { type: Boolean, required: true },
-  isNodeTypeChest: { type: Boolean, required: true },
-  minCharsCount: { type: Number, required: true },
-});
+  itemName: string,
+  typeId: Type | null,
+  isNodeTypeTower: boolean,
+  isNodeTypeChest: boolean,
+  minCharsCount: number,
+}
+
+const props = defineProps<Props>();
 const emit = defineEmits([
   EVENT_UPDATE_ITEM_NAME,
   EVENT_UPDATE_TYPE,
@@ -31,23 +34,23 @@ const emit = defineEmits([
   EVENT_UPDATE_IS_NODE_TYPE_CHEST,
 ]);
 
-const visibleTypes = computed(() => {
-  const map = {};
+const visibleTypes = computed<SelectItemMap>(() => {
+  const map = new Map<number, boolean>();
   const labels = getLabelsByTypes(t);
 
-  props.rewards.forEach((item) => {
-    map[item.item.typeId] = true;
+  props.rewards.forEach((item: Item) => {
+    map.set(item.item.typeId, true);
   });
 
-  const types = {};
-  Object.keys(map).forEach((typeId) => {
+  const types: SelectItemMap = {};
+  for (const typeId of map.keys()) {
     if (typeId > 0) {
       types[typeId] = labels[typeId];
     }
-  });
+  }
 
   return types;
-});
+})
 const isCheckedFlags = computed(() => {
   return props.isNodeTypeTower || props.isNodeTypeChest;
 });
@@ -67,13 +70,13 @@ const filledFilterCount = computed(() => {
   return count;
 });
 
-function onUpdateName(name) {
+function onUpdateName(name: string) {
   emit(EVENT_UPDATE_ITEM_NAME, name);
 }
-function onChangeType(typeId) {
+function onChangeType(typeId: Type) {
   emit(EVENT_UPDATE_TYPE, typeId);
 }
-function onChangeNodeType(event) {
+function onChangeNodeType(event: Event) {
   const typeId = parseInt(event.target.value);
 
   if (typeId === TYPE_TOWER) {

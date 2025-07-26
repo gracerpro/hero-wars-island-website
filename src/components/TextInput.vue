@@ -1,21 +1,24 @@
 <script>
 const EVENT_UPDATE_VALUE = "update:model-value";
 </script>
-<script setup>
-const props = defineProps({
-  inputId: { type: String, required: true },
-  modelValue: { type: String, default: "" },
-  modelModifiers: {
-    type: Object,
-    default: () => ({}),
-  },
+<script setup lang="ts">
+interface Props {
+  inputId: string,
+  modelValue: string,
+  modelModifiers: object,
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  modelValue: "",
+  modelModifiers: () => ({})
 });
 const emit = defineEmits([EVENT_UPDATE_VALUE]);
 
-const onInput = (event) => {
-  let value = event.target.value;
+const onInput = (event: Event) => {
+  const target = event.target as HTMLInputElement
+  let value = target.value;
 
-  if (props.modelModifiers.trim) {
+  if ("trim" in props.modelModifiers) {
     value = value.trim();
   }
 

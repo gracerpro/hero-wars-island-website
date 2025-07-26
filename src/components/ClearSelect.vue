@@ -1,20 +1,28 @@
 <script>
 const EVENT_UPDATE_VALUE = "update:model-value";
 </script>
-<script setup>
+<script setup lang="ts">
 import { computed } from "vue";
+import type { SelectItemMap } from "./select";
 
-const props = defineProps({
-  inputId: { type: String, required: true },
-  selectValues: { type: Object, required: true },
-  modelValue: { type: [Number, null], default: null },
+interface Props {
+  inputId: string,
+  selectValues: SelectItemMap,
+  modelValue: number | null,
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  modelValue: null,
 });
-const emit = defineEmits([EVENT_UPDATE_VALUE]);
+const emit = defineEmits<{
+  [EVENT_UPDATE_VALUE]: [value: number | null]
+}>();
 
 const isDisabled = computed(() => props.modelValue === null || props.modelValue === 0);
 
-const onChange = (event) => {
-  emit(EVENT_UPDATE_VALUE, event.target.value === "" ? null : parseInt(event.target.value));
+const onChange = (event: Event) => {
+  const target = event.target as HTMLSelectElement
+  emit(EVENT_UPDATE_VALUE, target.value === "" ? null : parseInt(target.value));
 };
 const onClear = () => {
   emit(EVENT_UPDATE_VALUE, null);
@@ -33,7 +41,7 @@ const onClear = () => {
         v-for="(name, id) in selectValues"
         :key="id"
         :value="id"
-        :selected="modelValue == id"
+        :selected="modelValue === id"
       >
         {{ name }}
       </option>

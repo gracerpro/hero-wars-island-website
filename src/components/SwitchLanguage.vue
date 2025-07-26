@@ -10,7 +10,7 @@ const router = useRouter();
 const currentLocale = computed(() => getCurrentLocale());
 const languages = computed(() => getLocalesLabels());
 
-const onChangeLanguage = async (locale) => {
+const onChangeLanguage = async (locale: string) => {
   if (currentLocale.value === locale) {
     return;
   }

@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import { ref, computed } from "vue";
 import { type ToastType, TYPE_DANGER, TYPE_SUCCESS } from "./toast";
+import { Toast } from "bootstrap";
 
-let Toast
+let LocalToast: typeof Toast | null
 
 if (!import.meta.env.SSR) {
-  import("bootstrap").then((module) => (Toast = module.Toast));
+  import("bootstrap").then((module) => (LocalToast = module.Toast));
 }
 
 const props = defineProps<{

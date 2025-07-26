@@ -33,8 +33,8 @@ function addBeforeEach(router: Router) {
       return next(newTo);
     }
 
-    const paramsLocale = to.params.locale;
-    if (paramsLocale) {
+    const paramsLocale = to.params.locale as string;
+    if (paramsLocale !== "") {
       if (!isSupportLocale(paramsLocale)) {
         if (paramsLocale !== "page-not-found") {
           return next(
