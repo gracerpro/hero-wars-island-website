@@ -32,15 +32,15 @@ const isShowNoData = computed(
 
 loadFeedbackItems();
 
-function getStatusClass(status: Status) {
-  const classes = {
+function getStatusClass(status: Status): string {
+  const classes: { [key: string] : string } = {
     [STATUS_CREATED]: "text-bg-primary",
     [STATUS_ABORT]: "text-bg-danger",
     [STATUS_CLOSED]: "text-bg-success",
     [STATUS_QUEUE]: "text-bg-secondary",
   };
 
-  return status in classes ? classes[status] : "text-bg-info";
+  return classes[status] ?? "text-bg-info";
 }
 
 function loadFeedbackItems() {

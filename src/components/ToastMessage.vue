@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, computed } from "vue";
 import { type ToastType, TYPE_DANGER, TYPE_SUCCESS } from "./toast";
-import { Toast } from "bootstrap";
+import { Toast } from "bootstrap"; // TODO: test, must be dynamic
 
 let LocalToast: typeof Toast | null
 
@@ -27,10 +27,6 @@ const classType = computed(() => {
   return "";
 });
 
-/**
- * @param {String} message
- * @param {String|null} type
- */
 function show(message: string, type?: ToastType) {
   toastMessage.value = message;
 
@@ -39,11 +35,11 @@ function show(message: string, type?: ToastType) {
   }
 
   const element = document.getElementById(props.elementId) as HTMLElement;
-  element.addEventListener("hide.bs.toast", () => (isShow.value = false), {
+  element.addEventListener(Toast.Events.hide, () => (isShow.value = false), {
     once: true,
   });
 
-  const toast = new Toast(element, {
+  const toast = new LocalToast(element, {
     delay: 2000,
     autohide: true,
   });

@@ -8,9 +8,13 @@ import { filterNameMinCharsCount } from "../news";
 
 defineProps<{
   loading: boolean,
-  name: string,
+  name: string
+}>()
+
+const emit = defineEmits<{
+  [EVENT_FIND]: [],
+  [EVENT_UPDATE_NAME]: [value: string],
 }>();
-const emit = defineEmits([EVENT_FIND, EVENT_UPDATE_NAME]);
 
 const { t } = useI18n();
 
@@ -32,7 +36,7 @@ function onClearName() {
           :value="name"
           class="form-control"
           :placeholder="t('common.name')"
-          @input="emit(EVENT_UPDATE_NAME, $event.target.value.trim())"
+          @input="emit(EVENT_UPDATE_NAME, ($event.target as HTMLInputElement).value.trim())"
         />
         <button
           type="button"

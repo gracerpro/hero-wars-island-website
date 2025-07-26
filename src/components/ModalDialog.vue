@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Modal } from "bootstrap";
+import { Modal } from "bootstrap"; // TODO: test, must be dynamic
 import { computed } from "vue";
 import { useI18n } from "vue-i18n";
 import type { DialogResult } from "./modal-dialog";

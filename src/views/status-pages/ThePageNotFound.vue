@@ -1,11 +1,11 @@
-<script setup>
+<script setup lang="ts">
 import { setMetaInfo } from "@/services/page-meta";
 import { useSSRContext } from "vue";
 import { useI18n } from "vue-i18n";
 
 const { t } = useI18n();
 const title = t("common.pageNotFound");
-const ssrContext = import.meta.env.SSR ? useSSRContext() : null;
+const ssrContext = import.meta.env.SSR ? useSSRContext() : undefined;
 
 setMetaInfo(
   {

@@ -22,6 +22,16 @@ export interface Feedback {
   username: string,
 }
 
+export interface FeedbackData {
+  contactEmail: string,
+  tempField: string,
+  submitTimeInMs: number,
+  username: string,
+  email: string,
+  subject: string,
+  message: string,
+}
+
 export class FeedbackApi {
   private apiRequest: ApiRequest
 
@@ -32,7 +42,7 @@ export class FeedbackApi {
     });
   }
 
-  async create(data: any /** TODO: type */): Promise<Feedback> {
+  async create(data: FeedbackData): Promise<Feedback> {
     const response = await this.apiRequest.post("/feedback-items/create", data);
 
     return this.modifyFeedback(response)

@@ -1,8 +1,8 @@
 <script>
 const EVENT_SELECT_NODE = "selectNode";
 </script>
-<script setup>
-import { TYPE_DANGER } from "@/components/ToastMessage.vue";
+<script setup lang="ts">
+import { TYPE_DANGER } from "@/components/toast";
 import {
   TYPE_START,
   TYPE_TOWER,
@@ -12,6 +12,7 @@ import {
   STATUS_NOT_SURE,
   TYPE_WOOD,
   TYPE_BUBBLE,
+  type Node,
 } from "@/api/NodeApi";
 import { ref, shallowRef, computed, defineAsyncComponent, onMounted, onUnmounted } from "vue";
 import {
@@ -23,10 +24,11 @@ import {
   canSelectNode,
   canSelectNextNode,
 } from "@/services/island-map";
-import { getIconsItems, getDrawedNodes, SIDE } from "./map";
+import { getIconsItems, getDrawedNodes, SIDE, type UserNodeIdsMap } from "./map";
 import { useI18n } from "vue-i18n";
 import IslandMapInfoDialog from "./IslandMapInfoDialog.vue";
-import { GAME_ID_WOOD } from "@/api/ItemApi";
+import { GAME_ID_WOOD, Item } from "@/api/ItemApi";
+import type { Image } from "@/api/IslandApi";
 
 const { t } = useI18n();
 
@@ -44,19 +46,24 @@ const mouse = {
   ty0: null,
 };
 
+interface Props {
+  scale: number,
+  translateX: number,
+  translateY: number,
+  isShowQuantity: boolean,
+  rewards: Array<Item>,
+  nodes: Map<number, Node>,
+  userNodesIdsMap: UserNodeIdsMap,
+  userNodesGoingIdsMap: UserNodeIdsMap,
+  disableNodesIdsMap: UserNodeIdsMap,
+  isSelectAnyNode: boolean,
+  backgroundImage: Image | null,
+}
+
 const emit = defineEmits([EVENT_CHANGE_TRANSLATE, EVENT_CHANGE_SCALE, EVENT_SELECT_NODE]);
-const props = defineProps({
-  scale: { type: Number, required: true },
-  translateX: { type: Number, required: true },
-  translateY: { type: Number, required: true },
-  isShowQuantity: { type: Boolean, required: true },
-  rewards: { type: Array, required: true },
-  nodes: { type: Object, required: true },
-  userNodesIdsMap: { type: Object, required: true },
-  userNodesGoingIdsMap: { type: Object, required: true },
-  disableNodesIdsMap: { type: Object, required: true },
-  isSelectAnyNode: { type: Boolean, default: true },
-  backgroundImage: { type: [Object, null], required: false, default: null },
+const props = withDefaults(defineProps<Props>(), {
+  isSelectAnyNode: true,
+  backgroundImage: null,
 });
 
 const svgMapRef = ref(null);
@@ -159,8 +166,8 @@ function onKeyDownMap(event) {
   }
 }
 
-function getNodeClass(node) {
-  const classes = {
+function getNodeClass(node: Node) {
+  const classes: { [key: string]: string } = {
     [TYPE_NODE]: "node-step",
     [TYPE_START]: "node-start",
     [TYPE_TOWER]: "node-tower",
@@ -168,13 +175,13 @@ function getNodeClass(node) {
     [TYPE_BUBBLE]: "node-bubble",
     [TYPE_CHEST]: "node-chest",
     [TYPE_BLOCKER]: "node-blocker",
-  };
-  let nodeClass = classes[node.typeId] ? classes[node.typeId] : "";
+  }
+  let nodeClass = classes[node.type] ?? "";
 
-  if (node.statusId == STATUS_NOT_SURE) {
+  if (node.status == STATUS_NOT_SURE) {
     nodeClass += " -warning";
   }
-  if (node.cost?.gameId === GAME_ID_WOOD) {
+  if (node.costItem.gameId === GAME_ID_WOOD) {
     nodeClass += " node-cost-wood";
   }
 
@@ -190,9 +197,8 @@ function getPoints(coordinates) {
 
 /**
  * @param {Object} drawedNode
- * @param {Object} event
  */
-function onNodeClick(drawedNode, event) {
+function onNodeClick(drawedNode, event: Event) {
   if (event.ctrlKey) {
     infoDialogDrawedNode.value = drawedNode;
     infoDialogComponent.value = IslandMapInfoDialog;
@@ -281,23 +287,22 @@ function onMouseMove(button) {
   }
 }
 
-function onMouseUp(event) {
+function onMouseUp(event: Event) {
   if (event.button === BUTTON_MAIN) {
     mouse.isDown = false;
   }
 }
 
-function onMouseWheel(event) {
+function onMouseWheel(event: Event) {
   const value = event.deltaY > 0 ? DELTA_SCALE : -DELTA_SCALE;
   emitNewScale(event, value);
   event.preventDefault();
 }
 
 /**
- * @param {Object} event
  * @param {Number} value
  */
-function emitNewScale(event, value) {
+function emitNewScale(event: Event, value) {
   if (event.ctrlKey) {
     value /= 10;
   } else if (event.shiftKey) {

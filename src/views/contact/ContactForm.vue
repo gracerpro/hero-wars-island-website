@@ -2,10 +2,13 @@
 import ClientOnly from "@/components/ClientOnly.vue";
 import { UserError } from "@/exceptions/UserError";
 import HeroClient from "@/api/HeroClient";
-import { ref, shallowReactive, onMounted } from "vue";
+import { ref, shallowReactive, onMounted, useTemplateRef } from "vue";
 import { useI18n } from "vue-i18n";
 import { TYPE_SUCCESS, TYPE_DANGER } from "@/components/toast";
 import { defineAsyncComponent } from "vue";
+import type { FeedbackData } from "@/api/FeedbackApi";
+import type { ComponentExposed } from "vue-component-type-helpers";
+import type ToastMessage from "@/components/ToastMessage.vue";
 
 const { t } = useI18n();
 
@@ -14,9 +17,9 @@ const submiting = ref(false);
 const client = new HeroClient();
 const createdDate = new Date();
 
-const ToastMessage = import.meta.env.SSR
-  ? null
-  : defineAsyncComponent(() => import("@/components/ToastMessage.vue"));
+if (!import.meta.env.SSR) {
+  defineAsyncComponent(() => import("@/components/ToastMessage.vue"));
+}
 
 const errorMessage = ref("");
 const feedback = shallowReactive({
@@ -25,8 +28,8 @@ const feedback = shallowReactive({
   subject: "",
   message: "",
 });
-const toast = ref(null);
-const formSubject = ref(null);
+const toastRef = useTemplateRef<ComponentExposed<typeof ToastMessage>>('toastRef');
+const formSubject = ref<HTMLElement | null>(null);
 const formId = "contactForm";
 
 onMounted(() => {
@@ -44,10 +47,12 @@ const onSubmit = () => {
 
   submiting.value = true;
 
-  const data = { ...feedback };
-  data.contactEmail = "";
-  data.tempField = "1";
-  data.submitTimeInMs = new Date().getTime() - createdDate.getTime();
+  const data: FeedbackData = {
+     ...feedback,
+     contactEmail: "",
+    tempField: "1",
+    submitTimeInMs: new Date().getTime() - createdDate.getTime()
+  };
   errorMessage.value = "";
 
   client.feedback
@@ -56,12 +61,12 @@ const onSubmit = () => {
       feedback.message = "";
       feedback.subject = "";
 
-      toast.value.show(t("page.contact.messageWasCreated"), TYPE_SUCCESS);
+      toastRef.value?.show(t("page.contact.messageWasCreated"), TYPE_SUCCESS);
     })
     .catch((error) => {
       if (error instanceof UserError) {
         errorMessage.value = error.message;
-        toast.value.show(error.message, TYPE_DANGER);
+        toastRef.value?.show(error.message, TYPE_DANGER);
       } else {
         errorMessage.value = t("common.internalError");
         throw error;
@@ -177,7 +182,7 @@ const onSubmit = () => {
 
     <client-only>
       <toast-message
-        ref="toast"
+        ref="toastRef"
         element-id="contactToast"
       />
     </client-only>

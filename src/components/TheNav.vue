@@ -24,14 +24,16 @@ onMounted(() => {
 
   if (!import.meta.env.SSR) {
     import("bootstrap").then(({ Collapse }) => {
-      (navbarNav.value as HTMLElement).addEventListener("hide.bs.collapse", () => {
+      const nav = navbarNav.value as HTMLElement
+
+      nav.addEventListener(Collapse.Events.hide, () => {
         store.commit(IS_SHOW_MENU_MUTATION, false);
       });
-      (navbarNav.value as HTMLElement).addEventListener("show.bs.collapse", () => {
+      nav.addEventListener(Collapse.Events.show, () => {
         store.commit(IS_SHOW_MENU_MUTATION, true);
       });
 
-      new Collapse(navbarNav.value, { toggle: store.state.isShowMenu });
+      new Collapse(nav, { toggle: store.state.isShowMenu });
     });
   }
 });
