@@ -60,11 +60,15 @@ interface Props {
   backgroundImage: Image | null,
 }
 
-const emit = defineEmits([EVENT_CHANGE_TRANSLATE, EVENT_CHANGE_SCALE, EVENT_SELECT_NODE]);
 const props = withDefaults(defineProps<Props>(), {
   isSelectAnyNode: true,
   backgroundImage: null,
 });
+const emit = defineEmits<{
+  [EVENT_CHANGE_TRANSLATE]: [x: number | null, y: number | null],
+  [EVENT_CHANGE_SCALE]: [value: number],
+  [EVENT_SELECT_NODE]: [],
+}>();
 
 const svgMapRef = ref(null);
 const infoDialog = ref(null);
@@ -299,10 +303,7 @@ function onMouseWheel(event: Event) {
   event.preventDefault();
 }
 
-/**
- * @param {Number} value
- */
-function emitNewScale(event: Event, value) {
+function emitNewScale(event: Event, value: number) {
   if (event.ctrlKey) {
     value /= 10;
   } else if (event.shiftKey) {

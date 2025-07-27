@@ -28,6 +28,8 @@ interface Props {
   isShowQuantity: boolean,
 }
 
+type ImagesByUrls = { [key: string]: HTMLImageElement }
+
 const props = defineProps<Props>();
 
 const { t } = useI18n();
@@ -119,6 +121,10 @@ async function downloadAsPng() {
 
     const context = canvasElem.getContext("2d");
 
+    if (context === null) {
+      throw new Error("Create 2D context is null.")
+    }
+
     drawMap(context, imagesByUrls);
 
     const url = canvasElem
@@ -134,9 +140,9 @@ async function downloadAsPng() {
   dialogRef.value?.hide();
 }
 
-async function loadImages() {
-  let urlMap = {};
-  let imagesByUrls = {};
+async function loadImages(): Promise<ImagesByUrls> {
+  let urlMap: { [key: string]: boolean } = {};
+  let imagesByUrls: ImagesByUrls = {};
 
   iconModifyRewards.value.forEach((modifyReward) => {
     const reward = modifyReward.item;
@@ -154,7 +160,7 @@ async function loadImages() {
       image.crossOrigin = "anonymous";
       image.onload = () => {
         imagesByUrls[url] = image;
-        resolve();
+        resolve(true);
       };
       image.onerror = () => {
         reject(new Error("Could not load an image."));
@@ -166,13 +172,13 @@ async function loadImages() {
   try {
     await Promise.all(promises);
   } catch (error) {
-    console.error(error);
+    console.error(error); // TODO: log it
   }
 
   return imagesByUrls;
 }
 
-function drawMap(context: CanvasRenderingContext2D, imagesByUrls) {
+function drawMap(context: CanvasRenderingContext2D, imagesByUrls: ImagesByUrls) {
   context.save();
 
   context.translate(

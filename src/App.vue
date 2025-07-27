@@ -19,7 +19,7 @@ if (!import.meta.env.SSR) {
     })
     .catch((error) => {
       console.error(error);
-      // log it...
+      // TODO: log it...
     });
 
   setTheme(store.state.theme);

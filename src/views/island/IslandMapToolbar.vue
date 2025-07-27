@@ -1,6 +1,6 @@
 <script>
 const EVENT_RESET = "reset";
-const EVENT_CHANGE_IS_SHOW_QUANTITY = "update:is-show-quantity";
+const EVENT_TOGGLE_IS_SHOW_QUANTITY = "update:is-show-quantity";
 const EVENT_FULLSCREEN_ON = "fullscreen-on";
 const EVENT_BEGIN_DOWNLOAD = "begin-download";
 const EVENT_RELOAD_MAP = "reload-map";
@@ -33,9 +33,9 @@ defineProps<Props>();
 
 const emit = defineEmits<{
   [EVENT_RESET]: [],
-  [EVENT_CHANGE_TRANSLATE]: [],
+  [EVENT_CHANGE_TRANSLATE]: [x: number | null, y: number | null],
   [EVENT_CHANGE_SCALE]: [value: number],
-  [EVENT_CHANGE_IS_SHOW_QUANTITY]: [value: boolean],
+  [EVENT_TOGGLE_IS_SHOW_QUANTITY]: [],
   [EVENT_FULLSCREEN_ON]: [],
   [EVENT_BEGIN_DOWNLOAD]: [],
   [EVENT_RELOAD_MAP]: [],
@@ -44,7 +44,7 @@ const emit = defineEmits<{
 }>();
 
 const helpDialogRef = useTemplateRef<ComponentExposed<typeof HelpDialog>>("helpDialogRef");
-const helpDialogComponent = shallowRef(null);
+const helpDialogComponent = shallowRef<typeof HelpDialog | null>(null);
 
 const isShowReloadMap = computed(() => {
   return import.meta.env.MODE === "development";
@@ -55,7 +55,7 @@ function onHelpClick() {
 }
 
 function onMountedHelpDialog() {
-  helpDialogRef.value.show().finally(() => {
+  helpDialogRef.value?.show().finally(() => {
     helpDialogComponent.value = null;
   });
 }
@@ -71,15 +71,15 @@ function onMountedHelpDialog() {
       :regions="regions"
       :region-numbers="regionNumbers"
       :loading="loading"
-      @update:region-numbers="(numbers) => emit(EVENT_UPDATE_REGION_NUMBERS, numbers)"
+      @update:region-numbers="(numbers: Array<number>) => emit(EVENT_UPDATE_REGION_NUMBERS, numbers)"
       @reset-region-numbers="emit(EVENT_RESET_REGION_NUMBERS)"
     />
     <island-map-toolbar-actions
       :loading="loading"
       :translate-x="translateX"
       :translate-y="translateY"
-      @change-translate="(dx, dy) => emit(EVENT_CHANGE_TRANSLATE, dx, dy)"
-      @change-scale="(value) => emit(EVENT_CHANGE_SCALE, value)"
+      @change-translate="(dx: number, dy: number) => emit(EVENT_CHANGE_TRANSLATE, dx, dy)"
+      @change-scale="(value: number) => emit(EVENT_CHANGE_SCALE, value)"
       @reset="emit(EVENT_RESET)"
     />
 
@@ -92,7 +92,7 @@ function onMountedHelpDialog() {
         :disabled="loading"
         :title="t('page.island.isShowQuantity')"
         :class="['btn toolbar-button', isShowQuantity ? 'btn-secondary' : 'btn-outline-secondary']"
-        @click="emit(EVENT_CHANGE_IS_SHOW_QUANTITY)"
+        @click="emit(EVENT_TOGGLE_IS_SHOW_QUANTITY)"
       >
         N
       </button>

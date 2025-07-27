@@ -1,7 +1,7 @@
 <script>
 const EVENT_RESET = "reset";
 </script>
-<script setup>
+<script setup lang="ts">
 import {
   DELTA_SCALE,
   EVENT_CHANGE_SCALE,
@@ -11,16 +11,22 @@ import {
 } from "@/services/island-map";
 import { useI18n } from "vue-i18n";
 
-const props = defineProps({
-  loading: { type: Boolean, required: true },
-  translateX: { type: Number, required: true },
-  translateY: { type: Number, required: true },
-});
-const emit = defineEmits([EVENT_RESET, EVENT_CHANGE_SCALE, EVENT_CHANGE_TRANSLATE]);
+interface Props {
+  loading: boolean,
+  translateX: number,
+  translateY: number,
+}
+
+const props = defineProps<Props>();
+const emit = defineEmits<{
+  [EVENT_RESET]: [],
+  [EVENT_CHANGE_SCALE]: [value: number],
+  [EVENT_CHANGE_TRANSLATE]: [x: number | null, y: number | null],
+}>();
 
 const { t } = useI18n();
 
-function onChangeScale(zoom, event) {
+function onChangeScale(zoom: number, event: MouseEvent) {
   let value = zoom * DELTA_SCALE;
 
   if (event.ctrlKey) {
@@ -32,7 +38,7 @@ function onChangeScale(zoom, event) {
   emit(EVENT_CHANGE_SCALE, value);
 }
 
-function onChangeTranslate(xDirection, yDirection, event) {
+function onChangeTranslate(xDirection: number, yDirection: number, event: MouseEvent) {
   let dx = 0,
     dy = 0;
 

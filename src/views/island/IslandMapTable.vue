@@ -2,14 +2,18 @@
 const EVENT_UPDATE_IS_SHOW_BLOCK = "update:isShowBlock";
 </script>
 <script setup lang="ts">
+import type { Item } from "@/api/ItemApi";
 import { useI18n } from "vue-i18n";
 
-defineProps({
-  header: { type: String, required: true },
-  isShowBlock: { type: Boolean, required: true },
-  rewards: { type: Array, required: true },
-  visibleRewardsCount: { type: Number, required: true },
-});
+interface Props {
+  header: string,
+  isShowBlock: boolean,
+  rewards: Array<Item>,
+  visibleRewardsCount: number,
+}
+
+defineProps<Props>();
+
 const emit = defineEmits<{
   [EVENT_UPDATE_IS_SHOW_BLOCK]: [value: boolean],
 }>();

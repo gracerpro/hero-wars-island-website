@@ -8,7 +8,7 @@ import { filterNameMinCharsCount } from "../news";
 
 defineProps<{
   loading: boolean,
-  name: string
+  name: string,
 }>()
 
 const emit = defineEmits<{

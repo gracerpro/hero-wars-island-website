@@ -2,20 +2,24 @@
 const EVENT_UPDATE_REGION_NUMBERS = "update:region-numbers";
 const EVENT_RESET_REGION_NUMBERS = "reset-region-numbers";
 </script>
-<script setup>
+<script setup lang="ts">
 import { useI18n } from "vue-i18n";
 import { getRegionTitle } from "./island";
+import type { Region } from "@/api/IslandApi";
 
 const { t } = useI18n();
 
-const props = defineProps({
-  regions: { type: Array, required: true },
-  regionNumbers: { type: Array, required: true },
-  loading: { type: Boolean, required: true },
-});
-const emit = defineEmits([EVENT_UPDATE_REGION_NUMBERS, EVENT_RESET_REGION_NUMBERS]);
+const props = defineProps<{
+  regions: Array<Region>,
+  regionNumbers: Array<number>,
+  loading: boolean,
+}>();
+const emit = defineEmits<{
+  [EVENT_UPDATE_REGION_NUMBERS]: [value: Array<number>],
+  [EVENT_RESET_REGION_NUMBERS]: []
+}>()
 
-function onChangeNumber(region) {
+function onChangeNumber(region: Region) {
   if (!region.isVisible) {
     return;
   }

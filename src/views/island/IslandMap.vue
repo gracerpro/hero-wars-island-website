@@ -90,7 +90,7 @@ let filter = shallowReactive<Filter>({
 
 const mapContainerRef = ref<HTMLElement|null>(null);
 const downloadDialog = ref<HTMLElement|null>(null);
-const downloadDialogComponent = shallowRef<IslandMapDownloadDialog|null>(null);
+const downloadDialogComponent = shallowRef<typeof IslandMapDownloadDialog|null>(null);
 
 const loading = computed(() => isLoadingNodes.value || calculatingRewards.value);
 
@@ -303,11 +303,7 @@ function onResetMap() {
   }
 }
 
-/**
- * @param {Number|null} x
- * @param {Number|null} y
- */
-function onChangeTranslate(x, y) {
+function onChangeTranslate(x: number | null, y: number | null) {
   if (x !== null) {
     translateX.value = x;
   }
@@ -316,7 +312,7 @@ function onChangeTranslate(x, y) {
   }
 }
 
-function onChangeIsShowQuantity() {
+function onToggleIsShowQuantity() {
   isShowQuantity.value = !isShowQuantity.value;
 }
 
@@ -327,7 +323,7 @@ function onChangeNode(node) {
   nodes.value[node.id] = node;
 }
 
-function onSelectNode(nodeId) {
+function onSelectNode(nodeId: number) {
   if (!nodes.value[nodeId]) {
     throw new Error(t("page.island.notFoundNodeAdmin"));
   }
@@ -551,7 +547,7 @@ function saveState() {
       :translate-y="translateY"
       :regions="island.regions"
       :region-numbers="regionNumbers"
-      @update:is-show-quantity="onChangeIsShowQuantity"
+      @update:is-show-quantity="onToggleIsShowQuantity"
       @reset="onResetMap"
       @change-scale="onChangeScale"
       @change-translate="onChangeTranslate"
