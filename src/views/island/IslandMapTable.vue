@@ -1,7 +1,7 @@
 <script>
 const EVENT_UPDATE_IS_SHOW_BLOCK = "update:isShowBlock";
 </script>
-<script setup>
+<script setup lang="ts">
 import { useI18n } from "vue-i18n";
 
 defineProps({
@@ -10,7 +10,9 @@ defineProps({
   rewards: { type: Array, required: true },
   visibleRewardsCount: { type: Number, required: true },
 });
-const emit = defineEmits([EVENT_UPDATE_IS_SHOW_BLOCK]);
+const emit = defineEmits<{
+  [EVENT_UPDATE_IS_SHOW_BLOCK]: [value: boolean],
+}>();
 
 const { t } = useI18n();
 

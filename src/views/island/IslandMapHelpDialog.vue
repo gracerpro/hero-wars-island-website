@@ -1,14 +1,15 @@
-<script setup>
+<script setup lang="ts">
 import ModalDialog from "@/components/ModalDialog.vue";
-import { ref } from "vue";
+import { useTemplateRef } from "vue";
 import { useI18n } from "vue-i18n";
 import { useShow } from "@/components/modal-dialog";
+import type { ComponentExposed } from "vue-component-type-helpers";
 
 const { t } = useI18n();
 
-const dialog = ref(null);
+const dialogRef = useTemplateRef<ComponentExposed<typeof ModalDialog>>("dialogRef");
 
-const { show, onMountedDialog } = useShow(dialog);
+const { show, onMountedDialog } = useShow(dialogRef);
 
 defineExpose({
   show,
@@ -18,7 +19,7 @@ defineExpose({
 <template>
   <suspense>
     <modal-dialog
-      ref="dialog"
+      ref="dialogRef"
       element-id="island-map-help-dialog"
       :is-show-submit="false"
       :header="t('common.map')"

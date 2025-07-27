@@ -1,6 +1,6 @@
-<script setup>
+<script setup lang="ts">
 import ModalDialog from "@/components/ModalDialog.vue";
-import { ref } from "vue";
+import { ref, useTemplateRef } from "vue";
 import { useI18n } from "vue-i18n";
 import { useShow } from "@/components/modal-dialog";
 import { download } from "@/helpers/download";
@@ -15,28 +15,34 @@ import {
   TYPE_START,
   TYPE_TOWER,
   TYPE_WOOD,
+  type Node,
 } from "@/api/NodeApi";
+import type { Island } from "@/api/IslandApi";
+import type { Item } from "@/api/ItemApi";
+import type { ComponentExposed } from "vue-component-type-helpers";
+
+interface Props {
+  island: Island,
+  nodes: Map<number, Node>,
+  rewards: Array<Item>,
+  isShowQuantity: boolean,
+}
+
+const props = defineProps<Props>();
 
 const { t } = useI18n();
 
 const formId = "download-map-form";
 
-const dialogRef = ref(null);
+const dialogRef = useTemplateRef<ComponentExposed<typeof ModalDialog>>("dialogRef");
 
-const { show, onMountedDialog } = useShow(dialogRef);
-
-const props = defineProps({
-  island: { type: Object, required: true },
-  nodes: { type: Object, required: true },
-  rewards: { type: Array, required: true },
-  isShowQuantity: { type: Boolean, required: true },
-});
+const { show, onMountedDialog } = useShow(dialogRef)
 
 const loading = ref(false);
 
 const drawedNodes = computed(() => getDrawedNodes(props.nodes));
 const iconItems = computed(() =>
-  getIconsItems(props.rewards, drawedNodes.value, props.isShowQuantity)
+  getIconsItems(props.rewards, drawedNodes.value)
 );
 const iconModifyRewards = computed(() => iconItems.value.icons);
 const rewardQuantities = computed(() => {
@@ -125,7 +131,7 @@ async function downloadAsPng() {
     loading.value = false;
   }
 
-  dialogRef.value.hide();
+  dialogRef.value?.hide();
 }
 
 async function loadImages() {
@@ -166,7 +172,7 @@ async function loadImages() {
   return imagesByUrls;
 }
 
-function drawMap(context, imagesByUrls) {
+function drawMap(context: CanvasRenderingContext2D, imagesByUrls) {
   context.save();
 
   context.translate(
@@ -251,7 +257,7 @@ function drawMap(context, imagesByUrls) {
   context.restore();
 }
 
-function drawEmptyImage(context, item) {
+function drawEmptyImage(context: CanvasRenderingContext2D, item) {
   context.fillStyle = "#fff";
   context.beginPath();
   context.rect(item.iconX, item.iconY, item.iconWidth, item.iconHeight);

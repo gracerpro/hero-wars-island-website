@@ -27,12 +27,12 @@ interface Props {
 }
 
 const props = defineProps<Props>();
-const emit = defineEmits([
-  EVENT_UPDATE_ITEM_NAME,
-  EVENT_UPDATE_TYPE,
-  EVENT_UPDATE_IS_NODE_TYPE_TOWER,
-  EVENT_UPDATE_IS_NODE_TYPE_CHEST,
-]);
+const emit = defineEmits<{
+  [EVENT_UPDATE_ITEM_NAME]: [value: string]
+  [EVENT_UPDATE_TYPE]: [type: Type | null],
+  [EVENT_UPDATE_IS_NODE_TYPE_TOWER]: [value: boolean],
+  [EVENT_UPDATE_IS_NODE_TYPE_CHEST]: [value: boolean],
+}>()
 
 const visibleTypes = computed<SelectItemMap>(() => {
   const map = new Map<number, boolean>();
@@ -73,17 +73,18 @@ const filledFilterCount = computed(() => {
 function onUpdateName(name: string) {
   emit(EVENT_UPDATE_ITEM_NAME, name);
 }
-function onChangeType(typeId: Type) {
-  emit(EVENT_UPDATE_TYPE, typeId);
+function onChangeType(value: number | null) {
+  emit(EVENT_UPDATE_TYPE, value as Type);
 }
 function onChangeNodeType(event: Event) {
-  const typeId = parseInt(event.target.value);
+  const target = event.target as HTMLInputElement
+  const typeId = parseInt(target.value);
 
   if (typeId === TYPE_TOWER) {
-    emit(EVENT_UPDATE_IS_NODE_TYPE_TOWER, event.target.checked);
+    emit(EVENT_UPDATE_IS_NODE_TYPE_TOWER, target.checked);
   }
   if (typeId === TYPE_CHEST) {
-    emit(EVENT_UPDATE_IS_NODE_TYPE_CHEST, event.target.checked);
+    emit(EVENT_UPDATE_IS_NODE_TYPE_CHEST, target.checked);
   }
 }
 function onReset() {

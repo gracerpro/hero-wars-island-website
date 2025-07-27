@@ -7,39 +7,43 @@ const EVENT_RELOAD_MAP = "reload-map";
 const EVENT_UPDATE_REGION_NUMBERS = "update:region-numbers";
 const EVENT_RESET_REGION_NUMBERS = "reset-region-numbers";
 </script>
-<script setup>
+<script setup lang="ts">
 import HelpDialog from "./IslandMapHelpDialog.vue";
 import IslandMapToolbarRegions from "./IslandMapToolbarRegions.vue";
 import IslandMapToolbarActions from "./IslandMapToolbarActions.vue";
-import { ref, shallowRef } from "vue";
+import { shallowRef, useTemplateRef } from "vue";
 import { EVENT_CHANGE_TRANSLATE, EVENT_CHANGE_SCALE } from "@/services/island-map";
 import { useI18n } from "vue-i18n";
 import { computed } from "vue";
+import type { Region } from "@/api/IslandApi";
+import type { ComponentExposed } from "vue-component-type-helpers";
+
+interface Props {
+  isShowQuantity: boolean,
+  loading: boolean,
+  translateX: number,
+  translateY: number,
+  regions: Array<Region>,
+  regionNumbers: Array<number>,
+}
 
 const { t } = useI18n();
 
-defineProps({
-  isShowQuantity: { type: Boolean, required: true },
-  loading: { type: Boolean, required: true },
-  translateX: { type: Number, required: true },
-  translateY: { type: Number, required: true },
-  regions: { type: Array, required: true },
-  regionNumbers: { type: Array, required: true },
-});
+defineProps<Props>();
 
-const emit = defineEmits([
-  EVENT_RESET,
-  EVENT_CHANGE_TRANSLATE,
-  EVENT_CHANGE_SCALE,
-  EVENT_CHANGE_IS_SHOW_QUANTITY,
-  EVENT_FULLSCREEN_ON,
-  EVENT_BEGIN_DOWNLOAD,
-  EVENT_RELOAD_MAP,
-  EVENT_UPDATE_REGION_NUMBERS,
-  EVENT_RESET_REGION_NUMBERS,
-]);
+const emit = defineEmits<{
+  [EVENT_RESET]: [],
+  [EVENT_CHANGE_TRANSLATE]: [],
+  [EVENT_CHANGE_SCALE]: [value: number],
+  [EVENT_CHANGE_IS_SHOW_QUANTITY]: [value: boolean],
+  [EVENT_FULLSCREEN_ON]: [],
+  [EVENT_BEGIN_DOWNLOAD]: [],
+  [EVENT_RELOAD_MAP]: [],
+  [EVENT_UPDATE_REGION_NUMBERS]: [value: Array<number>],
+  [EVENT_RESET_REGION_NUMBERS]: [],
+}>();
 
-const helpDialog = ref(null);
+const helpDialogRef = useTemplateRef<ComponentExposed<typeof HelpDialog>>("helpDialogRef");
 const helpDialogComponent = shallowRef(null);
 
 const isShowReloadMap = computed(() => {
@@ -51,7 +55,7 @@ function onHelpClick() {
 }
 
 function onMountedHelpDialog() {
-  helpDialog.value.show().finally(() => {
+  helpDialogRef.value.show().finally(() => {
     helpDialogComponent.value = null;
   });
 }
@@ -152,7 +156,7 @@ function onMountedHelpDialog() {
 
     <component
       :is="helpDialogComponent"
-      ref="helpDialog"
+      ref="helpDialogRef"
       @vue:mounted="onMountedHelpDialog"
     />
   </div>

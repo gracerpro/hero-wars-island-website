@@ -1,33 +1,27 @@
-<script setup>
+<script setup lang="ts">
 import ModalDialog from "@/components/ModalDialog.vue";
-import { ref, computed } from "vue";
+import { computed, useTemplateRef } from "vue";
 import { useI18n } from "vue-i18n";
 import { useShow } from "@/components/modal-dialog";
 import { getStatusName, getTypeName } from "@/api/NodeApi";
-import { getLabelsByTypes } from "@/api/ItemApi";
+import { getTypeName as getItemTypeName } from "@/api/ItemApi";
+import type { ComponentExposed } from "vue-component-type-helpers";
 
 const props = defineProps({
   drawedNode: { type: Object, required: true },
 });
 
 const { t } = useI18n();
-const labelsByTypes = getLabelsByTypes(t);
 
-const dialog = ref(null);
+const dialogRef = useTemplateRef<ComponentExposed<typeof ModalDialog>>("dialogRef");
 
-const { show, onMountedDialog } = useShow(dialog);
+const { show, onMountedDialog } = useShow(dialogRef);
 
 const hasRewards = computed(
   () => props.drawedNode.node.items && props.drawedNode.node.items.length > 0
 );
-
-/**
- * @param {String} typeId
- * @returns {String}
- */
-function getRewardTypeName(typeId) {
-  return labelsByTypes[typeId] ?? "";
-}
+const dialogId = computed(() => "island-map-info-dialog")
+const formId = computed(() => dialogId.value + "__form")
 
 defineExpose({
   show,
@@ -37,8 +31,9 @@ defineExpose({
 <template>
   <suspense>
     <modal-dialog
-      ref="dialog"
-      element-id="island-map-info-dialog"
+      ref="dialogRef"
+      :form-id="formId"
+      :element-id="dialogId"
       :is-show-submit="false"
       :header="t('common.cell')"
       @vue:mounted="onMountedDialog"
@@ -67,7 +62,7 @@ defineExpose({
               <b>Server</b><br />
               ID: {{ reward.id }}<br />
               name: {{ reward.name }}<br />
-              type: {{ getRewardTypeName(reward.typeId) }}, id = {{ reward.typeId }}<br />
+              type: {{ getItemTypeName(reward.type, t) }}, id = {{ reward.typeId }}<br />
               quantity: {{ reward.quantity }}<br />
             </div>
             <div class="col-md-4">

@@ -6,6 +6,10 @@ import type { DialogResult } from "./modal-dialog";
 
 const { t } = useI18n();
 
+interface AppModal {
+  show: () => void,
+}
+
 defineExpose({
   show,
   hide,
@@ -23,8 +27,8 @@ if (!import.meta.env.SSR) {
 
 interface Props {
   elementId: string,
-  saving: boolean,
   formId: string,
+  saving: boolean,
   header: string,
   submitButtonText: string,
   size: string,
@@ -84,8 +88,7 @@ function show() {
   return promise;
 }
 
-function hide(result: DialogResult) {
-  dialogResult = result;
+function hide() {
   modal?.hide();
 }
 </script>

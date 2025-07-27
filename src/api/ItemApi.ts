@@ -95,3 +95,9 @@ export function getLabelsByTypes(t: ComposerTranslation) {
     [TYPE_STAMINA]: t("common.stamina"),
   };
 }
+
+export function getTypeName(type: Type, t: ComposerTranslation): string {
+  const labelsByTypes = getLabelsByTypes(t)
+
+  return labelsByTypes[type] ?? "";
+}
