@@ -1,4 +1,5 @@
-import { isCommonStep } from "@/api/NodeApi";
+import type { Item } from "@/api/ItemApi";
+import { isCommonStep, type Node } from "@/api/NodeApi";
 
 export const SIDE = 50;
 const HALF_SIDE = SIDE / 2;
@@ -6,6 +7,16 @@ const HEIGHT = 34;
 const IMAGE_SIDE = 24;
 
 export type UserNodeIdsMap = { [key: number]: boolean }
+
+export type NodeMap = Map<number, Node>
+
+export interface NodeReward {
+  uniqueId: string,
+  quantity: number,
+  humanQuantity: string,
+  item: Item,
+  node: Node,
+}
 
 /**
  * @param {Object} nodes

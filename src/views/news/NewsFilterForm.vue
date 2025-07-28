@@ -6,10 +6,12 @@ const EVENT_UPDATE_NAME = "update:name";
 import { useI18n } from "vue-i18n";
 import { filterNameMinCharsCount } from "../news";
 
-defineProps<{
+interface Props {
   loading: boolean,
   name: string,
-}>()
+}
+
+defineProps<Props>()
 
 const emit = defineEmits<{
   [EVENT_FIND]: [],

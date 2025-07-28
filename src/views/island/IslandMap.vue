@@ -11,7 +11,7 @@ import { onMounted, onUnmounted, ref, computed, shallowReactive } from "vue";
 import { getHumanQuantity } from "@/helpers/formatter";
 import { useI18n } from "vue-i18n";
 import { fullscreenElement } from "@/core/fullscreen";
-import { TYPE_CHEST, TYPE_TOWER, type NodeFilter } from "@/api/NodeApi";
+import { TYPE_CHEST, TYPE_TOWER, type Node, type NodeFilter } from "@/api/NodeApi";
 import { isObject } from "@/helpers/core";
 import { getNodesMap } from "@/services/api/island-node";
 import { SELECT_MODE_DISABLE, SELECT_MODE_GOING, SELECT_MODE_PLAN } from "./select-mode";
@@ -19,12 +19,15 @@ import type { SelectMode } from "./select-mode";
 import { shallowRef } from "vue";
 import { UserError } from "@/exceptions/UserError";
 import type { Island } from "@/api/IslandApi";
-import type { UserNodeIdsMap } from "./map";
+import type { NodeMap, NodeReward, UserNodeIdsMap } from "./map";
+import type { Item } from "@/api/ItemApi";
 
-const props = defineProps<{
+interface Props {
   island: Island,
   parentPageId: string,
-}>();
+}
+
+const props = defineProps<Props>();
 
 interface Filter {
   itemName: string,
@@ -65,7 +68,7 @@ const errorMessage = ref("");
 const regionNumbers = ref<Array<number>>([]);
 
 const isLoadingNodes = ref(true);
-const nodes = ref({});
+const nodes = ref<>({});
 const rewards = ref([]);
 const userNodesIdsMap = ref<UserNodeIdsMap>({});
 const userNodesGoingIdsMap = ref<UserNodeIdsMap>({});
@@ -179,16 +182,16 @@ onUnmounted(() => {
   saveState();
 });
 
-function onBeforeUnload(event: Event) {
-  event.returnValue = "";
+function onBeforeUnload(event: Event): string {
+  event.returnValue = false;
 
   saveState();
 
   return "";
 }
 
-async function loadNodes(isForce: boolean) {
-  let nodes = {};
+async function loadNodes(isForce: boolean): Promise<NodeMap> {
+  let nodes: NodeMap = {};
   let filter: NodeFilter = {};
 
   const visibleRegions = props.island.regions
@@ -217,24 +220,15 @@ async function loadNodes(isForce: boolean) {
   return nodes;
 }
 
-/**
- * @param {Array} nodes
- */
-function calculateRewards(nodes) {
+function calculateRewards(nodes: NodeMap): Array<NodeReward> {
   calculatingRewards.value = true;
 
-  const tmpMap = {};
-  const rewards = [];
+  const tmpMap: { [key: string]: boolean } = {};
+  const rewards: Array<NodeReward> = [];
   let index = 0;
 
-  for (const id in nodes) {
-    const node = nodes[id];
-    const itemCount = node?.items.length;
-    if (!itemCount) {
-      continue;
-    }
-
-    node.items.forEach((item) => {
+  nodes.forEach((node) => {
+    node.rewards.forEach((item) => {
       const uid = getUniqueId(node, item, index);
       if (tmpMap[uid]) {
         throw new Error("UID exists " + uid);
@@ -242,30 +236,23 @@ function calculateRewards(nodes) {
       tmpMap[uid] = true;
 
       rewards.push({
+        quantity: item.quantity,
         uniqueId: uid,
-        iconUrl: item.iconUrl,
         humanQuantity: getHumanQuantity(item.quantity),
-        emeraldCost: item.emeraldCost !== null ? item.emeraldCost * item.quantity : null,
-        node,
         item,
+        node,
       });
 
       ++index;
     });
-  }
+  })
 
   calculatingRewards.value = false;
 
   return rewards;
 }
 
-/**
- * @param {Object} node
- * @param {Object} reward
- * @param {Number} index
- * @returns {String}
- */
-function getUniqueId(node, reward, index) {
+function getUniqueId(node: Node, reward: Item, index: number): string {
   return "mx" + node.mx + "_my" + node.my + "_id" + reward.id + "_i" + index;
 }
 
@@ -394,7 +381,7 @@ function forceReloadMap() {
  * @param {Boolean} isForce
  */
 function reloadMap(isForce = false) {
-  loadNodes(isForce).then((responseNodes) => {
+  loadNodes(isForce).then((responseNodes: NodeMap) => {
     nodes.value = responseNodes;
     rewards.value = calculateRewards(responseNodes);
 

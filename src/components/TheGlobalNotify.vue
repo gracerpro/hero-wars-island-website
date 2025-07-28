@@ -10,9 +10,11 @@ interface VisibleNotification {
   content: string,
 }
 
-const props = defineProps<{
+interface Props {
   notifications: Array<Notification>
-}>()
+}
+
+const props = defineProps<Props>()
 
 const store = useStore();
 

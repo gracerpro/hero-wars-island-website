@@ -7,9 +7,11 @@ import { getStatusName, getTypeName } from "@/api/NodeApi";
 import { getTypeName as getItemTypeName } from "@/api/ItemApi";
 import type { ComponentExposed } from "vue-component-type-helpers";
 
-const props = defineProps({
+interface Props {
   drawedNode: { type: Object, required: true },
-});
+}
+
+const props = defineProps<Props>();
 
 const { t } = useI18n();
 

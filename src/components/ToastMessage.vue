@@ -3,15 +3,17 @@ import { ref, computed } from "vue";
 import { type ToastType, TYPE_DANGER, TYPE_SUCCESS } from "./toast";
 import { Toast } from "bootstrap"; // TODO: test, must be dynamic
 
+interface Props {
+  elementId: string
+}
+
+const props = defineProps<Props>()
+
 let LocalToast: typeof Toast | null
 
 if (!import.meta.env.SSR) {
   import("bootstrap").then((module) => (LocalToast = module.Toast));
 }
-
-const props = defineProps<{
-  elementId: string
-}>()
 
 const toastMessage = ref("");
 const toastType = ref<ToastType>(TYPE_SUCCESS);

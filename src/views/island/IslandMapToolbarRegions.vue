@@ -7,17 +7,19 @@ import { useI18n } from "vue-i18n";
 import { getRegionTitle } from "./island";
 import type { Region } from "@/api/IslandApi";
 
-const { t } = useI18n();
-
-const props = defineProps<{
+interface Props {
   regions: Array<Region>,
   regionNumbers: Array<number>,
   loading: boolean,
-}>();
+}
+
+const props = defineProps<Props>();
 const emit = defineEmits<{
   [EVENT_UPDATE_REGION_NUMBERS]: [value: Array<number>],
   [EVENT_RESET_REGION_NUMBERS]: []
 }>()
+
+const { t } = useI18n();
 
 function onChangeNumber(region: Region) {
   if (!region.isVisible) {

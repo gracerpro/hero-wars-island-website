@@ -27,13 +27,16 @@ export const defaultCostItem = {
 
 export interface Node {
   id: number,
+  mx: number,
+  my: number,
   type: Type,
   status: Status,
   costItem: Item,
+  rewards: Array<Item>,
 }
 
 export type NodeFilter = {
-  regionNumbers?: Array<number>
+  regionNumbers?: Array<number>,
 }
 
 export class NodeApi {
@@ -47,7 +50,7 @@ export class NodeApi {
   }
 
   async getList(islandId: number, filter?: NodeFilter): Promise<ApiList<Node>> {
-    let params = new URLSearchParams()
+    const params = new URLSearchParams()
     params.append("islandId", islandId.toString())
 
     if (filter) {
@@ -78,11 +81,11 @@ export class NodeApi {
     return this.modifyNode(response);
   }*/
 
-  private modifyNode(response: any): Node {
-    let items: Array<Item> = []
+  private modifyNode(data: any): Node {
+    let rewards: Array<Item> = []
 
-    if (response.items) {
-      items = response.items.map((data: any) => {
+    if (data.items) {
+      rewards = data.items.map((data: any) => {
         return {
           description: data.description ?? "",
           quantity: data.quantity > 0 ? data.quantity : 1,
@@ -92,10 +95,13 @@ export class NodeApi {
     }
 
     return {
-      id: response.id,
-      type: response.typeId ?? TYPE_NODE,
-      status: response.statusId ?? STATUS_CREATED,
-      costItem: response.cost ?? defaultCostItem,
+      id: data.id,
+      type: data.typeId ?? TYPE_NODE,
+      status: data.statusId ?? STATUS_CREATED,
+      costItem: data.cost ?? defaultCostItem,
+      rewards,
+      mx: data.mx,
+      my: data.my,
     }
   }
 }

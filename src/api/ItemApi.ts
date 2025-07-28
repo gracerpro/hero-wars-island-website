@@ -28,6 +28,8 @@ export interface Item {
   name: string,
   gameId: number,
   type: Type,
+  iconUrl: string,
+  emeraldCost: number | null,
 }
 
 export type ItemFilter = {
@@ -45,7 +47,7 @@ export class ItemApi {
   }
 
   async getList(limit: number, filter?: ItemFilter): Promise<ApiList<Item>> {
-    let params = new URLSearchParams();
+    const params = new URLSearchParams();
     params.append("limit", limit.toString())
 
     if (filter) {
@@ -67,12 +69,13 @@ export class ItemApi {
     return new ApiList<Item>(items, totalCount)
   }
 
-  private modifyItem(response: any): Item {
+  private modifyItem(data: any): Item  {
     return {
-      id: response.id,
-      name: response.name,
+      id: data.id,
+      name: data.name,
       gameId: 0,
-      type: response.typeId,
+      type: data.typeId,
+      iconUrl: data.iconUrl,
     }
   }
 }
