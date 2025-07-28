@@ -19,7 +19,7 @@ import type { SelectMode } from "./select-mode";
 import { shallowRef } from "vue";
 import { UserError } from "@/exceptions/UserError";
 import type { Island } from "@/api/IslandApi";
-import type { NodeMap, NodeReward, UserNodeIdsMap } from "./map";
+import type { NodeMap, ViewNodeReward, UserNodeIdsMap } from "./map";
 import type { Item } from "@/api/ItemApi";
 
 interface Props {
@@ -220,11 +220,11 @@ async function loadNodes(isForce: boolean): Promise<NodeMap> {
   return nodes;
 }
 
-function calculateRewards(nodes: NodeMap): Array<NodeReward> {
+function calculateRewards(nodes: NodeMap): Array<ViewNodeReward> {
   calculatingRewards.value = true;
 
   const tmpMap: { [key: string]: boolean } = {};
-  const rewards: Array<NodeReward> = [];
+  const rewards: Array<ViewNodeReward> = [];
   let index = 0;
 
   nodes.forEach((node) => {

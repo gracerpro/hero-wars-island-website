@@ -8,9 +8,7 @@ const IMAGE_SIDE = 24;
 
 export type UserNodeIdsMap = { [key: number]: boolean }
 
-export type NodeMap = Map<number, Node>
-
-export interface NodeReward {
+export interface ViewNodeReward {
   uniqueId: string,
   quantity: number,
   humanQuantity: string,

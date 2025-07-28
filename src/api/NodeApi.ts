@@ -1,6 +1,6 @@
 import { getCurrentLocale } from "@/i18n/translation";
 import ApiRequest from "../core/ApiRequest";
-import { GAME_ID_EXPLORER_MOVE, GAME_ID_WOOD, TYPE_COIN, type Item } from "./ItemApi";
+import { GAME_ID_EXPLORER_MOVE, GAME_ID_WOOD, modifyItem, TYPE_COIN, type Item, type ItemMap } from "./ItemApi";
 import { ApiList } from "./common";
 import type { ComposerTranslation } from "vue-i18n";
 
@@ -32,11 +32,24 @@ export interface Node {
   type: Type,
   status: Status,
   costItem: Item,
-  rewards: Array<Item>,
+  rewards: Array<NodeReward>,
+}
+
+export type NodeMap = Map<number, Node>
+
+export interface NodeReward {
+  itemId: number,
+  quantity: number,
 }
 
 export type NodeFilter = {
   regionNumbers?: Array<number>,
+}
+
+export type IslandNodeList = {
+  nodes: NodeMap,
+  totalCount: number,
+  rewards: ItemMap,
 }
 
 export class NodeApi {
@@ -49,7 +62,7 @@ export class NodeApi {
     });
   }
 
-  async getList(islandId: number, filter?: NodeFilter): Promise<ApiList<Node>> {
+  async getList(islandId: number, filter?: NodeFilter): Promise<IslandNodeList> {
     const params = new URLSearchParams()
     params.append("islandId", islandId.toString())
 
@@ -61,15 +74,29 @@ export class NodeApi {
 
     const response = await this.apiRequest.get("/island-nodes", params);
 
-    let items: Array<Node> = []
+    const nodes = new Map<number, Node>()
     let totalCount = 0
+    const rewards: ItemMap = {}
 
     if (response.items) {
-      items = response.items.map((node: any) => this.modifyNode(node));
-      totalCount = response.totalCount
+      response.items.forEach((node: any) => {
+        nodes.set(node.id, this.modifyNode(node))
+      })
+      totalCount = response.totalCount;
+
+      console.log(response.rewards)
+
+      for (const id in response.rewards) {
+        const reward = response.rewards[id]
+        rewards[parseInt(id)] = modifyItem(reward)
+      }
     }
 
-    return new ApiList<Node>(items, totalCount);
+    return {
+      nodes,
+      totalCount,
+      rewards,
+    };
   }
 
   /**
@@ -82,14 +109,13 @@ export class NodeApi {
   }*/
 
   private modifyNode(data: any): Node {
-    let rewards: Array<Item> = []
+    let rewards: Array<NodeReward> = []
 
     if (data.items) {
-      rewards = data.items.map((data: any) => {
+      rewards = data.items.map((itemData: any): NodeReward => {
         return {
-          description: data.description ?? "",
-          quantity: data.quantity > 0 ? data.quantity : 1,
-          emeraldCost: data.emeraldCost ?? null,
+          itemId: itemData.itemId,
+          quantity: itemData.quantity > 0 ? itemData.quantity : 1,
         }
       });
     }

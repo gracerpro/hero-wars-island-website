@@ -1,6 +1,6 @@
 import HeroClient from "@/api/HeroClient";
 import type { Island } from "@/api/IslandApi";
-import type { Node, NodeFilter } from "@/api/NodeApi";
+import type { IslandNodeList, Node, NodeFilter } from "@/api/NodeApi";
 import { INDEXED_DB_NAME } from "@/core/storage";
 import { isObject } from "@/helpers/core";
 import type { NodeMap } from "@/views/island/map";
@@ -9,8 +9,8 @@ type DateByIslandMap = { [key: number]: string }
 
 const client = new HeroClient();
 
-export async function getNodesMap(island: Island, isForce = false, filter?: NodeFilter): Promise<NodeMap> {
-  let nodesMap: NodeMap | null = null;
+export async function getNodesMap(island: Island, isForce = false, filter?: NodeFilter): Promise<IslandNodeList> {
+  let nodesList: IslandNodeList | null = null;
   const isEmptyFilter = filter === undefined || Object.values(filter).every((a) => a === undefined)
   const previosUpdatedAt = loadPreviousUpdatedAt(island);
   const isLoadFromServer =
@@ -18,31 +18,33 @@ export async function getNodesMap(island: Island, isForce = false, filter?: Node
 
   try {
     if (!isLoadFromServer) {
-      nodesMap = await getNodesFromCache(island);
+      nodesList = await getNodesFromCache(island);
       console.log("from cache nodesMap", nodesMap); // TODO: test
-      if (!(nodesMap instanceof Map)) {
-        nodesMap = null
+      if (!(nodesList instanceof IslandNodeList)) {
+        nodesList = null
       }
     }
   } catch (error) {
     console.error(error); // TODO: notify
   }
 
-  if (nodesMap === null || nodesMap === undefined) {
-    const list = await client.node.getList(island.id, filter);
-
-    nodesMap = new Map<number, Node>()
-    list.items.forEach((node: Node) => {
-      nodesMap!.set(node.id, node)
-    });
+  if (nodesList === null || nodesList === undefined) {
+    const nodesList = await client.node.getList(island.id, filter);
 
     if (isEmptyFilter) {
-      writeNodesToCache(island, nodesMap);
+      writeNodesToCache(island, nodesList);
       savePreviousUpdatedAt(island);
     }
   }
+  if (nodesList === null || nodesList === undefined) {
+    nodesList = {
+      nodes: new Map<number, Node>(),
+      totalCount: 0,
+      rewards: {},
+    }
+  }
 
-  return nodesMap;
+  return nodesList;
 }
 
 const PREVIOUS_DATES_NAME = "island.previosUpdateDates";
@@ -110,7 +112,7 @@ async function writeNodesToCache(island: Island, nodesMap: NodeMap): Promise<IDB
   });
 }
 
-async function getNodesFromCache(island: Island): Promise<NodeMap|null> {
+async function getNodesFromCache(island: Island): Promise<IslandNodeList|null> {
   const db = await openDb();
 
   return new Promise((resolve, reject) => {
@@ -119,8 +121,8 @@ async function getNodesFromCache(island: Island): Promise<NodeMap|null> {
     const request = nodeStore.get(island.id);
 
     request.onsuccess = () => {
-      const nodesMap = request.result?.nodesMap;
-      resolve(nodesMap);
+      const nodesList = request.result?.nodesMap;
+      resolve(nodesList);
     }
     request.onerror = () => {
       reject(request.error);

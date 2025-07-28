@@ -26,11 +26,16 @@ export const GAME_ID_WOOD = 53;
 export interface Item {
   id: number,
   name: string,
-  gameId: number,
+  gameId: number | null,
   type: Type,
-  iconUrl: string,
+  iconUrl: string | null,
+  iconWidth: number | null,
+  iconHeight: number | null,
   emeraldCost: number | null,
+  description: string,
 }
+
+export type ItemMap = { [key: number]: Item }
 
 export type ItemFilter = {
   name?: string
@@ -62,21 +67,25 @@ export class ItemApi {
     let totalCount: number = 0
 
     if (response.items) {
-      items = response.items.map((item: any) => this.modifyItem(item))
+      items = response.items.map((item: any) => modifyItem(item))
       totalCount = response.totalCount
     }
 
     return new ApiList<Item>(items, totalCount)
   }
+}
 
-  private modifyItem(data: any): Item  {
-    return {
-      id: data.id,
-      name: data.name,
-      gameId: 0,
-      type: data.typeId,
-      iconUrl: data.iconUrl,
-    }
+export function modifyItem(data: any): Item  {
+  return {
+    id: data.id,
+    name: data.name,
+    type: data.typeId, // TODO: validate type? if null then TYPE_UNKNOWN
+    gameId: data.gameId ?? null,
+    iconUrl: data.iconUrl ?? null,
+    iconWidth: data.iconWidth ?? null,
+    iconHeight: data.iconHeight ?? null,
+    emeraldCost: data.emeraldCost ?? null,
+    description: data.description ?? "",
   }
 }
 
