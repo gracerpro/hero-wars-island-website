@@ -25,9 +25,10 @@ interface Props {
 }
 
 interface StepCostItem {
-  type: Type,
-  gameId: number | null,
+  readonly type: Type,
+  readonly gameId: number | null,
   quantity: number,
+  readonly iconClass?: string,
 }
 
 const { t } = useI18n();
@@ -89,7 +90,7 @@ const otherStepCostItems = computed(() => {
     const item = userStepCostItems.value[key];
 
     if (!isCommonStep(item)) {
-      let icon = null;
+      let icon;
 
       if (item.type === TYPE_STARMONEY) {
         icon = "item-emerald";
@@ -97,7 +98,7 @@ const otherStepCostItems = computed(() => {
 
       result[key] = {
         ...item,
-        icon,
+        iconClass: icon,
       };
     }
   }
@@ -177,13 +178,7 @@ function onChangeSelectMode(event: Event) {
         >
           <span class="d-inline-block">
             <span
-              v-if="item.icon"
-              :class="['hero-color-icon align-middle me-3', item.icon]"
-              :title="'typeId = ' + item.type + ' gameId = ' + item.gameId"
-            ></span>
-            <span
-              v-else
-              class="hero-color-icon align-middle me-3"
+              :class="['hero-color-icon align-middle me-3', item.iconClass ?? '']"
               :title="'typeId = ' + item.type + ' gameId = ' + item.gameId"
             ></span>
             <span class="fs-4 align-middle">

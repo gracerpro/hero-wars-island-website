@@ -2,13 +2,13 @@
 const EVENT_UPDATE_IS_SHOW_BLOCK = "update:isShowBlock";
 </script>
 <script setup lang="ts">
-import type { Item } from "@/api/ItemApi";
 import { useI18n } from "vue-i18n";
+import type { ViewNodeReward } from "./map";
 
 interface Props {
   header: string,
   isShowBlock: boolean,
-  rewards: Array<Item>,
+  rewards: Array<ViewNodeReward>,
   visibleRewardsCount: number,
 }
 
@@ -20,8 +20,8 @@ const emit = defineEmits<{
 
 const { t } = useI18n();
 
-const getItemName = (item) => {
-  return item.item.name ? item.item.name : t("common.noName");
+const getItemName = (item: ViewNodeReward) => {
+  return item.item.name.length > 0 ? item.item.name : t("common.noName");
 };
 </script>
 
@@ -52,21 +52,21 @@ const getItemName = (item) => {
             <td colspan="3">{{ t("common.noData") }}</td>
           </tr>
           <tr
-            v-for="item in rewards"
+            v-for="reward in rewards"
             v-else
-            :key="item.uniqueId"
+            :key="reward.uniqueId"
           >
             <td>
               <img
-                v-if="item.item.iconUrl"
-                :src="item.item.iconUrl"
-                :width="item.item.iconWidth"
-                :height="item.item.iconHeight"
+                v-if="reward.item.iconUrl && reward.item.iconWidth && reward.item.iconHeight"
+                :src="reward.item.iconUrl"
+                :width="reward.item.iconWidth"
+                :height="reward.item.iconHeight"
                 class="icon"
               />
             </td>
-            <td>{{ getItemName(item) }}</td>
-            <td class="text-end">{{ item.humanQuantity }}</td>
+            <td>{{ getItemName(reward) }}</td>
+            <td class="text-end">{{ reward.humanQuantity }}</td>
           </tr>
         </tbody>
       </table>

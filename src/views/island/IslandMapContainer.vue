@@ -251,7 +251,7 @@ function selectNode(drawedNode) {
     if (!props.isSelectAnyNode) {
       const message = canSelectNextNode(totalNodes.value, props.userNodesIdsMap, drawedNode);
       if (message) {
-        toastRef.value.show(message, TYPE_DANGER);
+        toastRef.value?.show(message, TYPE_DANGER);
         return;
       }
     }
@@ -316,7 +316,7 @@ function onMouseWheel(event: WheelEvent) {
   event.preventDefault();
 }
 
-function emitNewScale(event: MouseEvent, value: number) {
+function emitNewScale(event: MouseEvent | KeyboardEvent, value: number) {
   if (event.ctrlKey) {
     value /= 10;
   } else if (event.shiftKey) {

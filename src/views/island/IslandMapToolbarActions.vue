@@ -2,6 +2,8 @@
 const EVENT_RESET = "reset";
 </script>
 <script setup lang="ts">
+/* global MouseEvent */
+
 import {
   DELTA_SCALE,
   EVENT_CHANGE_SCALE,

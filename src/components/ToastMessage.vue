@@ -1,4 +1,6 @@
 <script setup lang="ts">
+/* global HTMLElement */
+
 import { ref, computed } from "vue";
 import { type ToastType, TYPE_DANGER, TYPE_SUCCESS } from "./toast";
 import { Toast } from "bootstrap"; // TODO: test, must be dynamic

@@ -1,4 +1,8 @@
 <script setup lang="ts">
+/* global window */
+/* global Event */
+/* global localStorage */
+
 import IslandMapLoading from "./IslandMapLoading.vue";
 import IslandMapToolbar from "./IslandMapToolbar.vue";
 import IslandMapSteps from "./IslandMapSteps.vue";
@@ -424,8 +428,7 @@ function loadState() {
     if (item !== null) {
       stateData = JSON.parse(item) || {};
     }
-  } catch (error) {
-    console.error(error);
+  } catch {
     stateData = {}
   }
   if (typeof stateData !== "object") {

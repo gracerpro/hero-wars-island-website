@@ -78,7 +78,7 @@ function onMountedHelpDialog() {
       :loading="loading"
       :translate-x="translateX"
       :translate-y="translateY"
-      @change-translate="(dx: number, dy: number) => emit(EVENT_CHANGE_TRANSLATE, dx, dy)"
+      @change-translate="(dx: number | null, dy: number | null) => emit(EVENT_CHANGE_TRANSLATE, dx, dy)"
       @change-scale="(value: number) => emit(EVENT_CHANGE_SCALE, value)"
       @reset="emit(EVENT_RESET)"
     />
