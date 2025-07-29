@@ -1,9 +1,8 @@
 import HeroClient from "@/api/HeroClient";
 import type { Island } from "@/api/IslandApi";
-import type { IslandNodeList, Node, NodeFilter } from "@/api/NodeApi";
+import type { IslandNodeList, Node, NodeFilter, NodeMap } from "@/api/NodeApi";
 import { INDEXED_DB_NAME } from "@/core/storage";
 import { isObject } from "@/helpers/core";
-import type { NodeMap } from "@/views/island/map";
 
 type DateByIslandMap = { [key: number]: string }
 
@@ -19,8 +18,8 @@ export async function getNodesMap(island: Island, isForce = false, filter?: Node
   try {
     if (!isLoadFromServer) {
       nodesList = await getNodesFromCache(island);
-      console.log("from cache nodesMap", nodesMap); // TODO: test
-      if (!(nodesList instanceof IslandNodeList)) {
+      console.log("from cache nodesMap", nodesList); // TODO: test
+      if (!isNodeList(nodesList)) {
         nodesList = null
       }
     }
@@ -29,7 +28,7 @@ export async function getNodesMap(island: Island, isForce = false, filter?: Node
   }
 
   if (nodesList === null || nodesList === undefined) {
-    const nodesList = await client.node.getList(island.id, filter);
+    const nodesList = await client.node.byIslandList(island.id, filter);
 
     if (isEmptyFilter) {
       writeNodesToCache(island, nodesList);
@@ -45,6 +44,12 @@ export async function getNodesMap(island: Island, isForce = false, filter?: Node
   }
 
   return nodesList;
+}
+
+function isNodeList(data: any): boolean {
+  return (data.nodes && typeof data.nodes === "object")
+    && (typeof data.totalCount === "number")
+    && (typeof data.rewards === "object")
 }
 
 const PREVIOUS_DATES_NAME = "island.previosUpdateDates";
@@ -122,6 +127,7 @@ async function getNodesFromCache(island: Island): Promise<IslandNodeList|null> {
 
     request.onsuccess = () => {
       const nodesList = request.result?.nodesMap;
+      console.log("nodesList from db", nodesList)
       resolve(nodesList);
     }
     request.onerror = () => {

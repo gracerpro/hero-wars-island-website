@@ -9,11 +9,18 @@ const IMAGE_SIDE = 24;
 export type UserNodeIdsMap = { [key: number]: boolean }
 
 export interface ViewNodeReward {
-  uniqueId: string,
+  readonly uniqueId: string,
+  readonly quantity: number,
+  readonly humanQuantity: string,
+  readonly item: Item,
+  readonly node: Node,
+}
+
+export type GroupReward = {
+  readonly itemId: number,
+  readonly item: Item,
   quantity: number,
   humanQuantity: string,
-  item: Item,
-  node: Node,
 }
 
 /**

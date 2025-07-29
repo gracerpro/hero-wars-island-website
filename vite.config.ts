@@ -30,7 +30,7 @@ export default defineConfig(({mode}) => {
       vue(),
       ViteEjsPlugin(env),
       compression({
-        algorithm: 'gzip',
+        algorithms: ['gzip'],
         exclude: [/\.(br)$ /, /\.(gz)$/]
       }),
     ],

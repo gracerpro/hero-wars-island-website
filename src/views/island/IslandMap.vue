@@ -7,11 +7,11 @@ import IslandMapDownloadDialog from "./IslandMapDownloadDialog.vue";
 import IslandMapFilter from "./IslandMapFilter.vue";
 import IslandMapTable from "./IslandMapTable.vue";
 import { canSelectNode } from "@/services/island-map";
-import { onMounted, onUnmounted, ref, computed, shallowReactive } from "vue";
+import { onMounted, onUnmounted, ref, computed, shallowReactive, useTemplateRef } from "vue";
 import { getHumanQuantity } from "@/helpers/formatter";
 import { useI18n } from "vue-i18n";
 import { fullscreenElement } from "@/core/fullscreen";
-import { TYPE_CHEST, TYPE_TOWER, type Node, type NodeFilter } from "@/api/NodeApi";
+import { TYPE_CHEST, TYPE_TOWER, type IslandNodeList, type Node, type NodeFilter, type NodeMap, type NodeReward } from "@/api/NodeApi";
 import { isObject } from "@/helpers/core";
 import { getNodesMap } from "@/services/api/island-node";
 import { SELECT_MODE_DISABLE, SELECT_MODE_GOING, SELECT_MODE_PLAN } from "./select-mode";
@@ -19,8 +19,9 @@ import type { SelectMode } from "./select-mode";
 import { shallowRef } from "vue";
 import { UserError } from "@/exceptions/UserError";
 import type { Island } from "@/api/IslandApi";
-import type { NodeMap, ViewNodeReward, UserNodeIdsMap } from "./map";
-import type { Item } from "@/api/ItemApi";
+import type { ViewNodeReward, UserNodeIdsMap, GroupReward } from "./map";
+import { getUnknownItem, type Type } from "@/api/ItemApi";
+import type { ComponentExposed } from "vue-component-type-helpers";
 
 interface Props {
   island: Island,
@@ -31,7 +32,7 @@ const props = defineProps<Props>();
 
 interface Filter {
   itemName: string,
-  typeId: number | null,
+  itemType: Type | null,
   isNodeTypeTower: boolean,
   isNodeTypeChest: boolean,
 }
@@ -63,13 +64,13 @@ let byIslandState: IslandStateMap = {};
 const minCharsCount = 3;
 const componentId = props.parentPageId + "__map";
 
-const calculatingRewards = ref(false);
 const errorMessage = ref("");
 const regionNumbers = ref<Array<number>>([]);
 
 const isLoadingNodes = ref(true);
-const nodes = ref<>({});
-const rewards = ref([]);
+const nodes = ref<NodeMap>(new Map<number, Node>());
+const rewards = ref<Array<ViewNodeReward>>([]);
+const calculatingRewards = ref(false);
 const userNodesIdsMap = ref<UserNodeIdsMap>({});
 const userNodesGoingIdsMap = ref<UserNodeIdsMap>({});
 const disableNodesIdsMap = ref<UserNodeIdsMap>({});
@@ -86,13 +87,13 @@ const isShowRewardsBlock = ref(true);
 const isShowUserRewardsBlock = ref(true);
 let filter = shallowReactive<Filter>({
   itemName: "",
-  typeId: null,
+  itemType: null,
   isNodeTypeTower: false,
   isNodeTypeChest: false,
 });
 
-const mapContainerRef = ref<HTMLElement|null>(null);
-const downloadDialog = ref<HTMLElement|null>(null);
+const mapContainerRef = useTemplateRef<ComponentExposed<typeof IslandMapContainer>>("mapContainerRef");
+const downloadDialog = useTemplateRef<ComponentExposed<typeof IslandMapDownloadDialog>>("downloadDialog");
 const downloadDialogComponent = shallowRef<typeof IslandMapDownloadDialog|null>(null);
 
 const loading = computed(() => isLoadingNodes.value || calculatingRewards.value);
@@ -110,11 +111,11 @@ const visibleRewards = computed(() => {
       return item.item.name.toLowerCase().includes(filter.itemName.toLowerCase());
     });
   }
-  if (filter.typeId !== null && filter.typeId > 0) {
-    resultRewards = resultRewards.filter((item) => item.item.typeId === filter.typeId);
+  if (filter.itemType !== null && filter.itemType > 0) {
+    resultRewards = resultRewards.filter((item) => item.item.type === filter.itemType);
   }
   if (filter.isNodeTypeChest || filter.isNodeTypeTower) {
-    const typeMap = {};
+    const typeMap: {[key: number]: boolean} = {};
 
     if (filter.isNodeTypeChest) {
       typeMap[TYPE_CHEST] = true;
@@ -124,7 +125,7 @@ const visibleRewards = computed(() => {
     }
 
     resultRewards = resultRewards.filter((item) => {
-      return typeMap[item.node.typeId] !== undefined;
+      return typeMap[item.node.type] !== undefined;
     });
   }
 
@@ -133,24 +134,25 @@ const visibleRewards = computed(() => {
 const visibleRewardsCount = computed(() => visibleRewards.value.length);
 const userRewards = computed(() => {
   return rewards.value.filter((reward) => {
-    return nodes.value[reward.node.id] && userNodesIdsMap.value[reward.node.id];
+    return nodes.value.has(reward.node.id) && userNodesIdsMap.value[reward.node.id];
   });
 });
 const userRewardsCount = computed(() => userRewards.value.length);
 const groupRewards = computed(() => {
-  const map = {};
+  const map: { [key: number]: GroupReward } = {};
 
   rewards.value
     .filter((reward) => !disableNodesIdsMap.value[reward.node.id])
-    .forEach(({ item }) => {
-      if (!map[item.id]) {
-        map[item.id] = {
-          id: item.id,
+    .forEach((reward) => {
+      if (!map[reward.item.id]) {
+        map[reward.item.id] = {
+          itemId: reward.item.id,
           quantity: 0,
-          item,
+          item: reward.item,
+          humanQuantity: ""
         };
       }
-      map[item.id].quantity += item.quantity;
+      map[reward.item.id].quantity += reward.quantity;
     });
 
   let arr = Object.values(map);
@@ -190,8 +192,12 @@ function onBeforeUnload(event: Event): string {
   return "";
 }
 
-async function loadNodes(isForce: boolean): Promise<NodeMap> {
-  let nodes: NodeMap = {};
+async function loadNodes(isForce: boolean): Promise<IslandNodeList> {
+  let nodeList: IslandNodeList = {
+    nodes: new Map<number, Node>(),
+    totalCount: 0,
+    rewards: {}
+  };
   let filter: NodeFilter = {};
 
   const visibleRegions = props.island.regions
@@ -205,7 +211,7 @@ async function loadNodes(isForce: boolean): Promise<NodeMap> {
 
   isLoadingNodes.value = true;
   try {
-    nodes = await getNodesMap(props.island, isForce, filter);
+    nodeList = await getNodesMap(props.island, isForce, filter);
   } catch (error) {
     if (error instanceof UserError) {
       errorMessage.value = error.message;
@@ -217,29 +223,29 @@ async function loadNodes(isForce: boolean): Promise<NodeMap> {
     isLoadingNodes.value = false;
   }
 
-  return nodes;
+  return nodeList;
 }
 
-function calculateRewards(nodes: NodeMap): Array<ViewNodeReward> {
+function calculateRewards(nodeList: IslandNodeList): Array<ViewNodeReward> {
   calculatingRewards.value = true;
 
   const tmpMap: { [key: string]: boolean } = {};
   const rewards: Array<ViewNodeReward> = [];
   let index = 0;
 
-  nodes.forEach((node) => {
-    node.rewards.forEach((item) => {
-      const uid = getUniqueId(node, item, index);
+  nodeList.nodes.forEach((node) => {
+    node.rewards.forEach((nodeReward) => {
+      const uid = getUniqueId(node, nodeReward, index);
       if (tmpMap[uid]) {
         throw new Error("UID exists " + uid);
       }
       tmpMap[uid] = true;
 
       rewards.push({
-        quantity: item.quantity,
+        quantity: nodeReward.quantity,
         uniqueId: uid,
-        humanQuantity: getHumanQuantity(item.quantity),
-        item,
+        humanQuantity: getHumanQuantity(nodeReward.quantity),
+        item: nodeList.rewards[nodeReward.itemId] ?? getUnknownItem(),
         node,
       });
 
@@ -252,14 +258,11 @@ function calculateRewards(nodes: NodeMap): Array<ViewNodeReward> {
   return rewards;
 }
 
-function getUniqueId(node: Node, reward: Item, index: number): string {
-  return "mx" + node.mx + "_my" + node.my + "_id" + reward.id + "_i" + index;
+function getUniqueId(node: Node, nodeReward: NodeReward, index: number): string {
+  return "mx" + node.mx + "_my" + node.my + "_id" + nodeReward.itemId + "_i" + index;
 }
 
-/**
- * @param {Number} value
- */
-function onChangeScale(value) {
+function onChangeScale(value: number) {
   scale.value += value;
 
   const MAX_SCALE = 8;
@@ -303,15 +306,15 @@ function onToggleIsShowQuantity() {
   isShowQuantity.value = !isShowQuantity.value;
 }
 
-function onChangeNode(node) {
-  if (!nodes.value[node.id]) {
+function onChangeNode(node: Node) {
+  if (!nodes.value.has(node.id)) {
     throw new Error(t("page.island.notFoundNodeAdmin"));
   }
-  nodes.value[node.id] = node;
+  nodes.value.set(node.id, node);
 }
 
 function onSelectNode(nodeId: number) {
-  if (!nodes.value[nodeId]) {
+  if (!nodes.value.has(nodeId)) {
     throw new Error(t("page.island.notFoundNodeAdmin"));
   }
 
@@ -365,7 +368,9 @@ function onResetDisableNodes() {
 }
 
 function onFullscreen() {
-  fullscreenElement(mapContainerRef.value.svgMapRef);
+  if (mapContainerRef.value?.svgMapRef !== null) {
+    fullscreenElement(mapContainerRef.value?.svgMapRef as FullscreenElement);
+  }
 }
 
 function onBeginDownload() {
@@ -377,16 +382,13 @@ function forceReloadMap() {
   reloadMap(true);
 }
 
-/**
- * @param {Boolean} isForce
- */
 function reloadMap(isForce = false) {
-  loadNodes(isForce).then((responseNodes: NodeMap) => {
-    nodes.value = responseNodes;
-    rewards.value = calculateRewards(responseNodes);
+  loadNodes(isForce).then((nodeList: IslandNodeList) => {
+    nodes.value = nodeList.nodes;
+    rewards.value = calculateRewards(nodeList);
 
     for (const nodeId in userNodesIdsMap.value) {
-      const node = nodes.value[nodeId];
+      const node = nodes.value.get(nodeId);
       if ((node && !canSelectNode(node)) || disableNodesIdsMap.value[nodeId]) {
         delete userNodesIdsMap.value[nodeId];
       }
@@ -395,7 +397,7 @@ function reloadMap(isForce = false) {
 }
 
 function onMountedDownloadDialog() {
-  downloadDialog.value.show().finally(() => {
+  downloadDialog.value?.show().finally(() => {
     downloadDialogComponent.value = null;
   });
 }
@@ -432,14 +434,14 @@ function loadState() {
 
   let tmpFilter: Filter = {
     itemName: "",
-    typeId: null,
+    itemType: null,
     isNodeTypeTower: false,
     isNodeTypeChest: false
   }
 
   if (stateData?.filter) {
     tmpFilter.itemName = stateData.filter.itemName ?? "";
-    tmpFilter.typeId = stateData.filter.typeId ?? null;
+    tmpFilter.itemType = stateData.filter.type ?? null;
     tmpFilter.isNodeTypeChest = stateData.filter.isNodeTypeChest ?? false;
     tmpFilter.isNodeTypeTower = stateData.filter.isNodeTypeTower ?? false;
   }
@@ -588,7 +590,7 @@ function saveState() {
         <div class="col-lg-6">
           <island-map-filter
             v-model:item-name="filter.itemName"
-            v-model:type-id="filter.typeId"
+            v-model:type-id="filter.type"
             v-model:is-node-type-tower="filter.isNodeTypeTower"
             v-model:is-node-type-chest="filter.isNodeTypeChest"
             :rewards="rewards"

@@ -35,6 +35,22 @@ export interface Item {
   description: string,
 }
 
+const unknownItem: Item = {
+  id: 0,
+  name: "Unknown",
+  gameId: null,
+  type: TYPE_UNKNOWN,
+  iconUrl: null,
+  iconWidth: null,
+  iconHeight: null,
+  emeraldCost: null,
+  description: "",
+}
+
+export function getUnknownItem(): Item {
+  return unknownItem
+}
+
 export type ItemMap = { [key: number]: Item }
 
 export type ItemFilter = {

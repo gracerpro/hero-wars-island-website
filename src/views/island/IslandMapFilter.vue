@@ -5,20 +5,24 @@ const EVENT_UPDATE_IS_NODE_TYPE_TOWER = "update:is-node-type-tower";
 const EVENT_UPDATE_IS_NODE_TYPE_CHEST = "update:is-node-type-chest";
 </script>
 <script setup lang="ts">
+/* global HTMLInputElement */
+/* global Event */
+
 import TextInput from "@/components/TextInput.vue";
 import ClearSelect from "@/components/ClearSelect.vue";
-import { getLabelsByTypes, type Item, type Type } from "@/api/ItemApi";
+import { getLabelsByTypes, type Type } from "@/api/ItemApi";
 import { useI18n } from "vue-i18n";
 import { TYPE_CHEST, TYPE_TOWER } from "@/api/NodeApi";
 import { computed } from "vue";
 import type { SelectItemMap } from "@/components/select";
+import type { ViewNodeReward } from "./map";
 
 const { t } = useI18n();
 
 const formId = "nodesForm";
 
 interface Props {
-  rewards: { type: Object, required: true },
+  rewards: Array<ViewNodeReward>,
   itemName: string,
   typeId: Type | null,
   isNodeTypeTower: boolean,
@@ -38,14 +42,14 @@ const visibleTypes = computed<SelectItemMap>(() => {
   const map = new Map<number, boolean>();
   const labels = getLabelsByTypes(t);
 
-  props.rewards.forEach((item: Item) => {
-    map.set(item.item.typeId, true);
+  props.rewards.forEach((reward) => {
+    map.set(reward.item.type, true);
   });
 
   const types: SelectItemMap = {};
-  for (const typeId of map.keys()) {
-    if (typeId > 0) {
-      types[typeId] = labels[typeId];
+  for (const type of map.keys()) {
+    if (type > 0) {
+      types[type] = labels[type as Type] ?? t("common.unknown");
     }
   }
 

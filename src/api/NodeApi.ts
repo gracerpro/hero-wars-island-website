@@ -1,7 +1,6 @@
 import { getCurrentLocale } from "@/i18n/translation";
 import ApiRequest from "../core/ApiRequest";
 import { GAME_ID_EXPLORER_MOVE, GAME_ID_WOOD, modifyItem, TYPE_COIN, type Item, type ItemMap } from "./ItemApi";
-import { ApiList } from "./common";
 import type { ComposerTranslation } from "vue-i18n";
 
 export const TYPE_NODE = 0;
@@ -32,6 +31,7 @@ export interface Node {
   type: Type,
   status: Status,
   costItem: Item,
+  costItemCount: number,
   rewards: Array<NodeReward>,
 }
 
@@ -62,7 +62,7 @@ export class NodeApi {
     });
   }
 
-  async getList(islandId: number, filter?: NodeFilter): Promise<IslandNodeList> {
+  async byIslandList(islandId: number, filter?: NodeFilter): Promise<IslandNodeList> {
     const params = new URLSearchParams()
     params.append("islandId", islandId.toString())
 
@@ -120,11 +120,29 @@ export class NodeApi {
       });
     }
 
+    // data.cost
+    // - itemId
+    // - count
+    // - gameId ?
+
+    const costItem: Item = {
+      id: data.cost ?? 0,
+      name: data.cost ?? "Default cost item", // TODO: locale
+      gameId: data.cost ?? GAME_ID_EXPLORER_MOVE,
+      type: TYPE_COIN,
+      iconUrl: null,
+      iconWidth: null,
+      iconHeight: null,
+      emeraldCost: null,
+      description: ""
+    }
+
     return {
       id: data.id,
       type: data.typeId ?? TYPE_NODE,
       status: data.statusId ?? STATUS_CREATED,
-      costItem: data.cost ?? defaultCostItem,
+      costItem,
+      costItemCount: 1,
       rewards,
       mx: data.mx,
       my: data.my,

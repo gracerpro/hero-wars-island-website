@@ -3,6 +3,7 @@ import js from '@eslint/js'
 import tsEslint from "typescript-eslint"
 import skipFormattingConfig from "@vue/eslint-config-prettier/skip-formatting";
 import vueParser from "vue-eslint-parser";
+import globals from "globals";
 
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
@@ -19,7 +20,7 @@ export default [
       "vite.config.ts",
       "prerender.js",
       "server.js"
-    ]
+    ],
   },
   js.configs.recommended,
   ...tsEslint.configs.recommended,
@@ -28,6 +29,9 @@ export default [
     files: ["src/**/*.ts", "tests/**/*.ts"],
     languageOptions: {
       parser: tsEslint.parser,
+      globals: {
+        ...globals.browser,
+      }
     },
     plugins: {
       '@typescript-eslint': tsEslint.plugin
@@ -36,7 +40,10 @@ export default [
   {
     files: ["src/**/*.js", "tests/**/*.js"],
     languageOptions: {
-      ecmaVersion: "latest"
+      ecmaVersion: "latest",
+      globals: {
+        ...globals.browser,
+      }
     },
   },
   {

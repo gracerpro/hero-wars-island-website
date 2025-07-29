@@ -1,4 +1,10 @@
 <script setup lang="ts">
+/* global document */
+/* global console */
+/* global HTMLImageElement */
+/* global Image */
+/* global CanvasRenderingContext2D */
+
 import ModalDialog from "@/components/ModalDialog.vue";
 import { ref, useTemplateRef } from "vue";
 import { useI18n } from "vue-i18n";
@@ -16,6 +22,7 @@ import {
   TYPE_TOWER,
   TYPE_WOOD,
   type Node,
+  type NodeMap,
 } from "@/api/NodeApi";
 import type { Island } from "@/api/IslandApi";
 import type { Item } from "@/api/ItemApi";
@@ -23,9 +30,16 @@ import type { ComponentExposed } from "vue-component-type-helpers";
 
 interface Props {
   island: Island,
-  nodes: Map<number, Node>,
+  nodes: NodeMap,
   rewards: Array<Item>,
   isShowQuantity: boolean,
+}
+
+type MinMaxNodeCoordinates = {
+  minX: number | null,
+  maxX: number | null,
+  minY: number | null,
+  maxY: number | null,
 }
 
 type ImagesByUrls = { [key: string]: HTMLImageElement }
@@ -51,37 +65,34 @@ const rewardQuantities = computed(() => {
   return props.isShowQuantity ? iconItems.value.quantities : [];
 });
 
-const minMaxNodeCoordinates = computed(() => {
-  let minX = null;
-  let minY = null;
-  let maxX = null;
-  let maxY = null;
+const minMaxNodeCoordinates = computed<MinMaxNodeCoordinates>(() => {
+  let minX: number | null = null;
+  let minY: number | null = null;
+  let maxX: number | null = null;
+  let maxY: number | null = null;
 
-  for (const id in props.nodes) {
-    const node = props.nodes[id];
+  if (props.nodes.size > 0) {
+    const node = props.nodes.values().next().value as Node
     minX = node.mx;
     maxX = node.mx;
     minY = node.my;
     maxY = node.my;
-    break;
   }
 
-  for (const id in props.nodes) {
-    const node = props.nodes[id];
-
-    if (node.mx > maxX) {
+  props.nodes.forEach((node) => {
+    if (node.mx > (maxX as number)) {
       maxX = node.mx;
     }
-    if (node.mx < minX) {
+    if (node.mx < (minX as number)) {
       minX = node.mx;
     }
-    if (node.my < minY) {
+    if (node.my < (minY as number)) {
       minY = node.my;
     }
-    if (node.my > maxY) {
+    if (node.my > (maxY as number)) {
       maxY = node.my;
     }
-  }
+  })
 
   return {
     minX,
@@ -91,12 +102,18 @@ const minMaxNodeCoordinates = computed(() => {
   };
 });
 const horizontalCellsCount = computed(() => {
-  // +1 for center cell
-  return minMaxNodeCoordinates.value.maxX - minMaxNodeCoordinates.value.minX + 1;
+  if (minMaxNodeCoordinates.value.maxX !== null && minMaxNodeCoordinates.value.minX !== null) {
+    // +1 for center cell
+    return minMaxNodeCoordinates.value.maxX - minMaxNodeCoordinates.value.minX + 1;
+  }
+  return 0
 });
 const verticalCellsCount = computed(() => {
-  // +1 for center cell
-  return minMaxNodeCoordinates.value.maxY - minMaxNodeCoordinates.value.minY + 1;
+  if (minMaxNodeCoordinates.value.maxY !== null && minMaxNodeCoordinates.value.minY !== null) {
+    // +1 for center cell
+    return minMaxNodeCoordinates.value.maxY - minMaxNodeCoordinates.value.minY + 1;
+  }
+  return 0
 });
 const canvasWidth = computed(() => {
   return horizontalCellsCount.value * getHorizontalStep() + 1 * getHorizontalStep();
@@ -181,10 +198,12 @@ async function loadImages(): Promise<ImagesByUrls> {
 function drawMap(context: CanvasRenderingContext2D, imagesByUrls: ImagesByUrls) {
   context.save();
 
-  context.translate(
-    -(minMaxNodeCoordinates.value.minX - 1) * getHorizontalStep(),
-    -(minMaxNodeCoordinates.value.minY - 1) * getVerticalStep()
-  );
+  if (minMaxNodeCoordinates.value.minX !== null && minMaxNodeCoordinates.value.minY !== null) {
+    context.translate(
+      -(minMaxNodeCoordinates.value.minX - 1) * getHorizontalStep(),
+      -(minMaxNodeCoordinates.value.minY - 1) * getVerticalStep()
+    );
+  }
 
   const FONT_SIZE = 20;
   const FONT_SIZE_SMALL = 15;

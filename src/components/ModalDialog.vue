@@ -1,14 +1,13 @@
 <script setup lang="ts">
+/* global HTMLElement */
+/* global document */
+
 import { Modal } from "bootstrap"; // TODO: test, must be dynamic
 import { computed } from "vue";
 import { useI18n } from "vue-i18n";
 import type { DialogResult } from "./modal-dialog";
 
 const { t } = useI18n();
-
-interface AppModal {
-  show: () => void,
-}
 
 defineExpose({
   show,
@@ -28,12 +27,12 @@ if (!import.meta.env.SSR) {
 interface Props {
   elementId: string,
   formId: string,
-  saving: boolean,
-  header: string,
-  submitButtonText: string,
-  size: string,
-  isShowSubmit: boolean,
-  initResult: object | number | string | null | undefined,
+  saving?: boolean,
+  header?: string,
+  submitButtonText?: string,
+  size?: string,
+  isShowSubmit?: boolean,
+  initResult?: object | number | string | null,
 }
 
 const props = withDefaults(defineProps<Props>(), {

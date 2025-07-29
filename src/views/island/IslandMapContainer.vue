@@ -2,6 +2,14 @@
 const EVENT_SELECT_NODE = "selectNode";
 </script>
 <script setup lang="ts">
+/* global window */
+/* global SVGElement */
+/* global MouseEvent */
+/* global WheelEvent */
+/* global KeyboardEvent */
+
+/* eslint-env browser */
+
 import { TYPE_DANGER } from "@/components/toast";
 import {
   TYPE_START,
@@ -14,7 +22,7 @@ import {
   TYPE_BUBBLE,
   type Node,
 } from "@/api/NodeApi";
-import { ref, shallowRef, computed, defineAsyncComponent, onMounted, onUnmounted } from "vue";
+import { ref, shallowRef, computed, defineAsyncComponent, onMounted, onUnmounted, useTemplateRef } from "vue";
 import {
   TRANSLATE_X,
   TRANSLATE_Y,
@@ -27,8 +35,9 @@ import {
 import { getIconsItems, getDrawedNodes, SIDE, type UserNodeIdsMap } from "./map";
 import { useI18n } from "vue-i18n";
 import IslandMapInfoDialog from "./IslandMapInfoDialog.vue";
-import { GAME_ID_WOOD, Item } from "@/api/ItemApi";
+import { GAME_ID_WOOD, type Item } from "@/api/ItemApi";
 import type { Image } from "@/api/IslandApi";
+import type { ComponentExposed } from "vue-component-type-helpers";
 
 const { t } = useI18n();
 
@@ -38,7 +47,15 @@ const ToastMessage = import.meta.env.SSR
 
 const BUTTON_MAIN = 0;
 
-const mouse = {
+type MouseState = {
+  isDown: boolean,
+  x0: number | null,
+  y0: number | null,
+  tx0: number | null,
+  ty0: number | null,
+}
+
+const mouse: MouseState = {
   isDown: false,
   x0: null,
   y0: null,
@@ -56,8 +73,8 @@ interface Props {
   userNodesIdsMap: UserNodeIdsMap,
   userNodesGoingIdsMap: UserNodeIdsMap,
   disableNodesIdsMap: UserNodeIdsMap,
-  isSelectAnyNode: boolean,
-  backgroundImage: Image | null,
+  isSelectAnyNode?: boolean,
+  backgroundImage?: Image | null,
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -67,15 +84,15 @@ const props = withDefaults(defineProps<Props>(), {
 const emit = defineEmits<{
   [EVENT_CHANGE_TRANSLATE]: [x: number | null, y: number | null],
   [EVENT_CHANGE_SCALE]: [value: number],
-  [EVENT_SELECT_NODE]: [],
+  [EVENT_SELECT_NODE]: [nodeId: number],
 }>();
 
-const svgMapRef = ref(null);
-const infoDialog = ref(null);
-const infoDialogComponent = shallowRef(null);
+const infoDialog = useTemplateRef<ComponentExposed<typeof IslandMapInfoDialog>>("infoDialog");
+const infoDialogComponent = shallowRef<typeof IslandMapInfoDialog | null>(null);
 const infoDialogDrawedNode = ref(null);
 
-const toast = ref(null);
+const svgMapRef = useTemplateRef<SVGElement>("svgMapRef");
+const toastRef = useTemplateRef<ComponentExposed<typeof ToastMessage>>("toastRef");
 
 defineExpose({
   svgMapRef,
@@ -118,7 +135,7 @@ onUnmounted(() => {
   window.removeEventListener("keydown", onKeyDownMap);
 });
 
-function onKeyDownMap(event) {
+function onKeyDownMap(event: KeyboardEvent) {
   if (event.defaultPrevented) {
     return;
   }
@@ -202,7 +219,7 @@ function getPoints(coordinates) {
 /**
  * @param {Object} drawedNode
  */
-function onNodeClick(drawedNode, event: Event) {
+function onNodeClick(drawedNode, event: MouseEvent) {
   if (event.ctrlKey) {
     infoDialogDrawedNode.value = drawedNode;
     infoDialogComponent.value = IslandMapInfoDialog;
@@ -211,11 +228,7 @@ function onNodeClick(drawedNode, event: Event) {
   }
 }
 
-/**
- * @param {Object} item
- * @param {Object} event
- */
-function onItemClick(item, event) {
+function onItemClick(item, event: MouseEvent) {
   const nodeId = item.nodeId ? item.nodeId : item.node.id;
   const drawedNode = totalNodes.value[nodeId];
 
@@ -238,7 +251,7 @@ function selectNode(drawedNode) {
     if (!props.isSelectAnyNode) {
       const message = canSelectNextNode(totalNodes.value, props.userNodesIdsMap, drawedNode);
       if (message) {
-        toast.value.show(message, TYPE_DANGER);
+        toastRef.value.show(message, TYPE_DANGER);
         return;
       }
     }
@@ -250,7 +263,7 @@ function selectNode(drawedNode) {
 /**
  * @param {Object} button
  */
-function onMouseDown(event) {
+function onMouseDown(event: MouseEvent) {
   if (event.button === BUTTON_MAIN) {
     mouse.isDown = true;
     mouse.x0 = event.pageX;
@@ -267,7 +280,7 @@ function onMouseEnter() {
 /**
  * @param {Object} button
  */
-function onMouseMove(button) {
+function onMouseMove(button: MouseEvent) {
   if (!mouse.isDown) {
     return;
   }
@@ -276,12 +289,12 @@ function onMouseMove(button) {
   let resultY = null;
 
   if (mouse.x0 !== null && mouse.tx0 !== null) {
-    const fx = viewWidth.value / svgMapRef.value.clientHeight;
+    const fx = viewWidth.value / svgMapRef.value!.clientHeight;
     const dx = button.pageX - mouse.x0;
     resultX = mouse.tx0 + dx * fx;
   }
   if (mouse.y0 !== null && mouse.ty0 !== null) {
-    const fy = viewHeight.value / svgMapRef.value.clientHeight;
+    const fy = viewHeight.value / svgMapRef.value!.clientHeight;
     const dy = button.pageY - mouse.y0;
     resultY = mouse.ty0 + dy * fy;
   }
@@ -291,19 +304,19 @@ function onMouseMove(button) {
   }
 }
 
-function onMouseUp(event: Event) {
+function onMouseUp(event: MouseEvent) {
   if (event.button === BUTTON_MAIN) {
     mouse.isDown = false;
   }
 }
 
-function onMouseWheel(event: Event) {
+function onMouseWheel(event: WheelEvent) {
   const value = event.deltaY > 0 ? DELTA_SCALE : -DELTA_SCALE;
   emitNewScale(event, value);
   event.preventDefault();
 }
 
-function emitNewScale(event: Event, value: number) {
+function emitNewScale(event: MouseEvent, value: number) {
   if (event.ctrlKey) {
     value /= 10;
   } else if (event.shiftKey) {
@@ -314,7 +327,7 @@ function emitNewScale(event: Event, value: number) {
 }
 
 function onMountedInfoDialog() {
-  infoDialog.value.show().finally(() => {
+  infoDialog.value?.show().finally(() => {
     infoDialogDrawedNode.value = null;
     infoDialogComponent.value = null;
   });
@@ -439,7 +452,7 @@ function getItemName(item) {
     />
 
     <toast-message
-      ref="toast"
+      ref="toastRef"
       element-id="mapContainerToast"
     />
   </div>

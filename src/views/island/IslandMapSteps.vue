@@ -5,20 +5,29 @@ const EVENT_RESET_DISABLE_NODES = "reset-disable-nodes";
 const EVENT_UPDATE_SELECT_MODE = "update:select-mode";
 </script>
 <script setup lang="ts">
+/* global Event */
+/* global HTMLInputElement */
+
 import { createI18nRouteTo } from "@/i18n/translation";
 import { computed } from "vue";
 import { useI18n } from "vue-i18n";
 import { SELECT_MODE_DISABLE, SELECT_MODE_GOING, SELECT_MODE_PLAN, type SelectMode } from "./select-mode";
-import { defaultCostItem, isCommonStep, isStepType } from "@/api/NodeApi";
-import { GAME_ID_EXPLORER_MOVE, GAME_ID_WOOD, TYPE_COIN, TYPE_STARMONEY } from "@/api/ItemApi";
+import { isCommonStep, type NodeMap } from "@/api/NodeApi";
+import { GAME_ID_EXPLORER_MOVE, GAME_ID_WOOD, TYPE_COIN, TYPE_STARMONEY, type Type } from "@/api/ItemApi";
 import type { UserNodeIdsMap } from "./map";
 
 interface Props {
   selectMode: SelectMode,
   isSelectAnyNode: boolean,
   disableNodesCount: number,
-  nodes: Map<number, Node>,
+  nodes: NodeMap,
   userNodesIdsMap: UserNodeIdsMap,
+}
+
+interface StepCostItem {
+  type: Type,
+  gameId: number | null,
+  quantity: number,
 }
 
 const { t } = useI18n();
@@ -51,31 +60,30 @@ const selectModeHint = computed(() => {
   return "";
 });
 const userStepCostItems = computed(() => {
-  const map = {};
+  const map: { [key: string]: StepCostItem } = {};
 
   for (let nodeId in props.userNodesIdsMap) {
-    const node = props.nodes[nodeId];
+    const node = props.nodes.get(nodeId);
     if (!node) {
       continue;
     }
 
-    const costItem = node.cost ?? defaultCostItem;
-    const key = costItem.typeId + "_" + costItem.gameId;
+    const key = node.costItem.type + "_" + node.costItem.gameId;
 
     if (!map[key]) {
       map[key] = {
-        typeId: costItem.typeId,
-        gameId: costItem.gameId,
-        count: 0,
+        type: node.costItem.type,
+        gameId: node.costItem.gameId,
+        quantity: 0,
       };
     }
-    map[key].count += costItem.count ?? 1;
+    map[key].quantity += node.costItemCount;
   }
 
   return map;
 });
 const otherStepCostItems = computed(() => {
-  const result = {};
+  const result: { [key: string]: StepCostItem } = {};
 
   for (const key in userStepCostItems.value) {
     const item = userStepCostItems.value[key];
@@ -83,7 +91,7 @@ const otherStepCostItems = computed(() => {
     if (!isCommonStep(item)) {
       let icon = null;
 
-      if (item.typeId === TYPE_STARMONEY) {
+      if (item.type === TYPE_STARMONEY) {
         icon = "item-emerald";
       }
 
@@ -97,40 +105,30 @@ const otherStepCostItems = computed(() => {
   return result;
 });
 const explorerMoveCount = computed(
-  () => userStepCostItems.value[TYPE_COIN + "_" + GAME_ID_EXPLORER_MOVE]?.count ?? 0
+  () => userStepCostItems.value[TYPE_COIN + "_" + GAME_ID_EXPLORER_MOVE]?.quantity ?? 0
 );
 const woodMoveCount = computed(
-  () => userStepCostItems.value[TYPE_COIN + "_" + GAME_ID_WOOD]?.count ?? 0
+  () => userStepCostItems.value[TYPE_COIN + "_" + GAME_ID_WOOD]?.quantity ?? 0
 );
 const totalWoodMoveCount = computed(() => {
   let result = 0;
 
-  for (const nodeId in props.nodes) {
-    const node = props.nodes[nodeId];
-
-    if (node.cost) {
-      if (node.cost.typeId === TYPE_COIN && node.cost.gameId == GAME_ID_WOOD) {
-        ++result;
-      }
+  props.nodes.forEach((node) => {
+    if (node.costItem.type === TYPE_COIN && node.costItem.gameId == GAME_ID_WOOD) {
+      ++result;
     }
-  }
+  })
 
   return result;
 });
 const totalExplorerMoveCount = computed(() => {
   let result = 0;
 
-  for (const nodeId in props.nodes) {
-    const node = props.nodes[nodeId];
-
-    if (!node.cost) {
-      if (isStepType(node.typeId)) {
-        ++result;
-      }
-    } else if (node.cost.typeId === TYPE_COIN && node.cost.gameId == GAME_ID_EXPLORER_MOVE) {
+  props.nodes.forEach((node) => {
+    if (node.costItem.type === TYPE_COIN && node.costItem.gameId == GAME_ID_EXPLORER_MOVE) {
       ++result;
     }
-  }
+  })
 
   return result;
 });
@@ -181,15 +179,15 @@ function onChangeSelectMode(event: Event) {
             <span
               v-if="item.icon"
               :class="['hero-color-icon align-middle me-3', item.icon]"
-              :title="'typeId = ' + item.typeId + ' gameId = ' + item.gameId"
+              :title="'typeId = ' + item.type + ' gameId = ' + item.gameId"
             ></span>
             <span
               v-else
               class="hero-color-icon align-middle me-3"
-              :title="'typeId = ' + item.typeId + ' gameId = ' + item.gameId"
+              :title="'typeId = ' + item.type + ' gameId = ' + item.gameId"
             ></span>
             <span class="fs-4 align-middle">
-              <b>{{ item.count }}</b>
+              <b>{{ item.quantity }}</b>
             </span>
           </span>
         </div>
