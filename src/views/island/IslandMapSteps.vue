@@ -11,17 +11,17 @@ const EVENT_UPDATE_SELECT_MODE = "update:select-mode";
 import { createI18nRouteTo } from "@/i18n/translation";
 import { computed } from "vue";
 import { useI18n } from "vue-i18n";
-import { SELECT_MODE_DISABLE, SELECT_MODE_GOING, SELECT_MODE_PLAN, type SelectMode } from "./select-mode";
+import { SELECT_MODE_DISABLE, SELECT_MODE_GOING, SELECT_MODE_PLAN } from "./map";
 import { isCommonStep, type NodeMap } from "@/api/NodeApi";
 import { GAME_ID_EXPLORER_MOVE, GAME_ID_WOOD, TYPE_COIN, TYPE_STARMONEY, type Type } from "@/api/ItemApi";
-import type { UserNodeIdsMap } from "./map";
+import type { UserNodeIds, SelectMode } from "./map";
 
 interface Props {
   selectMode: SelectMode,
   isSelectAnyNode: boolean,
   disableNodesCount: number,
   nodes: NodeMap,
-  userNodesIdsMap: UserNodeIdsMap,
+  userNodesIds: UserNodeIds,
 }
 
 interface StepCostItem {
@@ -63,23 +63,21 @@ const selectModeHint = computed(() => {
 const userStepCostItems = computed(() => {
   const map: { [key: string]: StepCostItem } = {};
 
-  for (let nodeId in props.userNodesIdsMap) {
+  props.userNodesIds.forEach((nodeId) => {
     const node = props.nodes.get(nodeId);
-    if (!node) {
-      continue;
-    }
+    if (node) {
+      const key = node.costItem.type + "_" + node.costItem.gameId;
 
-    const key = node.costItem.type + "_" + node.costItem.gameId;
-
-    if (!map[key]) {
-      map[key] = {
-        type: node.costItem.type,
-        gameId: node.costItem.gameId,
-        quantity: 0,
-      };
+      if (!map[key]) {
+        map[key] = {
+          type: node.costItem.type,
+          gameId: node.costItem.gameId,
+          quantity: 0,
+        };
+      }
+      map[key].quantity += node.costItemCount;
     }
-    map[key].quantity += node.costItemCount;
-  }
+  })
 
   return map;
 });

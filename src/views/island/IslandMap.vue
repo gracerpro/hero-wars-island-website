@@ -18,12 +18,11 @@ import { fullscreenElement } from "@/core/fullscreen";
 import { TYPE_CHEST, TYPE_TOWER, type IslandNodeList, type Node, type NodeFilter, type NodeMap, type NodeReward } from "@/api/NodeApi";
 import { isObject } from "@/helpers/core";
 import { getNodesMap } from "@/services/api/island-node";
-import { SELECT_MODE_DISABLE, SELECT_MODE_GOING, SELECT_MODE_PLAN } from "./select-mode";
-import type { SelectMode } from "./select-mode";
+import { SELECT_MODE_DISABLE, SELECT_MODE_GOING, SELECT_MODE_PLAN } from "./map";
 import { shallowRef } from "vue";
 import { UserError } from "@/exceptions/UserError";
 import type { Island } from "@/api/IslandApi";
-import type { ViewNodeReward, UserNodeIdsMap, GroupReward } from "./map";
+import type { ViewNodeReward, UserNodeIds, ViewReward, SelectMode } from "./map";
 import { getUnknownItem, type Type } from "@/api/ItemApi";
 import type { ComponentExposed } from "vue-component-type-helpers";
 
@@ -75,9 +74,9 @@ const isLoadingNodes = ref(true);
 const nodes = ref<NodeMap>(new Map<number, Node>());
 const rewards = ref<Array<ViewNodeReward>>([]);
 const calculatingRewards = ref(false);
-const userNodesIdsMap = ref<UserNodeIdsMap>({});
-const userNodesGoingIdsMap = ref<UserNodeIdsMap>({});
-const disableNodesIdsMap = ref<UserNodeIdsMap>({});
+const userNodesIds = ref<UserNodeIds>(new Set());
+const userNodesGoingIds = ref<UserNodeIds>(new Set());
+const disableNodesIds = ref<UserNodeIds>(new Set());
 
 const scale = ref(1);
 const translateX = ref(0);
@@ -104,7 +103,7 @@ const loading = computed(() => isLoadingNodes.value || calculatingRewards.value)
 
 const visibleRewards = computed(() => {
   let resultRewards = rewards.value.filter((reward) => {
-    return !disableNodesIdsMap.value[reward.node.id];
+    return !disableNodesIds.value.has(reward.node.id);
   });
 
   if (filter.itemName.length >= minCharsCount) {
@@ -138,19 +137,19 @@ const visibleRewards = computed(() => {
 const visibleRewardsCount = computed(() => visibleRewards.value.length);
 const userRewards = computed(() => {
   return rewards.value.filter((reward) => {
-    return nodes.value.has(reward.node.id) && userNodesIdsMap.value[reward.node.id];
+    return nodes.value.has(reward.node.id) && userNodesIds.value.has(reward.node.id);
   });
 });
 const userRewardsCount = computed(() => userRewards.value.length);
 const groupRewards = computed(() => {
-  const map: { [key: number]: GroupReward } = {};
+  const map: { [key: number]: ViewReward } = {};
 
   rewards.value
-    .filter((reward) => !disableNodesIdsMap.value[reward.node.id])
+    .filter((reward) => !disableNodesIds.value.has(reward.node.id))
     .forEach((reward) => {
       if (!map[reward.item.id]) {
         map[reward.item.id] = {
-          itemId: reward.item.id,
+          uniqueId: reward.uniqueId,
           quantity: 0,
           item: reward.item,
           humanQuantity: ""
@@ -174,8 +173,8 @@ const groupRewards = computed(() => {
 
   return arr;
 });
-const groupRewardsCount = computed(() => Object.keys(groupRewards.value).length);
-const disableNodesCount = computed(() => Object.keys(disableNodesIdsMap.value).length);
+const groupRewardsCount = computed(() => groupRewards.value.length);
+const disableNodesCount = computed(() => disableNodesIds.value.size);
 
 loadState();
 
@@ -233,21 +232,14 @@ async function loadNodes(isForce: boolean): Promise<IslandNodeList> {
 function calculateRewards(nodeList: IslandNodeList): Array<ViewNodeReward> {
   calculatingRewards.value = true;
 
-  const tmpMap: { [key: string]: boolean } = {};
   const rewards: Array<ViewNodeReward> = [];
   let index = 0;
 
   nodeList.nodes.forEach((node) => {
     node.rewards.forEach((nodeReward) => {
-      const uid = getUniqueId(node, nodeReward, index);
-      if (tmpMap[uid]) {
-        throw new Error("UID exists " + uid);
-      }
-      tmpMap[uid] = true;
-
       rewards.push({
         quantity: nodeReward.quantity,
-        uniqueId: uid,
+        uniqueId: getUniqueId(node, nodeReward, index),
         humanQuantity: getHumanQuantity(nodeReward.quantity),
         item: nodeList.rewards[nodeReward.itemId] ?? getUnknownItem(),
         node,
@@ -324,37 +316,37 @@ function onSelectNode(nodeId: number) {
 
   switch (selectMode.value) {
     case SELECT_MODE_PLAN:
-      if (!disableNodesIdsMap.value[nodeId]) {
-        if (userNodesIdsMap.value[nodeId]) {
-          delete userNodesIdsMap.value[nodeId];
+      if (!disableNodesIds.value.has(nodeId)) {
+        if (userNodesIds.value.has(nodeId)) {
+          userNodesIds.value.delete(nodeId);
         } else {
-          userNodesIdsMap.value[nodeId] = true;
+          userNodesIds.value.add(nodeId);
         }
-        if (userNodesGoingIdsMap.value[nodeId]) {
-          delete userNodesGoingIdsMap.value[nodeId];
+        if (userNodesGoingIds.value.has(nodeId)) {
+          userNodesGoingIds.value.delete(nodeId);
         }
       }
       break;
     case SELECT_MODE_GOING:
-      if (userNodesIdsMap.value[nodeId] && !disableNodesIdsMap.value[nodeId]) {
-        if (userNodesGoingIdsMap.value[nodeId]) {
-          delete userNodesGoingIdsMap.value[nodeId];
+      if (userNodesIds.value.has(nodeId) && !disableNodesIds.value.has(nodeId)) {
+        if (userNodesGoingIds.value.has(nodeId)) {
+          userNodesGoingIds.value.delete(nodeId);
         } else {
-          userNodesGoingIdsMap.value[nodeId] = true;
+          userNodesGoingIds.value.add(nodeId);
         }
       }
       break;
     case SELECT_MODE_DISABLE:
-      if (disableNodesIdsMap.value[nodeId]) {
-        delete disableNodesIdsMap.value[nodeId];
+      if (disableNodesIds.value.has(nodeId)) {
+        disableNodesIds.value.delete(nodeId);
       } else {
-        disableNodesIdsMap.value[nodeId] = true;
+        disableNodesIds.value.add(nodeId);
 
-        if (userNodesIdsMap.value[nodeId]) {
-          delete userNodesIdsMap.value[nodeId];
+        if (userNodesIds.value.has(nodeId)) {
+          userNodesIds.value.delete(nodeId);
         }
-        if (userNodesGoingIdsMap.value[nodeId]) {
-          delete userNodesGoingIdsMap.value[nodeId];
+        if (userNodesGoingIds.value.has(nodeId)) {
+          userNodesGoingIds.value.delete(nodeId);
         }
       }
       break;
@@ -362,13 +354,13 @@ function onSelectNode(nodeId: number) {
 }
 
 function onResetUserNodes() {
-  userNodesGoingIdsMap.value = {};
-  userNodesIdsMap.value = {};
+  userNodesGoingIds.value.clear();
+  userNodesIds.value.clear();
   selectMode.value = SELECT_MODE_PLAN;
 }
 
 function onResetDisableNodes() {
-  disableNodesIdsMap.value = {};
+  disableNodesIds.value.clear();
 }
 
 function onFullscreen() {
@@ -391,13 +383,13 @@ function reloadMap(isForce = false) {
     nodes.value = nodeList.nodes;
     rewards.value = calculateRewards(nodeList);
 
-    for (const nodeId in userNodesIdsMap.value) {
+    userNodesIds.value.forEach((nodeId) => {
       const node = nodes.value.get(nodeId);
-      if ((node && !canSelectNode(node)) || disableNodesIdsMap.value[nodeId]) {
-        delete userNodesIdsMap.value[nodeId];
+      if ((node && !canSelectNode(node)) || disableNodesIds.value.has(nodeId)) {
+        userNodesIds.value.delete(nodeId);
       }
-    }
-  });
+    })
+  })
 }
 
 function onMountedDownloadDialog() {
@@ -420,6 +412,7 @@ function onChangeRegionNumbers(newNumbers: Array<number>) {
 }
 
 function loadState() {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let stateData: any = {}
 
   try {
@@ -486,14 +479,18 @@ function loadState() {
 
   regionNumbers.value = byIsland.regionNumbers || [];
 
+  userNodesIds.value.clear()
+  userNodesGoingIds.value.clear()
+  disableNodesIds.value.clear()
+
   if (byIsland.userNodesIds) {
-    byIsland.userNodesIds.forEach((id) => (userNodesIdsMap.value[id] = true));
+    byIsland.userNodesIds.forEach((id) => userNodesIds.value.add(id));
   }
   if (byIsland.userNodesGoingIds) {
-    byIsland.userNodesGoingIds.forEach((id) => (userNodesGoingIdsMap.value[id] = true));
+    byIsland.userNodesGoingIds.forEach((id) => userNodesGoingIds.value.add(id));
   }
   if (byIsland.disableNodesIds) {
-    byIsland.disableNodesIds.forEach((id) => (disableNodesIdsMap.value[id] = true));
+    byIsland.disableNodesIds.forEach((id) => disableNodesIds.value.add(id));
   }
 
   filter = tmpFilter;
@@ -506,9 +503,9 @@ function loadState() {
 
 function saveState() {
   byIslandState[props.island.id] = {
-    userNodesIds: Object.keys(userNodesIdsMap.value).map((id) => parseInt(id)),
-    disableNodesIds: Object.keys(disableNodesIdsMap.value).map((id) => parseInt(id)),
-    userNodesGoingIds: Object.keys(userNodesGoingIdsMap.value).map((id) => parseInt(id)),
+    userNodesIds: [...userNodesIds.value],
+    disableNodesIds: [...disableNodesIds.value],
+    userNodesGoingIds: [...userNodesGoingIds.value],
     scale: scale.value,
     translateX: translateX.value,
     translateY: translateY.value,
@@ -567,9 +564,9 @@ function saveState() {
         :is-select-any-node="isSelectAnyNode"
         :rewards="visibleRewards"
         :nodes="nodes"
-        :user-nodes-ids-map="userNodesIdsMap"
-        :user-nodes-going-ids-map="userNodesGoingIdsMap"
-        :disable-nodes-ids-map="disableNodesIdsMap"
+        :user-nodes-ids="userNodesIds"
+        :user-nodes-going-ids="userNodesGoingIds"
+        :disable-nodes-ids="disableNodesIds"
         :background-image="island.backgroundImage"
         @change-translate="onChangeTranslate"
         @change-scale="onChangeScale"
@@ -593,7 +590,7 @@ function saveState() {
         <div class="col-lg-6">
           <island-map-filter
             v-model:item-name="filter.itemName"
-            v-model:type-id="filter.type"
+            v-model:item-type="filter.itemType"
             v-model:is-node-type-tower="filter.isNodeTypeTower"
             v-model:is-node-type-chest="filter.isNodeTypeChest"
             :rewards="rewards"
@@ -605,7 +602,7 @@ function saveState() {
             v-model:is-select-any-node="isSelectAnyNode"
             v-model:select-mode="selectMode"
             :nodes="nodes"
-            :user-nodes-ids-map="userNodesIdsMap"
+            :user-nodes-ids="userNodesIds"
             :disable-nodes-count="disableNodesCount"
             @reset-user-nodes="onResetUserNodes"
             @reset-disable-nodes="onResetDisableNodes"

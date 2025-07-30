@@ -3,12 +3,12 @@ const EVENT_UPDATE_IS_SHOW_BLOCK = "update:isShowBlock";
 </script>
 <script setup lang="ts">
 import { useI18n } from "vue-i18n";
-import type { ViewNodeReward } from "./map";
+import type { ViewReward } from "./map";
 
 interface Props {
   header: string,
   isShowBlock: boolean,
-  rewards: Array<ViewNodeReward>,
+  rewards: Array<ViewReward>,
   visibleRewardsCount: number,
 }
 
@@ -20,7 +20,7 @@ const emit = defineEmits<{
 
 const { t } = useI18n();
 
-const getItemName = (item: ViewNodeReward) => {
+const getItemName = (item: ViewReward) => {
   return item.item.name.length > 0 ? item.item.name : t("common.noName");
 };
 </script>

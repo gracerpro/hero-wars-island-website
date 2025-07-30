@@ -11,7 +11,7 @@ import { useI18n } from "vue-i18n";
 import { useShow } from "@/components/modal-dialog";
 import { download } from "@/helpers/download";
 import { computed } from "vue";
-import { getDrawedNodes, getIconsItems, getVerticalStep, getHorizontalStep } from "./map";
+import { getDrawedNodes, getIconsItems, getVerticalStep, getHorizontalStep, type ViewNodeReward } from "./map";
 import {
   STATUS_NOT_SURE,
   TYPE_BLOCKER,
@@ -25,13 +25,12 @@ import {
   type NodeMap,
 } from "@/api/NodeApi";
 import type { Island } from "@/api/IslandApi";
-import type { Item } from "@/api/ItemApi";
 import type { ComponentExposed } from "vue-component-type-helpers";
 
 interface Props {
   island: Island,
   nodes: NodeMap,
-  rewards: Array<Item>,
+  rewards: Array<ViewNodeReward>,
   isShowQuantity: boolean,
 }
 
@@ -207,7 +206,7 @@ function drawMap(context: CanvasRenderingContext2D, imagesByUrls: ImagesByUrls) 
 
   const FONT_SIZE = 20;
   const FONT_SIZE_SMALL = 15;
-  const colors = {
+  const colors: { [key: string]: string } = {
     [TYPE_NODE]: "#9da7c9",
     [TYPE_START]: "#94fdfe",
     [TYPE_TOWER]: "#ba662c",
@@ -223,11 +222,8 @@ function drawMap(context: CanvasRenderingContext2D, imagesByUrls: ImagesByUrls) 
     const coordinates = drawedNode.coordinates;
     const node = drawedNode.node;
 
-    if (colors[node.typeId]) {
-      context.fillStyle = colors[node.typeId];
-    } else {
-      context.fillStyle = "#ffff00";
-    }
+    context.fillStyle = colors[node.typeId] ?? "#ffff00";
+
     if (node.statusId == STATUS_NOT_SURE) {
       context.fillStyle = "#ffff00";
     }

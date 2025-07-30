@@ -18,7 +18,7 @@ export function canSelectNode(node: Node): boolean {
  * @param {Object} node
  * @returns {String|null}
  */
-export function canSelectNextNode(drawedNodes, userNodesIdsMap, nextDrawedNode) {
+export function canSelectNextNode(drawedNodes, userNodesIds, nextDrawedNode) {
   const { t } = useI18n();
   let result = null;
 

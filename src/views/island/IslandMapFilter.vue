@@ -24,7 +24,7 @@ const formId = "nodesForm";
 interface Props {
   rewards: Array<ViewNodeReward>,
   itemName: string,
-  typeId: Type | null,
+  itemType: Type | null,
   isNodeTypeTower: boolean,
   isNodeTypeChest: boolean,
   minCharsCount: number,
@@ -61,7 +61,7 @@ const isCheckedFlags = computed(() => {
 const filledFilterCount = computed(() => {
   let count = 0;
 
-  if (props.typeId !== null) {
+  if (props.itemType !== null) {
     ++count;
   }
   if (props.itemName !== "") {
@@ -82,17 +82,17 @@ function onChangeType(value: number | null) {
 }
 function onChangeNodeType(event: Event) {
   const target = event.target as HTMLInputElement
-  const typeId = parseInt(target.value);
+  const itemType = parseInt(target.value);
 
-  if (typeId === TYPE_TOWER) {
+  if (itemType === TYPE_TOWER) {
     emit(EVENT_UPDATE_IS_NODE_TYPE_TOWER, target.checked);
   }
-  if (typeId === TYPE_CHEST) {
+  if (itemType === TYPE_CHEST) {
     emit(EVENT_UPDATE_IS_NODE_TYPE_CHEST, target.checked);
   }
 }
 function onReset() {
-  if (props.typeId !== null) {
+  if (props.itemType !== null) {
     emit(EVENT_UPDATE_TYPE, null);
   }
   if (props.itemName !== "") {
@@ -133,21 +133,21 @@ function onReset() {
     </div>
     <div class="col-md-6 mb-3">
       <label
-        :for="formId + '__typeId'"
-        :class="['form-label', typeId != null ? 'not-empty' : '']"
+        :for="formId + '__itemType'"
+        :class="['form-label', itemType != null ? 'not-empty' : '']"
       >
         {{ t("common.type") }}
         <span
-          v-if="typeId != null"
+          v-if="itemType != null"
           class="badge rounded-pill text-bg-warning"
           >&nbsp;</span
         >
       </label>
       <clear-select
-        :model-value="typeId"
-        :input-id="formId + '__typeId'"
+        :model-value="itemType"
+        :input-id="formId + '__itemType'"
         :select-values="visibleTypes"
-        :class="{ 'not-empty': typeId != null }"
+        :class="{ 'not-empty': itemType != null }"
         @update:model-value="onChangeType"
       />
     </div>

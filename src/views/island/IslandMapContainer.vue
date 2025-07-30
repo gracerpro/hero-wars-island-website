@@ -32,12 +32,36 @@ import {
   canSelectNode,
   canSelectNextNode,
 } from "@/services/island-map";
-import { getIconsItems, getDrawedNodes, SIDE, type UserNodeIdsMap } from "./map";
+import { getIconsItems, getDrawedNodes, SIDE, type UserNodeIds, type ViewNodeReward } from "./map";
 import { useI18n } from "vue-i18n";
 import IslandMapInfoDialog from "./IslandMapInfoDialog.vue";
-import { GAME_ID_WOOD, type Item } from "@/api/ItemApi";
+import { GAME_ID_WOOD } from "@/api/ItemApi";
 import type { Image } from "@/api/IslandApi";
 import type { ComponentExposed } from "vue-component-type-helpers";
+
+interface Props {
+  scale: number,
+  translateX: number,
+  translateY: number,
+  isShowQuantity: boolean,
+  rewards: Array<ViewNodeReward>,
+  nodes: Map<number, Node>,
+  userNodesIds: UserNodeIds,
+  userNodesGoingIds: UserNodeIds,
+  disableNodesIds: UserNodeIds,
+  isSelectAnyNode?: boolean,
+  backgroundImage?: Image | null,
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  isSelectAnyNode: true,
+  backgroundImage: null,
+});
+const emit = defineEmits<{
+  [EVENT_CHANGE_TRANSLATE]: [x: number | null, y: number | null],
+  [EVENT_CHANGE_SCALE]: [value: number],
+  [EVENT_SELECT_NODE]: [nodeId: number],
+}>();
 
 const { t } = useI18n();
 
@@ -62,30 +86,6 @@ const mouse: MouseState = {
   tx0: null,
   ty0: null,
 };
-
-interface Props {
-  scale: number,
-  translateX: number,
-  translateY: number,
-  isShowQuantity: boolean,
-  rewards: Array<Item>,
-  nodes: Map<number, Node>,
-  userNodesIdsMap: UserNodeIdsMap,
-  userNodesGoingIdsMap: UserNodeIdsMap,
-  disableNodesIdsMap: UserNodeIdsMap,
-  isSelectAnyNode?: boolean,
-  backgroundImage?: Image | null,
-}
-
-const props = withDefaults(defineProps<Props>(), {
-  isSelectAnyNode: true,
-  backgroundImage: null,
-});
-const emit = defineEmits<{
-  [EVENT_CHANGE_TRANSLATE]: [x: number | null, y: number | null],
-  [EVENT_CHANGE_SCALE]: [value: number],
-  [EVENT_SELECT_NODE]: [nodeId: number],
-}>();
 
 const infoDialog = useTemplateRef<ComponentExposed<typeof IslandMapInfoDialog>>("infoDialog");
 const infoDialogComponent = shallowRef<typeof IslandMapInfoDialog | null>(null);
@@ -249,7 +249,7 @@ function selectNode(drawedNode) {
   }
   if (!isUserNode(drawedNode.node)) {
     if (!props.isSelectAnyNode) {
-      const message = canSelectNextNode(totalNodes.value, props.userNodesIdsMap, drawedNode);
+      const message = canSelectNextNode(totalNodes.value, props.userNodesIds, drawedNode);
       if (message) {
         toastRef.value?.show(message, TYPE_DANGER);
         return;
@@ -338,7 +338,7 @@ function onMountedInfoDialog() {
  * @returns {Boolean}
  */
 function isUserNode(node) {
-  return props.userNodesIdsMap[node.id] !== undefined;
+  return props.userNodesIds.has(node.id);
 }
 
 /**
@@ -347,8 +347,8 @@ function isUserNode(node) {
  */
 function getUserNodeClass(drawedNode) {
   const nodeId = drawedNode.node.id;
-  if (props.userNodesIdsMap[nodeId]) {
-    return props.userNodesGoingIdsMap[nodeId] ? "user-node-going" : "user-node";
+  if (props.userNodesIds.has(nodeId)) {
+    return props.userNodesGoingIds.has(nodeId) ? "user-node-going" : "user-node";
   }
   return "";
 }
