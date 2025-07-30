@@ -6,9 +6,10 @@ import { useShow } from "@/components/modal-dialog";
 import { getStatusName, getTypeName } from "@/api/NodeApi";
 import { getTypeName as getItemTypeName } from "@/api/ItemApi";
 import type { ComponentExposed } from "vue-component-type-helpers";
+import type { DrawedNode } from "./map";
 
 interface Props {
-  drawedNode: { type: Object, required: true },
+  drawedNode: DrawedNode,
 }
 
 const props = defineProps<Props>();

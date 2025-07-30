@@ -32,7 +32,7 @@ import {
   canSelectNode,
   canSelectNextNode,
 } from "@/services/island-map";
-import { getIconsItems, getDrawedNodes, SIDE, type UserNodeIds, type ViewNodeReward } from "./map";
+import { getIconsItems, getDrawedNodes, SIDE, type UserNodeIds, type ViewNodeReward, type NodeCoordinates, type DrawedNode, type IconItemsResult, type WarningPointsMap } from "./map";
 import { useI18n } from "vue-i18n";
 import IslandMapInfoDialog from "./IslandMapInfoDialog.vue";
 import { GAME_ID_WOOD } from "@/api/ItemApi";
@@ -79,6 +79,11 @@ type MouseState = {
   ty0: number | null,
 }
 
+interface SvgDrawedNode extends DrawedNode {
+  nodeClass: string,
+  spacePoints: string,
+}
+
 const mouse: MouseState = {
   isDown: false,
   x0: null,
@@ -89,7 +94,7 @@ const mouse: MouseState = {
 
 const infoDialog = useTemplateRef<ComponentExposed<typeof IslandMapInfoDialog>>("infoDialog");
 const infoDialogComponent = shallowRef<typeof IslandMapInfoDialog | null>(null);
-const infoDialogDrawedNode = ref(null);
+const infoDialogDrawedNode = ref<SvgDrawedNode | null>(null);
 
 const svgMapRef = useTemplateRef<SVGElement>("svgMapRef");
 const toastRef = useTemplateRef<ComponentExposed<typeof ToastMessage>>("toastRef");
@@ -104,25 +109,29 @@ const viewHeight = computed(() => viewSide.value * 2);
 const viewBox = computed(() => {
   return `-${viewSide.value} -${viewSide.value} ${viewSide.value * 2} ${viewSide.value * 2}`;
 });
-const totalNodes = computed(() => {
-  let drawedNodes = getDrawedNodes(props.nodes);
+const totalNodes = computed<Map<number, SvgDrawedNode>>(() => {
+  const result = new Map<number, SvgDrawedNode>()
+  const drawedNodes = getDrawedNodes(props.nodes);
 
-  drawedNodes.forEach((drawedNode) => {
-    drawedNode.nodeClass = getNodeClass(drawedNode.node);
-    drawedNode.points = getPoints(drawedNode.coordinates);
+  drawedNodes.forEach((drawedNode, nodeId) => {
+    result.set(nodeId, {
+      ...drawedNode,
+      nodeClass: getNodeClass(drawedNode.node),
+      spacePoints: getPoints(drawedNode.coordinates),
+    })
   })
 
-  return drawedNodes;
-});
+  return result;
+})
 const backgroundImageUrl = computed(() => {
   return props.backgroundImage ? props.backgroundImage.url : "";
 });
 
-const iconItems = computed(() => {
+const iconItems = computed<IconItemsResult>(() => {
   return getIconsItems(props.rewards, totalNodes.value);
 });
 const rewardIcons = computed(() => iconItems.value.icons);
-const warningPoints = computed(() => iconItems.value.warningPoints);
+const warningPoints = computed<WarningPointsMap>(() => iconItems.value.warningPoints);
 const rewardQuantities = computed(() => {
   return props.isShowQuantity ? iconItems.value.quantities : [];
 });
@@ -186,7 +195,7 @@ function onKeyDownMap(event: KeyboardEvent) {
   }
 }
 
-function getNodeClass(node: Node) {
+function getNodeClass(node: Node): string {
   const classes: { [key: string]: string } = {
     [TYPE_NODE]: "node-step",
     [TYPE_START]: "node-start",
@@ -208,17 +217,11 @@ function getNodeClass(node: Node) {
   return nodeClass;
 }
 
-/**
- * @param {Array} coordinates
- */
-function getPoints(coordinates) {
+function getPoints(coordinates: NodeCoordinates): string {
   return coordinates.map((item) => item.x + "," + item.y).join(" ");
 }
 
-/**
- * @param {Object} drawedNode
- */
-function onNodeClick(drawedNode, event: MouseEvent) {
+function onNodeClick(drawedNode: SvgDrawedNode, event: MouseEvent) {
   if (event.ctrlKey) {
     infoDialogDrawedNode.value = drawedNode;
     infoDialogComponent.value = IslandMapInfoDialog;
@@ -229,20 +232,19 @@ function onNodeClick(drawedNode, event: MouseEvent) {
 
 function onItemClick(item, event: MouseEvent) {
   const nodeId = item.nodeId ? item.nodeId : item.node.id;
-  const drawedNode = totalNodes.value[nodeId];
+  const drawedNode = totalNodes.value.get(nodeId);
 
-  if (event.ctrlKey) {
-    infoDialogDrawedNode.value = drawedNode;
-    infoDialogComponent.value = IslandMapInfoDialog;
-  } else {
-    selectNode(drawedNode);
+  if (drawedNode) {
+    if (event.ctrlKey) {
+      infoDialogDrawedNode.value = drawedNode;
+      infoDialogComponent.value = IslandMapInfoDialog;
+    } else {
+      selectNode(drawedNode);
+    }
   }
 }
 
-/**
- * @param {Object} drawedNode
- */
-function selectNode(drawedNode) {
+function selectNode(drawedNode: SvgDrawedNode) {
   if (!canSelectNode(drawedNode.node)) {
     return;
   }
@@ -259,9 +261,6 @@ function selectNode(drawedNode) {
   emit(EVENT_SELECT_NODE, drawedNode.node.id);
 }
 
-/**
- * @param {Object} button
- */
 function onMouseDown(event: MouseEvent) {
   if (event.button === BUTTON_MAIN) {
     mouse.isDown = true;
@@ -332,19 +331,11 @@ function onMountedInfoDialog() {
   });
 }
 
-/**
- * @param {Object} node
- * @returns {Boolean}
- */
-function isUserNode(node) {
+function isUserNode(node: Node): boolean {
   return props.userNodesIds.has(node.id);
 }
 
-/**
- * @param {Object} drawedNode
- * @returns {String}
- */
-function getUserNodeClass(drawedNode) {
+function getUserNodeClass(drawedNode: SvgDrawedNode): string {
   const nodeId = drawedNode.node.id;
   if (props.userNodesIds.has(nodeId)) {
     return props.userNodesGoingIds.has(nodeId) ? "user-node-going" : "user-node";
@@ -383,9 +374,9 @@ function getItemTitle(item): string {
     >
       <g :transform="'translate(' + translateX + ' ' + translateY + ')'">
         <polygon
-          v-for="node in totalNodes"
+          v-for="[, node] in totalNodes"
           :key="node.xyId"
-          :points="node.points"
+          :points="node.spacePoints"
           :class="['node', node.nodeClass, getUserNodeClass(node)]"
           @click="onNodeClick(node, $event)"
         />
@@ -394,12 +385,12 @@ function getItemTitle(item): string {
           :key="item.uniqueId"
         >
           <image
-            v-if="item.item.iconUrl"
+            v-if="item.iconUrl"
             :x="item.iconX"
             :y="item.iconY"
             :width="item.iconWidth"
             :height="item.iconHeight"
-            :href="item.item.iconUrl"
+            :href="item.iconUrl"
             class="item-image"
             @click="onItemClick(item, $event)"
           >
@@ -422,7 +413,7 @@ function getItemTitle(item): string {
           </rect>
         </template>
         <circle
-          v-for="(point, nodeId) in warningPoints"
+          v-for="[nodeId, point] in warningPoints"
           :key="nodeId"
           :cx="point.x"
           :cy="point.y"

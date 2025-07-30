@@ -221,9 +221,9 @@ function drawMap(context: CanvasRenderingContext2D, imagesByUrls: ImagesByUrls) 
     const coordinates = drawedNode.coordinates;
     const node = drawedNode.node;
 
-    context.fillStyle = colors[node.typeId] ?? "#ffff00";
+    context.fillStyle = colors[node.type] ?? "#ffff00";
 
-    if (node.statusId == STATUS_NOT_SURE) {
+    if (node.status == STATUS_NOT_SURE) {
       context.fillStyle = "#ffff00";
     }
 

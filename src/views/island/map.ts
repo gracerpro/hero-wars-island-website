@@ -24,7 +24,19 @@ export interface Coordinate {
   y: number
 }
 
+export interface RewardQuantity {
+  nodeId: number,
+  isSmallText: boolean,
+  humanQuantity: string,
+  x: number,
+  y: number,
+  uid: string,
+}
+
 export type NodeCoordinates = [Coordinate, Coordinate, Coordinate, Coordinate, Coordinate, Coordinate]
+
+type CountsByNode = { [key: number]: number }
+type IndexesByNode = { [key: number]: number }
 
 export interface DrawedNode {
   node: Node,
@@ -41,8 +53,31 @@ export const SELECT_MODE_DISABLE = "disable";
 
 export type SelectMode = "plan" | "going" | "disable"
 
+export interface IconItem {
+  iconX: number,
+  iconY: number,
+  iconWidth: number,
+  iconHeight: number,
+  node: Node,
+  uniqueId: string,
+  iconUrl: string | null,
+}
+
+export interface WarningPoint {
+  nodeId: number, // TODO: remove this field, use key
+  x: number,
+  y: number,
+}
+export type WarningPointsMap = Map<number, WarningPoint>
+
+export type IconItemsResult = {
+  icons: Array<IconItem>,
+  quantities: Array<RewardQuantity>,
+  warningPoints: WarningPointsMap,
+}
+
 export function getDrawedNodes(nodes: NodeMap): DrawedNodeMap {
-  const drawedNodes = new Map();
+  const drawedNodes = new Map<number, DrawedNode>();
 
   nodes.forEach((node) => {
     drawedNodes.set(node.id, getDrawedNode(node));
@@ -51,40 +86,45 @@ export function getDrawedNodes(nodes: NodeMap): DrawedNodeMap {
   return drawedNodes;
 }
 
-/**
- * @param {Array} dataItems
- * @param {Object} drawedNodes
- * @returns {Array}
- */
-export function getIconsItems(dataItems, drawedNodes) {
-  const countsByNode = getCountsByNode(dataItems);
-  const resultItems = [];
-  const indexesByNode = {};
-  const rewardQuantities = [];
-  const warningPoints = {};
+export function getIconsItems(nodeRewards: Array<ViewNodeReward>, drawedNodes: DrawedNodeMap): IconItemsResult {
+  const countsByNode = getCountsByNode(nodeRewards);
+  const indexesByNode: IndexesByNode = {};
+  const rewardQuantities: Array<RewardQuantity> = [];
+  const warningPoints: WarningPointsMap = new Map<number, WarningPoint>();
+  const resultItems: Array<IconItem> = [];
 
-  dataItems.forEach((item) => {
-    const nodeId = item.node.id;
-    const drawedNode = drawedNodes[nodeId];
+  nodeRewards.forEach((nodeReward) => {
+    const nodeId = nodeReward.node.id;
+    const drawedNode = drawedNodes.get(nodeId) as DrawedNode;
     const count = countsByNode[nodeId];
-    const isShowText = item.item.quantity > 1;
+    const isShowText = nodeReward.quantity > 1;
 
-    let itemQuantity = {
-      nodeId,
-      isSmallText: false,
-      humanQuantity: item.humanQuantity,
-    };
+    let rewardQuantity: RewardQuantity | null = null
+
+    let item: IconItem | null = null;
 
     if (count === 1) {
-      item.iconWidth = IMAGE_SIDE * 2.2;
-      item.iconHeight = IMAGE_SIDE * 2.2;
-      item.iconX = drawedNode.x - item.iconWidth / 2;
-      item.iconY = drawedNode.y - item.iconHeight / 2;
+      const iconWidth = IMAGE_SIDE * 2.2
+      const iconHeight = IMAGE_SIDE * 2.2
+      item = {
+        node: nodeReward.node,
+        uniqueId: nodeReward.uniqueId,
+        iconUrl: nodeReward.item.iconUrl,
+        iconWidth,
+        iconHeight,
+        iconX: drawedNode.x - iconWidth / 2,
+        iconY: drawedNode.y - iconHeight / 2,
+      }
 
       if (isShowText) {
-        itemQuantity.x = item.iconX + item.iconWidth * 0.02;
-        itemQuantity.y = drawedNode.y + HEIGHT - 3;
-        itemQuantity.uid = nodeId + "_0";
+        rewardQuantity = {
+          nodeId,
+          isSmallText: false,
+          humanQuantity: nodeReward.humanQuantity,
+          x: item.iconX + item.iconWidth * 0.02,
+          y: drawedNode.y + HEIGHT - 3,
+          uid: nodeId + "_0",
+        }
       }
     } else {
       if (!indexesByNode[nodeId]) {
@@ -94,35 +134,56 @@ export function getIconsItems(dataItems, drawedNodes) {
       const borderWidth = 2;
 
       if (count === 2) {
-        item.iconWidth = IMAGE_SIDE * 1.4;
-        item.iconHeight = IMAGE_SIDE * 1.4;
-        const cx = item.iconWidth + borderWidth;
+        const iconWidth = IMAGE_SIDE * 1.4
+        const iconHeight = IMAGE_SIDE * 1.4
+        const cx = iconWidth + borderWidth;
         const srartX = drawedNode.x - cx + borderWidth / 2;
-        item.iconX = srartX + cx * index;
-        item.iconY = drawedNode.y - item.iconHeight / 2;
+
+        item = {
+          node: nodeReward.node,
+          uniqueId: nodeReward.uniqueId,
+          iconUrl: nodeReward.item.iconUrl,
+          iconWidth,
+          iconHeight,
+          iconX: srartX + cx * index,
+          iconY: drawedNode.y - iconHeight / 2,
+        }
 
         if (isShowText) {
           const fontSize = 16;
-          itemQuantity.x = srartX + cx * index;
-          itemQuantity.y = drawedNode.y + HEIGHT - fontSize * 0.7;
-          itemQuantity.isSmallText = true;
-          itemQuantity.uid = nodeId + "_" + index;
+
+          rewardQuantity = {
+            nodeId,
+            isSmallText: true,
+            humanQuantity: nodeReward.humanQuantity,
+            x: srartX + cx * index,
+            y: drawedNode.y + HEIGHT - fontSize * 0.7,
+            uid: nodeId + "_" + index,
+          }
         }
       } else if (index <= 3) {
         // 0,0   1,0
         //     *
         // 0,1   1,1
-        item.iconWidth = IMAGE_SIDE * 1.1;
-        item.iconHeight = IMAGE_SIDE * 1.1;
-        const cx = item.iconWidth + borderWidth;
+        const iconWidth = IMAGE_SIDE * 1.1
+        const iconHeight = IMAGE_SIDE * 1.1
+        const cx = iconWidth + borderWidth;
         const srartX = drawedNode.x - cx + borderWidth / 2;
-        item.iconX = srartX + (index % 2 === 0 ? 0 : cx);
-        const cy = item.iconHeight + borderWidth;
+        const cy = iconHeight + borderWidth;
         const srartY = drawedNode.y - cy + borderWidth / 2;
-        item.iconY = srartY + (index < 2 ? 0 : cy);
+
+        item = {
+          node: nodeReward.node,
+          uniqueId: nodeReward.uniqueId,
+          iconUrl: nodeReward.item.iconUrl,
+          iconWidth,
+          iconHeight,
+          iconX: srartX + (index % 2 === 0 ? 0 : cx),
+          iconY: srartY + (index < 2 ? 0 : cy),
+        }
       } else {
-        item = null;
-        itemQuantity = null;
+        item = null
+        rewardQuantity = null;
       }
 
       indexesByNode[nodeId]++;
@@ -130,21 +191,19 @@ export function getIconsItems(dataItems, drawedNodes) {
 
     if (item) {
       resultItems.push(item);
-    }
-    if (isShowText && itemQuantity) {
-      rewardQuantities.push(itemQuantity);
-    }
 
-    if (item.node.cost) {
-      if (!isCommonStep(item.node.cost)) {
-        warningPoints[nodeId] = {
+      if (!isCommonStep(item.node.costItem)) {
+        warningPoints.set(nodeId, {
           nodeId,
           x: drawedNode.x + SIDE * 0.7,
           y: drawedNode.y,
-        };
+        });
       }
     }
-  });
+    if (isShowText && rewardQuantity) {
+      rewardQuantities.push(rewardQuantity);
+    }
+  })
 
   return {
     icons: resultItems,
@@ -153,19 +212,19 @@ export function getIconsItems(dataItems, drawedNodes) {
   };
 }
 
-function getCountsByNode(items) {
-  let countsByNode = {};
+function getCountsByNode(nodeRewards: Array<ViewNodeReward>): CountsByNode {
+  const result: CountsByNode = {};
 
-  items.forEach((item) => {
-    const nodeId = item.node.id;
+  nodeRewards.forEach((nodeReward) => {
+    const nodeId = nodeReward.node.id;
 
-    if (!countsByNode[nodeId]) {
-      countsByNode[nodeId] = 0;
+    if (!result[nodeId]) {
+      result[nodeId] = 0;
     }
-    countsByNode[nodeId]++;
-  });
+    result[nodeId]++;
+  })
 
-  return countsByNode;
+  return result;
 }
 
 function getDrawedNode(node: Node): DrawedNode {
@@ -181,17 +240,11 @@ function getDrawedNode(node: Node): DrawedNode {
   };
 }
 
-/**
- * @returns {Number}
- */
-export function getHorizontalStep() {
+export function getHorizontalStep(): number {
   return 1.5 * SIDE;
 }
 
-/**
- * @returns {Number}
- */
-export function getVerticalStep() {
+export function getVerticalStep(): number {
   return 2 * HEIGHT;
 }
 
