@@ -1,5 +1,5 @@
 import type { Item } from "@/api/ItemApi";
-import { isCommonStep, type Node } from "@/api/NodeApi";
+import { isCommonStep, type Node, type NodeMap } from "@/api/NodeApi";
 
 export const SIDE = 50;
 const HALF_SIDE = SIDE / 2;
@@ -19,23 +19,34 @@ export interface ViewNodeReward extends ViewReward {
   readonly node: Node,
 }
 
+export interface Coordinate {
+  x: number,
+  y: number
+}
+
+export type NodeCoordinates = [Coordinate, Coordinate, Coordinate, Coordinate, Coordinate, Coordinate]
+
+export interface DrawedNode {
+  node: Node,
+  x: number,
+  y: number,
+  xyId: string,
+  coordinates: NodeCoordinates,
+}
+export type DrawedNodeMap = Map<number, DrawedNode>
+
 export const SELECT_MODE_PLAN = "plan";
 export const SELECT_MODE_GOING = "going";
 export const SELECT_MODE_DISABLE = "disable";
 
 export type SelectMode = "plan" | "going" | "disable"
 
-/**
- * @param {Object} nodes
- * @returns {Object}
- */
-export function getDrawedNodes(nodes) {
-  let drawedNodes = {};
+export function getDrawedNodes(nodes: NodeMap): DrawedNodeMap {
+  const drawedNodes = new Map();
 
-  for (const id in nodes) {
-    const node = nodes[id];
-    drawedNodes[id] = getDrawedNode(node);
-  }
+  nodes.forEach((node) => {
+    drawedNodes.set(node.id, getDrawedNode(node));
+  })
 
   return drawedNodes;
 }
@@ -157,10 +168,7 @@ function getCountsByNode(items) {
   return countsByNode;
 }
 
-/**
- * @param {Object} node
- */
-function getDrawedNode(node) {
+function getDrawedNode(node: Node): DrawedNode {
   const x = node.mx * getHorizontalStep();
   const y = node.my * getVerticalStep() + (node.mx % 2 === 0 ? 0 : getVerticalStep() / 2);
 
@@ -187,12 +195,8 @@ export function getVerticalStep() {
   return 2 * HEIGHT;
 }
 
-/**
- * @param {Number} x
- * @param {Number} y
- */
-function getCoordinates(x, y) {
-  let coordinates = new Array(6);
+function getCoordinates(x: number, y: number): NodeCoordinates {
+  const coordinates = new Array<Coordinate>(6);
   coordinates[0] = { x: x + SIDE, y };
   coordinates[1] = { x: x + HALF_SIDE, y: y + HEIGHT };
   coordinates[2] = { x: x - HALF_SIDE, y: y + HEIGHT };
@@ -200,5 +204,5 @@ function getCoordinates(x, y) {
   coordinates[4] = { x: x - HALF_SIDE, y: y - HEIGHT };
   coordinates[5] = { x: x + HALF_SIDE, y: y - HEIGHT };
 
-  return coordinates;
+  return coordinates as NodeCoordinates;
 }

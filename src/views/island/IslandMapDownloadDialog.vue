@@ -217,8 +217,7 @@ function drawMap(context: CanvasRenderingContext2D, imagesByUrls: ImagesByUrls) 
   };
 
   context.strokeStyle = "#ddd";
-  for (const id in drawedNodes.value) {
-    const drawedNode = drawedNodes.value[id];
+  drawedNodes.value.forEach((drawedNode) => {
     const coordinates = drawedNode.coordinates;
     const node = drawedNode.node;
 
@@ -238,7 +237,7 @@ function drawMap(context: CanvasRenderingContext2D, imagesByUrls: ImagesByUrls) 
     context.closePath();
     context.fill();
     context.stroke();
-  }
+  })
 
   context.lineWidth = 1;
   iconModifyRewards.value.forEach((modifyReward) => {

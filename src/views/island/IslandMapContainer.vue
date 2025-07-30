@@ -107,11 +107,10 @@ const viewBox = computed(() => {
 const totalNodes = computed(() => {
   let drawedNodes = getDrawedNodes(props.nodes);
 
-  for (const id in drawedNodes) {
-    const drawedNode = drawedNodes[id];
+  drawedNodes.forEach((drawedNode) => {
     drawedNode.nodeClass = getNodeClass(drawedNode.node);
     drawedNode.points = getPoints(drawedNode.coordinates);
-  }
+  })
 
   return drawedNodes;
 });
@@ -353,12 +352,14 @@ function getUserNodeClass(drawedNode) {
   return "";
 }
 
-function getQuantity(item) {
-  return item.item.quantity > 1 ? ", " + item.item.quantity : "";
-}
+function getItemTitle(item): string {
+  let result = item.item.name ?? t("common.noName")
 
-function getItemName(item) {
-  return item.item.name ? item.item.name : t("common.noName");
+  if (item.item.quantity > 1) {
+    result += ", " + item.item.quantity
+  }
+
+  return result
 }
 </script>
 
@@ -402,7 +403,7 @@ function getItemName(item) {
             class="item-image"
             @click="onItemClick(item, $event)"
           >
-            <title>{{ getItemName(item) + getQuantity(item) }}</title>
+            <title>{{ getItemTitle(item) }}</title>
           </image>
           <rect
             v-else
@@ -415,7 +416,7 @@ function getItemName(item) {
             @click="onItemClick(item, $event)"
           >
             <title>
-              {{ getItemName(item) + getQuantity(item) }},
+              {{ getItemTitle(item) }},
               {{ t("page.island.notLinkedImage") }}
             </title>
           </rect>

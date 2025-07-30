@@ -365,7 +365,7 @@ function onResetDisableNodes() {
 
 function onFullscreen() {
   if (mapContainerRef.value?.svgMapRef !== null) {
-    fullscreenElement(mapContainerRef.value?.svgMapRef as FullscreenElement);
+    fullscreenElement(mapContainerRef.value?.svgMapRef);
   }
 }
 

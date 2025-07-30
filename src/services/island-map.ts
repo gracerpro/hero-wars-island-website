@@ -1,5 +1,6 @@
 import { TYPE_BLOCKER, TYPE_START, type Node } from "@/api/NodeApi";
 import { useI18n } from "@/i18n";
+import type { DrawedNode, DrawedNodeMap, UserNodeIds } from "@/views/island/map";
 
 export const TRANSLATE_X = 20;
 export const TRANSLATE_Y = 20;
@@ -12,29 +13,27 @@ export function canSelectNode(node: Node): boolean {
   return node.type !== TYPE_START && node.type != TYPE_BLOCKER;
 }
 
-/**
- * @param {Object} drawedNodes
- * @param {Object} userNodesIdsMap
- * @param {Object} node
- * @returns {String|null}
- */
-export function canSelectNextNode(drawedNodes, userNodesIds, nextDrawedNode) {
+export function canSelectNextNode(
+  drawedNodes: DrawedNodeMap,
+  userNodesIds: UserNodeIds,
+  nextDrawedNode: DrawedNode
+): string | null {
   const { t } = useI18n();
   let result = null;
 
-  if (nextDrawedNode.node.typeId === TYPE_START) {
+  if (nextDrawedNode.node.type === TYPE_START) {
     return t("page.island.canNotSelectStartNode");
   }
 
   // if no link to selected or started node
   // then cancel
 
-  if (Object.keys(userNodesIdsMap).length === 0) {
+  if (userNodesIds.size === 0) {
     let isFound = false;
     let isNearStart = false;
-    for (const id in drawedNodes) {
-      const drawedNode = drawedNodes[id];
-      if (drawedNode.node.typeId === TYPE_START) {
+
+    for (const drawedNode of drawedNodes.values()) {
+      if (drawedNode.node.type === TYPE_START) {
         isFound = true;
 
         if (isNearNode(nextDrawedNode, drawedNode)) {
@@ -50,18 +49,16 @@ export function canSelectNextNode(drawedNodes, userNodesIds, nextDrawedNode) {
     }
   } else {
     let isFound = false;
-    for (const id in drawedNodes) {
-      const drawedNode = drawedNodes[id];
-
+    for (const drawedNode of drawedNodes.values()) {
       if (nextDrawedNode.xyId === drawedNode.xyId) {
         continue;
       }
       if (isNearNode(nextDrawedNode, drawedNode)) {
-        if (drawedNode.node.typeId === TYPE_START) {
+        if (drawedNode.node.type === TYPE_START) {
           isFound = true;
           break;
         }
-        if (userNodesIdsMap[drawedNode.node.id]) {
+        if (userNodesIds.has(drawedNode.node.id)) {
           isFound = true;
           break;
         }
@@ -75,12 +72,7 @@ export function canSelectNextNode(drawedNodes, userNodesIds, nextDrawedNode) {
   return result;
 }
 
-/**
- * @param {Object} nextDrawedNode
- * @param {Object} drawedNode
- * @returns {Boolean}
- */
-function isNearNode(nextDrawedNode, drawedNode) {
+function isNearNode(nextDrawedNode: DrawedNode, drawedNode: DrawedNode): boolean {
   const dy = nextDrawedNode.node.my - drawedNode.node.my;
 
   if (nextDrawedNode.node.mx == drawedNode.node.mx) {
