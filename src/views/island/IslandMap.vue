@@ -23,7 +23,7 @@ import { shallowRef } from "vue";
 import { UserError } from "@/exceptions/UserError";
 import type { Island } from "@/api/IslandApi";
 import type { ViewNodeReward, UserNodeIds, ViewReward, SelectMode } from "./map";
-import { getUnknownItem, type Type } from "@/api/ItemApi";
+import { getUnknownItem, type ItemMap, type Type } from "@/api/ItemApi";
 import type { ComponentExposed } from "vue-component-type-helpers";
 
 interface Props {
@@ -73,6 +73,7 @@ const regionNumbers = ref<Array<number>>([]);
 const isLoadingNodes = ref(true);
 const nodes = ref<NodeMap>(new Map<number, Node>());
 const rewards = ref<Array<ViewNodeReward>>([]);
+const originRewards = ref<ItemMap>({});
 const calculatingRewards = ref(false);
 const userNodesIds = ref<UserNodeIds>(new Set());
 const userNodesGoingIds = ref<UserNodeIds>(new Set());
@@ -364,7 +365,7 @@ function onResetDisableNodes() {
 }
 
 function onFullscreen() {
-  if (mapContainerRef.value?.svgMapRef !== null) {
+  if (mapContainerRef.value?.svgMapRef) {
     fullscreenElement(mapContainerRef.value?.svgMapRef);
   }
 }
@@ -382,6 +383,7 @@ function reloadMap(isForce = false) {
   loadNodes(isForce).then((nodeList: IslandNodeList) => {
     nodes.value = nodeList.nodes;
     rewards.value = calculateRewards(nodeList);
+    originRewards.value = nodeList.rewards
 
     userNodesIds.value.forEach((nodeId) => {
       const node = nodes.value.get(nodeId);
@@ -563,6 +565,7 @@ function saveState() {
         :is-show-quantity="isShowQuantity"
         :is-select-any-node="isSelectAnyNode"
         :rewards="visibleRewards"
+        :origin-rewards="originRewards"
         :nodes="nodes"
         :user-nodes-ids="userNodesIds"
         :user-nodes-going-ids="userNodesGoingIds"

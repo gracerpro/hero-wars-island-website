@@ -27,6 +27,7 @@ export interface Item {
   id: number,
   name: string,
   gameId: number | null,
+  gameType: string | null,
   type: Type,
   iconUrl: string | null,
   iconWidth: number | null,
@@ -39,6 +40,7 @@ const unknownItem: Item = {
   id: 0,
   name: "Unknown",
   gameId: null,
+  gameType: null,
   type: TYPE_UNKNOWN,
   iconUrl: null,
   iconWidth: null,
@@ -97,6 +99,7 @@ export function modifyItem(data: any): Item  {
     name: data.name,
     type: data.typeId, // TODO: validate type? if null then TYPE_UNKNOWN
     gameId: data.gameId ?? null,
+    gameType: data.gameType ?? null,
     iconUrl: data.iconUrl ?? null,
     iconWidth: data.iconWidth ?? null,
     iconHeight: data.iconHeight ?? null,

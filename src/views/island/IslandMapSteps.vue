@@ -13,7 +13,7 @@ import { computed } from "vue";
 import { useI18n } from "vue-i18n";
 import { SELECT_MODE_DISABLE, SELECT_MODE_GOING, SELECT_MODE_PLAN } from "./map";
 import { isCommonStep, type NodeMap } from "@/api/NodeApi";
-import { GAME_ID_EXPLORER_MOVE, GAME_ID_WOOD, TYPE_COIN, TYPE_STARMONEY, type Type } from "@/api/ItemApi";
+import { GAME_ID_EXPLORER_MOVE, GAME_ID_WOOD, TYPE_COIN, TYPE_STARMONEY, type Item } from "@/api/ItemApi";
 import type { UserNodeIds, SelectMode } from "./map";
 
 interface Props {
@@ -25,8 +25,7 @@ interface Props {
 }
 
 interface StepCostItem {
-  readonly type: Type,
-  readonly gameId: number | null,
+  readonly item: Item,
   quantity: number,
   readonly iconClass?: string,
 }
@@ -70,8 +69,7 @@ const userStepCostItems = computed(() => {
 
       if (!map[key]) {
         map[key] = {
-          type: node.costItem.type,
-          gameId: node.costItem.gameId,
+          item: node.costItem,
           quantity: 0,
         };
       }
@@ -85,17 +83,17 @@ const otherStepCostItems = computed(() => {
   const result: { [key: string]: StepCostItem } = {};
 
   for (const key in userStepCostItems.value) {
-    const item = userStepCostItems.value[key];
+    const stepItem = userStepCostItems.value[key];
 
-    if (!isCommonStep(item)) {
+    if (!isCommonStep(stepItem.item)) {
       let icon;
 
-      if (item.type === TYPE_STARMONEY) {
+      if (stepItem.item.type === TYPE_STARMONEY) {
         icon = "item-emerald";
       }
 
       result[key] = {
-        ...item,
+        ...stepItem,
         iconClass: icon,
       };
     }
@@ -170,17 +168,17 @@ function onChangeSelectMode(event: Event) {
           </span>
         </div>
         <div
-          v-for="(item, key) in otherStepCostItems"
+          v-for="(stepItem, key) in otherStepCostItems"
           :key="key"
           class="mb-1"
         >
           <span class="d-inline-block">
             <span
-              :class="['hero-color-icon align-middle me-3', item.iconClass ?? '']"
-              :title="'typeId = ' + item.type + ' gameId = ' + item.gameId"
+              :class="['hero-color-icon align-middle me-3', stepItem.iconClass ?? '']"
+              :title="'typeId = ' + stepItem.item.type + ' gameId = ' + stepItem.item.gameId"
             ></span>
             <span class="fs-4 align-middle">
-              <b>{{ item.quantity }}</b>
+              <b>{{ stepItem.quantity }}</b>
             </span>
           </span>
         </div>

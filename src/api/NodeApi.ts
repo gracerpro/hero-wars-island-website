@@ -128,7 +128,8 @@ export class NodeApi {
     const costItem: Item = {
       id: data.cost ?? 0,
       name: data.cost ?? "Default cost item", // TODO: locale
-      gameId: data.cost ?? GAME_ID_EXPLORER_MOVE,
+      gameId: data.gameId ?? GAME_ID_EXPLORER_MOVE,
+      gameType: data.gameType ?? null,
       type: TYPE_COIN,
       iconUrl: null,
       iconWidth: null,

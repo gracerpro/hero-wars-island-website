@@ -11,7 +11,7 @@ import { useI18n } from "vue-i18n";
 import { useShow } from "@/components/modal-dialog";
 import { download } from "@/helpers/download";
 import { computed } from "vue";
-import { getDrawedNodes, getIconsItems, getVerticalStep, getHorizontalStep, type ViewNodeReward } from "./map";
+import { getDrawedNodes, getIconsItems, getVerticalStep, getHorizontalStep, type ViewNodeReward, type IconItem } from "./map";
 import {
   STATUS_NOT_SURE,
   TYPE_BLOCKER,
@@ -56,12 +56,12 @@ const { show, onMountedDialog } = useShow(dialogRef)
 const loading = ref(false);
 
 const drawedNodes = computed(() => getDrawedNodes(props.nodes));
-const iconItems = computed(() =>
+const iconItemsResult = computed(() =>
   getIconsItems(props.rewards, drawedNodes.value)
 );
-const iconModifyRewards = computed(() => iconItems.value.icons);
+const iconItems = computed(() => iconItemsResult.value.icons);
 const rewardQuantities = computed(() => {
-  return props.isShowQuantity ? iconItems.value.quantities : [];
+  return props.isShowQuantity ? iconItemsResult.value.quantities : [];
 });
 
 const minMaxNodeCoordinates = computed<MinMaxNodeCoordinates>(() => {
@@ -160,12 +160,10 @@ async function loadImages(): Promise<ImagesByUrls> {
   let urlMap: { [key: string]: boolean } = {};
   let imagesByUrls: ImagesByUrls = {};
 
-  iconModifyRewards.value.forEach((modifyReward) => {
-    const reward = modifyReward.item;
-
-    if (reward.iconUrl) {
-      if (!urlMap[reward.iconUrl]) {
-        urlMap[reward.iconUrl] = true;
+  iconItems.value.forEach((iconItem) => {
+    if (iconItem.iconUrl) {
+      if (!urlMap[iconItem.iconUrl]) {
+        urlMap[iconItem.iconUrl] = true;
       }
     }
   });
@@ -240,30 +238,28 @@ function drawMap(context: CanvasRenderingContext2D, imagesByUrls: ImagesByUrls) 
   })
 
   context.lineWidth = 1;
-  iconModifyRewards.value.forEach((modifyReward) => {
-    const item = modifyReward.item;
-
-    if (item.iconUrl) {
-      if (imagesByUrls[item.iconUrl]) {
-        const image = imagesByUrls[item.iconUrl];
+  iconItems.value.forEach((iconItem) => {
+    if (iconItem.iconUrl) {
+      if (imagesByUrls[iconItem.iconUrl]) {
+        const image = imagesByUrls[iconItem.iconUrl];
         context.drawImage(
           image,
-          modifyReward.iconX,
-          modifyReward.iconY,
-          modifyReward.iconWidth,
-          modifyReward.iconHeight
+          iconItem.iconX,
+          iconItem.iconY,
+          iconItem.iconWidth,
+          iconItem.iconHeight
         );
       } else {
-        drawEmptyImage(context, modifyReward);
+        drawEmptyImage(context, iconItem);
         context.fillStyle = "#000";
         context.fillText(
           "?",
-          modifyReward.iconX + modifyReward.iconWidth / 2,
-          modifyReward.iconY + modifyReward.iconHeight / 2
+          iconItem.iconX + iconItem.iconWidth / 2,
+          iconItem.iconY + iconItem.iconHeight / 2
         );
       }
     } else {
-      drawEmptyImage(context, modifyReward);
+      drawEmptyImage(context, iconItem);
     }
   });
 
@@ -277,7 +273,7 @@ function drawMap(context: CanvasRenderingContext2D, imagesByUrls: ImagesByUrls) 
   context.restore();
 }
 
-function drawEmptyImage(context: CanvasRenderingContext2D, item) {
+function drawEmptyImage(context: CanvasRenderingContext2D, item: IconItem) {
   context.fillStyle = "#fff";
   context.beginPath();
   context.rect(item.iconX, item.iconY, item.iconWidth, item.iconHeight);

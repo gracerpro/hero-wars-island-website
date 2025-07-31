@@ -61,6 +61,8 @@ export interface IconItem {
   node: Node,
   uniqueId: string,
   iconUrl: string | null,
+  itemName: string,
+  quantity: number,
 }
 
 export interface WarningPoint {
@@ -110,6 +112,8 @@ export function getIconsItems(nodeRewards: Array<ViewNodeReward>, drawedNodes: D
         node: nodeReward.node,
         uniqueId: nodeReward.uniqueId,
         iconUrl: nodeReward.item.iconUrl,
+        itemName: nodeReward.item.name,
+        quantity: nodeReward.quantity,
         iconWidth,
         iconHeight,
         iconX: drawedNode.x - iconWidth / 2,
@@ -121,7 +125,7 @@ export function getIconsItems(nodeRewards: Array<ViewNodeReward>, drawedNodes: D
           nodeId,
           isSmallText: false,
           humanQuantity: nodeReward.humanQuantity,
-          x: item.iconX + item.iconWidth * 0.02,
+          x: item!.iconX + item!.iconWidth * 0.02,
           y: drawedNode.y + HEIGHT - 3,
           uid: nodeId + "_0",
         }
@@ -143,6 +147,8 @@ export function getIconsItems(nodeRewards: Array<ViewNodeReward>, drawedNodes: D
           node: nodeReward.node,
           uniqueId: nodeReward.uniqueId,
           iconUrl: nodeReward.item.iconUrl,
+          itemName: nodeReward.item.name,
+          quantity: nodeReward.quantity,
           iconWidth,
           iconHeight,
           iconX: srartX + cx * index,
@@ -176,6 +182,8 @@ export function getIconsItems(nodeRewards: Array<ViewNodeReward>, drawedNodes: D
           node: nodeReward.node,
           uniqueId: nodeReward.uniqueId,
           iconUrl: nodeReward.item.iconUrl,
+          itemName: nodeReward.item.name,
+          quantity: nodeReward.quantity,
           iconWidth,
           iconHeight,
           iconX: srartX + (index % 2 === 0 ? 0 : cx),

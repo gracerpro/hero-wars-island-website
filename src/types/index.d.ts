@@ -6,7 +6,8 @@ declare global {
     ym?: any; // Declare 'ym' as an optional property on Window
   }
 
-  interface FullscreenElement extends HTMLElement {
+  interface FullscreenElement extends Element {
+    requestFullscreen?: () => Promise<void>;
     webkitRequestFullscreen?: () => Promise<void>;
     mozRequestFullScreen?: () => Promise<void>; // For Firefox
   }

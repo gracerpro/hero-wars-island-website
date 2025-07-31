@@ -11,6 +11,7 @@ const EVENT_SELECT_NODE = "selectNode";
 /* eslint-env browser */
 
 import { TYPE_DANGER } from "@/components/toast";
+import type ToastMessage from "@/components/ToastMessage.vue"
 import {
   TYPE_START,
   TYPE_TOWER,
@@ -32,10 +33,10 @@ import {
   canSelectNode,
   canSelectNextNode,
 } from "@/services/island-map";
-import { getIconsItems, getDrawedNodes, SIDE, type UserNodeIds, type ViewNodeReward, type NodeCoordinates, type DrawedNode, type IconItemsResult, type WarningPointsMap } from "./map";
+import { getIconsItems, getDrawedNodes, SIDE, type UserNodeIds, type ViewNodeReward, type NodeCoordinates, type DrawedNode, type IconItemsResult, type WarningPointsMap, type IconItem, type RewardQuantity } from "./map";
 import { useI18n } from "vue-i18n";
 import IslandMapInfoDialog from "./IslandMapInfoDialog.vue";
-import { GAME_ID_WOOD } from "@/api/ItemApi";
+import { GAME_ID_WOOD, type ItemMap } from "@/api/ItemApi";
 import type { Image } from "@/api/IslandApi";
 import type { ComponentExposed } from "vue-component-type-helpers";
 
@@ -46,6 +47,7 @@ interface Props {
   isShowQuantity: boolean,
   rewards: Array<ViewNodeReward>,
   nodes: Map<number, Node>,
+  originRewards: ItemMap,
   userNodesIds: UserNodeIds,
   userNodesGoingIds: UserNodeIds,
   disableNodesIds: UserNodeIds,
@@ -65,7 +67,7 @@ const emit = defineEmits<{
 
 const { t } = useI18n();
 
-const ToastMessage = import.meta.env.SSR
+const LocalToastMessage = import.meta.env.SSR
   ? null
   : defineAsyncComponent(() => import("@/components/ToastMessage.vue"));
 
@@ -132,7 +134,7 @@ const iconItems = computed<IconItemsResult>(() => {
 });
 const rewardIcons = computed(() => iconItems.value.icons);
 const warningPoints = computed<WarningPointsMap>(() => iconItems.value.warningPoints);
-const rewardQuantities = computed(() => {
+const rewardQuantities = computed<Array<RewardQuantity>>(() => {
   return props.isShowQuantity ? iconItems.value.quantities : [];
 });
 
@@ -230,8 +232,7 @@ function onNodeClick(drawedNode: SvgDrawedNode, event: MouseEvent) {
   }
 }
 
-function onItemClick(item, event: MouseEvent) {
-  const nodeId = item.nodeId ? item.nodeId : item.node.id;
+function onItemClick(nodeId: number, event: MouseEvent) {
   const drawedNode = totalNodes.value.get(nodeId);
 
   if (drawedNode) {
@@ -343,11 +344,11 @@ function getUserNodeClass(drawedNode: SvgDrawedNode): string {
   return "";
 }
 
-function getItemTitle(item): string {
-  let result = item.item.name ?? t("common.noName")
+function getItemTitle(item: IconItem): string {
+  let result = item.itemName ?? t("common.noName")
 
-  if (item.item.quantity > 1) {
-    result += ", " + item.item.quantity
+  if (item.quantity > 1) {
+    result += ", " + item.quantity
   }
 
   return result
@@ -392,7 +393,7 @@ function getItemTitle(item): string {
             :height="item.iconHeight"
             :href="item.iconUrl"
             class="item-image"
-            @click="onItemClick(item, $event)"
+            @click="onItemClick(item.node.id, $event)"
           >
             <title>{{ getItemTitle(item) }}</title>
           </image>
@@ -404,7 +405,7 @@ function getItemTitle(item): string {
             :height="item.iconHeight"
             class="item-empty-image"
             :class="item.uniqueId"
-            @click="onItemClick(item, $event)"
+            @click="onItemClick(item.node.id, $event)"
           >
             <title>
               {{ getItemTitle(item) }},
@@ -419,7 +420,7 @@ function getItemTitle(item): string {
           :cy="point.y"
           r="10"
           class="warning-point"
-          @click="onItemClick(point, $event)"
+          @click="onItemClick(point.nodeId, $event)"
         >
           <title>{{ t("page.island.unusualStepPrice") }}</title>
         </circle>
@@ -429,7 +430,7 @@ function getItemTitle(item): string {
           :x="item.x"
           :y="item.y"
           :class="['text', item.isSmallText ? 'text-small' : '']"
-          @click="onItemClick(item, $event)"
+          @click="onItemClick(item.nodeId, $event)"
         >
           {{ item.humanQuantity }}
         </text>
@@ -438,12 +439,14 @@ function getItemTitle(item): string {
 
     <component
       :is="infoDialogComponent"
+      v-if="infoDialogDrawedNode"
       ref="infoDialog"
       :drawed-node="infoDialogDrawedNode"
+      :origin-rewards="originRewards"
       @vue:mounted="onMountedInfoDialog"
     />
 
-    <toast-message
+    <local-toast-message
       ref="toastRef"
       element-id="mapContainerToast"
     />

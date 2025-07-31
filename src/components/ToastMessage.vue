@@ -1,5 +1,6 @@
 <script setup lang="ts">
 /* global HTMLElement */
+/* global document */
 
 import { ref, computed } from "vue";
 import { type ToastType, TYPE_DANGER, TYPE_SUCCESS } from "./toast";
@@ -43,12 +44,14 @@ function show(message: string, type?: ToastType) {
     once: true,
   });
 
-  const toast = new LocalToast(element, {
-    delay: 2000,
-    autohide: true,
-  });
-  toast.show();
-  isShow.value = true;
+  if (LocalToast) {
+    const toast = new LocalToast(element, {
+      delay: 2000,
+      autohide: true,
+    });
+    toast.show();
+    isShow.value = true;
+  }
 }
 
 defineExpose({
