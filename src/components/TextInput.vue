@@ -2,10 +2,13 @@
 const EVENT_UPDATE_VALUE = "update:model-value";
 </script>
 <script setup lang="ts">
+/* global Event */
+/* global HTMLInputElement  */
+
 interface Props {
   inputId: string,
-  modelValue: string,
-  modelModifiers: object,
+  modelValue?: string,
+  modelModifiers?: object,
 }
 
 const props = withDefaults(defineProps<Props>(), {

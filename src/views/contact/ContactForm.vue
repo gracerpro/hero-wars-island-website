@@ -1,4 +1,7 @@
 <script setup lang="ts">
+/* global HTMLElement */
+/* global setTimeout */
+
 import ClientOnly from "@/components/ClientOnly.vue";
 import { UserError } from "@/exceptions/UserError";
 import HeroClient from "@/api/HeroClient";

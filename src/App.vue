@@ -1,4 +1,6 @@
 <script setup lang="ts">
+/* global console */
+
 import TheNav from "./components/TheNav.vue";
 import TheGlobalNotify from "./components/TheGlobalNotify.vue";
 import { loadGlobalData, type GlobalData } from "./services/api/global-data";

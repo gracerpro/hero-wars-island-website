@@ -2,7 +2,7 @@
 import { type IBreadcrumbItem } from './breadcrumbs';
 
 interface Props {
-  links: Array<IBreadcrumbItem>
+  links?: Array<IBreadcrumbItem>
 }
 
 withDefaults(defineProps<Props>(), {

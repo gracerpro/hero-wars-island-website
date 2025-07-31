@@ -2,13 +2,16 @@
 const EVENT_UPDATE_VALUE = "update:model-value";
 </script>
 <script setup lang="ts">
+/* global Event */
+/* global HTMLSelectElement */
+
 import { computed } from "vue";
 import type { SelectItemMap } from "./select";
 
 interface Props {
   inputId: string,
   selectValues: SelectItemMap,
-  modelValue: number | null,
+  modelValue?: number | null,
 }
 
 const props = withDefaults(defineProps<Props>(), {

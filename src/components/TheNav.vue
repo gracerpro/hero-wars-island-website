@@ -1,4 +1,6 @@
 <script setup lang="ts">
+/* global HTMLElement */
+
 import { useI18n } from "vue-i18n";
 import { ref, onMounted } from "vue";
 import HeroClient from "@/api/HeroClient";

@@ -6,10 +6,6 @@ interface PageInfo {
   keywords?: string,
 }
 
-interface AppSsrContext {
-  page: PageInfo
-}
-
 export function setMetaInfo(info: PageInfo, ssrContext?: SSRContext) {
   if (import.meta.env.SSR) {
     if (ssrContext) {
@@ -45,7 +41,7 @@ export function setMetaInfo(info: PageInfo, ssrContext?: SSRContext) {
 }
 
 function createMeta(name: string, content: string) {
-  var meta = document.createElement("meta");
+  const meta = document.createElement("meta");
   meta.name = name;
   meta.content = content;
   document.getElementsByTagName("head")[0].appendChild(meta);

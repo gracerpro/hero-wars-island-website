@@ -21,7 +21,7 @@ let dialogResult: DialogResult = null;
 if (!import.meta.env.SSR) {
   // Load bootstrap module asynchronously else get an error on SSR
   // ReferenceError: document is not defined
-  (await import("bootstrap")).Modal;
+  //(await import("bootstrap")).Modal;
 }
 
 interface Props {

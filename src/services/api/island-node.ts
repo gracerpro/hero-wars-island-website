@@ -1,6 +1,6 @@
 import HeroClient from "@/api/HeroClient";
 import type { Island } from "@/api/IslandApi";
-import type { IslandNodeList, Node, NodeFilter, NodeMap } from "@/api/NodeApi";
+import type { IslandNodeList, Node, NodeFilter } from "@/api/NodeApi";
 import { INDEXED_DB_NAME } from "@/core/storage";
 import { isObject } from "@/helpers/core";
 
@@ -100,13 +100,13 @@ function savePreviousUpdatedAt(island: Island) {
   localStorage.setItem(PREVIOUS_DATES_NAME, JSON.stringify(datesByIsland));
 }
 
-async function writeNodesToCache(island: Island, nodesMap: NodeMap): Promise<IDBValidKey | undefined> {
+async function writeNodesToCache(island: Island, nodeList: IslandNodeList): Promise<IDBValidKey | undefined> {
   const db = await openDb();
 
   return new Promise((resolve, reject) => {
     const transaction = db.transaction("islandNodes", "readwrite");
     const nodeStore = transaction.objectStore("islandNodes");
-    const request = nodeStore.put({ islandId: island.id, nodesMap });
+    const request = nodeStore.put({ islandId: island.id, nodeList });
 
     request.onsuccess = function () {
       resolve(request.result);
@@ -126,7 +126,7 @@ async function getNodesFromCache(island: Island): Promise<IslandNodeList|null> {
     const request = nodeStore.get(island.id);
 
     request.onsuccess = () => {
-      const nodesList = request.result?.nodesMap;
+      const nodesList = request.result?.nodeList;
       console.log("nodesList from db", nodesList)
       resolve(nodesList);
     }

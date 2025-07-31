@@ -1,4 +1,5 @@
 import { createI18nRouteTo, guessDefaultLocale } from "@/i18n/translation";
+import type { RouteLocationNormalizedGeneric } from "vue-router";
 
 export default [
   {
@@ -57,7 +58,7 @@ export default [
   {
     // [Vue Router warn]: Discarded invalid param(s) "catchAll" when navigating. See https://github.com/vuejs/router/blob/main/packages/router/CHANGELOG.md#414-2022-08-22 for more details
     path: "/:catchAll(.*)",
-    redirect: (to) => {
+    redirect: (to: RouteLocationNormalizedGeneric) => {
       return createI18nRouteTo(
         { name: "page-not-found", query: { returnUrl: to.path } },
         guessDefaultLocale()

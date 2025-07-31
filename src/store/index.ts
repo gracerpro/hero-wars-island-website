@@ -26,7 +26,7 @@ interface AppState {
   theme: Theme,
 }
 
-let globalNotifications: GlobalNotificationsMap  = {};
+const globalNotifications: GlobalNotificationsMap  = {};
 
 let theme: Theme = THEME_LIGHT;
 let isShowMenu = true;
