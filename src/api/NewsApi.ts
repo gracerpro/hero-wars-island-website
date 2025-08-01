@@ -56,6 +56,7 @@ export class NewsApi {
     let totalCount = 0
 
     if (response.items) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       items = response.items.map((oneNews: any) => this.modifyOneNews(oneNews));
       totalCount = response.totalCount
     }
@@ -64,7 +65,7 @@ export class NewsApi {
   }
 
   async get(slug: string): Promise<OneNews | null> {
-    let response = await this.apiRequest.get("/news/view?slug=" + slug);
+    const response = await this.apiRequest.get("/news/view?slug=" + slug);
 
     if (response) {
       return this.modifyOneNews(response);
@@ -73,14 +74,15 @@ export class NewsApi {
     return null;
   }
 
-  private modifyOneNews(response: any): OneNews {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  private modifyOneNews(data: any): OneNews {
     return {
-      id: response.id,
-      slug: response.slug,
-      name: response.name,
-      createdAt: new Date(response.createdAt),
-      updatedAt: new Date(response.updatedAt),
-      snippet: response.snippet,
+      id: data.id,
+      slug: data.slug,
+      name: data.name,
+      createdAt: new Date(data.createdAt),
+      updatedAt: new Date(data.updatedAt),
+      snippet: data.snippet,
     }
   }
 }

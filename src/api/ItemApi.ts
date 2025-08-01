@@ -85,6 +85,7 @@ export class ItemApi {
     let totalCount: number = 0
 
     if (response.items) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       items = response.items.map((item: any) => modifyItem(item))
       totalCount = response.totalCount
     }
@@ -93,6 +94,7 @@ export class ItemApi {
   }
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function modifyItem(data: any): Item  {
   return {
     id: data.id,

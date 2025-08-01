@@ -18,10 +18,6 @@ export async function getNodesMap(island: Island, isForce = false, filter?: Node
   try {
     if (!isLoadFromServer) {
       nodesList = await getNodesFromCache(island);
-      console.log("from cache nodesMap", nodesList); // TODO: test
-      if (!isNodeList(nodesList)) {
-        nodesList = null
-      }
     }
   } catch (error) {
     console.error(error); // TODO: notify
@@ -46,6 +42,7 @@ export async function getNodesMap(island: Island, isForce = false, filter?: Node
   return nodesList;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function isNodeList(data: any): boolean {
   return (data.nodes && typeof data.nodes === "object")
     && (typeof data.totalCount === "number")
@@ -126,8 +123,13 @@ async function getNodesFromCache(island: Island): Promise<IslandNodeList|null> {
     const request = nodeStore.get(island.id);
 
     request.onsuccess = () => {
-      const nodesList = request.result?.nodeList;
+      let nodesList = request.result?.nodeList;
       console.log("nodesList from db", nodesList)
+
+      if (!isNodeList(nodesList)) {
+        nodesList = null
+      }
+
       resolve(nodesList);
     }
     request.onerror = () => {

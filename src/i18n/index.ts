@@ -1,9 +1,12 @@
 import ru from "./locales/ru.json";
-import { createI18n as _createI18n } from "vue-i18n";
+import { createI18n as _createI18n, type I18n } from "vue-i18n";
 
-let i18n: any = null;
+let i18n: I18n
 
-export function createI18n(locale: string, messages: any) {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type Messages = {ru: any, en?: any}
+
+export function createI18n(locale: string, messages: Messages) {
   if (!locale) {
     locale = import.meta.env.VITE_DEFAULT_LOCALE;
   }

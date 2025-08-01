@@ -1,5 +1,6 @@
 import { nextTick } from "vue";
 import { useI18n } from "@/i18n";
+import type { RouteLocationNormalizedGeneric } from "vue-router";
 
 function getDefaultLocale(): string {
   return import.meta.env.VITE_DEFAULT_LOCALE;
@@ -35,7 +36,7 @@ export function getCurrentLocale(): string {
   return i18n.locale.value;
 }
 
-export function createI18nRouteTo(to: any, locale: string | null = null): object {
+export function createI18nRouteTo(to: RouteLocationNormalizedGeneric, locale: string | null = null): object {
   locale = locale !== null ? locale : getCurrentLocale();
 
   if (!isShowLocaleInRoute(locale)) {

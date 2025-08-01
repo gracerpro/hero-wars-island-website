@@ -112,6 +112,7 @@ export class IslandApi {
     let totalCount = 0
 
     if (response.items) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       items = response.items.map((island: any) => this.modifyIsland(island));
       totalCount = response.totalCount
     }
@@ -119,40 +120,42 @@ export class IslandApi {
     return new ApiList<Island>(items, totalCount);
   }
 
-  private modifyIsland(response: any): Island {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  private modifyIsland(data: any): Island {
     let regions: Array<Region> = []
     let image: Image | null = null
 
-    if (response.regions) {
-      regions = response.regions.map((data: any) => {
+    if (data.regions) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      regions = data.regions.map((regionData: any) => {
         return {
-          startAt: data.startAt ? new Date(data.startAt) : null,
+          startAt: regionData.startAt ? new Date(regionData.startAt) : null,
         }
       });
     }
-    if (response.backgroundImage) {
+    if (data.backgroundImage) {
       image = {
-        url: response.backgroundImage.url,
-        width: response.backgroundImage.width,
-        height: response.backgroundImage.height,
-        size: response.backgroundImage.size,
+        url: data.backgroundImage.url,
+        width: data.backgroundImage.width,
+        height: data.backgroundImage.height,
+        size: data.backgroundImage.size,
       }
     }
 
     return {
-      id: response.id,
-      eventStartAt: new Date(response.eventStartAt),
-      eventEndAt: new Date(response.eventEndAt),
-      name: response.name,
-      nodesLastUpdatedAt: response.nodesLastUpdatedAt ? new Date(response.nodesLastUpdatedAt) : null,
+      id: data.id,
+      eventStartAt: new Date(data.eventStartAt),
+      eventEndAt: new Date(data.eventEndAt),
+      name: data.name,
+      nodesLastUpdatedAt: data.nodesLastUpdatedAt ? new Date(data.nodesLastUpdatedAt) : null,
       regions,
       initMap: {
-        scale: response.initMap.scale,
-        offsetX: response.initMap.offsetX,
-        offsetY: response.initMap.offsetY,
+        scale: data.initMap.scale,
+        offsetX: data.initMap.offsetX,
+        offsetY: data.initMap.offsetY,
       },
-      syncGameVersion: response.syncGameVersion ?? null,
-      syncAt: response.syncAt ?? null,
+      syncGameVersion: data.syncGameVersion ?? null,
+      syncAt: data.syncAt ?? null,
       backgroundImage: image,
     }
   }

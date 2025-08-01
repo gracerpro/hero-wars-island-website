@@ -79,6 +79,7 @@ export class NodeApi {
     const rewards: ItemMap = {}
 
     if (response.items) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       response.items.forEach((node: any) => {
         nodes.set(node.id, this.modifyNode(node))
       })
@@ -99,19 +100,12 @@ export class NodeApi {
     };
   }
 
-  /**
-   * TODO: it use?
-   */
-  /*async update(nodeId: number, data): Promise<Node> {
-    const response = await this.apiRequest.post(`/island-nodes/${nodeId}/update`, data);
-
-    return this.modifyNode(response);
-  }*/
-
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private modifyNode(data: any): Node {
     let rewards: Array<NodeReward> = []
 
     if (data.items) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       rewards = data.items.map((itemData: any): NodeReward => {
         return {
           itemId: itemData.itemId,
@@ -123,13 +117,12 @@ export class NodeApi {
     // data.cost
     // - itemId
     // - count
-    // - gameId ?
 
     const costItem: Item = {
-      id: data.cost ?? 0,
+      id: data.cost.itemId ?? 0,
       name: data.cost ?? "Default cost item", // TODO: locale
-      gameId: data.gameId ?? GAME_ID_EXPLORER_MOVE,
-      gameType: data.gameType ?? null,
+      gameId: data.cost.gameId ?? GAME_ID_EXPLORER_MOVE,
+      gameType: data.cost.gameType ?? null,
       type: TYPE_COIN,
       iconUrl: null,
       iconWidth: null,

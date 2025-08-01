@@ -62,6 +62,7 @@ export class FeedbackApi {
     let totalCount = 0
 
     if (response.items) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       items = response.items.map((item: any) => this.modifyFeedback(item));
       totalCount = response.totalCount
     }
@@ -69,6 +70,7 @@ export class FeedbackApi {
     return new ApiList<Feedback>(items, totalCount);
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private modifyFeedback(response: any): Feedback {
     return {
       id: response.id,

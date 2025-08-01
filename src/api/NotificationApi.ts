@@ -26,6 +26,7 @@ export class NotificationApi {
     let totalCount = 0
 
     if (response.items) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       items = response.items.map((item: any) => this.modifyNotification(item));
       totalCount = response.totalCount
     }
@@ -33,12 +34,13 @@ export class NotificationApi {
     return new ApiList<Notification>(items, totalCount);
   }
 
-  private modifyNotification(notification: any): Notification {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  private modifyNotification(data: any): Notification {
     return {
-      id: notification.id,
-      createdAt: new Date(notification.createdAt),
-      contentUpdatedAt: new Date(notification.contentUpdatedAt),
-      content: notification.content,
+      id: data.id,
+      createdAt: new Date(data.createdAt),
+      contentUpdatedAt: new Date(data.contentUpdatedAt),
+      content: data.content,
     }
   }
 }

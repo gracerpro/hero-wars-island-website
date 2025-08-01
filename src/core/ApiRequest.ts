@@ -18,6 +18,7 @@ class ApiRequest {
     this.beforeRequest = callable;
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   async get(url: string, params?: URLSearchParams): Promise<any> {
     if (this.beforeRequest !== null) {
       this.beforeRequest(this);
@@ -48,6 +49,7 @@ class ApiRequest {
     return response.json();
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   async post(url: string, data: object): Promise<any> {
     if (this.beforeRequest !== null) {
       this.beforeRequest(this);
