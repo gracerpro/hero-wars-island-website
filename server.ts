@@ -1,6 +1,6 @@
 import fs from 'node:fs/promises'
 import express from 'express'
-import { AppSsrManifest, getHtml, RenderFun } from "./src/common.js";
+import { AppSsrManifest, getHtml, RenderFun } from "./src/server-common.js";
 import { HttpError } from './src/exceptions/HttpError';
 import { ViteDevServer } from 'vite';
 
@@ -16,6 +16,8 @@ const templateHtml = isProduction
 const ssrManifest = isProduction
   ? await fs.readFile('./dist/client/.vite/ssr-manifest.json', 'utf-8')
   : undefined
+
+console.log("ssrManifest", ssrManifest)
 
 // Create http server
 const app = express()
@@ -45,11 +47,7 @@ app.use('*', async (request, response) => {
 
     console.log("recieve url:", url);
 
-    let { html, statusCode } = await getAppHtml(url, ssrManifest);
-
-    if (!statusCode) {
-      statusCode = 200;
-    }
+    const { html, statusCode } = await getAppHtml(url, ssrManifest);
 
     response.status(statusCode).set({ 'Content-Type': 'text/html; charset=UTF-8' }).send(html)
   } catch (e) {
