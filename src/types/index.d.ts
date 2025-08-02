@@ -4,6 +4,7 @@ export {};
 declare global {
 	interface Window {
     ym?: any; // Declare 'ym' as an optional property on Window
+    __INITIAL_STATE__: any;
   }
 
   interface FullscreenElement extends Element {

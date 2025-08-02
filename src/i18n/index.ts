@@ -1,4 +1,3 @@
-import ru from "./locales/ru.json";
 import { createI18n as _createI18n, type I18n } from "vue-i18n";
 
 let i18n: I18n
@@ -7,13 +6,6 @@ let i18n: I18n
 type Messages = {ru: any, en?: any}
 
 export function createI18n(locale: string, messages: Messages) {
-  if (!locale) {
-    locale = import.meta.env.VITE_DEFAULT_LOCALE;
-  }
-  if (!messages) {
-    messages = { ru };
-  }
-
   i18n = _createI18n({
     locale,
     fallbackLocale: locale,

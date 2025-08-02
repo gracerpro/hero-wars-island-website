@@ -1,8 +1,9 @@
 import { basename } from "node:path";
-import { renderToString } from "vue/server-renderer";
+import { renderToString, type SSRContext } from "vue/server-renderer";
 import createApp from "./main";
+import type { AppSsrManifest, RenderResult } from "./common";
 
-export async function render(url, ssrManifest) {
+export async function render(url: string, ssrManifest: AppSsrManifest): Promise<RenderResult> {
   const { app, router } = createApp();
 
   await router.push(url);
@@ -13,7 +14,7 @@ export async function render(url, ssrManifest) {
   // @vitejs/plugin-vue injects code into a component's setup() that registers
   // itself on ctx.modules. After the render, ctx.modules would contain all the
   // components that have been instantiated during this render call.
-  const context = {
+  const context: SSRContext = {
     url,
   };
 
@@ -51,9 +52,12 @@ export async function render(url, ssrManifest) {
   };
 }
 
-function renderPreloadLinks(modules, manifest) {
+function renderPreloadLinks(modules: Array<string>, manifest: AppSsrManifest) {
   let links = "";
   const seen = new Set();
+
+  console.log("modules", modules);
+  console.log("manifest", manifest);
 
   modules.forEach((id) => {
     const files = manifest[id];
@@ -77,7 +81,7 @@ function renderPreloadLinks(modules, manifest) {
   return links;
 }
 
-function renderPreloadLink(file) {
+function renderPreloadLink(file: string) {
   if (file.endsWith(".js")) {
     return `<link rel="modulepreload" crossorigin href="${file}">`;
   } else if (file.endsWith(".css")) {

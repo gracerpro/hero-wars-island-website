@@ -1,7 +1,8 @@
 import fs from 'node:fs/promises'
 import express from 'express'
-import { getHtml } from "./common.js";
-import HttpError from './src/exceptions/HttpError.js';
+import { AppSsrManifest, getHtml, RenderFun } from "./src/common.js";
+import { HttpError } from './src/exceptions/HttpError';
+import { ViteDevServer } from 'vite';
 
 // Constants
 const isProduction = process.env.NODE_ENV === 'production';
@@ -20,7 +21,7 @@ const ssrManifest = isProduction
 const app = express()
 
 // Add Vite or respective production middlewares
-let vite
+let vite: ViteDevServer
 
 if (!isProduction) {
   const { createServer } = await import('vite')
@@ -70,9 +71,9 @@ app.listen(port, () => {
 });
 
 
-async function getAppHtml(url, manifest) {
-  let template;
-  let render;
+async function getAppHtml(url: string, manifest: AppSsrManifest) {
+  let template: string;
+  let render: RenderFun;
 
   if (!isProduction) {
     // Always read fresh template in development
@@ -100,5 +101,10 @@ async function getAppHtml(url, manifest) {
     render = (await import('./dist/server/entry-server.js')).render
   }
 
-  return getHtml(url, manifest, template, render);
+  return getHtml({
+    url,
+    manifest,
+    template,
+    render
+  });
 }

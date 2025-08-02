@@ -1,7 +1,7 @@
 // Pre-render the app into static HTML.
 
 import fs from 'node:fs'
-import { getHtml } from './common.js'
+import { getHtml } from './src/common.js'
 import fetch from "node-fetch";
 import { loadEnv } from 'vite';
 import { gzip } from 'node-gzip';
