@@ -7,7 +7,7 @@ import {
   isShowLocaleInRoute,
   createI18nRouteTo,
 } from "@/i18n/translation";
-import routes from "./routes";
+import { routes } from "./routes";
 
 export function createRouter() {
   const router = _createRouter({
@@ -39,7 +39,9 @@ function addBeforeEach(router: Router) {
         if (paramsLocale !== "page-not-found") {
           return next(
             createI18nRouteTo(
-              { name: "page-not-found", query: { returnUrl: to.path } },
+              {
+                name: "page-not-found", query: { returnUrl: to.path },
+              },
               guessDefaultLocale()
             )
           );
