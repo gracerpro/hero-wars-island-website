@@ -3,7 +3,7 @@ import { renderToString, type SSRContext } from "vue/server-renderer";
 import createApp from "./main";
 import type { AppSsrManifest, RenderResult } from "./server-common";
 
-export async function render(url: string, ssrManifest: AppSsrManifest): Promise<RenderResult> {
+export async function render(url: string, ssrManifest?: AppSsrManifest): Promise<RenderResult> {
   const { app, router } = createApp();
 
   await router.push(url);

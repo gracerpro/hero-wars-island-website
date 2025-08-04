@@ -1,8 +1,8 @@
 import fs from 'node:fs/promises'
-import express from 'express'
-import { AppSsrManifest, getHtml, RenderFun } from "./src/server-common.js";
+import express, { type Request, type Response } from 'express'
+import { type AppSsrManifest, getHtml, type RenderFun } from "./src/server-common.js";
 import { HttpError } from './src/exceptions/HttpError';
-import { ViteDevServer } from 'vite';
+import type { ViteDevServer } from 'vite';
 
 // Constants
 const isProduction = process.env.NODE_ENV === 'production';
@@ -19,6 +19,7 @@ const ssrManifest = isProduction
 
 console.log("ssrManifest", ssrManifest)
 
+/*
 // Create http server
 const app = express()
 
@@ -41,7 +42,7 @@ if (!isProduction) {
 }
 
 // Serve HTML
-app.use('*', async (request, response) => {
+app.use('*', async (request: Request, response: Response) => {
   try {
     const url = request.originalUrl.replace(base, '');
 
@@ -50,16 +51,23 @@ app.use('*', async (request, response) => {
     const { html, statusCode } = await getAppHtml(url, ssrManifest);
 
     response.status(statusCode).set({ 'Content-Type': 'text/html; charset=UTF-8' }).send(html)
-  } catch (e) {
-    vite?.ssrFixStacktrace(e)
-    console.log(e.stack)
+  } catch (e: unknown) {
+    if (e instanceof Error) {
+      vite?.ssrFixStacktrace(e)
+      console.log(e.stack)
+    }
 
     if (e instanceof HttpError) {
       response.status(e.statusCode)
     } else {
       response.status(500)
     }
-    response.end(e.stack)
+
+    if (e instanceof Error) {
+      response.end(e.stack)
+    } else {
+      response.end("error")
+    }
   }
 })
 
@@ -69,7 +77,7 @@ app.listen(port, () => {
 });
 
 
-async function getAppHtml(url: string, manifest: AppSsrManifest) {
+async function getAppHtml(url: string, manifest?: AppSsrManifest) {
   let template: string;
   let render: RenderFun;
 
@@ -106,3 +114,5 @@ async function getAppHtml(url: string, manifest: AppSsrManifest) {
     render
   });
 }
+
+*/

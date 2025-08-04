@@ -19,7 +19,7 @@
   },
   "include": ["src/**/*.ts", "src/**/*.vue"],
   "exclude": [
-    "entry-server.ts",
-    "server-common.ts",
+    "src/entry-server.ts",
+    "src/server-common.ts",
   ]
 }

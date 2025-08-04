@@ -20,7 +20,7 @@ export interface RenderResult {
   state: any,
 }
 
-export type RenderFun = (url: string, ssrManifest: AppSsrManifest) => Promise<RenderResult>
+export type RenderFun = (url: string, ssrManifest?: AppSsrManifest) => Promise<RenderResult>
 
 export interface RenderParams {
   url: string,
