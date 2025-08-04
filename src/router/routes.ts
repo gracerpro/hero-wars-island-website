@@ -1,83 +1,89 @@
 import { createI18nRouteTo, guessDefaultLocale } from "@/i18n/translation";
-import type { RouteLocationNormalizedGeneric, RouteRecordInfo, RouteRecordRaw } from "vue-router";
+import type { RouteRecordInfo, RouteRecordRaw } from "vue-router";
 
 export interface RouteNamedMap {
-  home: RouteRecordInfo<
-    // here we have the same name
-    'home',
-    // this is the path, it will appear in autocompletion
-    '/',
-    // these are the raw params (what can be passed to router.push() and RouterLink's "to" prop)
-    // In this case, there are no params allowed
-    Record<never, never>,
-    // these are the normalized params (what you get from useRoute())
-    Record<never, never>,
-    // this is a union of all children route names, in this case, there are none
-    never
-  >,
-  about: RouteRecordInfo<
-    "about",
-    "/about",
-    Record<never, never>,
-    Record<never, never>,
-    never
-  >,
-  contact: RouteRecordInfo<
-    "contact",
-    "/contact",
-    Record<never, never>,
-    Record<never, never>,
-    never
-  >,
-  "island-view": RouteRecordInfo<
-    "island-view",
-    "/islands/:id(\\d+)",
-    { id: number | string },
-    { id: string },
-    never
-  >,
-  help: RouteRecordInfo<
-    "help",
-    "/help",
-    Record<never, never>,
-    Record<never, never>,
-    never
-  >,
-  news: RouteRecordInfo<
-    "news",
-    "/news",
-    Record<never, never>,
-    Record<never, never>,
-    never
-  >,
-  "news-view": RouteRecordInfo<
-    "news-view",
-    "/news/:slug([a-zA-Z0-9\\-]+)",
-    { slug: string },
-    { slug: string },
-    never
-  >,
-  "page-not-found": RouteRecordInfo<
-    "page-not-found",
-    "/page-not-found",
-    Record<never, never>,
-    Record<never, never>,
-    never
-  >,
-  "internal-server-error": RouteRecordInfo<
-    "internal-server-error",
-    "/internal-server-error",
-    Record<never, never>,
-    Record<never, never>,
-    never
-  >,
+  locale: {
+    path: "/:locale?",
+    children: {
+      home: RouteRecordInfo<
+        // here we have the same name
+        'home',
+        // this is the path, it will appear in autocompletion
+        '/',
+        // these are the raw params (what can be passed to router.push() and RouterLink's "to" prop)
+        // In this case, there are no params allowed
+        Record<never, never>,
+        // these are the normalized params (what you get from useRoute())
+        Record<never, never>,
+        // this is a union of all children route names, in this case, there are none
+        never
+      >,
+      about: RouteRecordInfo<
+        "about",
+        "/about",
+        Record<never, never>,
+        Record<never, never>,
+        never
+      >,
+      contact: RouteRecordInfo<
+        "contact",
+        "/contact",
+        Record<never, never>,
+        Record<never, never>,
+        never
+      >,
+      "island-view": RouteRecordInfo<
+        "island-view",
+        "/islands/:id(\\d+)",
+        { id: number | string },
+        { id: string },
+        never
+      >,
+      help: RouteRecordInfo<
+        "help",
+        "/help",
+        Record<never, never>,
+        Record<never, never>,
+        never
+      >,
+      news: RouteRecordInfo<
+        "news",
+        "/news",
+        Record<never, never>,
+        Record<never, never>,
+        never
+      >,
+      "news-view": RouteRecordInfo<
+        "news-view",
+        "/news/:slug([a-zA-Z0-9\\-]+)",
+        { slug: string },
+        { slug: string },
+        never
+      >,
+      "page-not-found": RouteRecordInfo<
+        "page-not-found",
+        "/page-not-found",
+        Record<never, never>,
+        Record<never, never>,
+        never
+      >,
+      "internal-server-error": RouteRecordInfo<
+        "internal-server-error",
+        "/internal-server-error",
+        Record<never, never>,
+        Record<never, never>,
+        never
+      >,
+    }
+  },
 }
 
 // Last, you will need to augment the Vue Router types with this map of routes
 declare module 'vue-router' {
-  interface TypesConfig {
+  // TODO: typed routes
+ /* interface TypesConfig {
     RouteNamedMap: RouteNamedMap
-  }
+  }*/
 }
 
 const routes: Array<RouteRecordRaw> = [
@@ -127,24 +133,24 @@ const routes: Array<RouteRecordRaw> = [
         name: "page-not-found",
         component: () => import("../views/status-pages/ThePageNotFound.vue"),
       },
+      {
+        path: "internal-server-error",
+        name: "internal-server-error",
+        component: () => import("../views/status-pages/TheInternalServerError.vue"),
+      },
     ],
-  },
-  {
-    path: "/internal-server-error",
-    name: "internal-server-error",
-    component: () => import("../views/status-pages/TheInternalServerError.vue"),
   },
   {
     // [Vue Router warn]: Discarded invalid param(s) "catchAll" when navigating. See https://github.com/vuejs/router/blob/main/packages/router/CHANGELOG.md#414-2022-08-22 for more details
     path: "/:catchAll(.*)",
-    redirect: (to: RouteLocationNormalizedGeneric) => {
+    redirect: (to) => {
       return createI18nRouteTo(
         { name: "page-not-found", query: { returnUrl: to.path } },
         guessDefaultLocale()
-      );
+      )
     },
   },
-];
+] as const;
 
 export {
   routes

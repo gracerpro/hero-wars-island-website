@@ -1,6 +1,6 @@
 import { nextTick } from "vue";
 import { useI18n } from "@/i18n";
-import type { RouteLocation, RouteLocationAsRelativeGeneric, RouteLocationNormalizedGeneric, RouteLocationNormalizedLoadedGeneric, RouteLocationRaw } from "vue-router";
+import type {  RouteLocationAsRelativeGeneric } from "vue-router";
 
 function getDefaultLocale(): string {
   return import.meta.env.VITE_DEFAULT_LOCALE;
