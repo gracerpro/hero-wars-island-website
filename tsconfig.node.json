@@ -25,9 +25,5 @@
   },
   "files": [
     "vite.config.ts",
-    "server.ts",
-    "prerender.ts",
-    "src/entry-server.ts",
-    "src/server-common.ts",
   ]
 }

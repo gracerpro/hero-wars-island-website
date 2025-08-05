@@ -1,8 +1,10 @@
 import fs from 'node:fs/promises'
 import express, { type Request, type Response } from 'express'
-import { type AppSsrManifest, getHtml, type RenderFun } from "./src/server-common.js";
+import { type AppSsrManifest, getHtml, type RenderFun } from "./src/server-common.ts";
 import { HttpError } from './src/exceptions/HttpError';
 import type { ViteDevServer } from 'vite';
+
+console.log("123123")
 
 // Constants
 const isProduction = process.env.NODE_ENV === 'production';
