@@ -23,7 +23,7 @@
 
     "types": ["node"],
   },
-  "include": [
+  "files": [
     "vite.config.ts",
     "server.ts",
     "prerender.ts",

@@ -13,7 +13,7 @@
     "build:client": "tsc && vite build --outDir dist/client --ssrManifest .vite/ssr-manifest.json",
     "build:server": "tsc && vite build --outDir dist/server --ssr src/entry-server.js",
     "preview": "vite preview",
-    "lint": "eslint . --ext .js,.vue,.ts,.ts",
+    "lint": "eslint . --ext .js,.vue,.ts",
     "format": "prettier --write src/",
     "test": "vitest run",
     "coverage": "vitest run --coverage"
