@@ -46,6 +46,17 @@ export default defineConfig(({mode}) => {
         reporter: ['text'],
       },
       setupFiles: 'vitest.setup.js',
-    }
+    },
+    css: {
+      preprocessorOptions: {
+        scss: {
+          silenceDeprecations: [
+            'import', // Silence deprecation warnings related to @import rules
+            'global-builtin',
+            'color-functions',
+          ],
+        },
+      },
+    },
   }
 })
