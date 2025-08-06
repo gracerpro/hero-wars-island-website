@@ -1,10 +1,6 @@
-<script>
-const EVENT_FIND = "find";
-const EVENT_UPDATE_NAME = "update:name";
-</script>
 <script setup lang="ts">
 import { useI18n } from "vue-i18n";
-import { filterNameMinCharsCount } from "../news";
+import { EVENT_FIND, EVENT_UPDATE_NAME, filterNameMinCharsCount } from "./news";
 
 interface Props {
   loading: boolean,
@@ -14,8 +10,8 @@ interface Props {
 defineProps<Props>()
 
 const emit = defineEmits<{
-  [EVENT_FIND]: [],
-  [EVENT_UPDATE_NAME]: [value: string],
+  find: [],
+  "update:name": [value: string],
 }>();
 
 const { t } = useI18n();

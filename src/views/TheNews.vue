@@ -8,7 +8,7 @@ import { useSSRContext } from "vue";
 import { setMetaInfo } from "@/services/page-meta";
 import { fromCurrentDate } from "@/helpers/formatter";
 import { useRoute } from "vue-router";
-import { filterNameMinCharsCount } from "./news";
+import { filterNameMinCharsCount } from "./news/news";
 import NewsFilterForm from "./news/NewsFilterForm.vue";
 import type { NewsFilter, OneNews } from "@/api/NewsApi";
 
