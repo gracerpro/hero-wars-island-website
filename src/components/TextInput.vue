@@ -1,6 +1,3 @@
-<script>
-const EVENT_UPDATE_VALUE = "update:model-value";
-</script>
 <script setup lang="ts">
 /* global Event */
 /* global HTMLInputElement  */
@@ -15,7 +12,11 @@ const props = withDefaults(defineProps<Props>(), {
   modelValue: "",
   modelModifiers: () => ({})
 });
-const emit = defineEmits([EVENT_UPDATE_VALUE]);
+const emit = defineEmits<{
+  "update:model-value": [value: string]
+}>();
+
+const EVENT_UPDATE_VALUE = "update:model-value";
 
 const onInput = (event: Event) => {
   const target = event.target as HTMLInputElement

@@ -1,9 +1,3 @@
-<script>
-const EVENT_UPDATE_ITEM_NAME = "update:item-name";
-const EVENT_UPDATE_TYPE = "update:type-id";
-const EVENT_UPDATE_IS_NODE_TYPE_TOWER = "update:is-node-type-tower";
-const EVENT_UPDATE_IS_NODE_TYPE_CHEST = "update:is-node-type-chest";
-</script>
 <script setup lang="ts">
 /* global HTMLInputElement */
 /* global Event */
@@ -16,10 +10,7 @@ import { TYPE_CHEST, TYPE_TOWER } from "@/api/NodeApi";
 import { computed } from "vue";
 import type { SelectItemMap } from "@/components/select";
 import type { ViewNodeReward } from "./map";
-
-const { t } = useI18n();
-
-const formId = "nodesForm";
+import { EVENT_UPDATE_IS_NODE_TYPE_CHEST, EVENT_UPDATE_IS_NODE_TYPE_TOWER, EVENT_UPDATE_ITEM_NAME, EVENT_UPDATE_TYPE } from "./map-filter";
 
 interface Props {
   rewards: Array<ViewNodeReward>,
@@ -32,11 +23,15 @@ interface Props {
 
 const props = defineProps<Props>();
 const emit = defineEmits<{
-  [EVENT_UPDATE_ITEM_NAME]: [value: string]
-  [EVENT_UPDATE_TYPE]: [type: Type | null],
-  [EVENT_UPDATE_IS_NODE_TYPE_TOWER]: [value: boolean],
-  [EVENT_UPDATE_IS_NODE_TYPE_CHEST]: [value: boolean],
+  "update:item-name": [value: string]
+  "update:type-id": [type: Type | null],
+  "update:is-node-type-tower": [value: boolean],
+  "update:is-node-type-chest": [value: boolean],
 }>()
+
+const { t } = useI18n();
+
+const formId = "nodesForm";
 
 const visibleTypes = computed<SelectItemMap>(() => {
   const map = new Map<number, boolean>();

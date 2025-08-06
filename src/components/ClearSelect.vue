@@ -1,6 +1,3 @@
-<script>
-const EVENT_UPDATE_VALUE = "update:model-value";
-</script>
 <script setup lang="ts">
 /* global Event */
 /* global HTMLSelectElement */
@@ -18,8 +15,10 @@ const props = withDefaults(defineProps<Props>(), {
   modelValue: null,
 });
 const emit = defineEmits<{
-  [EVENT_UPDATE_VALUE]: [value: number | null]
+  "update:model-value": [value: number | null]
 }>();
+
+const EVENT_UPDATE_VALUE = "update:model-value";
 
 const isDisabled = computed(() => props.modelValue === null || props.modelValue === 0);
 

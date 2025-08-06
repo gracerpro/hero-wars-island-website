@@ -1,6 +1,3 @@
-<script>
-const EVENT_SELECT_NODE = "selectNode";
-</script>
 <script setup lang="ts">
 /* global window */
 /* global SVGElement */
@@ -33,7 +30,7 @@ import {
   canSelectNode,
   canSelectNextNode,
 } from "@/services/island-map";
-import { getIconsItems, getDrawedNodes, SIDE, type UserNodeIds, type ViewNodeReward, type NodeCoordinates, type DrawedNode, type IconItemsResult, type WarningPointsMap, type IconItem, type RewardQuantity } from "./map";
+import { getIconsItems, getDrawedNodes, SIDE, type UserNodeIds, type ViewNodeReward, type NodeCoordinates, type DrawedNode, type IconItemsResult, type WarningPointsMap, type IconItem, type RewardQuantity, EVENT_SELECT_NODE } from "./map";
 import { useI18n } from "vue-i18n";
 import IslandMapInfoDialog from "./IslandMapInfoDialog.vue";
 import { GAME_ID_WOOD, type ItemMap } from "@/api/ItemApi";
@@ -60,9 +57,9 @@ const props = withDefaults(defineProps<Props>(), {
   backgroundImage: null,
 });
 const emit = defineEmits<{
-  [EVENT_CHANGE_TRANSLATE]: [x: number | null, y: number | null],
-  [EVENT_CHANGE_SCALE]: [value: number],
-  [EVENT_SELECT_NODE]: [nodeId: number],
+  "change-translate": [x: number | null, y: number | null],
+  "change-scale": [value: number],
+  "select-node": [nodeId: number],
 }>();
 
 const { t } = useI18n();

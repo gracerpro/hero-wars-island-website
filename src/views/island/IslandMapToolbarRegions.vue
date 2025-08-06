@@ -1,11 +1,8 @@
-<script>
-const EVENT_UPDATE_REGION_NUMBERS = "update:region-numbers";
-const EVENT_RESET_REGION_NUMBERS = "reset-region-numbers";
-</script>
 <script setup lang="ts">
 import { useI18n } from "vue-i18n";
 import { getRegionTitle } from "./island";
 import type { Region } from "@/api/IslandApi";
+import { EVENT_RESET_REGION_NUMBERS, EVENT_UPDATE_REGION_NUMBERS } from "./toolbar";
 
 interface Props {
   regions: Array<Region>,
@@ -15,8 +12,8 @@ interface Props {
 
 const props = defineProps<Props>();
 const emit = defineEmits<{
-  [EVENT_UPDATE_REGION_NUMBERS]: [value: Array<number>],
-  [EVENT_RESET_REGION_NUMBERS]: []
+  "update:region-numbers": [value: Array<number>],
+  "reset-region-numbers": []
 }>()
 
 const { t } = useI18n();

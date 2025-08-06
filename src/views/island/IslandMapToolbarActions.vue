@@ -1,6 +1,3 @@
-<script>
-const EVENT_RESET = "reset";
-</script>
 <script setup lang="ts">
 /* global MouseEvent */
 
@@ -21,10 +18,12 @@ interface Props {
 
 const props = defineProps<Props>();
 const emit = defineEmits<{
-  [EVENT_RESET]: [],
-  [EVENT_CHANGE_SCALE]: [value: number],
-  [EVENT_CHANGE_TRANSLATE]: [x: number | null, y: number | null],
+  reset: [],
+  "change-scale": [value: number],
+  "change-translate": [x: number | null, y: number | null],
 }>();
+
+const EVENT_RESET = "reset";
 
 const { t } = useI18n();
 

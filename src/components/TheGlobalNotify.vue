@@ -3,7 +3,7 @@ import { type Notification } from "@/api/NotificationApi";
 import { type GlobalNotificationsMap } from "@/store";
 import { HIDE_GLOBAL_NOTIFY } from "@/store/mutation-types";
 import { computed } from "vue";
-import { useStore } from "vuex/types/index.js";
+import { useStore } from "vuex";
 
 interface VisibleNotification {
   id: number,

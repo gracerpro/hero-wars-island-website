@@ -1,9 +1,6 @@
-<script>
-const EVENT_UPDATE_IS_SHOW_BLOCK = "update:isShowBlock";
-</script>
 <script setup lang="ts">
 import { useI18n } from "vue-i18n";
-import type { ViewReward } from "./map";
+import { EVENT_UPDATE_IS_SHOW_BLOCK, type ViewReward } from "./map";
 
 interface Props {
   header: string,
@@ -15,7 +12,7 @@ interface Props {
 defineProps<Props>();
 
 const emit = defineEmits<{
-  [EVENT_UPDATE_IS_SHOW_BLOCK]: [value: boolean],
+  "update:is-show-block": [value: boolean],
 }>();
 
 const { t } = useI18n();

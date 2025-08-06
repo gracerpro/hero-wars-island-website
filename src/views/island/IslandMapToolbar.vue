@@ -1,12 +1,3 @@
-<script>
-const EVENT_RESET = "reset";
-const EVENT_TOGGLE_IS_SHOW_QUANTITY = "update:is-show-quantity";
-const EVENT_FULLSCREEN_ON = "fullscreen-on";
-const EVENT_BEGIN_DOWNLOAD = "begin-download";
-const EVENT_RELOAD_MAP = "reload-map";
-const EVENT_UPDATE_REGION_NUMBERS = "update:region-numbers";
-const EVENT_RESET_REGION_NUMBERS = "reset-region-numbers";
-</script>
 <script setup lang="ts">
 import HelpDialog from "./IslandMapHelpDialog.vue";
 import IslandMapToolbarRegions from "./IslandMapToolbarRegions.vue";
@@ -17,6 +8,7 @@ import { useI18n } from "vue-i18n";
 import { computed } from "vue";
 import type { Region } from "@/api/IslandApi";
 import type { ComponentExposed } from "vue-component-type-helpers";
+import { EVENT_BEGIN_DOWNLOAD, EVENT_FULLSCREEN_ON, EVENT_RELOAD_MAP, EVENT_RESET, EVENT_RESET_REGION_NUMBERS, EVENT_TOGGLE_IS_SHOW_QUANTITY, EVENT_UPDATE_REGION_NUMBERS } from "./toolbar";
 
 interface Props {
   isShowQuantity: boolean,
@@ -32,15 +24,15 @@ const { t } = useI18n();
 defineProps<Props>();
 
 const emit = defineEmits<{
-  [EVENT_RESET]: [],
-  [EVENT_CHANGE_TRANSLATE]: [x: number | null, y: number | null],
-  [EVENT_CHANGE_SCALE]: [value: number],
-  [EVENT_TOGGLE_IS_SHOW_QUANTITY]: [],
-  [EVENT_FULLSCREEN_ON]: [],
-  [EVENT_BEGIN_DOWNLOAD]: [],
-  [EVENT_RELOAD_MAP]: [],
-  [EVENT_UPDATE_REGION_NUMBERS]: [value: Array<number>],
-  [EVENT_RESET_REGION_NUMBERS]: [],
+  reset: [],
+  "change-translate": [x: number | null, y: number | null],
+  "change-scale": [value: number],
+  "update:is-show-quantity": [],
+  "fullscreen-on": [],
+  "begin-download": [],
+  "reload-map": [],
+  "update:region-numbers": [value: Array<number>],
+  "reset-region-numbers": [],
 }>();
 
 const helpDialogRef = useTemplateRef<ComponentExposed<typeof HelpDialog>>("helpDialogRef");

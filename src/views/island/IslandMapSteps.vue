@@ -1,9 +1,3 @@
-<script>
-const EVENT_UPDATE_IS_SELECT_ANY_NODE = "update:is-select-any-node";
-const EVENT_RESET_USER_NODES = "reset-user-nodes";
-const EVENT_RESET_DISABLE_NODES = "reset-disable-nodes";
-const EVENT_UPDATE_SELECT_MODE = "update:select-mode";
-</script>
 <script setup lang="ts">
 /* global Event */
 /* global HTMLInputElement */
@@ -15,6 +9,7 @@ import { SELECT_MODE_DISABLE, SELECT_MODE_GOING, SELECT_MODE_PLAN } from "./map"
 import { isCommonStep, type NodeMap } from "@/api/NodeApi";
 import { GAME_ID_EXPLORER_MOVE, GAME_ID_WOOD, TYPE_COIN, TYPE_STARMONEY, type Item } from "@/api/ItemApi";
 import type { UserNodeIds, SelectMode } from "./map";
+import { EVENT_RESET_DISABLE_NODES, EVENT_RESET_USER_NODES, EVENT_UPDATE_IS_SELECT_ANY_NODE, EVENT_UPDATE_SELECT_MODE } from "./steps";
 
 interface Props {
   selectMode: SelectMode,
@@ -34,12 +29,12 @@ const { t } = useI18n();
 
 const props = defineProps<Props>();
 
-const emit = defineEmits([
-  EVENT_UPDATE_IS_SELECT_ANY_NODE,
-  EVENT_RESET_USER_NODES,
-  EVENT_UPDATE_SELECT_MODE,
-  EVENT_RESET_DISABLE_NODES,
-]);
+const emit = defineEmits<{
+  "update:is-select-any-node": [value: boolean],
+  "reset-user-nodes": [],
+  "update:select-mode": [value: SelectMode],
+  "reset-disable-nodes": [],
+}>();
 
 const selectModes = computed(() => {
   return [
@@ -135,7 +130,7 @@ function onChangeIsSelectAnyNode(event: Event) {
 }
 
 function onChangeSelectMode(event: Event) {
-  emit(EVENT_UPDATE_SELECT_MODE, (event.target as HTMLInputElement).value);
+  emit(EVENT_UPDATE_SELECT_MODE, (event.target as HTMLInputElement).value as SelectMode);
 }
 </script>
 
