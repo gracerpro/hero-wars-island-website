@@ -56,8 +56,8 @@ export async function getHtml(params: RenderParams): Promise<HtmlResult> {
   html = html.replace("<!--page-keywords-->", keywords);
 
   html = html.replace(
-    "<!--initial-state-json-->",
-    rendered.state ? "'" + JSON.stringify(rendered.state) + "'" : ""
+    "/*** initial-state-json ***/",
+    rendered.state ? "window.__INITIAL_STATE__ = '" + JSON.stringify(rendered.state) + "'" : ""
   );
 
   return {
