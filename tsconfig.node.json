@@ -25,5 +25,8 @@
   },
   "files": [
     "vite.config.ts",
-  ]
+  ],
+  "paths": {
+    "@/*": ["./src/*"]
+  }
 }

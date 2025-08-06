@@ -1,10 +1,8 @@
 import fs from 'node:fs/promises'
 import express, { type Request, type Response } from 'express'
 import { type AppSsrManifest, getHtml, type RenderFun } from "./src/server-common.ts";
-import { HttpError } from './src/exceptions/HttpError';
+import { HttpError } from './src/exceptions/HttpError.ts';
 import type { ViteDevServer } from 'vite';
-
-console.log("123123")
 
 // Constants
 const isProduction = process.env.NODE_ENV === 'production';
@@ -20,8 +18,10 @@ const ssrManifest = isProduction
   : undefined
 
 console.log("ssrManifest", ssrManifest)
+console.log("port", port)
+console.log("templateHtml", templateHtml.length)
 
-/*
+
 // Create http server
 const app = express()
 
@@ -44,13 +44,14 @@ if (!isProduction) {
 }
 
 // Serve HTML
-app.use('*', async (request: Request, response: Response) => {
+app.use(async (request: Request, response: Response) => {
   try {
     const url = request.originalUrl.replace(base, '');
 
     console.log("recieve url:", url);
+    const ssrManifest2: AppSsrManifest = {} // TODO: ssrManifest
 
-    const { html, statusCode } = await getAppHtml(url, ssrManifest);
+    const { html, statusCode } = await getAppHtml(url, ssrManifest2);
 
     response.status(statusCode).set({ 'Content-Type': 'text/html; charset=UTF-8' }).send(html)
   } catch (e: unknown) {
@@ -77,7 +78,6 @@ app.use('*', async (request: Request, response: Response) => {
 app.listen(port, () => {
   console.log(`Server started at http://localhost:${port}`)
 });
-
 
 async function getAppHtml(url: string, manifest?: AppSsrManifest) {
   let template: string;
@@ -106,7 +106,9 @@ async function getAppHtml(url: string, manifest?: AppSsrManifest) {
     //const { render } = await runtime.executeEntrypoint('/src/entry-server.js')
   } else {
     template = templateHtml;
-    render = (await import('./dist/server/entry-server.js')).render
+
+    const moduleName = "./dist/server/entry-server.js"
+    render = (await import(moduleName)).render
   }
 
   return getHtml({
@@ -116,5 +118,3 @@ async function getAppHtml(url: string, manifest?: AppSsrManifest) {
     render
   });
 }
-
-*/

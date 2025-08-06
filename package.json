@@ -5,8 +5,8 @@
   "type": "module",
   "description": "The Hero Wars islands.",
   "scripts": {
-    "dev": "node server",
-    "dev-prod": "NODE_ENV=production node server",
+    "dev": "ts-node --project tsconfig.server.json server.ts",
+    "dev-prod": "NODE_ENV=production ts-node --project tsconfig.server.json server.ts",
     "generate": "tsc && vite build --outDir dist/static --ssrManifest .vite/ssr-manifest.json && npm run build:server && NODE_ENV=production node prerender",
     "generate-only": "NODE_ENV=production node prerender",
     "build": "npm run build:client && npm run build:server",
@@ -53,6 +53,7 @@
     "node-gzip": "^1.1.2",
     "prettier": "^3.6.2",
     "sass": "~1.89.2",
+    "ts-node": "^10.9.2",
     "typescript": "^5.9.2",
     "typescript-eslint": "^8.39.0",
     "vite": "^7.0.6",

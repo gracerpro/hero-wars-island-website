@@ -24,9 +24,9 @@ export type RenderFun = (url: string, ssrManifest?: AppSsrManifest) => Promise<R
 
 export interface RenderParams {
   url: string,
-  manifest: AppSsrManifest,
   template: string,
   render: RenderFun,
+  manifest?: AppSsrManifest,
 }
 
 export async function getHtml(params: RenderParams): Promise<HtmlResult> {
