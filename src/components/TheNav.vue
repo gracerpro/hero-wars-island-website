@@ -15,7 +15,7 @@ const { t } = useI18n()
 const store = useStore()
 
 const actualIsland = ref<Island | null>(null)
-const navbarNav = ref<HTMLElement | null>(null)
+const navbarNavRef = ref<HTMLElement | null>(null)
 
 onMounted(() => {
   const client = new HeroClient()
@@ -25,20 +25,22 @@ onMounted(() => {
   })
 
   if (!import.meta.env.SSR) {
-    import('bootstrap').then(({ Collapse }) => {
-      const nav = navbarNav.value as HTMLElement
-
-      nav.addEventListener(Collapse.Events.hide, () => {
-        store.commit(IS_SHOW_MENU_MUTATION, false)
-      })
-      nav.addEventListener(Collapse.Events.show, () => {
-        store.commit(IS_SHOW_MENU_MUTATION, true)
-      })
-
-      new Collapse(nav, { toggle: store.state.isShowMenu })
-    })
+    InitCollapse(navbarNavRef.value as HTMLElement)
   }
 })
+
+async function InitCollapse(navElement: HTMLElement) {
+  const module = (await import('bootstrap'))
+
+  navElement.addEventListener('hide.bs.collapse', () => {
+    store.commit(IS_SHOW_MENU_MUTATION, false)
+  })
+  navElement.addEventListener('hide.bs.collapse', () => {
+    store.commit(IS_SHOW_MENU_MUTATION, true)
+  })
+
+  new module.Collapse(navElement, { toggle: store.state.isShowMenu })
+}
 </script>
 
 <template>
@@ -57,7 +59,7 @@ onMounted(() => {
       </button>
       <div
         id="navbarNav"
-        ref="navbarNav"
+        ref="navbarNavRef"
         class="collapse navbar-collapse"
       >
         <div class="navbar-nav app-navbar-nav">

@@ -8,7 +8,7 @@
 /* eslint-env browser */
 
 import { TYPE_DANGER } from '@/components/toast'
-import type ToastMessage from '@/components/ToastMessage.vue'
+import ToastMessage from '@/components/ToastMessage.vue'
 import {
   TYPE_START,
   TYPE_TOWER,
@@ -24,7 +24,6 @@ import {
   ref,
   shallowRef,
   computed,
-  defineAsyncComponent,
   onMounted,
   onUnmounted,
   useTemplateRef,
@@ -57,6 +56,7 @@ import IslandMapInfoDialog from './IslandMapInfoDialog.vue'
 import { GAME_ID_WOOD, type ItemMap } from '@/api/ItemApi'
 import type { Image } from '@/api/IslandApi'
 import type { ComponentExposed } from 'vue-component-type-helpers'
+import ClientOnly from '@/components/ClientOnly.vue'
 
 interface Props {
   scale: number
@@ -84,10 +84,6 @@ const emit = defineEmits<{
 }>()
 
 const { t } = useI18n()
-
-const LocalToastMessage = import.meta.env.SSR
-  ? null
-  : defineAsyncComponent(() => import('@/components/ToastMessage.vue'))
 
 const BUTTON_MAIN = 0
 
@@ -464,10 +460,12 @@ function getItemTitle(item: IconItem): string {
       @vue:mounted="onMountedInfoDialog"
     />
 
-    <local-toast-message
-      ref="toastRef"
-      element-id="mapContainerToast"
-    />
+    <client-only>
+      <toast-message
+        ref="toastRef"
+        element-id="mapContainerToast"
+      />
+    </client-only>
   </div>
 </template>
 

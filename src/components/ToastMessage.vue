@@ -4,19 +4,13 @@
 
 import { ref, computed } from 'vue'
 import { type ToastType, TYPE_DANGER, TYPE_SUCCESS } from './toast'
-import { Toast } from 'bootstrap' // TODO: test, must be dynamic
+import { type Toast } from 'bootstrap'
 
 interface Props {
   elementId: string
 }
 
 const props = defineProps<Props>()
-
-let LocalToast: typeof Toast | null
-
-if (!import.meta.env.SSR) {
-  import('bootstrap').then((module) => (LocalToast = module.Toast))
-}
 
 const toastMessage = ref('')
 const toastType = ref<ToastType>(TYPE_SUCCESS)
@@ -32,6 +26,10 @@ const classType = computed(() => {
   return ''
 })
 
+async function loadToast(): Promise<typeof Toast> {
+  return (await (import('bootstrap'))).Toast
+}
+
 function show(message: string, type?: ToastType) {
   toastMessage.value = message
 
@@ -39,19 +37,19 @@ function show(message: string, type?: ToastType) {
     toastType.value = type
   }
 
-  const element = document.getElementById(props.elementId) as HTMLElement
-  element.addEventListener(Toast.Events.hide, () => (isShow.value = false), {
-    once: true,
-  })
+  loadToast().then((ToastClass) => {
+    const element = document.getElementById(props.elementId) as HTMLElement
+    element.addEventListener('hide.bs.toast', () => (isShow.value = false), {
+      once: true,
+    })
 
-  if (LocalToast) {
-    const toast = new LocalToast(element, {
+    const toast = new ToastClass(element, {
       delay: 2000,
       autohide: true,
     })
     toast.show()
     isShow.value = true
-  }
+  })
 }
 
 defineExpose({

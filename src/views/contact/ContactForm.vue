@@ -8,10 +8,9 @@ import HeroClient from '@/api/HeroClient'
 import { ref, shallowReactive, onMounted, useTemplateRef } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { TYPE_SUCCESS, TYPE_DANGER } from '@/components/toast'
-import { defineAsyncComponent } from 'vue'
 import type { FeedbackData } from '@/api/FeedbackApi'
 import type { ComponentExposed } from 'vue-component-type-helpers'
-import type ToastMessage from '@/components/ToastMessage.vue'
+import ToastMessage from '@/components/ToastMessage.vue'
 
 const { t } = useI18n()
 
@@ -19,10 +18,6 @@ const submiting = ref(false)
 
 const client = new HeroClient()
 const createdDate = new Date()
-
-if (!import.meta.env.SSR) {
-  defineAsyncComponent(() => import('@/components/ToastMessage.vue'))
-}
 
 const errorMessage = ref('')
 const feedback = shallowReactive({
@@ -43,7 +38,7 @@ onMounted(() => {
   }, 300)
 })
 
-const onSubmit = () => {
+function onSubmit() {
   if (submiting.value) {
     return
   }
