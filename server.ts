@@ -13,13 +13,17 @@ const base = '/';
 const templateHtml = isProduction
   ? await fs.readFile('./dist/client/index.html', 'utf-8')
   : ''
-const ssrManifest = isProduction
-  ? await fs.readFile('./dist/client/.vite/ssr-manifest.json', 'utf-8')
-  : undefined
 
-console.log("ssrManifest", ssrManifest)
-console.log("port", port)
-console.log("templateHtml", templateHtml.length)
+let ssrManifest: AppSsrManifest | undefined
+
+if (isProduction) {
+  const json = await fs.readFile('./dist/client/.vite/ssr-manifest.json', 'utf-8')
+  ssrManifest = JSON.parse(json)
+
+  if (typeof ssrManifest !== "object") {
+    throw new Error("ssr-manifest.json is not object.")
+  }
+}
 
 
 // Create http server
@@ -49,9 +53,8 @@ app.use(async (request: Request, response: Response) => {
     const url = request.originalUrl.replace(base, '');
 
     console.log("recieve url:", url);
-    const ssrManifest2: AppSsrManifest = {} // TODO: ssrManifest
 
-    const { html, statusCode } = await getAppHtml(url, ssrManifest2);
+    const { html, statusCode } = await getAppHtml(url, ssrManifest);
 
     response.status(statusCode).set({ 'Content-Type': 'text/html; charset=UTF-8' }).send(html)
   } catch (e: unknown) {
