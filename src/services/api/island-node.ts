@@ -28,7 +28,7 @@ export async function getNodesMap(
       nodesList = await getNodesFromCache(island)
     }
   } catch (error) {
-    console.error(error) // TODO: notify
+    console.error(error) // TODO: log it
   }
 
   if (nodesList === null || nodesList === undefined) {

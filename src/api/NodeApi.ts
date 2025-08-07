@@ -5,8 +5,9 @@ import {
   GAME_ID_WOOD,
   modifyItem,
   TYPE_COIN,
-  type Item,
+  TYPE_UNKNOWN,
   type ItemMap,
+  type Type as ItemType,
 } from './ItemApi'
 import type { ComposerTranslation } from 'vue-i18n'
 
@@ -25,29 +26,35 @@ export const STATUS_NOT_SURE = 3
 
 export type Status = 0 | 3
 
-export const defaultCostItem = {
-  typeId: TYPE_COIN,
+export interface CostItem {
+  readonly type: ItemType
+  readonly gameId: number
+}
+
+const defaultCostItem: CostItem = {
+  type: TYPE_COIN,
   gameId: GAME_ID_EXPLORER_MOVE,
-  count: 1,
+}
+
+export interface NodeReward {
+  readonly itemId: number
+  readonly quantity: number
+  gameId?: number
+  gameType?: string
 }
 
 export interface Node {
-  id: number
-  mx: number
-  my: number
-  type: Type
-  status: Status
-  costItem: Item
-  costItemCount: number
-  rewards: Array<NodeReward>
+  readonly id: number
+  readonly mx: number
+  readonly my: number
+  readonly type: Type
+  readonly status: Status
+  readonly costItem: CostItem
+  readonly costItemCount: number
+  readonly rewards: Array<NodeReward>
 }
 
 export type NodeMap = Map<number, Node>
-
-export interface NodeReward {
-  itemId: number
-  quantity: number
-}
 
 export type NodeFilter = {
   regionNumbers?: Array<number>
@@ -109,31 +116,33 @@ export class NodeApi {
   private modifyNode(data: any): Node {
     let rewards: Array<NodeReward> = []
 
-    if (data.items) {
+    if (data.rewards) {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      rewards = data.items.map((itemData: any): NodeReward => {
-        return {
-          itemId: itemData.itemId,
-          quantity: itemData.quantity > 0 ? itemData.quantity : 1,
+      rewards = data.rewards.map((rewardData: any): NodeReward => {
+        const reward: NodeReward = {
+          itemId: rewardData.itemId,
+          quantity: rewardData.quantity > 0 ? rewardData.quantity : 1,
         }
+        if (rewardData.gameId) {
+          reward.gameId = rewardData.gameId
+        }
+        if (rewardData.gameType) {
+          reward.gameType = rewardData.gameType
+        }
+
+        return reward
       })
     }
 
-    // data.cost
-    // - itemId
-    // - count
+    let costItem = defaultCostItem
+    let costItemCount = 1
 
-    const costItem: Item = {
-      id: data.cost.itemId ?? 0,
-      name: data.cost ?? 'Default cost item', // TODO: locale
-      gameId: data.cost.gameId ?? GAME_ID_EXPLORER_MOVE,
-      gameType: data.cost.gameType ?? null,
-      type: TYPE_COIN,
-      iconUrl: null,
-      iconWidth: null,
-      iconHeight: null,
-      emeraldCost: null,
-      description: '',
+    if (data.cost) {
+      costItem = {
+        gameId: data.cost.gameId,
+        type: data.cost.typeId ?? TYPE_UNKNOWN,
+      }
+      costItemCount = data.cost.count ?? 1
     }
 
     return {
@@ -141,7 +150,7 @@ export class NodeApi {
       type: data.typeId ?? TYPE_NODE,
       status: data.statusId ?? STATUS_CREATED,
       costItem,
-      costItemCount: 1,
+      costItemCount,
       rewards,
       mx: data.mx,
       my: data.my,
@@ -176,7 +185,7 @@ export function isStepType(type: Type) {
   return !(type === TYPE_START || type === TYPE_BLOCKER)
 }
 
-export function isCommonStep(costItem: Item) {
+export function isCommonStep(costItem: CostItem) {
   return (
     costItem.type === TYPE_COIN &&
     (costItem.gameId === GAME_ID_EXPLORER_MOVE || costItem.gameId === GAME_ID_WOOD)

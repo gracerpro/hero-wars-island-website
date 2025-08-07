@@ -438,7 +438,7 @@ function getItemTitle(item: IconItem): string {
           :cy="point.y"
           r="10"
           class="warning-point"
-          @click="onItemClick(point.nodeId, $event)"
+          @click="onItemClick(nodeId, $event)"
         >
           <title>{{ t('page.island.unusualStepPrice') }}</title>
         </circle>

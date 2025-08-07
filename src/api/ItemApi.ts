@@ -99,7 +99,7 @@ export function modifyItem(data: any): Item {
   return {
     id: data.id,
     name: data.name,
-    type: data.typeId, // TODO: validate type? if null then TYPE_UNKNOWN
+    type: data.typeId ?? TYPE_UNKNOWN, // TODO: validate type?
     gameId: data.gameId ?? null,
     gameType: data.gameType ?? null,
     iconUrl: data.iconUrl ?? null,

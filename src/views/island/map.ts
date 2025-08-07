@@ -77,7 +77,6 @@ export interface IconItem {
 }
 
 export interface WarningPoint {
-  nodeId: number // TODO: remove this field, use key
   x: number
   y: number
 }
@@ -216,7 +215,6 @@ export function getIconsItems(
 
       if (!isCommonStep(item.node.costItem)) {
         warningPoints.set(nodeId, {
-          nodeId,
           x: drawedNode.x + SIDE * 0.7,
           y: drawedNode.y,
         })
