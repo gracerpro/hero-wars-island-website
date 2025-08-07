@@ -1,108 +1,111 @@
-import { nextTick } from "vue";
-import { useI18n } from "@/i18n";
-import type {  RouteLocationAsRelativeGeneric } from "vue-router";
+import { nextTick } from 'vue'
+import { useI18n } from '@/i18n'
+import type { RouteLocationAsRelativeGeneric } from 'vue-router'
 
 function getDefaultLocale(): string {
-  return import.meta.env.VITE_DEFAULT_LOCALE;
+  return import.meta.env.VITE_DEFAULT_LOCALE
 }
 
 export type LocaleLabel = {
-  locale: string,
+  locale: string
   label: string
 }
 
 export function getLocalesLabels(): Array<LocaleLabel> {
-  const { t, te } = useI18n();
+  const { t, te } = useI18n()
 
   return getSupportLocales().map((locale: string) => {
     return {
       locale,
-      label: te("locale." + locale) ? t("locale." + locale) : locale,
-    };
-  });
+      label: te('locale.' + locale) ? t('locale.' + locale) : locale,
+    }
+  })
 }
 
 export function isSupportLocale(locale: string): boolean {
-  return getSupportLocales().includes(locale);
+  return getSupportLocales().includes(locale)
 }
 
 function getSupportLocales(): string[] {
-  return import.meta.env.VITE_SUPPORT_LOCALES.split(",");
+  return import.meta.env.VITE_SUPPORT_LOCALES.split(',')
 }
 
 export function getCurrentLocale(): string {
-  const i18n = useI18n();
+  const i18n = useI18n()
 
-  return i18n.locale.value;
+  return i18n.locale.value
 }
 
-export function createI18nRouteTo(to: RouteLocationAsRelativeGeneric, locale: string | null = null): RouteLocationAsRelativeGeneric {
-  locale = locale !== null ? locale : getCurrentLocale();
+export function createI18nRouteTo(
+  to: RouteLocationAsRelativeGeneric,
+  locale: string | null = null
+): RouteLocationAsRelativeGeneric {
+  locale = locale !== null ? locale : getCurrentLocale()
 
   if (!isShowLocaleInRoute(locale)) {
-    return to;
+    return to
   }
 
   if (to.params) {
     to.params[locale] = locale
   } else {
-    to.params = {locale}
+    to.params = { locale }
   }
 
   return to
 }
 
 export function isShowLocaleInRoute(locale: string): boolean {
-  return locale !== getDefaultLocale();
+  return locale !== getDefaultLocale()
 }
 
 async function loadLocaleMessages(locale: string): Promise<void> {
   if (!isLocaleLoaded(locale)) {
-    const messages = await import(`./locales/${locale}.json`);
-    const i18n = useI18n();
+    const messages = await import(`./locales/${locale}.json`)
+    const i18n = useI18n()
 
-    i18n.setLocaleMessage(locale, messages.default);
+    i18n.setLocaleMessage(locale, messages.default)
   }
 
-  return nextTick();
+  return nextTick()
 }
 
 function isLocaleLoaded(locale: string): boolean {
-  const i18n = useI18n();
+  const i18n = useI18n()
 
-  return i18n.availableLocales.includes(locale);
+  return i18n.availableLocales.includes(locale)
 }
 
 function saveLocale(locale: string) {
   if (import.meta.env.SSR) {
-    return;
+    return
   }
-  localStorage.setItem("locale", locale);
+  localStorage.setItem('locale', locale)
 }
 
 function getSavedLocale(): string | null {
   if (import.meta.env.SSR) {
-    return null;
+    return null
   }
 
-  const locale = localStorage.getItem("locale");
+  const locale = localStorage.getItem('locale')
   if (locale !== null) {
     if (isSupportLocale(locale.toLowerCase())) {
       return locale.toLowerCase()
     }
   }
 
-  return null;
+  return null
 }
 
 export async function setLanguage(locale: string) {
   if (!isLocaleLoaded(locale)) {
-    await loadLocaleMessages(locale);
+    await loadLocaleMessages(locale)
   }
 
-  const i18n = useI18n();
-  i18n.locale.value = locale;
-  saveLocale(locale);
+  const i18n = useI18n()
+  i18n.locale.value = locale
+  saveLocale(locale)
 
   if (!import.meta.env.SSR) {
     /**
@@ -112,36 +115,38 @@ export async function setLanguage(locale: string) {
      *
      * axios.defaults.headers.common['Accept-Language'] = locale
      */
-    (document.querySelector<HTMLInputElement>("html") as HTMLInputElement).setAttribute("lang", locale);
+    ;(document.querySelector<HTMLInputElement>('html') as HTMLInputElement).setAttribute(
+      'lang',
+      locale
+    )
   }
 }
 
 export function guessDefaultLocale(): string {
-  const savedLocale = getSavedLocale();
+  const savedLocale = getSavedLocale()
   if (savedLocale) {
-    return savedLocale;
+    return savedLocale
   }
 
-  const userLocale = getUserLocale();
+  const userLocale = getUserLocale()
   if (isSupportLocale(userLocale)) {
-    return userLocale;
+    return userLocale
   }
 
-  return getDefaultLocale();
+  return getDefaultLocale()
 }
 
 function getUserLocale(): string {
-  let locale;
+  let locale
 
   if (!import.meta.env.SSR) {
     locale = window.navigator.language /* TODO: || window.navigator.userLanguage; */
-
   }
   if (locale) {
-    locale = locale.toLowerCase();
+    locale = locale.toLowerCase()
   } else {
-    locale = import.meta.env.VITE_DEFAULT_LOCALE;
+    locale = import.meta.env.VITE_DEFAULT_LOCALE
   }
 
-  return locale.split("-")[0];
+  return locale.split('-')[0]
 }

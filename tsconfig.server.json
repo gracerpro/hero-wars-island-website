@@ -5,4 +5,7 @@
     "src/entry-server.ts",
     "src/server-common.ts",
   ],
+  "compilerOptions": {
+    "allowJs": true
+  }
 }

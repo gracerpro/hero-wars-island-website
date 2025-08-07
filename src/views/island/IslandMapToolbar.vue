@@ -1,55 +1,63 @@
 <script setup lang="ts">
-import HelpDialog from "./IslandMapHelpDialog.vue";
-import IslandMapToolbarRegions from "./IslandMapToolbarRegions.vue";
-import IslandMapToolbarActions from "./IslandMapToolbarActions.vue";
-import { shallowRef, useTemplateRef } from "vue";
-import { EVENT_CHANGE_TRANSLATE, EVENT_CHANGE_SCALE } from "@/services/island-map";
-import { useI18n } from "vue-i18n";
-import { computed } from "vue";
-import type { Region } from "@/api/IslandApi";
-import type { ComponentExposed } from "vue-component-type-helpers";
-import { EVENT_BEGIN_DOWNLOAD, EVENT_FULLSCREEN_ON, EVENT_RELOAD_MAP, EVENT_RESET, EVENT_RESET_REGION_NUMBERS, EVENT_TOGGLE_IS_SHOW_QUANTITY, EVENT_UPDATE_REGION_NUMBERS } from "./toolbar";
+import HelpDialog from './IslandMapHelpDialog.vue'
+import IslandMapToolbarRegions from './IslandMapToolbarRegions.vue'
+import IslandMapToolbarActions from './IslandMapToolbarActions.vue'
+import { shallowRef, useTemplateRef } from 'vue'
+import { EVENT_CHANGE_TRANSLATE, EVENT_CHANGE_SCALE } from '@/services/island-map'
+import { useI18n } from 'vue-i18n'
+import { computed } from 'vue'
+import type { Region } from '@/api/IslandApi'
+import type { ComponentExposed } from 'vue-component-type-helpers'
+import {
+  EVENT_BEGIN_DOWNLOAD,
+  EVENT_FULLSCREEN_ON,
+  EVENT_RELOAD_MAP,
+  EVENT_RESET,
+  EVENT_RESET_REGION_NUMBERS,
+  EVENT_TOGGLE_IS_SHOW_QUANTITY,
+  EVENT_UPDATE_REGION_NUMBERS,
+} from './toolbar'
 
 interface Props {
-  isShowQuantity: boolean,
-  loading: boolean,
-  translateX: number,
-  translateY: number,
-  regions: Array<Region>,
-  regionNumbers: Array<number>,
+  isShowQuantity: boolean
+  loading: boolean
+  translateX: number
+  translateY: number
+  regions: Array<Region>
+  regionNumbers: Array<number>
 }
 
-const { t } = useI18n();
+const { t } = useI18n()
 
-defineProps<Props>();
+defineProps<Props>()
 
 const emit = defineEmits<{
-  reset: [],
-  "change-translate": [x: number | null, y: number | null],
-  "change-scale": [value: number],
-  "update:is-show-quantity": [],
-  "fullscreen-on": [],
-  "begin-download": [],
-  "reload-map": [],
-  "update:region-numbers": [value: Array<number>],
-  "reset-region-numbers": [],
-}>();
+  reset: []
+  'change-translate': [x: number | null, y: number | null]
+  'change-scale': [value: number]
+  'update:is-show-quantity': []
+  'fullscreen-on': []
+  'begin-download': []
+  'reload-map': []
+  'update:region-numbers': [value: Array<number>]
+  'reset-region-numbers': []
+}>()
 
-const helpDialogRef = useTemplateRef<ComponentExposed<typeof HelpDialog>>("helpDialogRef");
-const helpDialogComponent = shallowRef<typeof HelpDialog | null>(null);
+const helpDialogRef = useTemplateRef<ComponentExposed<typeof HelpDialog>>('helpDialogRef')
+const helpDialogComponent = shallowRef<typeof HelpDialog | null>(null)
 
 const isShowReloadMap = computed(() => {
-  return import.meta.env.MODE === "development";
-});
+  return import.meta.env.MODE === 'development'
+})
 
 function onHelpClick() {
-  helpDialogComponent.value = HelpDialog;
+  helpDialogComponent.value = HelpDialog
 }
 
 function onMountedHelpDialog() {
   helpDialogRef.value?.show().finally(() => {
-    helpDialogComponent.value = null;
-  });
+    helpDialogComponent.value = null
+  })
 }
 </script>
 
@@ -63,14 +71,18 @@ function onMountedHelpDialog() {
       :regions="regions"
       :region-numbers="regionNumbers"
       :loading="loading"
-      @update:region-numbers="(numbers: Array<number>) => emit(EVENT_UPDATE_REGION_NUMBERS, numbers)"
+      @update:region-numbers="
+        (numbers: Array<number>) => emit(EVENT_UPDATE_REGION_NUMBERS, numbers)
+      "
       @reset-region-numbers="emit(EVENT_RESET_REGION_NUMBERS)"
     />
     <island-map-toolbar-actions
       :loading="loading"
       :translate-x="translateX"
       :translate-y="translateY"
-      @change-translate="(dx: number | null, dy: number | null) => emit(EVENT_CHANGE_TRANSLATE, dx, dy)"
+      @change-translate="
+        (dx: number | null, dy: number | null) => emit(EVENT_CHANGE_TRANSLATE, dx, dy)
+      "
       @change-scale="(value: number) => emit(EVENT_CHANGE_SCALE, value)"
       @reset="emit(EVENT_RESET)"
     />

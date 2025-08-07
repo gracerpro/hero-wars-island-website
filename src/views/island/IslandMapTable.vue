@@ -1,25 +1,25 @@
 <script setup lang="ts">
-import { useI18n } from "vue-i18n";
-import { EVENT_UPDATE_IS_SHOW_BLOCK, type ViewReward } from "./map";
+import { useI18n } from 'vue-i18n'
+import { EVENT_UPDATE_IS_SHOW_BLOCK, type ViewReward } from './map'
 
 interface Props {
-  header: string,
-  isShowBlock: boolean,
-  rewards: Array<ViewReward>,
-  visibleRewardsCount: number,
+  header: string
+  isShowBlock: boolean
+  rewards: Array<ViewReward>
+  visibleRewardsCount: number
 }
 
-defineProps<Props>();
+defineProps<Props>()
 
 const emit = defineEmits<{
-  "update:is-show-block": [value: boolean],
-}>();
+  'update:is-show-block': [value: boolean]
+}>()
 
-const { t } = useI18n();
+const { t } = useI18n()
 
 const getItemName = (item: ViewReward) => {
-  return item.item.name.length > 0 ? item.item.name : t("common.noName");
-};
+  return item.item.name.length > 0 ? item.item.name : t('common.noName')
+}
 </script>
 
 <template>
@@ -29,7 +29,7 @@ const getItemName = (item: ViewReward) => {
       href="#"
       @click.prevent="emit(EVENT_UPDATE_IS_SHOW_BLOCK, !isShowBlock)"
     >
-      {{ t(isShowBlock ? "common.hide" : "common.show") }}
+      {{ t(isShowBlock ? 'common.hide' : 'common.show') }}
     </a>
     <span class="badge text-bg-secondary ms-2">{{ visibleRewardsCount }}</span>
     <div
@@ -40,13 +40,13 @@ const getItemName = (item: ViewReward) => {
         <thead>
           <tr>
             <th></th>
-            <th>{{ t("common.resource") }}</th>
-            <th>{{ t("common.quantity") }}</th>
+            <th>{{ t('common.resource') }}</th>
+            <th>{{ t('common.quantity') }}</th>
           </tr>
         </thead>
         <tbody>
           <tr v-if="!rewards.length">
-            <td colspan="3">{{ t("common.noData") }}</td>
+            <td colspan="3">{{ t('common.noData') }}</td>
           </tr>
           <tr
             v-for="reward in rewards"

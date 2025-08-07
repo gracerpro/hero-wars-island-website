@@ -3,147 +3,157 @@
 /* global Event */
 /* global localStorage */
 
-import IslandMapLoading from "./IslandMapLoading.vue";
-import IslandMapToolbar from "./IslandMapToolbar.vue";
-import IslandMapSteps from "./IslandMapSteps.vue";
-import IslandMapContainer from "./IslandMapContainer.vue";
-import IslandMapDownloadDialog from "./IslandMapDownloadDialog.vue";
-import IslandMapFilter from "./IslandMapFilter.vue";
-import IslandMapTable from "./IslandMapTable.vue";
-import { canSelectNode } from "@/services/island-map";
-import { onMounted, onUnmounted, ref, computed, shallowReactive, useTemplateRef } from "vue";
-import { getHumanQuantity } from "@/helpers/formatter";
-import { useI18n } from "vue-i18n";
-import { fullscreenElement } from "@/core/fullscreen";
-import { TYPE_CHEST, TYPE_TOWER, type IslandNodeList, type Node, type NodeFilter, type NodeMap, type NodeReward } from "@/api/NodeApi";
-import { isObject } from "@/helpers/core";
-import { getNodesMap } from "@/services/api/island-node";
-import { SELECT_MODE_DISABLE, SELECT_MODE_GOING, SELECT_MODE_PLAN } from "./map";
-import { shallowRef } from "vue";
-import { UserError } from "@/exceptions/UserError";
-import type { Island } from "@/api/IslandApi";
-import type { ViewNodeReward, UserNodeIds, ViewReward, SelectMode } from "./map";
-import { getUnknownItem, type ItemMap, type Type } from "@/api/ItemApi";
-import type { ComponentExposed } from "vue-component-type-helpers";
+import IslandMapLoading from './IslandMapLoading.vue'
+import IslandMapToolbar from './IslandMapToolbar.vue'
+import IslandMapSteps from './IslandMapSteps.vue'
+import IslandMapContainer from './IslandMapContainer.vue'
+import IslandMapDownloadDialog from './IslandMapDownloadDialog.vue'
+import IslandMapFilter from './IslandMapFilter.vue'
+import IslandMapTable from './IslandMapTable.vue'
+import { canSelectNode } from '@/services/island-map'
+import { onMounted, onUnmounted, ref, computed, shallowReactive, useTemplateRef } from 'vue'
+import { getHumanQuantity } from '@/helpers/formatter'
+import { useI18n } from 'vue-i18n'
+import { fullscreenElement } from '@/core/fullscreen'
+import {
+  TYPE_CHEST,
+  TYPE_TOWER,
+  type IslandNodeList,
+  type Node,
+  type NodeFilter,
+  type NodeMap,
+  type NodeReward,
+} from '@/api/NodeApi'
+import { isObject } from '@/helpers/core'
+import { getNodesMap } from '@/services/api/island-node'
+import { SELECT_MODE_DISABLE, SELECT_MODE_GOING, SELECT_MODE_PLAN } from './map'
+import { shallowRef } from 'vue'
+import { UserError } from '@/exceptions/UserError'
+import type { Island } from '@/api/IslandApi'
+import type { ViewNodeReward, UserNodeIds, ViewReward, SelectMode } from './map'
+import { getUnknownItem, type ItemMap, type Type } from '@/api/ItemApi'
+import type { ComponentExposed } from 'vue-component-type-helpers'
 
 interface Props {
-  island: Island,
-  parentPageId: string,
+  island: Island
+  parentPageId: string
 }
 
-const props = defineProps<Props>();
+const props = defineProps<Props>()
 
 interface Filter {
-  itemName: string,
-  itemType: Type | null,
-  isNodeTypeTower: boolean,
-  isNodeTypeChest: boolean,
+  itemName: string
+  itemType: Type | null
+  isNodeTypeTower: boolean
+  isNodeTypeChest: boolean
 }
 
 type IslandState = {
-  scale: number,
-  translateX: number,
-  translateY: number,
-  regionNumbers: Array<number>,
-  userNodesIds: Array<number>,
-  userNodesGoingIds: Array<number>,
-  disableNodesIds: Array<number>,
+  scale: number
+  translateX: number
+  translateY: number
+  regionNumbers: Array<number>
+  userNodesIds: Array<number>
+  userNodesGoingIds: Array<number>
+  disableNodesIds: Array<number>
 }
-type IslandStateMap = {[key: number]: IslandState}
+type IslandStateMap = { [key: number]: IslandState }
 type State = {
-  byIsland: IslandStateMap,
-  filter: Filter,
-  isShowQuantity: boolean,
-  isSelectAnyNode: boolean,
-  isShowGroupRewards: boolean,
-  isShowRewardsBlock: boolean,
-  isShowUserRewardsBlock: boolean,
-};
+  byIsland: IslandStateMap
+  filter: Filter
+  isShowQuantity: boolean
+  isSelectAnyNode: boolean
+  isShowGroupRewards: boolean
+  isShowRewardsBlock: boolean
+  isShowUserRewardsBlock: boolean
+}
 
-const { t } = useI18n();
+const { t } = useI18n()
 
-let byIslandState: IslandStateMap = {};
+let byIslandState: IslandStateMap = {}
 
-const minCharsCount = 3;
-const componentId = props.parentPageId + "__map";
+const minCharsCount = 3
+const componentId = props.parentPageId + '__map'
 
-const errorMessage = ref("");
-const regionNumbers = ref<Array<number>>([]);
+const errorMessage = ref('')
+const regionNumbers = ref<Array<number>>([])
 
-const isLoadingNodes = ref(true);
-const nodes = ref<NodeMap>(new Map<number, Node>());
-const rewards = ref<Array<ViewNodeReward>>([]);
-const originRewards = ref<ItemMap>({});
-const calculatingRewards = ref(false);
-const userNodesIds = ref<UserNodeIds>(new Set());
-const userNodesGoingIds = ref<UserNodeIds>(new Set());
-const disableNodesIds = ref<UserNodeIds>(new Set());
+const isLoadingNodes = ref(true)
+const nodes = ref<NodeMap>(new Map<number, Node>())
+const rewards = ref<Array<ViewNodeReward>>([])
+const originRewards = ref<ItemMap>({})
+const calculatingRewards = ref(false)
+const userNodesIds = ref<UserNodeIds>(new Set())
+const userNodesGoingIds = ref<UserNodeIds>(new Set())
+const disableNodesIds = ref<UserNodeIds>(new Set())
 
-const scale = ref(1);
-const translateX = ref(0);
-const translateY = ref(0);
+const scale = ref(1)
+const translateX = ref(0)
+const translateY = ref(0)
 
-const isSelectAnyNode = ref(true);
-const selectMode = ref<SelectMode>(SELECT_MODE_PLAN);
-const isShowQuantity = ref(true);
-const isShowGroupRewards = ref(false);
-const isShowRewardsBlock = ref(true);
-const isShowUserRewardsBlock = ref(true);
+const isSelectAnyNode = ref(true)
+const selectMode = ref<SelectMode>(SELECT_MODE_PLAN)
+const isShowQuantity = ref(true)
+const isShowGroupRewards = ref(false)
+const isShowRewardsBlock = ref(true)
+const isShowUserRewardsBlock = ref(true)
 let filter = shallowReactive<Filter>({
-  itemName: "",
+  itemName: '',
   itemType: null,
   isNodeTypeTower: false,
   isNodeTypeChest: false,
-});
+})
 
-const mapContainerRef = useTemplateRef<ComponentExposed<typeof IslandMapContainer>>("mapContainerRef");
-const downloadDialog = useTemplateRef<ComponentExposed<typeof IslandMapDownloadDialog>>("downloadDialog");
-const downloadDialogComponent = shallowRef<typeof IslandMapDownloadDialog|null>(null);
+const mapContainerRef =
+  useTemplateRef<ComponentExposed<typeof IslandMapContainer>>('mapContainerRef')
+const downloadDialog =
+  useTemplateRef<ComponentExposed<typeof IslandMapDownloadDialog>>('downloadDialog')
+const downloadDialogComponent = shallowRef<typeof IslandMapDownloadDialog | null>(null)
 
-const loading = computed(() => isLoadingNodes.value || calculatingRewards.value);
+const loading = computed(() => isLoadingNodes.value || calculatingRewards.value)
 
 const visibleRewards = computed(() => {
   let resultRewards = rewards.value.filter((reward) => {
-    return !disableNodesIds.value.has(reward.node.id);
-  });
+    return !disableNodesIds.value.has(reward.node.id)
+  })
 
   if (filter.itemName.length >= minCharsCount) {
     resultRewards = resultRewards.filter((item) => {
       if (!item.item.name) {
-        return false;
+        return false
       }
-      return item.item.name.toLowerCase().includes(filter.itemName.toLowerCase());
-    });
+      return item.item.name.toLowerCase().includes(filter.itemName.toLowerCase())
+    })
   }
   if (filter.itemType !== null && filter.itemType > 0) {
-    resultRewards = resultRewards.filter((item) => item.item.type === filter.itemType);
+    resultRewards = resultRewards.filter((item) => item.item.type === filter.itemType)
   }
   if (filter.isNodeTypeChest || filter.isNodeTypeTower) {
-    const typeMap: {[key: number]: boolean} = {};
+    const typeMap: { [key: number]: boolean } = {}
 
     if (filter.isNodeTypeChest) {
-      typeMap[TYPE_CHEST] = true;
+      typeMap[TYPE_CHEST] = true
     }
     if (filter.isNodeTypeTower) {
-      typeMap[TYPE_TOWER] = true;
+      typeMap[TYPE_TOWER] = true
     }
 
     resultRewards = resultRewards.filter((item) => {
-      return typeMap[item.node.type] !== undefined;
-    });
+      return typeMap[item.node.type] !== undefined
+    })
   }
 
-  return resultRewards;
-});
-const visibleRewardsCount = computed(() => visibleRewards.value.length);
+  return resultRewards
+})
+const visibleRewardsCount = computed(() => visibleRewards.value.length)
 const userRewards = computed(() => {
   return rewards.value.filter((reward) => {
-    return nodes.value.has(reward.node.id) && userNodesIds.value.has(reward.node.id);
-  });
-});
-const userRewardsCount = computed(() => userRewards.value.length);
+    return nodes.value.has(reward.node.id) && userNodesIds.value.has(reward.node.id)
+  })
+})
+const userRewardsCount = computed(() => userRewards.value.length)
 const groupRewards = computed(() => {
-  const map: { [key: number]: ViewReward } = {};
+  const map: { [key: number]: ViewReward } = {}
 
   rewards.value
     .filter((reward) => !disableNodesIds.value.has(reward.node.id))
@@ -153,88 +163,88 @@ const groupRewards = computed(() => {
           uniqueId: reward.uniqueId,
           quantity: 0,
           item: reward.item,
-          humanQuantity: ""
-        };
+          humanQuantity: '',
+        }
       }
-      map[reward.item.id].quantity += reward.quantity;
-    });
+      map[reward.item.id].quantity += reward.quantity
+    })
 
-  let arr = Object.values(map);
+  let arr = Object.values(map)
 
   arr.sort((a, b) => {
     if (a.item.name < b.item.name) {
-      return -1;
+      return -1
     }
     if (a.item.name > b.item.name) {
-      return 1;
+      return 1
     }
-    return 0;
-  });
-  arr.every((item) => (item.humanQuantity = getHumanQuantity(item.quantity)));
+    return 0
+  })
+  arr.every((item) => (item.humanQuantity = getHumanQuantity(item.quantity)))
 
-  return arr;
-});
-const groupRewardsCount = computed(() => groupRewards.value.length);
-const disableNodesCount = computed(() => disableNodesIds.value.size);
+  return arr
+})
+const groupRewardsCount = computed(() => groupRewards.value.length)
+const disableNodesCount = computed(() => disableNodesIds.value.size)
 
-loadState();
+loadState()
 
 onMounted(() => {
-  window.addEventListener("beforeunload", onBeforeUnload);
-  reloadMap();
-});
+  window.addEventListener('beforeunload', onBeforeUnload)
+  reloadMap()
+})
 onUnmounted(() => {
-  window.removeEventListener("beforeunload", onBeforeUnload);
-  saveState();
-});
+  window.removeEventListener('beforeunload', onBeforeUnload)
+  saveState()
+})
 
 function onBeforeUnload(event: Event): string {
-  event.returnValue = false;
+  event.returnValue = false
 
-  saveState();
+  saveState()
 
-  return "";
+  return ''
 }
 
 async function loadNodes(isForce: boolean): Promise<IslandNodeList> {
   let nodeList: IslandNodeList = {
     nodes: new Map<number, Node>(),
     totalCount: 0,
-    rewards: {}
-  };
-  let filter: NodeFilter = {};
+    rewards: {},
+  }
+  let filter: NodeFilter = {}
 
   const visibleRegions = props.island.regions
     ? props.island.regions.filter((region) => region.isVisible)
-    : [];
-  const isAllNumbersSelect = visibleRegions.length === regionNumbers.value.length;
+    : []
+  const isAllNumbersSelect = visibleRegions.length === regionNumbers.value.length
 
   if (regionNumbers.value.length && !isAllNumbersSelect) {
-    filter.regionNumbers = regionNumbers.value;
+    filter.regionNumbers = regionNumbers.value
   }
 
-  isLoadingNodes.value = true;
+  isLoadingNodes.value = true
   try {
-    nodeList = await getNodesMap(props.island, isForce, filter);
+    nodeList = await getNodesMap(props.island, isForce, filter)
   } catch (error) {
     if (error instanceof UserError) {
-      errorMessage.value = error.message;
+      errorMessage.value = error.message
     } else {
-      errorMessage.value = t("page.island.failNodesLoading");
-      throw error;
+      errorMessage.value = t('page.island.failNodesLoading')
+      throw error
     }
   } finally {
-    isLoadingNodes.value = false;
+    isLoadingNodes.value = false
   }
 
-  return nodeList;
+  return nodeList
 }
 
 function calculateRewards(nodeList: IslandNodeList): Array<ViewNodeReward> {
-  calculatingRewards.value = true;
+  calculatingRewards.value = true
 
-  const rewards: Array<ViewNodeReward> = [];
-  let index = 0;
+  const rewards: Array<ViewNodeReward> = []
+  let index = 0
 
   nodeList.nodes.forEach((node) => {
     node.rewards.forEach((nodeReward) => {
@@ -244,151 +254,151 @@ function calculateRewards(nodeList: IslandNodeList): Array<ViewNodeReward> {
         humanQuantity: getHumanQuantity(nodeReward.quantity),
         item: nodeList.rewards[nodeReward.itemId] ?? getUnknownItem(),
         node,
-      });
+      })
 
-      ++index;
-    });
+      ++index
+    })
   })
 
-  calculatingRewards.value = false;
+  calculatingRewards.value = false
 
-  return rewards;
+  return rewards
 }
 
 function getUniqueId(node: Node, nodeReward: NodeReward, index: number): string {
-  return "mx" + node.mx + "_my" + node.my + "_id" + nodeReward.itemId + "_i" + index;
+  return 'mx' + node.mx + '_my' + node.my + '_id' + nodeReward.itemId + '_i' + index
 }
 
 function onChangeScale(value: number) {
-  scale.value += value;
+  scale.value += value
 
-  const MAX_SCALE = 8;
-  const MIN_SCALE = 0.3;
+  const MAX_SCALE = 8
+  const MIN_SCALE = 0.3
 
   if (scale.value > MAX_SCALE) {
-    scale.value = MAX_SCALE;
+    scale.value = MAX_SCALE
   } else if (scale.value < MIN_SCALE) {
-    scale.value = MIN_SCALE;
+    scale.value = MIN_SCALE
   }
 }
 
 function onResetMap() {
   if (props.island.initMap?.scale !== undefined) {
-    scale.value = props.island.initMap.scale;
+    scale.value = props.island.initMap.scale
   } else {
-    scale.value = 1;
+    scale.value = 1
   }
   if (props.island.initMap?.offsetX !== undefined) {
-    translateX.value = props.island.initMap.offsetX;
+    translateX.value = props.island.initMap.offsetX
   } else {
-    translateX.value = 0;
+    translateX.value = 0
   }
   if (props.island.initMap?.offsetY !== undefined) {
-    translateY.value = props.island.initMap.offsetY;
+    translateY.value = props.island.initMap.offsetY
   } else {
-    translateY.value = 0;
+    translateY.value = 0
   }
 }
 
 function onChangeTranslate(x: number | null, y: number | null) {
   if (x !== null) {
-    translateX.value = x;
+    translateX.value = x
   }
   if (y !== null) {
-    translateY.value = y;
+    translateY.value = y
   }
 }
 
 function onToggleIsShowQuantity() {
-  isShowQuantity.value = !isShowQuantity.value;
+  isShowQuantity.value = !isShowQuantity.value
 }
 
 function onChangeNode(node: Node) {
   if (!nodes.value.has(node.id)) {
-    throw new Error(t("page.island.notFoundNodeAdmin"));
+    throw new Error(t('page.island.notFoundNodeAdmin'))
   }
-  nodes.value.set(node.id, node);
+  nodes.value.set(node.id, node)
 }
 
 function onSelectNode(nodeId: number) {
   if (!nodes.value.has(nodeId)) {
-    throw new Error(t("page.island.notFoundNodeAdmin"));
+    throw new Error(t('page.island.notFoundNodeAdmin'))
   }
 
   switch (selectMode.value) {
     case SELECT_MODE_PLAN:
       if (!disableNodesIds.value.has(nodeId)) {
         if (userNodesIds.value.has(nodeId)) {
-          userNodesIds.value.delete(nodeId);
+          userNodesIds.value.delete(nodeId)
         } else {
-          userNodesIds.value.add(nodeId);
+          userNodesIds.value.add(nodeId)
         }
         if (userNodesGoingIds.value.has(nodeId)) {
-          userNodesGoingIds.value.delete(nodeId);
+          userNodesGoingIds.value.delete(nodeId)
         }
       }
-      break;
+      break
     case SELECT_MODE_GOING:
       if (userNodesIds.value.has(nodeId) && !disableNodesIds.value.has(nodeId)) {
         if (userNodesGoingIds.value.has(nodeId)) {
-          userNodesGoingIds.value.delete(nodeId);
+          userNodesGoingIds.value.delete(nodeId)
         } else {
-          userNodesGoingIds.value.add(nodeId);
+          userNodesGoingIds.value.add(nodeId)
         }
       }
-      break;
+      break
     case SELECT_MODE_DISABLE:
       if (disableNodesIds.value.has(nodeId)) {
-        disableNodesIds.value.delete(nodeId);
+        disableNodesIds.value.delete(nodeId)
       } else {
-        disableNodesIds.value.add(nodeId);
+        disableNodesIds.value.add(nodeId)
 
         if (userNodesIds.value.has(nodeId)) {
-          userNodesIds.value.delete(nodeId);
+          userNodesIds.value.delete(nodeId)
         }
         if (userNodesGoingIds.value.has(nodeId)) {
-          userNodesGoingIds.value.delete(nodeId);
+          userNodesGoingIds.value.delete(nodeId)
         }
       }
-      break;
+      break
   }
 }
 
 function onResetUserNodes() {
-  userNodesGoingIds.value.clear();
-  userNodesIds.value.clear();
-  selectMode.value = SELECT_MODE_PLAN;
+  userNodesGoingIds.value.clear()
+  userNodesIds.value.clear()
+  selectMode.value = SELECT_MODE_PLAN
 }
 
 function onResetDisableNodes() {
-  disableNodesIds.value.clear();
+  disableNodesIds.value.clear()
 }
 
 function onFullscreen() {
   if (mapContainerRef.value?.svgMapRef) {
-    fullscreenElement(mapContainerRef.value?.svgMapRef);
+    fullscreenElement(mapContainerRef.value?.svgMapRef)
   }
 }
 
 function onBeginDownload() {
-  downloadDialogComponent.value = IslandMapDownloadDialog;
+  downloadDialogComponent.value = IslandMapDownloadDialog
 }
 
 function forceReloadMap() {
-  saveState();
-  reloadMap(true);
+  saveState()
+  reloadMap(true)
 }
 
 function reloadMap(isForce = false) {
   loadNodes(isForce).then((nodeList: IslandNodeList) => {
-    nodes.value = nodeList.nodes;
-    rewards.value = calculateRewards(nodeList);
+    nodes.value = nodeList.nodes
+    rewards.value = calculateRewards(nodeList)
     originRewards.value = nodeList.rewards
 
     userNodesIds.value.forEach((nodeId) => {
-      const node = nodes.value.get(nodeId);
+      const node = nodes.value.get(nodeId)
       if ((node && !canSelectNode(node)) || disableNodesIds.value.has(nodeId)) {
-        userNodesIds.value.delete(nodeId);
+        userNodesIds.value.delete(nodeId)
       }
     })
   })
@@ -396,21 +406,21 @@ function reloadMap(isForce = false) {
 
 function onMountedDownloadDialog() {
   downloadDialog.value?.show().finally(() => {
-    downloadDialogComponent.value = null;
-  });
+    downloadDialogComponent.value = null
+  })
 }
 
 function onResetRegionNumbers() {
-  regionNumbers.value = [];
-  reloadMap();
+  regionNumbers.value = []
+  reloadMap()
 }
 
 function onChangeRegionNumbers(newNumbers: Array<number>) {
-  regionNumbers.value = newNumbers;
-  const isFullIsland = newNumbers.length === 0;
-  const isForse = isFullIsland ? false : true;
+  regionNumbers.value = newNumbers
+  const isFullIsland = newNumbers.length === 0
+  const isForse = isFullIsland ? false : true
 
-  reloadMap(isForse);
+  reloadMap(isForse)
 }
 
 function loadState() {
@@ -421,86 +431,86 @@ function loadState() {
     const item = localStorage.getItem(componentId)
 
     if (item !== null) {
-      stateData = JSON.parse(item) || {};
+      stateData = JSON.parse(item) || {}
     }
   } catch {
     stateData = {}
   }
-  if (typeof stateData !== "object") {
+  if (typeof stateData !== 'object') {
     stateData = {}
   }
 
   let tmpFilter: Filter = {
-    itemName: "",
+    itemName: '',
     itemType: null,
     isNodeTypeTower: false,
-    isNodeTypeChest: false
+    isNodeTypeChest: false,
   }
 
   if (stateData?.filter) {
-    tmpFilter.itemName = stateData.filter.itemName ?? "";
-    tmpFilter.itemType = stateData.filter.type ?? null;
-    tmpFilter.isNodeTypeChest = stateData.filter.isNodeTypeChest ?? false;
-    tmpFilter.isNodeTypeTower = stateData.filter.isNodeTypeTower ?? false;
+    tmpFilter.itemName = stateData.filter.itemName ?? ''
+    tmpFilter.itemType = stateData.filter.type ?? null
+    tmpFilter.isNodeTypeChest = stateData.filter.isNodeTypeChest ?? false
+    tmpFilter.isNodeTypeTower = stateData.filter.isNodeTypeTower ?? false
   }
 
   if (!stateData.byIsland || !isObject(stateData.byIsland)) {
-    stateData.byIsland = {};
+    stateData.byIsland = {}
   }
-  byIslandState = stateData.byIsland;
+  byIslandState = stateData.byIsland
 
-  const byIsland = byIslandState[props.island.id] ?? {};
+  const byIsland = byIslandState[props.island.id] ?? {}
 
   if (byIsland.scale === undefined) {
     if (props.island.initMap?.scale !== undefined) {
-      scale.value = props.island.initMap.scale;
+      scale.value = props.island.initMap.scale
     } else {
-      scale.value = 1;
+      scale.value = 1
     }
   } else {
-    scale.value = byIsland.scale;
+    scale.value = byIsland.scale
   }
   if (byIsland.translateX === undefined) {
     if (props.island.initMap?.offsetX !== undefined) {
-      translateX.value = props.island.initMap.offsetX;
+      translateX.value = props.island.initMap.offsetX
     } else {
-      translateX.value = 0;
+      translateX.value = 0
     }
   } else {
-    translateX.value = byIsland.translateX;
+    translateX.value = byIsland.translateX
   }
   if (byIsland.translateY === undefined) {
     if (props.island.initMap?.offsetY !== undefined) {
-      translateY.value = props.island.initMap.offsetY;
+      translateY.value = props.island.initMap.offsetY
     } else {
-      translateY.value = 0;
+      translateY.value = 0
     }
   } else {
-    translateY.value = byIsland.translateY;
+    translateY.value = byIsland.translateY
   }
 
-  regionNumbers.value = byIsland.regionNumbers || [];
+  regionNumbers.value = byIsland.regionNumbers || []
 
   userNodesIds.value.clear()
   userNodesGoingIds.value.clear()
   disableNodesIds.value.clear()
 
   if (byIsland.userNodesIds) {
-    byIsland.userNodesIds.forEach((id) => userNodesIds.value.add(id));
+    byIsland.userNodesIds.forEach((id) => userNodesIds.value.add(id))
   }
   if (byIsland.userNodesGoingIds) {
-    byIsland.userNodesGoingIds.forEach((id) => userNodesGoingIds.value.add(id));
+    byIsland.userNodesGoingIds.forEach((id) => userNodesGoingIds.value.add(id))
   }
   if (byIsland.disableNodesIds) {
-    byIsland.disableNodesIds.forEach((id) => disableNodesIds.value.add(id));
+    byIsland.disableNodesIds.forEach((id) => disableNodesIds.value.add(id))
   }
 
-  filter = tmpFilter;
-  isShowQuantity.value = stateData.isShowQuantity ?? true;
-  isShowRewardsBlock.value = stateData.isShowRewardsBlock ?? true;
-  isShowUserRewardsBlock.value = stateData.isShowUserRewardsBlock ?? true;
-  isShowGroupRewards.value = stateData.isShowGroupRewards ?? false;
-  isSelectAnyNode.value = stateData ?? true;
+  filter = tmpFilter
+  isShowQuantity.value = stateData.isShowQuantity ?? true
+  isShowRewardsBlock.value = stateData.isShowRewardsBlock ?? true
+  isShowUserRewardsBlock.value = stateData.isShowUserRewardsBlock ?? true
+  isShowGroupRewards.value = stateData.isShowGroupRewards ?? false
+  isSelectAnyNode.value = stateData ?? true
 }
 
 function saveState() {
@@ -512,7 +522,7 @@ function saveState() {
     translateX: translateX.value,
     translateY: translateY.value,
     regionNumbers: regionNumbers.value,
-  };
+  }
 
   const state: State = {
     filter,
@@ -522,9 +532,9 @@ function saveState() {
     isShowRewardsBlock: isShowRewardsBlock.value,
     isShowUserRewardsBlock: isShowUserRewardsBlock.value,
     byIsland: byIslandState,
-  };
+  }
 
-  localStorage.setItem(componentId, JSON.stringify(state));
+  localStorage.setItem(componentId, JSON.stringify(state))
 }
 </script>
 

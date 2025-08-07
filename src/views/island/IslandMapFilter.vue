@@ -2,102 +2,107 @@
 /* global HTMLInputElement */
 /* global Event */
 
-import TextInput from "@/components/TextInput.vue";
-import ClearSelect from "@/components/ClearSelect.vue";
-import { getLabelsByTypes, type Type } from "@/api/ItemApi";
-import { useI18n } from "vue-i18n";
-import { TYPE_CHEST, TYPE_TOWER } from "@/api/NodeApi";
-import { computed } from "vue";
-import type { SelectItemMap } from "@/components/select";
-import type { ViewNodeReward } from "./map";
-import { EVENT_UPDATE_IS_NODE_TYPE_CHEST, EVENT_UPDATE_IS_NODE_TYPE_TOWER, EVENT_UPDATE_ITEM_NAME, EVENT_UPDATE_TYPE } from "./map-filter";
+import TextInput from '@/components/TextInput.vue'
+import ClearSelect from '@/components/ClearSelect.vue'
+import { getLabelsByTypes, type Type } from '@/api/ItemApi'
+import { useI18n } from 'vue-i18n'
+import { TYPE_CHEST, TYPE_TOWER } from '@/api/NodeApi'
+import { computed } from 'vue'
+import type { SelectItemMap } from '@/components/select'
+import type { ViewNodeReward } from './map'
+import {
+  EVENT_UPDATE_IS_NODE_TYPE_CHEST,
+  EVENT_UPDATE_IS_NODE_TYPE_TOWER,
+  EVENT_UPDATE_ITEM_NAME,
+  EVENT_UPDATE_TYPE,
+} from './map-filter'
 
 interface Props {
-  rewards: Array<ViewNodeReward>,
-  itemName: string,
-  itemType: Type | null,
-  isNodeTypeTower: boolean,
-  isNodeTypeChest: boolean,
-  minCharsCount: number,
+  rewards: Array<ViewNodeReward>
+  itemName: string
+  itemType: Type | null
+  isNodeTypeTower: boolean
+  isNodeTypeChest: boolean
+  minCharsCount: number
 }
 
-const props = defineProps<Props>();
+const props = defineProps<Props>()
 const emit = defineEmits<{
-  "update:item-name": [value: string]
-  "update:type-id": [type: Type | null],
-  "update:is-node-type-tower": [value: boolean],
-  "update:is-node-type-chest": [value: boolean],
+  'update:item-name': [value: string]
+  'update:type-id': [type: Type | null]
+  'update:is-node-type-tower': [value: boolean]
+  'update:is-node-type-chest': [value: boolean]
 }>()
 
-const { t } = useI18n();
+const { t } = useI18n()
 
-const formId = "nodesForm";
+const formId = 'nodesForm'
 
 const visibleTypes = computed<SelectItemMap>(() => {
-  const map = new Map<number, boolean>();
-  const labels = getLabelsByTypes(t);
+  const map = new Map<number, boolean>()
+  const labels = getLabelsByTypes(t)
 
   props.rewards.forEach((reward) => {
-    map.set(reward.item.type, true);
-  });
+    map.set(reward.item.type, true)
+  })
 
-  const types: SelectItemMap = {};
+  const types: SelectItemMap = {}
   for (const type of map.keys()) {
     if (type > 0) {
-      types[type] = labels[type as Type] ?? t("common.unknown");
+      types[type] = labels[type as Type] ?? t('common.unknown')
     }
   }
 
-  return types;
+  return types
 })
 const isCheckedFlags = computed(() => {
-  return props.isNodeTypeTower || props.isNodeTypeChest;
-});
+  return props.isNodeTypeTower || props.isNodeTypeChest
+})
 const filledFilterCount = computed(() => {
-  let count = 0;
+  let count = 0
 
   if (props.itemType !== null) {
-    ++count;
+    ++count
   }
-  if (props.itemName !== "") {
-    ++count;
+  if (props.itemName !== '') {
+    ++count
   }
   if (isCheckedFlags.value) {
-    ++count;
+    ++count
   }
 
-  return count;
-});
+  return count
+})
 
 function onUpdateName(name: string) {
-  emit(EVENT_UPDATE_ITEM_NAME, name);
+  emit(EVENT_UPDATE_ITEM_NAME, name)
 }
 function onChangeType(value: number | null) {
-  emit(EVENT_UPDATE_TYPE, value as Type);
+  emit(EVENT_UPDATE_TYPE, value as Type)
 }
 function onChangeNodeType(event: Event) {
   const target = event.target as HTMLInputElement
-  const itemType = parseInt(target.value);
+  const itemType = parseInt(target.value)
 
   if (itemType === TYPE_TOWER) {
-    emit(EVENT_UPDATE_IS_NODE_TYPE_TOWER, target.checked);
+    emit(EVENT_UPDATE_IS_NODE_TYPE_TOWER, target.checked)
   }
   if (itemType === TYPE_CHEST) {
-    emit(EVENT_UPDATE_IS_NODE_TYPE_CHEST, target.checked);
+    emit(EVENT_UPDATE_IS_NODE_TYPE_CHEST, target.checked)
   }
 }
 function onReset() {
   if (props.itemType !== null) {
-    emit(EVENT_UPDATE_TYPE, null);
+    emit(EVENT_UPDATE_TYPE, null)
   }
-  if (props.itemName !== "") {
-    emit(EVENT_UPDATE_ITEM_NAME, "");
+  if (props.itemName !== '') {
+    emit(EVENT_UPDATE_ITEM_NAME, '')
   }
   if (props.isNodeTypeTower) {
-    emit(EVENT_UPDATE_IS_NODE_TYPE_TOWER, false);
+    emit(EVENT_UPDATE_IS_NODE_TYPE_TOWER, false)
   }
   if (props.isNodeTypeChest) {
-    emit(EVENT_UPDATE_IS_NODE_TYPE_CHEST, false);
+    emit(EVENT_UPDATE_IS_NODE_TYPE_CHEST, false)
   }
 }
 </script>
@@ -108,7 +113,7 @@ function onReset() {
       <label
         :for="formId + '__itemName'"
         :class="['form-label', itemName.length > 0 ? 'not-empty' : '']"
-        >{{ t("common.resource") }}
+        >{{ t('common.resource') }}
         <span
           v-if="itemName"
           class="badge rounded-pill text-bg-warning"
@@ -123,7 +128,7 @@ function onReset() {
         @update:model-value="onUpdateName"
       />
       <div class="form-text fw-normal">
-        {{ t("common.needEnterAtLeastCharacters", { n: minCharsCount }) }}
+        {{ t('common.needEnterAtLeastCharacters', { n: minCharsCount }) }}
       </div>
     </div>
     <div class="col-md-6 mb-3">
@@ -131,7 +136,7 @@ function onReset() {
         :for="formId + '__itemType'"
         :class="['form-label', itemType != null ? 'not-empty' : '']"
       >
-        {{ t("common.type") }}
+        {{ t('common.type') }}
         <span
           v-if="itemType != null"
           class="badge rounded-pill text-bg-warning"
@@ -159,7 +164,7 @@ function onReset() {
         <label
           class="form-check-label"
           :for="formId + '__nodeTypeTower'"
-          >{{ t("common.tower") }}</label
+          >{{ t('common.tower') }}</label
         >
       </div>
       <div class="form-check form-check-inline">
@@ -174,7 +179,7 @@ function onReset() {
         <label
           class="form-check-label"
           :for="formId + '__nodeTypeChest'"
-          >{{ t("common.chest") }}</label
+          >{{ t('common.chest') }}</label
         >
       </div>
       <span
@@ -190,7 +195,7 @@ function onReset() {
         :disabled="filledFilterCount === 0"
         @click="onReset"
       >
-        {{ t("common.reset") }}
+        {{ t('common.reset') }}
       </button>
     </div>
   </div>

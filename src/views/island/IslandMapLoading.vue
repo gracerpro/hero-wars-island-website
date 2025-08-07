@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import RowLoading from "@/components/RowLoading.vue";
+import RowLoading from '@/components/RowLoading.vue'
 </script>
 
 <template>

@@ -1,24 +1,24 @@
 <script setup lang="ts">
-import { useI18n } from "vue-i18n";
-import { EVENT_FIND, EVENT_UPDATE_NAME, filterNameMinCharsCount } from "./news";
+import { useI18n } from 'vue-i18n'
+import { EVENT_FIND, EVENT_UPDATE_NAME, filterNameMinCharsCount } from './news'
 
 interface Props {
-  loading: boolean,
-  name: string,
+  loading: boolean
+  name: string
 }
 
 defineProps<Props>()
 
 const emit = defineEmits<{
-  find: [],
-  "update:name": [value: string],
-}>();
+  find: []
+  'update:name': [value: string]
+}>()
 
-const { t } = useI18n();
+const { t } = useI18n()
 
 function onClearName() {
-  emit(EVENT_UPDATE_NAME, "");
-  emit(EVENT_FIND);
+  emit(EVENT_UPDATE_NAME, '')
+  emit(EVENT_FIND)
 }
 </script>
 
@@ -46,7 +46,7 @@ function onClearName() {
         </button>
       </div>
       <div class="form-text">
-        {{ t("common.needEnterAtLeastCharacters", { n: filterNameMinCharsCount }) }}
+        {{ t('common.needEnterAtLeastCharacters', { n: filterNameMinCharsCount }) }}
       </div>
     </div>
     <div class="col-md-2 mb-3">
@@ -55,7 +55,7 @@ function onClearName() {
         :disabled="loading"
         class="btn btn-primary"
       >
-        {{ t("common.find") }}
+        {{ t('common.find') }}
       </button>
     </div>
   </form>

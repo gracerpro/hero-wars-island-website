@@ -7,60 +7,60 @@ import {
   EVENT_CHANGE_TRANSLATE,
   TRANSLATE_X,
   TRANSLATE_Y,
-} from "@/services/island-map";
-import { useI18n } from "vue-i18n";
+} from '@/services/island-map'
+import { useI18n } from 'vue-i18n'
 
 interface Props {
-  loading: boolean,
-  translateX: number,
-  translateY: number,
+  loading: boolean
+  translateX: number
+  translateY: number
 }
 
-const props = defineProps<Props>();
+const props = defineProps<Props>()
 const emit = defineEmits<{
-  reset: [],
-  "change-scale": [value: number],
-  "change-translate": [x: number | null, y: number | null],
-}>();
+  reset: []
+  'change-scale': [value: number]
+  'change-translate': [x: number | null, y: number | null]
+}>()
 
-const EVENT_RESET = "reset";
+const EVENT_RESET = 'reset'
 
-const { t } = useI18n();
+const { t } = useI18n()
 
 function onChangeScale(zoom: number, event: MouseEvent) {
-  let value = zoom * DELTA_SCALE;
+  let value = zoom * DELTA_SCALE
 
   if (event.ctrlKey) {
-    value /= 10;
+    value /= 10
   } else if (event.shiftKey) {
-    value /= 2;
+    value /= 2
   }
 
-  emit(EVENT_CHANGE_SCALE, value);
+  emit(EVENT_CHANGE_SCALE, value)
 }
 
 function onChangeTranslate(xDirection: number, yDirection: number, event: MouseEvent) {
   let dx = 0,
-    dy = 0;
+    dy = 0
 
   if (xDirection !== 0) {
-    dx = 5 * xDirection * TRANSLATE_X;
+    dx = 5 * xDirection * TRANSLATE_X
     if (event.ctrlKey) {
-      dx /= 10;
+      dx /= 10
     } else if (event.shiftKey) {
-      dx /= 2;
+      dx /= 2
     }
   }
   if (yDirection !== 0) {
-    dy = 5 * yDirection * TRANSLATE_Y;
+    dy = 5 * yDirection * TRANSLATE_Y
     if (event.ctrlKey) {
-      dy /= 10;
+      dy /= 10
     } else if (event.shiftKey) {
-      dy /= 2;
+      dy /= 2
     }
   }
 
-  emit(EVENT_CHANGE_TRANSLATE, props.translateX + dx, props.translateY + dy);
+  emit(EVENT_CHANGE_TRANSLATE, props.translateX + dx, props.translateY + dy)
 }
 </script>
 

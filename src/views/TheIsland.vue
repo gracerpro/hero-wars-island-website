@@ -1,56 +1,56 @@
 <script setup lang="ts">
-import HeroClient from "@/api/HeroClient";
-import IslandMap from "./island/IslandMap.vue";
-import RowLoading from "@/components/RowLoading.vue";
-import { HttpError } from "@/exceptions/HttpError";
-import { setMetaInfo } from "@/services/page-meta";
-import { ref, watch, onMounted, onServerPrefetch, computed } from "vue";
-import { useRoute } from "vue-router";
-import { useI18n } from "vue-i18n";
-import { useSSRContext } from "vue";
-import type { Island } from "@/api/IslandApi";
+import HeroClient from '@/api/HeroClient'
+import IslandMap from './island/IslandMap.vue'
+import RowLoading from '@/components/RowLoading.vue'
+import { HttpError } from '@/exceptions/HttpError'
+import { setMetaInfo } from '@/services/page-meta'
+import { ref, watch, onMounted, onServerPrefetch, computed } from 'vue'
+import { useRoute } from 'vue-router'
+import { useI18n } from 'vue-i18n'
+import { useSSRContext } from 'vue'
+import type { Island } from '@/api/IslandApi'
 
-const { t } = useI18n();
-const route = useRoute();
-const ssrContext = import.meta.env.SSR ? useSSRContext() : undefined;
+const { t } = useI18n()
+const route = useRoute()
+const ssrContext = import.meta.env.SSR ? useSSRContext() : undefined
 
-const currentIsland = ref<Island | null>(null);
-const islandLoading = ref(true);
-const errorMessage = ref("");
+const currentIsland = ref<Island | null>(null)
+const islandLoading = ref(true)
+const errorMessage = ref('')
 
-const islandName = computed(() => currentIsland.value?.name);
-const islandDescription = computed(() => currentIsland.value?.description);
+const islandName = computed(() => currentIsland.value?.name)
+const islandDescription = computed(() => currentIsland.value?.description)
 
-const islandId = parseInt(route.params.id as string);
+const islandId = parseInt(route.params.id as string)
 
 onServerPrefetch(async () => {
-  return loadIsland(islandId);
-});
+  return loadIsland(islandId)
+})
 
 onMounted(() => {
   watch(
     () => route.params.id,
     (newId) => {
-      const id = queryId(newId as string);
+      const id = queryId(newId as string)
       if (id > 0) {
-        loadIsland(id);
+        loadIsland(id)
       }
     }
-  );
+  )
   watch(
     () => route.params.locale,
     () => {
       if (currentIsland.value) {
-        loadIsland(currentIsland.value.id);
+        loadIsland(currentIsland.value.id)
       }
     }
-  );
+  )
 
-  loadIsland(islandId);
-});
+  loadIsland(islandId)
+})
 
 function setPageInfo(island: Island | null) {
-  const defaultTitle = t("common.islandMap");
+  const defaultTitle = t('common.islandMap')
 
   if (island) {
     setMetaInfo(
@@ -60,56 +60,56 @@ function setPageInfo(island: Island | null) {
         keywords: island.pageKeywords,
       },
       ssrContext
-    );
+    )
   } else {
     setMetaInfo(
       {
         title: defaultTitle,
-        description: t("seo.island.description"),
-        keywords: t("seo.island.keywords"),
+        description: t('seo.island.description'),
+        keywords: t('seo.island.keywords'),
       },
       ssrContext
-    );
+    )
   }
 }
 
 function queryId(sourceId: string): number {
-  let intId = parseInt(sourceId);
+  let intId = parseInt(sourceId)
 
   if (Number.isNaN(intId)) {
-    errorMessage.value = t("page.island.islandNotFound");
-    intId = 0;
+    errorMessage.value = t('page.island.islandNotFound')
+    intId = 0
   }
 
-  return intId;
+  return intId
 }
 
 async function loadIsland(id: number) {
-  const client = new HeroClient();
+  const client = new HeroClient()
 
-  currentIsland.value = null;
-  islandLoading.value = true;
+  currentIsland.value = null
+  islandLoading.value = true
   try {
     const fields = {
       isWithDescription: true,
       isWithBackgroundImage: true,
-    };
-    currentIsland.value = await client.island.get(id, fields);
+    }
+    currentIsland.value = await client.island.get(id, fields)
   } catch (error) {
     if (error instanceof HttpError && error.statusCode === 404) {
-      errorMessage.value = t("page.island.islandNotFound");
+      errorMessage.value = t('page.island.islandNotFound')
     } else {
-      errorMessage.value = t("common.loadingFailDeveloperShow");
+      errorMessage.value = t('common.loadingFailDeveloperShow')
     }
   } finally {
     if (!import.meta.env.SSR) {
-      islandLoading.value = false;
+      islandLoading.value = false
     }
   }
 
-  setPageInfo(currentIsland.value);
+  setPageInfo(currentIsland.value)
 
-  return currentIsland.value;
+  return currentIsland.value
 }
 </script>
 
@@ -163,7 +163,7 @@ async function loadIsland(id: number) {
         class="d-block mx-auto"
       />
       <div class="text-center text-warning fw-bold">
-        {{ t("page.island.islandNotAvailable") }}
+        {{ t('page.island.islandNotAvailable') }}
       </div>
     </div>
     <island-map

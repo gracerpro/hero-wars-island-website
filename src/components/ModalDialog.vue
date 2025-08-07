@@ -2,21 +2,21 @@
 /* global HTMLElement */
 /* global document */
 
-import { Modal } from "bootstrap"; // TODO: test, must be dynamic
-import { computed } from "vue";
-import { useI18n } from "vue-i18n";
-import type { DialogResult } from "./modal-dialog";
+import { Modal } from 'bootstrap' // TODO: test, must be dynamic
+import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
+import type { DialogResult } from './modal-dialog'
 
-const { t } = useI18n();
+const { t } = useI18n()
 
 defineExpose({
   show,
   hide,
-});
+})
 
-let moduleResolve: (value: DialogResult) => void;
-let modal: Modal | null = null;
-let dialogResult: DialogResult = null;
+let moduleResolve: (value: DialogResult) => void
+let modal: Modal | null = null
+let dialogResult: DialogResult = null
 
 if (!import.meta.env.SSR) {
   // Load bootstrap module asynchronously else get an error on SSR
@@ -25,70 +25,70 @@ if (!import.meta.env.SSR) {
 }
 
 interface Props {
-  elementId: string,
-  formId: string,
-  saving?: boolean,
-  header?: string,
-  submitButtonText?: string,
-  size?: string,
-  isShowSubmit?: boolean,
-  initResult?: object | number | string | null,
+  elementId: string
+  formId: string
+  saving?: boolean
+  header?: string
+  submitButtonText?: string
+  size?: string
+  isShowSubmit?: boolean
+  initResult?: object | number | string | null
 }
 
 const props = withDefaults(defineProps<Props>(), {
   saving: false,
-  header: "",
-  submitButtonText: "",
-  size: "lg",
+  header: '',
+  submitButtonText: '',
+  size: 'lg',
   isShowSubmit: true,
   initResult: null,
-});
+})
 
 const sizeClass = computed(() => {
-  const sizes: { [key: string] : string } = {
-    sm: "modal-sm",
-    lg: "modal-lg",
-    xl: "modal-xl",
-  };
+  const sizes: { [key: string]: string } = {
+    sm: 'modal-sm',
+    lg: 'modal-lg',
+    xl: 'modal-xl',
+  }
 
-  return sizes[props.size] ?? "";
-});
+  return sizes[props.size] ?? ''
+})
 
 const hideDialog = () => {
-  modal?.dispose();
-  modal = null;
+  modal?.dispose()
+  modal = null
 
-  moduleResolve(dialogResult);
-};
+  moduleResolve(dialogResult)
+}
 
 function show() {
   if (modal) {
-    throw new Error("The modal dialog is already open.");
+    throw new Error('The modal dialog is already open.')
   }
 
   let promise = new Promise((resolve) => {
-    moduleResolve = resolve;
-  });
+    moduleResolve = resolve
+  })
 
-  const modalElement = document.getElementById(props.elementId) as HTMLElement;
+  const modalElement = document.getElementById(props.elementId) as HTMLElement
   modalElement.addEventListener(
     Modal.Events.hidden,
     () => {
-      hideDialog();
+      hideDialog()
     },
     { once: true }
-  );
+  )
 
-  dialogResult = props.initResult;
+  dialogResult = props.initResult
 
-  modal = new Modal(modalElement, {});
-  modal.show();
+  modal = new Modal(modalElement, {})
+  modal.show()
 
-  return promise;
+  return promise
 }
 
 function hide() {
-  modal?.hide();
+  modal?.hide()
 }
 </script>
 
@@ -136,7 +136,7 @@ function hide() {
               class="visually-hidden"
               >Loading...</span
             >
-            {{ submitButtonText ? submitButtonText : t("common.save") }}
+            {{ submitButtonText ? submitButtonText : t('common.save') }}
           </button>
           <button
             type="button"
@@ -144,7 +144,7 @@ function hide() {
             data-bs-dismiss="modal"
             :disabled="saving"
           >
-            {{ t("common.cancel") }}
+            {{ t('common.cancel') }}
           </button>
         </div>
       </div>

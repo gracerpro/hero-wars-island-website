@@ -1,34 +1,42 @@
-import HeroClient from "@/api/HeroClient";
-import type { Island } from "@/api/IslandApi";
-import type { IslandNodeList, Node, NodeFilter } from "@/api/NodeApi";
-import { INDEXED_DB_NAME } from "@/core/storage";
-import { isObject } from "@/helpers/core";
+import HeroClient from '@/api/HeroClient'
+import type { Island } from '@/api/IslandApi'
+import type { IslandNodeList, Node, NodeFilter } from '@/api/NodeApi'
+import { INDEXED_DB_NAME } from '@/core/storage'
+import { isObject } from '@/helpers/core'
 
 type DateByIslandMap = { [key: number]: string }
 
-const client = new HeroClient();
+const client = new HeroClient()
 
-export async function getNodesMap(island: Island, isForce = false, filter?: NodeFilter): Promise<IslandNodeList> {
-  let nodesList: IslandNodeList | null = null;
+export async function getNodesMap(
+  island: Island,
+  isForce = false,
+  filter?: NodeFilter
+): Promise<IslandNodeList> {
+  let nodesList: IslandNodeList | null = null
   const isEmptyFilter = filter === undefined || Object.values(filter).every((a) => a === undefined)
-  const previosUpdatedAt = loadPreviousUpdatedAt(island);
+  const previosUpdatedAt = loadPreviousUpdatedAt(island)
   const isLoadFromServer =
-    !previosUpdatedAt || !island.nodesLastUpdatedAt || previosUpdatedAt < island.nodesLastUpdatedAt || isForce || !isEmptyFilter;
+    !previosUpdatedAt ||
+    !island.nodesLastUpdatedAt ||
+    previosUpdatedAt < island.nodesLastUpdatedAt ||
+    isForce ||
+    !isEmptyFilter
 
   try {
     if (!isLoadFromServer) {
-      nodesList = await getNodesFromCache(island);
+      nodesList = await getNodesFromCache(island)
     }
   } catch (error) {
-    console.error(error); // TODO: notify
+    console.error(error) // TODO: notify
   }
 
   if (nodesList === null || nodesList === undefined) {
-    const nodesList = await client.node.byIslandList(island.id, filter);
+    const nodesList = await client.node.byIslandList(island.id, filter)
 
     if (isEmptyFilter) {
-      writeNodesToCache(island, nodesList);
-      savePreviousUpdatedAt(island);
+      writeNodesToCache(island, nodesList)
+      savePreviousUpdatedAt(island)
     }
   }
   if (nodesList === null || nodesList === undefined) {
@@ -39,127 +47,133 @@ export async function getNodesMap(island: Island, isForce = false, filter?: Node
     }
   }
 
-  return nodesList;
+  return nodesList
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function isNodeList(data: any): boolean {
-  return (data.nodes && typeof data.nodes === "object")
-    && (typeof data.totalCount === "number")
-    && (typeof data.rewards === "object")
+  return (
+    data.nodes &&
+    typeof data.nodes === 'object' &&
+    typeof data.totalCount === 'number' &&
+    typeof data.rewards === 'object'
+  )
 }
 
-const PREVIOUS_DATES_NAME = "island.previosUpdateDates";
+const PREVIOUS_DATES_NAME = 'island.previosUpdateDates'
 
 export function resetCache() {
-  localStorage.setItem(PREVIOUS_DATES_NAME, JSON.stringify({}));
+  localStorage.setItem(PREVIOUS_DATES_NAME, JSON.stringify({}))
 }
 
 function loadPreviousUpdatedAt(island: Island): Date | null {
-  let datesByIsland: DateByIslandMap = {};
+  let datesByIsland: DateByIslandMap = {}
 
   try {
-    datesByIsland = JSON.parse(localStorage.getItem(PREVIOUS_DATES_NAME) ?? "");
+    datesByIsland = JSON.parse(localStorage.getItem(PREVIOUS_DATES_NAME) ?? '')
     if (!isObject(datesByIsland)) {
-      datesByIsland = {};
+      datesByIsland = {}
     }
   } catch {
-    datesByIsland = {};
+    datesByIsland = {}
   }
 
-  const date = datesByIsland[island.id];
+  const date = datesByIsland[island.id]
   if (date) {
-    return new Date(date);
+    return new Date(date)
   }
 
-  return null;
+  return null
 }
 
 function savePreviousUpdatedAt(island: Island) {
-  let datesByIsland: DateByIslandMap = {};
+  let datesByIsland: DateByIslandMap = {}
 
   try {
     const item = localStorage.getItem(PREVIOUS_DATES_NAME)
 
     if (item !== null) {
-      datesByIsland = JSON.parse(item);
+      datesByIsland = JSON.parse(item)
 
       if (!isObject(datesByIsland)) {
-        datesByIsland = {};
+        datesByIsland = {}
       }
     }
   } catch {
-    datesByIsland = {};
+    datesByIsland = {}
   }
 
-  datesByIsland[island.id] = new Date().toISOString();
+  datesByIsland[island.id] = new Date().toISOString()
 
-  localStorage.setItem(PREVIOUS_DATES_NAME, JSON.stringify(datesByIsland));
+  localStorage.setItem(PREVIOUS_DATES_NAME, JSON.stringify(datesByIsland))
 }
 
-async function writeNodesToCache(island: Island, nodeList: IslandNodeList): Promise<IDBValidKey | undefined> {
-  const db = await openDb();
+async function writeNodesToCache(
+  island: Island,
+  nodeList: IslandNodeList
+): Promise<IDBValidKey | undefined> {
+  const db = await openDb()
 
   return new Promise((resolve, reject) => {
-    const transaction = db.transaction("islandNodes", "readwrite");
-    const nodeStore = transaction.objectStore("islandNodes");
-    const request = nodeStore.put({ islandId: island.id, nodeList });
+    const transaction = db.transaction('islandNodes', 'readwrite')
+    const nodeStore = transaction.objectStore('islandNodes')
+    const request = nodeStore.put({ islandId: island.id, nodeList })
 
     request.onsuccess = function () {
-      resolve(request.result);
-    };
+      resolve(request.result)
+    }
     request.onerror = function () {
-      reject(request.error);
-    };
-  });
+      reject(request.error)
+    }
+  })
 }
 
-async function getNodesFromCache(island: Island): Promise<IslandNodeList|null> {
-  const db = await openDb();
+async function getNodesFromCache(island: Island): Promise<IslandNodeList | null> {
+  const db = await openDb()
 
   return new Promise((resolve, reject) => {
-    const transaction = db.transaction("islandNodes", "readonly");
-    const nodeStore = transaction.objectStore("islandNodes");
-    const request = nodeStore.get(island.id);
+    const transaction = db.transaction('islandNodes', 'readonly')
+    const nodeStore = transaction.objectStore('islandNodes')
+    const request = nodeStore.get(island.id)
 
     request.onsuccess = () => {
-      let nodesList = request.result?.nodeList;
-      console.log("nodesList from db", nodesList)
+      let nodesList = request.result?.nodeList
+      console.log('nodesList from db', nodesList)
 
       if (!isNodeList(nodesList)) {
         nodesList = null
       }
 
-      resolve(nodesList);
+      resolve(nodesList)
     }
     request.onerror = () => {
-      reject(request.error);
+      reject(request.error)
     }
   })
 }
 
 async function openDb(): Promise<IDBDatabase> {
   return new Promise((resolve, reject) => {
-    const openRequest = window.indexedDB.open(INDEXED_DB_NAME);
+    const openRequest = window.indexedDB.open(INDEXED_DB_NAME)
 
     openRequest.onerror = () => {
-      reject(openRequest.error);
-    };
+      reject(openRequest.error)
+    }
     openRequest.onsuccess = () => {
-      const db = openRequest.result;
+      const db = openRequest.result
 
       db.onversionchange = () => {
-        db.close();
-      };
-
-      resolve(db);
-    };
-    openRequest.onupgradeneeded = (event: IDBVersionChangeEvent) => {
-      const db = (event.target as IDBRequest).result as IDBDatabase;
-
-      if (!db.objectStoreNames.contains("islandNodes")) {
-        db.createObjectStore("islandNodes", { keyPath: "islandId", autoIncrement: false });
+        db.close()
       }
-    };
-  });
+
+      resolve(db)
+    }
+    openRequest.onupgradeneeded = (event: IDBVersionChangeEvent) => {
+      const db = (event.target as IDBRequest).result as IDBDatabase
+
+      if (!db.objectStoreNames.contains('islandNodes')) {
+        db.createObjectStore('islandNodes', { keyPath: 'islandId', autoIncrement: false })
+      }
+    }
+  })
 }

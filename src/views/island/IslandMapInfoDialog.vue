@@ -1,46 +1,51 @@
 <script setup lang="ts">
-import ModalDialog from "@/components/ModalDialog.vue";
-import { computed, useTemplateRef } from "vue";
-import { useI18n } from "vue-i18n";
-import { useShow } from "@/components/modal-dialog";
-import { getStatusName, getTypeName, type NodeReward } from "@/api/NodeApi";
-import { getTypeName as getItemTypeName, getUnknownItem, type Item, type ItemMap } from "@/api/ItemApi";
-import type { ComponentExposed } from "vue-component-type-helpers";
-import type { DrawedNode } from "./map";
+import ModalDialog from '@/components/ModalDialog.vue'
+import { computed, useTemplateRef } from 'vue'
+import { useI18n } from 'vue-i18n'
+import { useShow } from '@/components/modal-dialog'
+import { getStatusName, getTypeName, type NodeReward } from '@/api/NodeApi'
+import {
+  getTypeName as getItemTypeName,
+  getUnknownItem,
+  type Item,
+  type ItemMap,
+} from '@/api/ItemApi'
+import type { ComponentExposed } from 'vue-component-type-helpers'
+import type { DrawedNode } from './map'
 
 interface Props {
-  drawedNode: DrawedNode,
-  originRewards: ItemMap,
+  drawedNode: DrawedNode
+  originRewards: ItemMap
 }
 
 interface LocalReward extends NodeReward {
   item: Item
 }
 
-const props = defineProps<Props>();
+const props = defineProps<Props>()
 
-const { t } = useI18n();
+const { t } = useI18n()
 
-const dialogRef = useTemplateRef<ComponentExposed<typeof ModalDialog>>("dialogRef");
+const dialogRef = useTemplateRef<ComponentExposed<typeof ModalDialog>>('dialogRef')
 
-const { show, onMountedDialog } = useShow(dialogRef);
+const { show, onMountedDialog } = useShow(dialogRef)
 
-const hasRewards = computed(() => props.drawedNode.node.rewards.length > 0);
-const dialogId = computed(() => "island-map-info-dialog")
-const formId = computed(() => dialogId.value + "__form")
+const hasRewards = computed(() => props.drawedNode.node.rewards.length > 0)
+const dialogId = computed(() => 'island-map-info-dialog')
+const formId = computed(() => dialogId.value + '__form')
 
 const rewards = computed<Array<LocalReward>>(() => {
   return props.drawedNode.node.rewards.map((nodeReward) => {
     return {
       ...nodeReward,
-      item: props.originRewards[nodeReward.itemId] ?? getUnknownItem()
+      item: props.originRewards[nodeReward.itemId] ?? getUnknownItem(),
     }
   })
 })
 
 defineExpose({
   show,
-});
+})
 </script>
 
 <template>

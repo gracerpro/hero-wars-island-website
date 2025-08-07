@@ -1,7 +1,7 @@
-export const EVENT_RESET = "reset";
-export const EVENT_TOGGLE_IS_SHOW_QUANTITY = "update:is-show-quantity";
-export const EVENT_FULLSCREEN_ON = "fullscreen-on";
-export const EVENT_BEGIN_DOWNLOAD = "begin-download";
-export const EVENT_RELOAD_MAP = "reload-map";
-export const EVENT_UPDATE_REGION_NUMBERS = "update:region-numbers";
-export const EVENT_RESET_REGION_NUMBERS = "reset-region-numbers";
+export const EVENT_RESET = 'reset'
+export const EVENT_TOGGLE_IS_SHOW_QUANTITY = 'update:is-show-quantity'
+export const EVENT_FULLSCREEN_ON = 'fullscreen-on'
+export const EVENT_BEGIN_DOWNLOAD = 'begin-download'
+export const EVENT_RELOAD_MAP = 'reload-map'
+export const EVENT_UPDATE_REGION_NUMBERS = 'update:region-numbers'
+export const EVENT_RESET_REGION_NUMBERS = 'reset-region-numbers'

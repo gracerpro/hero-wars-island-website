@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import { type IBreadcrumbItem } from './breadcrumbs';
+import { type IBreadcrumbItem } from './breadcrumbs'
 
 interface Props {
   links?: Array<IBreadcrumbItem>
 }
 
 withDefaults(defineProps<Props>(), {
-  links: () => []
+  links: () => [],
 })
 </script>
 

@@ -1,4 +1,12 @@
-import { createMemoryHistory, createRouter as _createRouter, createWebHistory, type Router, type NavigationGuardNext, type RouteLocationNormalizedGeneric, type RouteLocationNormalizedLoadedGeneric } from "vue-router";
+import {
+  createMemoryHistory,
+  createRouter as _createRouter,
+  createWebHistory,
+  type Router,
+  type NavigationGuardNext,
+  type RouteLocationNormalizedGeneric,
+  type RouteLocationNormalizedLoadedGeneric,
+} from 'vue-router'
 import {
   getCurrentLocale,
   guessDefaultLocale,
@@ -6,8 +14,8 @@ import {
   setLanguage,
   isShowLocaleInRoute,
   createI18nRouteTo,
-} from "@/i18n/translation";
-import { routes } from "./routes";
+} from '@/i18n/translation'
+import { routes } from './routes'
 
 export function createRouter() {
   const router = _createRouter({
@@ -15,51 +23,52 @@ export function createRouter() {
       ? createMemoryHistory(import.meta.env.VITE_BASE_URL)
       : createWebHistory(import.meta.env.VITE_BASE_URL),
     routes,
-    linkActiveClass: "active",
-    linkExactActiveClass: "",
-  });
+    linkActiveClass: 'active',
+    linkExactActiveClass: '',
+  })
 
-  addBeforeEach(router);
+  addBeforeEach(router)
 
-  return router;
+  return router
 }
 
 function addBeforeEach(router: Router) {
   router.beforeEach(async (to, from, next) => {
-    if (to.path.length > 1 && to.path.endsWith("/")) {
-      const newTo = { ...to };
-      newTo.path = to.path.slice(0, -1);
+    if (to.path.length > 1 && to.path.endsWith('/')) {
+      const newTo = { ...to }
+      newTo.path = to.path.slice(0, -1)
 
-      return next(newTo);
+      return next(newTo)
     }
 
-    const paramsLocale = to.params.locale as string;
-    if (paramsLocale !== "") {
+    const paramsLocale = to.params.locale as string
+    if (paramsLocale !== '') {
       if (!isSupportLocale(paramsLocale)) {
-        if (paramsLocale !== "page-not-found") {
+        if (paramsLocale !== 'page-not-found') {
           return next(
             createI18nRouteTo(
               {
-                name: "page-not-found", query: { returnUrl: to.path },
+                name: 'page-not-found',
+                query: { returnUrl: to.path },
               },
               guessDefaultLocale()
             )
-          );
+          )
         }
       } else if (paramsLocale !== getCurrentLocale()) {
-        await setLanguage(paramsLocale);
+        await setLanguage(paramsLocale)
       }
     } else {
-      const guessLocale = guessDefaultLocale();
+      const guessLocale = guessDefaultLocale()
       if (isShowLocaleInRoute(guessLocale)) {
-        if (to.name !== "page-not-found") {
-          return next("/" + guessLocale);
+        if (to.name !== 'page-not-found') {
+          return next('/' + guessLocale)
         }
       }
     }
 
-    callNext(next, to, from);
-  });
+    callNext(next, to, from)
+  })
 }
 
 function callNext(
@@ -68,12 +77,12 @@ function callNext(
   from: RouteLocationNormalizedLoadedGeneric
 ) {
   if (!import.meta.env.SSR && import.meta.env.VITE_YANDEX_METRIC_ID > 0) {
-    window.ym(parseInt(import.meta.env.VITE_YANDEX_METRIC_ID), "hit", to.path, {
+    window.ym(parseInt(import.meta.env.VITE_YANDEX_METRIC_ID), 'hit', to.path, {
       params: {
         referer: from.path,
       },
-    });
+    })
   }
 
-  next();
+  next()
 }

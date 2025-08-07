@@ -1,1 +1,1 @@
-export type SelectItemMap = { [key: number] : string }
+export type SelectItemMap = { [key: number]: string }

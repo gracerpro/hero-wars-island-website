@@ -2,81 +2,81 @@
 /* global HTMLElement */
 /* global setTimeout */
 
-import ClientOnly from "@/components/ClientOnly.vue";
-import { UserError } from "@/exceptions/UserError";
-import HeroClient from "@/api/HeroClient";
-import { ref, shallowReactive, onMounted, useTemplateRef } from "vue";
-import { useI18n } from "vue-i18n";
-import { TYPE_SUCCESS, TYPE_DANGER } from "@/components/toast";
-import { defineAsyncComponent } from "vue";
-import type { FeedbackData } from "@/api/FeedbackApi";
-import type { ComponentExposed } from "vue-component-type-helpers";
-import type ToastMessage from "@/components/ToastMessage.vue";
+import ClientOnly from '@/components/ClientOnly.vue'
+import { UserError } from '@/exceptions/UserError'
+import HeroClient from '@/api/HeroClient'
+import { ref, shallowReactive, onMounted, useTemplateRef } from 'vue'
+import { useI18n } from 'vue-i18n'
+import { TYPE_SUCCESS, TYPE_DANGER } from '@/components/toast'
+import { defineAsyncComponent } from 'vue'
+import type { FeedbackData } from '@/api/FeedbackApi'
+import type { ComponentExposed } from 'vue-component-type-helpers'
+import type ToastMessage from '@/components/ToastMessage.vue'
 
-const { t } = useI18n();
+const { t } = useI18n()
 
-const submiting = ref(false);
+const submiting = ref(false)
 
-const client = new HeroClient();
-const createdDate = new Date();
+const client = new HeroClient()
+const createdDate = new Date()
 
 if (!import.meta.env.SSR) {
-  defineAsyncComponent(() => import("@/components/ToastMessage.vue"));
+  defineAsyncComponent(() => import('@/components/ToastMessage.vue'))
 }
 
-const errorMessage = ref("");
+const errorMessage = ref('')
 const feedback = shallowReactive({
-  username: "",
-  email: "",
-  subject: "",
-  message: "",
-});
-const toastRef = useTemplateRef<ComponentExposed<typeof ToastMessage>>('toastRef');
-const formSubject = ref<HTMLElement | null>(null);
-const formId = "contactForm";
+  username: '',
+  email: '',
+  subject: '',
+  message: '',
+})
+const toastRef = useTemplateRef<ComponentExposed<typeof ToastMessage>>('toastRef')
+const formSubject = ref<HTMLElement | null>(null)
+const formId = 'contactForm'
 
 onMounted(() => {
   setTimeout(() => {
     if (formSubject.value) {
-      formSubject.value.focus();
+      formSubject.value.focus()
     }
-  }, 300);
-});
+  }, 300)
+})
 
 const onSubmit = () => {
   if (submiting.value) {
-    return;
+    return
   }
 
-  submiting.value = true;
+  submiting.value = true
 
   const data: FeedbackData = {
-     ...feedback,
-     contactEmail: "",
-    tempField: "1",
-    submitTimeInMs: new Date().getTime() - createdDate.getTime()
-  };
-  errorMessage.value = "";
+    ...feedback,
+    contactEmail: '',
+    tempField: '1',
+    submitTimeInMs: new Date().getTime() - createdDate.getTime(),
+  }
+  errorMessage.value = ''
 
   client.feedback
     .create(data)
     .then(() => {
-      feedback.message = "";
-      feedback.subject = "";
+      feedback.message = ''
+      feedback.subject = ''
 
-      toastRef.value?.show(t("page.contact.messageWasCreated"), TYPE_SUCCESS);
+      toastRef.value?.show(t('page.contact.messageWasCreated'), TYPE_SUCCESS)
     })
     .catch((error) => {
       if (error instanceof UserError) {
-        errorMessage.value = error.message;
-        toastRef.value?.show(error.message, TYPE_DANGER);
+        errorMessage.value = error.message
+        toastRef.value?.show(error.message, TYPE_DANGER)
       } else {
-        errorMessage.value = t("common.internalError");
-        throw error;
+        errorMessage.value = t('common.internalError')
+        throw error
       }
     })
-    .finally(() => (submiting.value = false));
-};
+    .finally(() => (submiting.value = false))
+}
 </script>
 
 <template>
@@ -88,7 +88,7 @@ const onSubmit = () => {
       <label
         class="form-label"
         :for="formId + '__subject'"
-        >{{ t("page.contact.theme") }}</label
+        >{{ t('page.contact.theme') }}</label
       >
       <input
         :id="formId + '__subject'"
@@ -103,7 +103,7 @@ const onSubmit = () => {
       <label
         :for="formId + '__message'"
         class="form-label"
-        >{{ t("page.contact.message") }}</label
+        >{{ t('page.contact.message') }}</label
       >
       <textarea
         :id="formId + '__message'"
@@ -119,7 +119,7 @@ const onSubmit = () => {
         <label
           :for="formId + '__username'"
           class="form-label"
-          >{{ t("page.contact.username") }}</label
+          >{{ t('page.contact.username') }}</label
         >
         <input
           :id="formId + '__username'"
@@ -132,14 +132,14 @@ const onSubmit = () => {
           :id="formId + '__username__help'"
           class="form-text"
         >
-          {{ t("page.contact.canBeEmpty") }}
+          {{ t('page.contact.canBeEmpty') }}
         </div>
       </div>
       <div class="col-lg-6 mb-3">
         <label
           :for="formId + '__email'"
           class="form-label"
-          >{{ t("page.contact.email") }}</label
+          >{{ t('page.contact.email') }}</label
         >
         <input
           :id="formId + '__email'"
@@ -153,7 +153,7 @@ const onSubmit = () => {
           :id="formId + '__email__help'"
           class="form-text"
         >
-          {{ t("page.contact.canBeEmpty") }}
+          {{ t('page.contact.canBeEmpty') }}
         </div>
       </div>
     </div>
@@ -179,7 +179,7 @@ const onSubmit = () => {
           class="spinner-border spinner-border-sm"
           aria-hidden="true"
         ></span>
-        {{ t("common.send") }}
+        {{ t('common.send') }}
       </button>
     </div>
 

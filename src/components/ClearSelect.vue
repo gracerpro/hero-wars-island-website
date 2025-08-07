@@ -2,33 +2,33 @@
 /* global Event */
 /* global HTMLSelectElement */
 
-import { computed } from "vue";
-import type { SelectItemMap } from "./select";
+import { computed } from 'vue'
+import type { SelectItemMap } from './select'
 
 interface Props {
-  inputId: string,
-  selectValues: SelectItemMap,
-  modelValue?: number | null,
+  inputId: string
+  selectValues: SelectItemMap
+  modelValue?: number | null
 }
 
 const props = withDefaults(defineProps<Props>(), {
   modelValue: null,
-});
+})
 const emit = defineEmits<{
-  "update:model-value": [value: number | null]
-}>();
+  'update:model-value': [value: number | null]
+}>()
 
-const EVENT_UPDATE_VALUE = "update:model-value";
+const EVENT_UPDATE_VALUE = 'update:model-value'
 
-const isDisabled = computed(() => props.modelValue === null || props.modelValue === 0);
+const isDisabled = computed(() => props.modelValue === null || props.modelValue === 0)
 
 const onChange = (event: Event) => {
   const target = event.target as HTMLSelectElement
-  emit(EVENT_UPDATE_VALUE, target.value === "" ? null : parseInt(target.value));
-};
+  emit(EVENT_UPDATE_VALUE, target.value === '' ? null : parseInt(target.value))
+}
 const onClear = () => {
-  emit(EVENT_UPDATE_VALUE, null);
-};
+  emit(EVENT_UPDATE_VALUE, null)
+}
 </script>
 
 <template>

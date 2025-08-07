@@ -3,34 +3,34 @@
 /* global HTMLInputElement  */
 
 interface Props {
-  inputId: string,
-  modelValue?: string,
-  modelModifiers?: object,
+  inputId: string
+  modelValue?: string
+  modelModifiers?: object
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  modelValue: "",
-  modelModifiers: () => ({})
-});
+  modelValue: '',
+  modelModifiers: () => ({}),
+})
 const emit = defineEmits<{
-  "update:model-value": [value: string]
-}>();
+  'update:model-value': [value: string]
+}>()
 
-const EVENT_UPDATE_VALUE = "update:model-value";
+const EVENT_UPDATE_VALUE = 'update:model-value'
 
 const onInput = (event: Event) => {
   const target = event.target as HTMLInputElement
-  let value = target.value;
+  let value = target.value
 
-  if ("trim" in props.modelModifiers) {
-    value = value.trim();
+  if ('trim' in props.modelModifiers) {
+    value = value.trim()
   }
 
-  emit(EVENT_UPDATE_VALUE, value);
-};
+  emit(EVENT_UPDATE_VALUE, value)
+}
 const onClear = () => {
-  emit(EVENT_UPDATE_VALUE, "");
-};
+  emit(EVENT_UPDATE_VALUE, '')
+}
 </script>
 
 <template>

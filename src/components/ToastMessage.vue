@@ -2,9 +2,9 @@
 /* global HTMLElement */
 /* global document */
 
-import { ref, computed } from "vue";
-import { type ToastType, TYPE_DANGER, TYPE_SUCCESS } from "./toast";
-import { Toast } from "bootstrap"; // TODO: test, must be dynamic
+import { ref, computed } from 'vue'
+import { type ToastType, TYPE_DANGER, TYPE_SUCCESS } from './toast'
+import { Toast } from 'bootstrap' // TODO: test, must be dynamic
 
 interface Props {
   elementId: string
@@ -15,48 +15,48 @@ const props = defineProps<Props>()
 let LocalToast: typeof Toast | null
 
 if (!import.meta.env.SSR) {
-  import("bootstrap").then((module) => (LocalToast = module.Toast));
+  import('bootstrap').then((module) => (LocalToast = module.Toast))
 }
 
-const toastMessage = ref("");
-const toastType = ref<ToastType>(TYPE_SUCCESS);
-const isShow = ref(false);
+const toastMessage = ref('')
+const toastType = ref<ToastType>(TYPE_SUCCESS)
+const isShow = ref(false)
 
 const classType = computed(() => {
   if (toastType.value === TYPE_SUCCESS) {
-    return "text-bg-success";
+    return 'text-bg-success'
   }
   if (toastType.value === TYPE_DANGER) {
-    return "text-bg-danger";
+    return 'text-bg-danger'
   }
-  return "";
-});
+  return ''
+})
 
 function show(message: string, type?: ToastType) {
-  toastMessage.value = message;
+  toastMessage.value = message
 
   if (type) {
-    toastType.value = type;
+    toastType.value = type
   }
 
-  const element = document.getElementById(props.elementId) as HTMLElement;
+  const element = document.getElementById(props.elementId) as HTMLElement
   element.addEventListener(Toast.Events.hide, () => (isShow.value = false), {
     once: true,
-  });
+  })
 
   if (LocalToast) {
     const toast = new LocalToast(element, {
       delay: 2000,
       autohide: true,
-    });
-    toast.show();
-    isShow.value = true;
+    })
+    toast.show()
+    isShow.value = true
   }
 }
 
 defineExpose({
   show,
-});
+})
 </script>
 
 <template>

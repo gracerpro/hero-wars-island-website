@@ -1,22 +1,22 @@
 <script setup lang="ts">
-import ModalDialog from "@/components/ModalDialog.vue";
-import { computed, useTemplateRef } from "vue";
-import { useI18n } from "vue-i18n";
-import { useShow } from "@/components/modal-dialog";
-import type { ComponentExposed } from "vue-component-type-helpers";
+import ModalDialog from '@/components/ModalDialog.vue'
+import { computed, useTemplateRef } from 'vue'
+import { useI18n } from 'vue-i18n'
+import { useShow } from '@/components/modal-dialog'
+import type { ComponentExposed } from 'vue-component-type-helpers'
 
-const { t } = useI18n();
+const { t } = useI18n()
 
-const dialogRef = useTemplateRef<ComponentExposed<typeof ModalDialog>>("dialogRef");
+const dialogRef = useTemplateRef<ComponentExposed<typeof ModalDialog>>('dialogRef')
 
-const { show, onMountedDialog } = useShow(dialogRef);
+const { show, onMountedDialog } = useShow(dialogRef)
 
-const dialogId = computed(() => "island-map-help-dialog")
-const formId = computed(() => dialogId.value + "__form")
+const dialogId = computed(() => 'island-map-help-dialog')
+const formId = computed(() => dialogId.value + '__form')
 
 defineExpose({
   show,
-});
+})
 </script>
 
 <template>
@@ -30,22 +30,22 @@ defineExpose({
       @vue:mounted="onMountedDialog"
     >
       <p>
-        {{ t("page.island.helpParagraph1") }}<br />
-        {{ t("page.island.helpParagraph2") }}<br />
-        {{ t("page.island.keyboardParagraph") }}<br />
-        {{ t("page.island.helpFullscreenExit") }}<br />
-        {{ t("page.island.helpKeyboard") }}<br />
+        {{ t('page.island.helpParagraph1') }}<br />
+        {{ t('page.island.helpParagraph2') }}<br />
+        {{ t('page.island.keyboardParagraph') }}<br />
+        {{ t('page.island.helpFullscreenExit') }}<br />
+        {{ t('page.island.helpKeyboard') }}<br />
       </p>
-      <h4>{{ t("common.node", 2) }}</h4>
+      <h4>{{ t('common.node', 2) }}</h4>
       <ul class="list-unstyled">
-        <li><span class="node-box node-start"></span>{{ t("common.startNode") }}</li>
-        <li><span class="node-box node"></span>{{ t("page.island.oneResource") }}</li>
-        <li><span class="node-box node-tower"></span>{{ t("common.tower") }}</li>
-        <li><span class="node-box node-wood"></span>{{ t("common.wood") }}</li>
-        <li><span class="node-box node-chest"></span>{{ t("common.chest") }}</li>
-        <li><span class="node-box node-blocker"></span>{{ t("common.blockerExNames") }}</li>
-        <li><span class="node-box -warning"></span>{{ t("common.warningCellDescription") }}</li>
-        <li><span class="node-box node-bubble"></span>{{ t("common.bubbleName") }}</li>
+        <li><span class="node-box node-start"></span>{{ t('common.startNode') }}</li>
+        <li><span class="node-box node"></span>{{ t('page.island.oneResource') }}</li>
+        <li><span class="node-box node-tower"></span>{{ t('common.tower') }}</li>
+        <li><span class="node-box node-wood"></span>{{ t('common.wood') }}</li>
+        <li><span class="node-box node-chest"></span>{{ t('common.chest') }}</li>
+        <li><span class="node-box node-blocker"></span>{{ t('common.blockerExNames') }}</li>
+        <li><span class="node-box -warning"></span>{{ t('common.warningCellDescription') }}</li>
+        <li><span class="node-box node-bubble"></span>{{ t('common.bubbleName') }}</li>
       </ul>
     </modal-dialog>
   </suspense>

@@ -1,9 +1,9 @@
-import { createI18nRouteTo, guessDefaultLocale } from "@/i18n/translation";
-import type { RouteRecordInfo, RouteRecordRaw } from "vue-router";
+import { createI18nRouteTo, guessDefaultLocale } from '@/i18n/translation'
+import type { RouteRecordInfo, RouteRecordRaw } from 'vue-router'
 
 export interface RouteNamedMap {
   locale: {
-    path: "/:locale?",
+    path: '/:locale?'
     children: {
       home: RouteRecordInfo<
         // here we have the same name
@@ -17,141 +17,121 @@ export interface RouteNamedMap {
         Record<never, never>,
         // this is a union of all children route names, in this case, there are none
         never
-      >,
-      about: RouteRecordInfo<
-        "about",
-        "/about",
-        Record<never, never>,
-        Record<never, never>,
-        never
-      >,
+      >
+      about: RouteRecordInfo<'about', '/about', Record<never, never>, Record<never, never>, never>
       contact: RouteRecordInfo<
-        "contact",
-        "/contact",
+        'contact',
+        '/contact',
         Record<never, never>,
         Record<never, never>,
         never
-      >,
-      "island-view": RouteRecordInfo<
-        "island-view",
-        "/islands/:id(\\d+)",
+      >
+      'island-view': RouteRecordInfo<
+        'island-view',
+        '/islands/:id(\\d+)',
         { id: number | string },
         { id: string },
         never
-      >,
-      help: RouteRecordInfo<
-        "help",
-        "/help",
-        Record<never, never>,
-        Record<never, never>,
-        never
-      >,
-      news: RouteRecordInfo<
-        "news",
-        "/news",
-        Record<never, never>,
-        Record<never, never>,
-        never
-      >,
-      "news-view": RouteRecordInfo<
-        "news-view",
-        "/news/:slug([a-zA-Z0-9\\-]+)",
+      >
+      help: RouteRecordInfo<'help', '/help', Record<never, never>, Record<never, never>, never>
+      news: RouteRecordInfo<'news', '/news', Record<never, never>, Record<never, never>, never>
+      'news-view': RouteRecordInfo<
+        'news-view',
+        '/news/:slug([a-zA-Z0-9\\-]+)',
         { slug: string },
         { slug: string },
         never
-      >,
-      "page-not-found": RouteRecordInfo<
-        "page-not-found",
-        "/page-not-found",
+      >
+      'page-not-found': RouteRecordInfo<
+        'page-not-found',
+        '/page-not-found',
         Record<never, never>,
         Record<never, never>,
         never
-      >,
-      "internal-server-error": RouteRecordInfo<
-        "internal-server-error",
-        "/internal-server-error",
+      >
+      'internal-server-error': RouteRecordInfo<
+        'internal-server-error',
+        '/internal-server-error',
         Record<never, never>,
         Record<never, never>,
         never
-      >,
+      >
     }
-  },
+  }
 }
 
 // Last, you will need to augment the Vue Router types with this map of routes
 declare module 'vue-router' {
   // TODO: typed routes
- /* interface TypesConfig {
+  /* interface TypesConfig {
     RouteNamedMap: RouteNamedMap
   }*/
 }
 
 const routes: Array<RouteRecordRaw> = [
   {
-    path: "/:locale?",
+    path: '/:locale?',
     children: [
       {
-        path: "",
-        name: "home",
+        path: '',
+        name: 'home',
         // route level code-splitting
         // this generates a separate chunk (about.[hash].js) for this route
         // which is lazy-loaded when the route is visited.
-        component: () => import("../views/TheHome.vue"),
+        component: () => import('../views/TheHome.vue'),
       },
       {
-        path: "about",
-        name: "about",
-        component: () => import("../views/TheAbout.vue"),
+        path: 'about',
+        name: 'about',
+        component: () => import('../views/TheAbout.vue'),
       },
       {
-        path: "contact",
-        name: "contact",
-        component: () => import("../views/TheContact.vue"),
+        path: 'contact',
+        name: 'contact',
+        component: () => import('../views/TheContact.vue'),
       },
       {
-        path: "islands/:id(\\d+)",
-        name: "island",
-        component: () => import("../views/TheIsland.vue"),
+        path: 'islands/:id(\\d+)',
+        name: 'island',
+        component: () => import('../views/TheIsland.vue'),
       },
       {
-        path: "help",
-        name: "help",
-        component: () => import("../views/TheHelp.vue"),
+        path: 'help',
+        name: 'help',
+        component: () => import('../views/TheHelp.vue'),
       },
       {
-        path: "news",
-        name: "news",
-        component: () => import("../views/TheNews.vue"),
+        path: 'news',
+        name: 'news',
+        component: () => import('../views/TheNews.vue'),
       },
       {
-        path: "news/:slug([a-zA-Z0-9\\-]+)",
-        name: "newsView",
-        component: () => import("../views/TheNewsView.vue"),
+        path: 'news/:slug([a-zA-Z0-9\\-]+)',
+        name: 'newsView',
+        component: () => import('../views/TheNewsView.vue'),
       },
       {
-        path: "page-not-found",
-        name: "page-not-found",
-        component: () => import("../views/status-pages/ThePageNotFound.vue"),
+        path: 'page-not-found',
+        name: 'page-not-found',
+        component: () => import('../views/status-pages/ThePageNotFound.vue'),
       },
       {
-        path: "internal-server-error",
-        name: "internal-server-error",
-        component: () => import("../views/status-pages/TheInternalServerError.vue"),
+        path: 'internal-server-error',
+        name: 'internal-server-error',
+        component: () => import('../views/status-pages/TheInternalServerError.vue'),
       },
     ],
   },
   {
     // [Vue Router warn]: Discarded invalid param(s) "catchAll" when navigating. See https://github.com/vuejs/router/blob/main/packages/router/CHANGELOG.md#414-2022-08-22 for more details
-    path: "/:catchAll(.*)",
+    path: '/:catchAll(.*)',
     redirect: (to) => {
       return createI18nRouteTo(
-        { name: "page-not-found", query: { returnUrl: to.path } },
+        { name: 'page-not-found', query: { returnUrl: to.path } },
         guessDefaultLocale()
       )
     },
   },
-] as const;
+] as const
 
-export {
-  routes
-}
+export { routes }

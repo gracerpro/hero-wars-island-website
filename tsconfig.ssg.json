@@ -3,4 +3,7 @@
   "files": [
     "prerender.ts",
   ],
+  "compilerOptions": {
+    "allowJs": true
+  }
 }

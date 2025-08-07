@@ -1,37 +1,37 @@
 <script setup lang="ts">
-import { useI18n } from "vue-i18n";
-import { getRegionTitle } from "./island";
-import type { Region } from "@/api/IslandApi";
-import { EVENT_RESET_REGION_NUMBERS, EVENT_UPDATE_REGION_NUMBERS } from "./toolbar";
+import { useI18n } from 'vue-i18n'
+import { getRegionTitle } from './island'
+import type { Region } from '@/api/IslandApi'
+import { EVENT_RESET_REGION_NUMBERS, EVENT_UPDATE_REGION_NUMBERS } from './toolbar'
 
 interface Props {
-  regions: Array<Region>,
-  regionNumbers: Array<number>,
-  loading: boolean,
+  regions: Array<Region>
+  regionNumbers: Array<number>
+  loading: boolean
 }
 
-const props = defineProps<Props>();
+const props = defineProps<Props>()
 const emit = defineEmits<{
-  "update:region-numbers": [value: Array<number>],
-  "reset-region-numbers": []
+  'update:region-numbers': [value: Array<number>]
+  'reset-region-numbers': []
 }>()
 
-const { t } = useI18n();
+const { t } = useI18n()
 
 function onChangeNumber(region: Region) {
   if (!region.isVisible) {
-    return;
+    return
   }
-  const numbers = props.regionNumbers;
-  const index = numbers.indexOf(region.number);
+  const numbers = props.regionNumbers
+  const index = numbers.indexOf(region.number)
 
   if (index >= 0) {
-    numbers.splice(index, 1);
+    numbers.splice(index, 1)
   } else {
-    numbers.push(region.number);
+    numbers.push(region.number)
   }
 
-  emit(EVENT_UPDATE_REGION_NUMBERS, numbers);
+  emit(EVENT_UPDATE_REGION_NUMBERS, numbers)
 }
 </script>
 

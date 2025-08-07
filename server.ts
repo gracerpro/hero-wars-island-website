@@ -1,18 +1,16 @@
 import fs from 'node:fs/promises'
 import express, { type Request, type Response } from 'express'
-import { type AppSsrManifest, getHtml, type RenderFun } from "./src/server-common.ts";
-import { HttpError } from './src/exceptions/HttpError.ts';
-import type { ViteDevServer } from 'vite';
+import { type AppSsrManifest, getHtml, type RenderFun } from './src/server-common.ts'
+import { HttpError } from './src/exceptions/HttpError.ts'
+import type { ViteDevServer } from 'vite'
 
 // Constants
-const isProduction = process.env.NODE_ENV === 'production';
-const port = 8082;
-const base = '/';
+const isProduction = process.env.NODE_ENV === 'production'
+const port = 8082
+const base = '/'
 
 // Cached production assets
-const templateHtml = isProduction
-  ? await fs.readFile('./dist/client/index.html', 'utf-8')
-  : ''
+const templateHtml = isProduction ? await fs.readFile('./dist/client/index.html', 'utf-8') : ''
 
 let ssrManifest: AppSsrManifest | undefined
 
@@ -20,11 +18,10 @@ if (isProduction) {
   const json = await fs.readFile('./dist/client/.vite/ssr-manifest.json', 'utf-8')
   ssrManifest = JSON.parse(json)
 
-  if (typeof ssrManifest !== "object") {
-    throw new Error("ssr-manifest.json is not object.")
+  if (typeof ssrManifest !== 'object') {
+    throw new Error('ssr-manifest.json is not object.')
   }
 }
-
 
 // Create http server
 const app = express()
@@ -37,7 +34,7 @@ if (!isProduction) {
   vite = await createServer({
     server: { middlewareMode: true },
     appType: 'custom',
-    base
+    base,
   })
   app.use(vite.middlewares)
 } else {
@@ -50,11 +47,11 @@ if (!isProduction) {
 // Serve HTML
 app.use(async (request: Request, response: Response) => {
   try {
-    const url = request.originalUrl.replace(base, '');
+    const url = request.originalUrl.replace(base, '')
 
-    console.log("recieve url:", url);
+    console.log('recieve url:', url)
 
-    const { html, statusCode } = await getAppHtml(url, ssrManifest);
+    const { html, statusCode } = await getAppHtml(url, ssrManifest)
 
     response.status(statusCode).set({ 'Content-Type': 'text/html; charset=UTF-8' }).send(html)
   } catch (e: unknown) {
@@ -72,7 +69,7 @@ app.use(async (request: Request, response: Response) => {
     if (e instanceof Error) {
       response.end(e.stack)
     } else {
-      response.end("error")
+      response.end('error')
     }
   }
 })
@@ -80,11 +77,11 @@ app.use(async (request: Request, response: Response) => {
 // Start http server
 app.listen(port, () => {
   console.log(`Server started at http://localhost:${port}`)
-});
+})
 
 async function getAppHtml(url: string, manifest?: AppSsrManifest) {
-  let template: string;
-  let render: RenderFun;
+  let template: string
+  let render: RenderFun
 
   if (!isProduction) {
     // Always read fresh template in development
@@ -108,16 +105,15 @@ async function getAppHtml(url: string, manifest?: AppSsrManifest) {
     //const runtime = await vite.createViteRuntime(server)
     //const { render } = await runtime.executeEntrypoint('/src/entry-server.js')
   } else {
-    template = templateHtml;
+    template = templateHtml
 
-    const moduleName = "./dist/server/entry-server.js"
-    render = (await import(moduleName)).render
+    render = (await import('./dist/server/entry-server.js')).render
   }
 
   return getHtml({
     url,
     manifest,
     template,
-    render
-  });
+    render,
+  })
 }

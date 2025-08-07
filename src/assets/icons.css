@@ -14,23 +14,23 @@
   mask-size: contain;
   background-color: #000000;
 }
-[data-bs-theme="dark"] .hero-color-icon {
+[data-bs-theme='dark'] .hero-color-icon {
   background-color: #ffffff;
 }
 
 .item-wood {
-  mask-image: url("/icons/items/wood.svg");
+  mask-image: url('/icons/items/wood.svg');
 }
 .item-explorer-move {
-  mask-image: url("/icons/items/exporer-move.svg");
+  mask-image: url('/icons/items/exporer-move.svg');
 }
 .item-emerald {
-  mask-image: url("/icons/items/emerald.svg");
+  mask-image: url('/icons/items/emerald.svg');
 }
 
 .hero-download {
   background-color: #ffffff;
   mask-size: cover;
-  mask-image: url("/icons/download.svg");
+  mask-image: url('/icons/download.svg');
   mask-repeat: no-repeat;
 }

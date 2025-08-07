@@ -1,44 +1,44 @@
 <script setup lang="ts">
 /* global HTMLElement */
 
-import { useI18n } from "vue-i18n";
-import { ref, onMounted } from "vue";
-import HeroClient from "@/api/HeroClient";
-import SwitchLanguage from "./SwitchLanguage.vue";
-import { createI18nRouteTo } from "@/i18n/translation";
-import { useStore } from "vuex";
-import SwitchTheme from "./SwitchTheme.vue";
-import { IS_SHOW_MENU_MUTATION } from "@/store/mutation-types";
-import { type Island } from "@/api/IslandApi";
+import { useI18n } from 'vue-i18n'
+import { ref, onMounted } from 'vue'
+import HeroClient from '@/api/HeroClient'
+import SwitchLanguage from './SwitchLanguage.vue'
+import { createI18nRouteTo } from '@/i18n/translation'
+import { useStore } from 'vuex'
+import SwitchTheme from './SwitchTheme.vue'
+import { IS_SHOW_MENU_MUTATION } from '@/store/mutation-types'
+import { type Island } from '@/api/IslandApi'
 
-const { t } = useI18n();
-const store = useStore();
+const { t } = useI18n()
+const store = useStore()
 
-const actualIsland = ref<Island | null>(null);
-const navbarNav = ref<HTMLElement | null>(null);
+const actualIsland = ref<Island | null>(null)
+const navbarNav = ref<HTMLElement | null>(null)
 
 onMounted(() => {
-  const client = new HeroClient();
+  const client = new HeroClient()
 
   client.island.getActual().then((island) => {
-    actualIsland.value = island;
-  });
+    actualIsland.value = island
+  })
 
   if (!import.meta.env.SSR) {
-    import("bootstrap").then(({ Collapse }) => {
+    import('bootstrap').then(({ Collapse }) => {
       const nav = navbarNav.value as HTMLElement
 
       nav.addEventListener(Collapse.Events.hide, () => {
-        store.commit(IS_SHOW_MENU_MUTATION, false);
-      });
+        store.commit(IS_SHOW_MENU_MUTATION, false)
+      })
       nav.addEventListener(Collapse.Events.show, () => {
-        store.commit(IS_SHOW_MENU_MUTATION, true);
-      });
+        store.commit(IS_SHOW_MENU_MUTATION, true)
+      })
 
-      new Collapse(nav, { toggle: store.state.isShowMenu });
-    });
+      new Collapse(nav, { toggle: store.state.isShowMenu })
+    })
   }
-});
+})
 </script>
 
 <template>
@@ -64,7 +64,7 @@ onMounted(() => {
           <router-link
             :to="createI18nRouteTo({ name: 'home' })"
             class="nav-link"
-            >{{ t("common.homePage") }}</router-link
+            >{{ t('common.homePage') }}</router-link
           >
           <router-link
             v-if="actualIsland"
@@ -75,27 +75,27 @@ onMounted(() => {
               })
             "
             class="nav-link"
-            >{{ t("common.actualIsland") }}</router-link
+            >{{ t('common.actualIsland') }}</router-link
           >
           <router-link
             :to="createI18nRouteTo({ name: 'contact' })"
             class="nav-link"
-            >{{ t("common.contacts") }}</router-link
+            >{{ t('common.contacts') }}</router-link
           >
           <router-link
             :to="createI18nRouteTo({ name: 'news' })"
             class="nav-link"
-            >{{ t("common.news") }}</router-link
+            >{{ t('common.news') }}</router-link
           >
           <router-link
             :to="createI18nRouteTo({ name: 'about' })"
             class="nav-link"
-            >{{ t("common.about") }}</router-link
+            >{{ t('common.about') }}</router-link
           >
           <router-link
             :to="createI18nRouteTo({ name: 'help' })"
             class="nav-link"
-            >{{ t("common.help") }}</router-link
+            >{{ t('common.help') }}</router-link
           >
         </div>
       </div>
