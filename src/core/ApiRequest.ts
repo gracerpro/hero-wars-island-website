@@ -1,7 +1,26 @@
 import { HttpError } from '@/exceptions/HttpError'
 import { UserError } from '@/exceptions/UserError'
+import { isObject } from '@/helpers/core'
 
 type BeforeRequestCallback = (request: ApiRequest) => void
+
+interface AppResponse {
+  status: number,
+  ok: boolean,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  json: () => Promise<any>;
+}
+
+interface AppRequestInit {
+  method: string
+  redirect: RequestRedirect,
+  headers: Headers,
+}
+
+interface ErrorResponse {
+  isClientSafe?: boolean,
+  message?: string,
+}
 
 class ApiRequest {
   private readonly backendUrl: string = import.meta.env.VITE_BACKEND_API_URL
@@ -33,8 +52,13 @@ class ApiRequest {
 
     if (!response.ok) {
       if (response.status >= 400) {
-        const data = await response.json()
-        const message = typeof data === 'object' ? data.message : null
+        let data = (await response.json()) as ErrorResponse
+
+        if (!isObject(data)) {
+          data = {}
+        }
+
+        const message = data.message ?? 'Http error ' + response.status
 
         if (data.isClientSafe) {
           throw new UserError(message)
@@ -63,8 +87,12 @@ class ApiRequest {
 
     if (!response.ok) {
       if (response.status >= 400) {
-        const data = await response.json()
-        const message = typeof data === 'object' ? data.message : null
+        let data = (await response.json()) as ErrorResponse
+
+        if (!isObject(data)) {
+          data = {}
+        }
+        const message = data.message ?? 'Http error ' + response.status
 
         if (data.isClientSafe) {
           throw new UserError(message)
@@ -79,7 +107,7 @@ class ApiRequest {
     return response.json()
   }
 
-  private getOptions(method: string): RequestInit {
+  private getOptions(method: string): AppRequestInit {
     const headers = new Headers({
       'Content-Type': 'application/json; charset=UTF-8',
       Accept: 'application/json',
@@ -96,15 +124,14 @@ class ApiRequest {
     }
   }
 
-  private async fetch(url: string, init?: RequestInit): Promise<Response> {
-    let result: Response
+  private async fetch(url: string, init?: AppRequestInit): Promise<AppResponse> {
+    let result: AppResponse
 
     if (import.meta.env.SSR) {
-      // const fetchModule = await import('node-fetch')
-      // result = await fetchModule.default(url, init)
-      throw new Error('TODO: fetch on server')
+      const fetchModule = await import('node-fetch')
+      result = (await fetchModule.default(url, init)) as AppResponse
     } else {
-      result = await window.fetch(url, init)
+      result = (await window.fetch(url, init)) as AppResponse
     }
 
     return result
