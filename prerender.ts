@@ -84,7 +84,7 @@ async function readUrlsFromView(): Promise<Array<string>> {
     [NAME_ISLAND]: true,
     [NAME_NEWS_VIEW]: true,
   };
-  const urls = [];
+  const urls: Array<string> = [];
   const files = fs.readdirSync("./src/views", { withFileTypes: true, recursive: false });
 
   for (let i = 0; i < files.length; ++i) {
@@ -198,7 +198,7 @@ async function loadListNames(
   pageSize: number,
   modifyItemFun: ModifyItemFun
 ): Promise<Array<string>> {
-  const resultNames = [];
+  const resultNames: Array<string> = [];
   const maxIteration = 50;
 
   for (let pageNumber = 1; ; ++pageNumber) {
