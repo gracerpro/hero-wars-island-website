@@ -25,7 +25,7 @@ export async function getNodesMap(
 
   try {
     if (!isLoadFromServer) {
-      nodesList = await getNodesFromCache(island)
+      nodesList = await readNodesFromCache(island)
     }
   } catch (error) {
     console.error(error) // TODO: log it
@@ -51,7 +51,7 @@ export async function getNodesMap(
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-function isNodeList(data: any): boolean {
+function isNodeListVersion2(data: any): boolean {
   return (
     data.nodes &&
     typeof data.nodes === 'object' &&
@@ -128,7 +128,7 @@ async function writeNodesToCache(
   })
 }
 
-async function getNodesFromCache(island: Island): Promise<IslandNodeList | null> {
+async function readNodesFromCache(island: Island): Promise<IslandNodeList | null> {
   const db = await openDb()
 
   return new Promise((resolve, reject) => {
@@ -140,7 +140,7 @@ async function getNodesFromCache(island: Island): Promise<IslandNodeList | null>
       let nodesList = request.result?.nodeList
       console.log('nodesList from db', nodesList)
 
-      if (!isNodeList(nodesList)) {
+      if (!isNodeListVersion2(nodesList)) {
         nodesList = null
       }
 

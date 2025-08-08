@@ -18,15 +18,13 @@ export default [
       "**/*.d.ts",
       "*.config.js",
       "vite.config.ts",
-      "prerender.js",
-      "server.js"
     ],
   },
   js.configs.recommended,
   ...tsEslint.configs.recommended,
   ...eslintPluginVue.configs['flat/recommended'],
   {
-    files: ["src/**/*.ts", "tests/**/*.ts"],
+    files: ["src/**/*.ts", "tests/**/*.ts", "server.ts", "prerender.ts"],
     languageOptions: {
       parser: tsEslint.parser,
       globals: {
