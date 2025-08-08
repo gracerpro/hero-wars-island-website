@@ -2,13 +2,17 @@ import { nextTick } from 'vue'
 import { useI18n } from '@/i18n'
 import type { RouteLocationAsRelativeGeneric } from 'vue-router'
 
-function getDefaultLocale(): string {
-  return import.meta.env.VITE_DEFAULT_LOCALE
+interface NavigatorWithUserLanguage extends Navigator {
+  userLanguage?: string
 }
 
 export type LocaleLabel = {
   locale: string
   label: string
+}
+
+function getDefaultLocale(): string {
+  return import.meta.env.VITE_DEFAULT_LOCALE
 }
 
 export function getLocalesLabels(): Array<LocaleLabel> {
@@ -140,7 +144,8 @@ function getUserLocale(): string {
   let locale
 
   if (!import.meta.env.SSR) {
-    locale = window.navigator.language /* TODO: || window.navigator.userLanguage; */
+    locale =
+      window.navigator.language || (window.navigator as NavigatorWithUserLanguage).userLanguage
   }
   if (locale) {
     locale = locale.toLowerCase()
