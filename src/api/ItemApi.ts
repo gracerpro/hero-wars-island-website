@@ -19,6 +19,11 @@ export const TYPE_AVATAR_FRAME = 13
 export const TYPE_STAMINA = 14
 
 export type Type = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14
+const allTypes = new Set<number>([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14])
+
+export function isType(a: number): a is Type {
+  return allTypes.has(a as Type)
+}
 
 export const GAME_ID_EXPLORER_MOVE = 41
 export const GAME_ID_WOOD = 53
@@ -99,7 +104,7 @@ export function modifyItem(data: any): Item {
   return {
     id: data.id,
     name: data.name,
-    type: data.typeId ?? TYPE_UNKNOWN, // TODO: validate type?
+    type: isType(data.typeId) ? data.typeId : TYPE_UNKNOWN,
     gameId: data.gameId ?? null,
     gameType: data.gameType ?? null,
     iconUrl: data.iconUrl ?? null,
