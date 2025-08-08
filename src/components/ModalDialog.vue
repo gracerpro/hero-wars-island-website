@@ -2,27 +2,16 @@
 /* global HTMLElement */
 /* global document */
 
-import { Modal } from 'bootstrap' // TODO: test, must be dynamic
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { DialogResult } from './modal-dialog'
+import type { Modal } from 'bootstrap'
 
 const { t } = useI18n()
-
-defineExpose({
-  show,
-  hide,
-})
 
 let moduleResolve: (value: DialogResult) => void
 let modal: Modal | null = null
 let dialogResult: DialogResult = null
-
-if (!import.meta.env.SSR) {
-  // Load bootstrap module asynchronously else get an error on SSR
-  // ReferenceError: document is not defined
-  //(await import("bootstrap")).Modal;
-}
 
 interface Props {
   elementId: string
@@ -30,7 +19,7 @@ interface Props {
   saving?: boolean
   header?: string
   submitButtonText?: string
-  size?: string
+  size?: 'sm' | 'lg' | 'xl'
   isShowSubmit?: boolean
   initResult?: object | number | string | null
 }
@@ -61,10 +50,12 @@ const hideDialog = () => {
   moduleResolve(dialogResult)
 }
 
-function show() {
+async function show(): Promise<unknown> {
   if (modal) {
     throw new Error('The modal dialog is already open.')
   }
+
+  const module = await import('bootstrap')
 
   let promise = new Promise((resolve) => {
     moduleResolve = resolve
@@ -72,7 +63,7 @@ function show() {
 
   const modalElement = document.getElementById(props.elementId) as HTMLElement
   modalElement.addEventListener(
-    Modal.Events.hidden,
+    'hidden.bs.modal',
     () => {
       hideDialog()
     },
@@ -81,7 +72,7 @@ function show() {
 
   dialogResult = props.initResult
 
-  modal = new Modal(modalElement, {})
+  modal = new module.Modal(modalElement)
   modal.show()
 
   return promise
@@ -90,6 +81,11 @@ function show() {
 function hide() {
   modal?.hide()
 }
+
+defineExpose({
+  show,
+  hide,
+})
 </script>
 
 <template>

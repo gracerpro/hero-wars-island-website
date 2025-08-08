@@ -27,7 +27,7 @@ const classType = computed(() => {
 })
 
 async function loadToast(): Promise<typeof Toast> {
-  return (await (import('bootstrap'))).Toast
+  return (await import('bootstrap')).Toast
 }
 
 function show(message: string, type?: ToastType) {

@@ -5,21 +5,21 @@ import { isObject } from '@/helpers/core'
 type BeforeRequestCallback = (request: ApiRequest) => void
 
 interface AppResponse {
-  status: number,
-  ok: boolean,
+  status: number
+  ok: boolean
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  json: () => Promise<any>;
+  json: () => Promise<any>
 }
 
 interface AppRequestInit {
   method: string
-  redirect: RequestRedirect,
-  headers: Headers,
+  redirect: RequestRedirect
+  headers: Headers
 }
 
 interface ErrorResponse {
-  isClientSafe?: boolean,
-  message?: string,
+  isClientSafe?: boolean
+  message?: string
 }
 
 class ApiRequest {

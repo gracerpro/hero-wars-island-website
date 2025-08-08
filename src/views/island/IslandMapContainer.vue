@@ -20,14 +20,7 @@ import {
   TYPE_BUBBLE,
   type Node,
 } from '@/api/NodeApi'
-import {
-  ref,
-  shallowRef,
-  computed,
-  onMounted,
-  onUnmounted,
-  useTemplateRef,
-} from 'vue'
+import { ref, shallowRef, computed, onMounted, onUnmounted, useTemplateRef } from 'vue'
 import {
   TRANSLATE_X,
   TRANSLATE_Y,

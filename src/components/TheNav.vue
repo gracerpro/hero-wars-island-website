@@ -30,7 +30,7 @@ onMounted(() => {
 })
 
 async function InitCollapse(navElement: HTMLElement) {
-  const module = (await import('bootstrap'))
+  const module = await import('bootstrap')
 
   navElement.addEventListener('hide.bs.collapse', () => {
     store.commit(IS_SHOW_MENU_MUTATION, false)

@@ -7,7 +7,7 @@ export interface DialogShow {
 
 export type DialogResult = object | number | string | null
 
-export function useShow(refDialog: Ref): DialogShow {
+export function useShow(refDialog: Ref /* Ref<typeof ModalDialog> */): DialogShow {
   let moduleResolve: (value: unknown) => void
 
   const show = () => {
@@ -17,7 +17,9 @@ export function useShow(refDialog: Ref): DialogShow {
   }
 
   const onMountedDialog = () => {
-    moduleResolve(refDialog.value.show())
+    refDialog.value.show().then((result: DialogResult) => {
+      moduleResolve(result)
+    })
   }
 
   return {

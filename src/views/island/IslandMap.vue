@@ -501,11 +501,16 @@ function loadState() {
   }
 
   filter = tmpFilter
-  isShowQuantity.value = typeof stateData.isShowQuantity === "boolean" ? stateData.isShowQuantity : true
-  isShowRewardsBlock.value = typeof stateData.isShowRewardsBlock === "boolean" ? stateData.isShowRewardsBlock : true
-  isShowUserRewardsBlock.value = typeof stateData.isShowUserRewardsBlock === "boolean" ? stateData.isShowUserRewardsBlock : true
-  isShowGroupRewards.value = typeof stateData.isShowGroupRewards === "boolean" ? stateData.isShowGroupRewards : false
-  isSelectAnyNode.value = typeof stateData.isSelectAnyNode === "boolean" ? stateData.isSelectAnyNode : true
+  isShowQuantity.value =
+    typeof stateData.isShowQuantity === 'boolean' ? stateData.isShowQuantity : true
+  isShowRewardsBlock.value =
+    typeof stateData.isShowRewardsBlock === 'boolean' ? stateData.isShowRewardsBlock : true
+  isShowUserRewardsBlock.value =
+    typeof stateData.isShowUserRewardsBlock === 'boolean' ? stateData.isShowUserRewardsBlock : true
+  isShowGroupRewards.value =
+    typeof stateData.isShowGroupRewards === 'boolean' ? stateData.isShowGroupRewards : false
+  isSelectAnyNode.value =
+    typeof stateData.isSelectAnyNode === 'boolean' ? stateData.isSelectAnyNode : true
 }
 
 function saveState() {
