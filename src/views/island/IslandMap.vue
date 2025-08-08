@@ -1,6 +1,4 @@
 <script setup lang="ts">
-/* global window */
-/* global Event */
 /* global localStorage */
 
 import IslandMapLoading from './IslandMapLoading.vue'
@@ -33,6 +31,7 @@ import type { Island } from '@/api/IslandApi'
 import type { ViewNodeReward, UserNodeIds, ViewReward, SelectMode } from './map'
 import { getUnknownItem, type ItemMap, type Type } from '@/api/ItemApi'
 import type { ComponentExposed } from 'vue-component-type-helpers'
+import { AddOnBeforeUnload, RemoveOnBeforeUnload } from '@/helpers/event'
 
 interface Props {
   island: Island
@@ -190,20 +189,16 @@ const disableNodesCount = computed(() => disableNodesIds.value.size)
 loadState()
 
 onMounted(() => {
-  window.addEventListener('beforeunload', onBeforeUnload)
+  AddOnBeforeUnload(onBeforeUnload)
   reloadMap()
 })
 onUnmounted(() => {
-  window.removeEventListener('beforeunload', onBeforeUnload)
+  RemoveOnBeforeUnload(onBeforeUnload)
   saveState()
 })
 
-function onBeforeUnload(event: Event): string {
-  event.returnValue = false
-
+function onBeforeUnload() {
   saveState()
-
-  return ''
 }
 
 async function loadNodes(isForce: boolean): Promise<IslandNodeList> {
