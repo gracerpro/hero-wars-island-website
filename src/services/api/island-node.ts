@@ -27,8 +27,12 @@ export async function getNodesMap(
     if (!isLoadFromServer) {
       nodesList = await readNodesFromCache(island)
     }
+    if (!isNodeListVersion2(nodesList)) {
+      nodesList = null
+    }
   } catch (error) {
     console.error(error) // TODO: log it
+    nodesList = null
   }
 
   if (nodesList === null || nodesList === undefined) {
@@ -37,6 +41,10 @@ export async function getNodesMap(
     if (isEmptyFilter) {
       writeNodesToCache(island, nodesList)
       savePreviousUpdatedAt(island)
+    }
+
+    if (!isNodeListVersion2(nodesList)) {
+      nodesList = null
     }
   }
   if (nodesList === null || nodesList === undefined) {
@@ -137,12 +145,7 @@ async function readNodesFromCache(island: Island): Promise<IslandNodeList | null
     const request = nodeStore.get(island.id)
 
     request.onsuccess = () => {
-      let nodesList = request.result?.nodeList
-      console.log('nodesList from db', nodesList)
-
-      if (!isNodeListVersion2(nodesList)) {
-        nodesList = null
-      }
+      const nodesList = request.result?.nodeList
 
       resolve(nodesList)
     }
