@@ -62,7 +62,7 @@ export type NodeFilter = {
 
 export type IslandNodeList = {
   nodes: NodeMap
-  totalCount: number
+  nodesTotalCount: number
   rewards: ItemMap
 }
 
@@ -107,7 +107,7 @@ export class NodeApi {
 
     return {
       nodes,
-      totalCount,
+      nodesTotalCount: totalCount,
       rewards,
     }
   }

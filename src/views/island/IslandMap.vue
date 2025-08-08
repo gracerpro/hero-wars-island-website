@@ -204,7 +204,7 @@ function onBeforeUnload() {
 async function loadNodes(isForce: boolean): Promise<IslandNodeList> {
   let nodeList: IslandNodeList = {
     nodes: new Map<number, Node>(),
-    totalCount: 0,
+    nodesTotalCount: 0,
     rewards: {},
   }
   let filter: NodeFilter = {}

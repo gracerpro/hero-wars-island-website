@@ -32,7 +32,7 @@ export async function getNodesMap(
   }
 
   if (nodesList === null || nodesList === undefined) {
-    const nodesList = await client.node.byIslandList(island.id, filter)
+    nodesList = await client.node.byIslandList(island.id, filter)
 
     if (isEmptyFilter) {
       writeNodesToCache(island, nodesList)
@@ -42,7 +42,7 @@ export async function getNodesMap(
   if (nodesList === null || nodesList === undefined) {
     nodesList = {
       nodes: new Map<number, Node>(),
-      totalCount: 0,
+      nodesTotalCount: 0,
       rewards: {},
     }
   }
@@ -55,7 +55,7 @@ function isNodeListVersion2(data: any): boolean {
   return (
     data.nodes &&
     typeof data.nodes === 'object' &&
-    typeof data.totalCount === 'number' &&
+    typeof data.nodesTotalCount === 'number' &&
     typeof data.rewards === 'object'
   )
 }

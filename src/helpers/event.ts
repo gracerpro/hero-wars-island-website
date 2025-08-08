@@ -7,17 +7,12 @@ export function AddOnBeforeUnload(callback: BeforeUnloadCallback) {
     window.addEventListener('beforeunload', onBeforeUnload)
   }
   beforeUnloadCallbacks.add(callback)
-
-  console.log(beforeUnloadCallbacks)
 }
 
 export function RemoveOnBeforeUnload(callback: BeforeUnloadCallback) {
   if (beforeUnloadCallbacks.size === 1) {
     window.removeEventListener('beforeunload', onBeforeUnload)
   }
-
-  console.log(beforeUnloadCallbacks)
-
   beforeUnloadCallbacks.delete(callback)
 }
 
