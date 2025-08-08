@@ -1,13 +1,13 @@
 import { flushPromises, shallowMount } from '@vue/test-utils'
 import TheNews from '../../src/views/TheNews.vue'
 import { describe, it, expect, vi } from 'vitest'
-import { News } from '@/api/News'
+import { NewsApi } from '@/api/NewsApi'
 import { responseNews } from "../data/news"
 import { responseEmptyList } from "../data/common"
 
 describe('The news page', () => {
   it("mount component", async () => {
-    const getList = vi.spyOn(News.prototype, "getList");
+    const getList = vi.spyOn(NewsApi.prototype, "getList");
     getList.mockResolvedValue(responseEmptyList)
 
     expect(TheNews).toBeTruthy()
@@ -19,7 +19,7 @@ describe('The news page', () => {
   })
 
   it("empty list", async () => {
-    const getList = vi.spyOn(News.prototype, "getList");
+    const getList = vi.spyOn(NewsApi.prototype, "getList");
     getList.mockResolvedValue(responseEmptyList)
 
     const wrapper = shallowMount(TheNews)
@@ -34,7 +34,7 @@ describe('The news page', () => {
   })
 
   it("not empty list", async () => {
-    const getList = vi.spyOn(News.prototype, "getList");
+    const getList = vi.spyOn(NewsApi.prototype, "getList");
     getList.mockResolvedValue(responseNews)
 
     const wrapper = shallowMount(TheNews)

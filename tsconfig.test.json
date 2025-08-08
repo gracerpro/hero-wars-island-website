@@ -1,0 +1,12 @@
+{
+  "extends": "./tsconfig.node.json",
+  "files": [
+    "vitest.setup.ts",
+  ],
+  "include": ["tests/**/*.ts"],
+  "compilerOptions": {
+    "paths": {
+      "@/*": ["./src/*"],
+    }
+  }
+}

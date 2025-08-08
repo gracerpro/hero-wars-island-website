@@ -4,7 +4,8 @@
     { "path": "./tsconfig.app.json" },
     { "path": "./tsconfig.node.json" },
     { "path": "./tsconfig.server.json" },
-    { "path": "./tsconfig.ssg.json"}
+    { "path": "./tsconfig.ssg.json"},
+    { "path": "./tsconfig.test.json" }
   ],
   "exclude": [
     "node_modules", "dist", "coverage"

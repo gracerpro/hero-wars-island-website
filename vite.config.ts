@@ -45,7 +45,7 @@ export default defineConfig(({mode}) => {
         provider: 'v8',
         reporter: ['text'],
       },
-      setupFiles: 'vitest.setup.js',
+      setupFiles: 'vitest.setup.ts',
     },
     css: {
       preprocessorOptions: {

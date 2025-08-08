@@ -1,17 +1,17 @@
 import { flushPromises, shallowMount } from '@vue/test-utils'
 import TheHome from '../../src/views/TheHome.vue'
 import { describe, it, expect, vi } from 'vitest'
-import { Island } from '@/api/Island'
-import { News } from '@/api/News'
+import { IslandApi, type Island } from '@/api/IslandApi'
+import { NewsApi } from '@/api/NewsApi'
 import { responseEmptyList } from "../data/common"
 import { responseNews } from "../data/news"
 import { responseIslands } from "../data/island"
 
 describe('The home page', () => {
   it("mount component", async () => {
-    const getIslandList = vi.spyOn(Island.prototype, "getList");
+    const getIslandList = vi.spyOn(IslandApi.prototype, "getList");
     getIslandList.mockResolvedValue(responseEmptyList)
-    const getNewsList = vi.spyOn(News.prototype, "getList");
+    const getNewsList = vi.spyOn(NewsApi.prototype, "getList");
     getNewsList.mockResolvedValue(responseEmptyList)
 
     expect(TheHome).toBeTruthy()
@@ -23,10 +23,10 @@ describe('The home page', () => {
   })
 
   it("load islands", async () => {
-    const getIslandsList = vi.spyOn(Island.prototype, "getList");
+    const getIslandsList = vi.spyOn(IslandApi.prototype, "getList");
     getIslandsList.mockResolvedValue(responseIslands)
 
-    const getNewsList = vi.spyOn(News.prototype, "getList");
+    const getNewsList = vi.spyOn(NewsApi.prototype, "getList");
     getNewsList.mockResolvedValue(responseEmptyList)
 
     const wrapper = shallowMount(TheHome)

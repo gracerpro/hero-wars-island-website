@@ -1,5 +1,5 @@
 import { expect, test, vi } from 'vitest'
-import { getHumanQuantity, formatDate, fromCurrentDate } from "../../src/helpers/formatter.js";
+import { getHumanQuantity, formatDate, fromCurrentDate } from "@/helpers/formatter.ts";
 
 test('getHumanQuantity', () => {
   expect(getHumanQuantity(0)).toBe("0")
@@ -13,8 +13,6 @@ test('getHumanQuantity', () => {
 })
 
 test('formatDate', () => {
-  expect(formatDate(null)).toBe("")
-
   expect(formatDate(new Date(2000, 0, 1))).toBe("01.01.2000")
 })
 

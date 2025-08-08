@@ -26,4 +26,4 @@ export const responseNews = {
     },
   ],
   totalCount: 3
-}
+} as const

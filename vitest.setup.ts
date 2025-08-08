@@ -1,8 +1,8 @@
 import { config } from '@vue/test-utils'
-import en from "@/i18n/locales/en.json";
+import en from './src/i18n/locales/en.json'
 import { createRouter, createWebHistory } from 'vue-router';
-import routes from '@/router/routes';
-import { createI18n } from '@/i18n';
+import { routes } from './src/router/routes.ts';
+import { createI18n } from './src/i18n';
 
 const router = createRouter({
   history: createWebHistory(),
