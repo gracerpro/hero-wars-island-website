@@ -1,6 +1,6 @@
 import HeroClient from '@/api/HeroClient'
 import type { Island } from '@/api/IslandApi'
-import type { IslandNodeList, Node, NodeFilter } from '@/api/NodeApi'
+import type { IslandNodeList, Node, NodeFilter, NodeMap } from '@/api/NodeApi'
 import { INDEXED_DB_NAME } from '@/core/storage'
 import { isObject } from '@/helpers/core'
 
@@ -13,7 +13,7 @@ export async function getNodesMap(
   isForce = false,
   filter?: NodeFilter
 ): Promise<IslandNodeList> {
-  let nodesList: IslandNodeList | null = null
+  let nodeList: IslandNodeList | null = null
   const isEmptyFilter = filter === undefined || Object.values(filter).every((a) => a === undefined)
   const previosUpdatedAt = loadPreviousUpdatedAt(island)
   const isLoadFromServer =
@@ -25,43 +25,43 @@ export async function getNodesMap(
 
   try {
     if (!isLoadFromServer) {
-      nodesList = await readNodesFromCache(island)
+      nodeList = await readNodesFromCache(island)
     }
-    if (!isNodeListVersion2(nodesList)) {
-      nodesList = null
+    if (!isNodeListVersion2(nodeList)) {
+      nodeList = null
     }
   } catch (error) {
     console.error(error) // TODO: log it
-    nodesList = null
+    nodeList = null
   }
 
-  if (nodesList === null || nodesList === undefined) {
-    nodesList = await client.node.byIslandList(island.id, filter)
+  if (nodeList === null || nodeList === undefined) {
+    nodeList = await client.node.byIslandList(island.id, filter)
 
     if (isEmptyFilter) {
-      writeNodesToCache(island, nodesList)
+      writeNodesToCache(island, nodeList)
       savePreviousUpdatedAt(island)
     }
 
-    if (!isNodeListVersion2(nodesList)) {
-      nodesList = null
+    if (!isNodeListVersion2(nodeList)) {
+      nodeList = null
     }
   }
-  if (nodesList === null || nodesList === undefined) {
-    nodesList = {
+  if (nodeList === null || nodeList === undefined) {
+    nodeList = {
       nodes: new Map<number, Node>(),
       nodesTotalCount: 0,
       rewards: {},
     }
   }
 
-  return nodesList
+  return nodeList
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function isNodeListVersion2(data: any): boolean {
   return (
-    data.nodes &&
+    data?.nodes &&
     typeof data.nodes === 'object' &&
     typeof data.nodesTotalCount === 'number' &&
     typeof data.rewards === 'object'
@@ -125,7 +125,22 @@ async function writeNodesToCache(
   return new Promise((resolve, reject) => {
     const transaction = db.transaction('islandNodes', 'readwrite')
     const nodeStore = transaction.objectStore('islandNodes')
-    const request = nodeStore.put({ islandId: island.id, nodeList })
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const newNodes: { [key: string]: any } = {}
+
+    nodeList.nodes.forEach((node, id) => {
+      newNodes[id.toString()] = node
+    })
+
+    const request = nodeStore.put({
+      islandId: island.id,
+      nodeList: {
+        nodesTotalCount: nodeList.nodesTotalCount,
+        rewards: nodeList.rewards,
+        nodes: newNodes,
+      },
+    })
 
     request.onsuccess = function () {
       resolve(request.result)
@@ -145,9 +160,25 @@ async function readNodesFromCache(island: Island): Promise<IslandNodeList | null
     const request = nodeStore.get(island.id)
 
     request.onsuccess = () => {
-      const nodesList = request.result?.nodeList
+      const nodeList = request.result?.nodeList
 
-      resolve(nodesList)
+      if (!nodeList) {
+        return resolve(null)
+      }
+
+      try {
+        const nodes: NodeMap = new Map<number, Node>()
+
+        for (const id in nodeList.nodes) {
+          const node = nodeList.nodes[id]
+          nodes.set(node.id, node)
+        }
+        nodeList.nodes = nodes
+
+        resolve(nodeList)
+      } catch {
+        resolve(null)
+      }
     }
     request.onerror = () => {
       reject(request.error)
