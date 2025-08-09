@@ -51,7 +51,7 @@ export function createI18nRouteTo(
   }
 
   if (to.params) {
-    to.params[locale] = locale
+    to.params.locale = locale
   } else {
     to.params = { locale }
   }

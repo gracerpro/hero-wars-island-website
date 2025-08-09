@@ -56,8 +56,15 @@ function renderPreloadLinks(modules: Array<string>, manifest: AppSsrManifest) {
   let links = ''
   const seen = new Set()
 
-  console.log('modules', modules)
-  console.log('manifest', manifest)
+  /*
+  modules Set(5) {
+    'src/App.vue',
+    'src/components/A.vue',
+    'src/components/B.vue',
+    'src/components/D.vue',
+    'src/views/E.vue'
+  }
+  */
 
   modules.forEach((id) => {
     const files = manifest[id]
