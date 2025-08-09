@@ -14,7 +14,7 @@
     "build:server": "tsc && vite build --outDir dist/server --ssr src/entry-server.js",
     "preview": "vite preview",
     "lint": "eslint . --ext .js,.vue,.ts",
-    "format": "prettier --write src/ server.ts prerender.ts",
+    "format": "prettier --write src/ tests/ server.ts prerender.ts",
     "test": "vitest run",
     "coverage": "vitest run --coverage"
   },

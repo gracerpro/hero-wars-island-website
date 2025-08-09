@@ -117,6 +117,12 @@ function getIslandHint(island: Island) {
 
   return result
 }
+
+defineExpose({
+  islands,
+  errorMessage,
+  news,
+})
 </script>
 
 <template>

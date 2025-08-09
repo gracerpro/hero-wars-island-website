@@ -87,6 +87,10 @@ function loadNews() {
     })
     .finally(() => (loading.value = false))
 }
+
+defineExpose({
+  news,
+})
 </script>
 
 <template>

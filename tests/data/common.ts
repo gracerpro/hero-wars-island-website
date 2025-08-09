@@ -1,4 +1,4 @@
 export const responseEmptyList = {
   items: [],
-  totalCount: 0
+  totalCount: 0,
 }
