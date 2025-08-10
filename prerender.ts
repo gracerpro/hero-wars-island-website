@@ -39,9 +39,6 @@ type LoadItemsFun = (pageNumber: number, pageSize: number) => Promise<LoadItemsR
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type ModifyItemFun = (item: any) => string
 
-/**
- * @param {String[]} urls
- */
 async function createFiles(urls: Array<string>) {
   console.log('Create a files...')
 
@@ -50,6 +47,8 @@ async function createFiles(urls: Array<string>) {
   console.log('base path', basePath)
 
   for (const url of urls) {
+    console.log('get html for url "' + url + '"')
+
     const { html } = await getHtml({
       url,
       manifest,
@@ -72,7 +71,7 @@ async function createFiles(urls: Array<string>) {
     const compressedHtml = await gzip(html)
     fs.writeFileSync(filePath + '.gz', compressedHtml)
 
-    console.log('pre-rendered:', pathName, 'size', html.length)
+    console.log('pre-rendered', pathName, 'size', html.length)
   }
 }
 

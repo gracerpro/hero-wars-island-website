@@ -7,8 +7,8 @@
   "scripts": {
     "dev": "ts-node --project tsconfig.server.json server.ts",
     "dev-prod": "NODE_ENV=production ts-node --project tsconfig.server.json server.ts",
-    "generate": "tsc && vite build --outDir dist/static --ssrManifest .vite/ssr-manifest.json && npm run build:server && NODE_ENV=production node prerender",
-    "generate-only": "NODE_ENV=production node prerender",
+    "generate": "tsc && vite build --outDir dist/static --ssrManifest .vite/ssr-manifest.json && npm run build:server && npm run generate-only",
+    "generate-only": "NODE_ENV=production ts-node --project tsconfig.ssg.json prerender.ts",
     "build": "npm run build:client && npm run build:server",
     "build:client": "tsc && vite build --outDir dist/client --ssrManifest .vite/ssr-manifest.json",
     "build:server": "tsc && vite build --outDir dist/server --ssr src/entry-server.js",

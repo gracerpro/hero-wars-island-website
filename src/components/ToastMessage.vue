@@ -4,7 +4,6 @@
 
 import { ref, computed } from 'vue'
 import { type ToastType, TYPE_DANGER, TYPE_SUCCESS } from './toast'
-import { type Toast } from 'bootstrap'
 
 interface Props {
   elementId: string
@@ -26,10 +25,6 @@ const classType = computed(() => {
   return ''
 })
 
-async function loadToast(): Promise<typeof Toast> {
-  return (await import('bootstrap')).Toast
-}
-
 function show(message: string, type?: ToastType) {
   toastMessage.value = message
 
@@ -37,13 +32,13 @@ function show(message: string, type?: ToastType) {
     toastType.value = type
   }
 
-  loadToast().then((ToastClass) => {
+  import('bootstrap').then((module) => {
     const element = document.getElementById(props.elementId) as HTMLElement
     element.addEventListener('hide.bs.toast', () => (isShow.value = false), {
       once: true,
     })
 
-    const toast = new ToastClass(element, {
+    const toast = new module.Toast(element, {
       delay: 2000,
       autohide: true,
     })
