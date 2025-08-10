@@ -87,6 +87,9 @@ export class NewsApi {
       createdAt: new Date(data.createdAt),
       updatedAt: new Date(data.updatedAt),
       snippet: data.snippet,
+      pageTitle: data.pageTitle,
+      pageDescription: data.pageDescription,
+      pageKeywords: data.pageKeywords,
     }
   }
 }

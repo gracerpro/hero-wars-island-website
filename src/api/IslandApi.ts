@@ -154,6 +154,9 @@ export class IslandApi {
       syncGameVersion: data.syncGameVersion ?? null,
       syncAt: data.syncAt ?? null,
       backgroundImage: image,
+      pageTitle: data.pageTitle,
+      pageDescription: data.pageDescription,
+      pageKeywords: data.pageKeywords,
     }
   }
 }
