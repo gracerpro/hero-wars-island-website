@@ -27,7 +27,7 @@
     "node-fetch": "^3.3.2",
     "sirv": "^3.0.0",
     "vite-plugin-ejs": "^1.7.0",
-    "vue": "^3.2.13",
+    "vue": "^3.5.18",
     "vue-component-type-helpers": "^3.0.4",
     "vue-i18n": "^11.0.1",
     "vue-router": "^4.5.1",
