@@ -9,7 +9,7 @@ import IslandMapDownloadDialog from './IslandMapDownloadDialog.vue'
 import IslandMapFilter from './IslandMapFilter.vue'
 import IslandMapTable from './IslandMapTable.vue'
 import { canSelectNode } from '@/services/island-map'
-import { onMounted, onUnmounted, ref, computed, shallowReactive, useTemplateRef } from 'vue'
+import { onMounted, onUnmounted, ref, computed, useTemplateRef, shallowReactive } from 'vue'
 import { getHumanQuantity } from '@/helpers/formatter'
 import { useI18n } from 'vue-i18n'
 import { fullscreenElement } from '@/core/fullscreen'
@@ -96,7 +96,8 @@ const isShowQuantity = ref(true)
 const isShowGroupRewards = ref(false)
 const isShowRewardsBlock = ref(true)
 const isShowUserRewardsBlock = ref(true)
-let filter = shallowReactive<Filter>({
+
+const filter = shallowReactive<Filter>({
   itemName: '',
   itemType: null,
   isNodeTypeTower: false,
@@ -435,18 +436,11 @@ function loadState() {
     stateData = {}
   }
 
-  let tmpFilter: Filter = {
-    itemName: '',
-    itemType: null,
-    isNodeTypeTower: false,
-    isNodeTypeChest: false,
-  }
-
   if (stateData?.filter) {
-    tmpFilter.itemName = stateData.filter.itemName ?? ''
-    tmpFilter.itemType = stateData.filter.type ?? null
-    tmpFilter.isNodeTypeChest = stateData.filter.isNodeTypeChest ?? false
-    tmpFilter.isNodeTypeTower = stateData.filter.isNodeTypeTower ?? false
+    filter.itemName = stateData.filter.itemName ?? ''
+    filter.itemType = stateData.filter.type ?? null
+    filter.isNodeTypeChest = stateData.filter.isNodeTypeChest ?? false
+    filter.isNodeTypeTower = stateData.filter.isNodeTypeTower ?? false
   }
 
   if (!stateData.byIsland || !isObject(stateData.byIsland)) {
@@ -500,7 +494,6 @@ function loadState() {
     byIsland.disableNodesIds.forEach((id) => disableNodesIds.value.add(id))
   }
 
-  filter = tmpFilter
   isShowQuantity.value =
     typeof stateData.isShowQuantity === 'boolean' ? stateData.isShowQuantity : true
   isShowRewardsBlock.value =
@@ -606,8 +599,8 @@ function saveState() {
             v-model:item-type="filter.itemType"
             v-model:is-node-type-tower="filter.isNodeTypeTower"
             v-model:is-node-type-chest="filter.isNodeTypeChest"
-            :rewards="rewards"
             :min-chars-count="minCharsCount"
+            :rewards="rewards"
           />
         </div>
         <div class="col-lg-6">

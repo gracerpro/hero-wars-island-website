@@ -1,49 +1,31 @@
 <script setup lang="ts">
-/* global Event */
-/* global HTMLSelectElement */
-
 import { computed } from 'vue'
 import type { SelectItemMap } from './select'
 
 interface Props {
   inputId: string
   selectValues: SelectItemMap
-  modelValue?: number | null
 }
 
-const props = withDefaults(defineProps<Props>(), {
-  modelValue: null,
-})
-const emit = defineEmits<{
-  'update:model-value': [value: number | null]
-}>()
+defineProps<Props>()
 
-const EVENT_UPDATE_VALUE = 'update:model-value'
+const modelValue = defineModel<number | null>({ default: null })
 
-const isDisabled = computed(() => props.modelValue === null || props.modelValue === 0)
-
-const onChange = (event: Event) => {
-  const target = event.target as HTMLSelectElement
-  emit(EVENT_UPDATE_VALUE, target.value === '' ? null : parseInt(target.value))
-}
-const onClear = () => {
-  emit(EVENT_UPDATE_VALUE, null)
-}
+const isDisabled = computed(() => modelValue.value === null || modelValue.value === 0)
 </script>
 
 <template>
   <div class="input-group">
     <select
       :id="inputId"
+      v-model="modelValue"
       class="form-select"
-      @change="onChange"
     >
       <option value=""></option>
       <option
         v-for="(name, id) in selectValues"
         :key="id"
         :value="id"
-        :selected="modelValue === id"
       >
         {{ name }}
       </option>
@@ -54,7 +36,7 @@ const onClear = () => {
         class="btn-close"
         aria-label="Close"
         :disabled="isDisabled"
-        @click="onClear"
+        @click="modelValue = null"
       ></button>
     </span>
   </div>
