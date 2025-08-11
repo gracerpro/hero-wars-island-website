@@ -10,6 +10,9 @@ export default defineConfig(({mode}) => {
   const env = loadEnv(mode, process.cwd());
 
   return {
+    build: {
+      outDir: "dist/static"
+    },
     server: {
       host: true,
       allowedHosts: true,
