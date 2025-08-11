@@ -19,12 +19,16 @@ const NAME_NEWS_VIEW = 'news-view'
 
 const enLocale = 'en'
 
+const { isClean } = parseParameters(process.argv)
+
 initDirectories()
 const urls = await readUrlsFromView()
 await createFiles(urls)
 
-// done, delete .vite directory including ssr manifest
-fs.rmSync('./dist/static/.vite', { recursive: true })
+if (isClean) {
+  // done, delete .vite directory including ssr manifest
+  fs.rmSync('./dist/static/.vite', { recursive: true })
+}
 
 /////////////////////////////////////////////////////
 
@@ -38,6 +42,24 @@ type LoadItemsFun = (pageNumber: number, pageSize: number) => Promise<LoadItemsR
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type ModifyItemFun = (item: any) => string
+
+function parseParameters(argv: Array<string>) {
+  let isClean = true
+
+  argv.forEach((arg) => {
+    const keyValue = arg.split('=')
+    const key = keyValue[0]
+    const value = keyValue[1] ?? undefined
+
+    if (key === '--clean' && value === '0') {
+      isClean = false
+    }
+  })
+
+  return {
+    isClean,
+  }
+}
 
 async function createFiles(urls: Array<string>) {
   console.log('Create a files...')
