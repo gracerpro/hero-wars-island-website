@@ -24,8 +24,6 @@ import { ref, shallowRef, computed, onMounted, onUnmounted, useTemplateRef } fro
 import {
   TRANSLATE_X,
   TRANSLATE_Y,
-  EVENT_CHANGE_TRANSLATE,
-  EVENT_CHANGE_SCALE,
   DELTA_SCALE,
   canSelectNode,
   canSelectNextNode,
@@ -42,7 +40,6 @@ import {
   type WarningPointsMap,
   type IconItem,
   type RewardQuantity,
-  EVENT_SELECT_NODE,
 } from './map'
 import { useI18n } from 'vue-i18n'
 import IslandMapInfoDialog from './IslandMapInfoDialog.vue'
@@ -199,7 +196,7 @@ function onKeyDownMap(event: KeyboardEvent) {
       dx /= 2
       dy /= 2
     }
-    emit(EVENT_CHANGE_TRANSLATE, props.translateX + dx, props.translateY + dy)
+    emit('change-translate', props.translateX + dx, props.translateY + dy)
     event.preventDefault()
   }
 }
@@ -266,7 +263,7 @@ function selectNode(drawedNode: SvgDrawedNode) {
     }
   }
 
-  emit(EVENT_SELECT_NODE, drawedNode.node.id)
+  emit('select-node', drawedNode.node.id)
 }
 
 function onMouseDown(event: MouseEvent) {
@@ -306,7 +303,7 @@ function onMouseMove(button: MouseEvent) {
   }
 
   if (resultX !== null || resultY !== null) {
-    emit(EVENT_CHANGE_TRANSLATE, resultX, resultY)
+    emit('change-translate', resultX, resultY)
   }
 }
 
@@ -329,7 +326,7 @@ function emitNewScale(event: MouseEvent | KeyboardEvent, value: number) {
     value /= 2
   }
 
-  emit(EVENT_CHANGE_SCALE, value)
+  emit('change-scale', value)
 }
 
 function onMountedInfoDialog() {

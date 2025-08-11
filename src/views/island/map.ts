@@ -6,8 +6,6 @@ const HALF_SIDE = SIDE / 2
 const HEIGHT = 34
 const IMAGE_SIDE = 24
 
-export const EVENT_SELECT_NODE = 'select-node'
-
 export type UserNodeIds = Set<number>
 
 export interface ViewReward {

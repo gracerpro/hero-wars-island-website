@@ -1,13 +1,7 @@
 <script setup lang="ts">
 /* global MouseEvent */
 
-import {
-  DELTA_SCALE,
-  EVENT_CHANGE_SCALE,
-  EVENT_CHANGE_TRANSLATE,
-  TRANSLATE_X,
-  TRANSLATE_Y,
-} from '@/services/island-map'
+import { DELTA_SCALE, TRANSLATE_X, TRANSLATE_Y } from '@/services/island-map'
 import { useI18n } from 'vue-i18n'
 
 interface Props {
@@ -23,8 +17,6 @@ const emit = defineEmits<{
   'change-translate': [x: number | null, y: number | null]
 }>()
 
-const EVENT_RESET = 'reset'
-
 const { t } = useI18n()
 
 function onChangeScale(zoom: number, event: MouseEvent) {
@@ -36,7 +28,7 @@ function onChangeScale(zoom: number, event: MouseEvent) {
     value /= 2
   }
 
-  emit(EVENT_CHANGE_SCALE, value)
+  emit('change-scale', value)
 }
 
 function onChangeTranslate(xDirection: number, yDirection: number, event: MouseEvent) {
@@ -60,7 +52,7 @@ function onChangeTranslate(xDirection: number, yDirection: number, event: MouseE
     }
   }
 
-  emit(EVENT_CHANGE_TRANSLATE, props.translateX + dx, props.translateY + dy)
+  emit('change-translate', props.translateX + dx, props.translateY + dy)
 }
 </script>
 
@@ -124,7 +116,7 @@ function onChangeTranslate(xDirection: number, yDirection: number, event: MouseE
       class="btn btn-secondary toolbar-button"
       :title="t('common.reset')"
       :disabled="loading"
-      @click="emit(EVENT_RESET)"
+      @click="emit('reset')"
     >
       0
     </button>

@@ -3,12 +3,10 @@ import HelpDialog from './IslandMapHelpDialog.vue'
 import IslandMapToolbarRegions from './IslandMapToolbarRegions.vue'
 import IslandMapToolbarActions from './IslandMapToolbarActions.vue'
 import { shallowRef, useTemplateRef } from 'vue'
-import { EVENT_CHANGE_TRANSLATE, EVENT_CHANGE_SCALE } from '@/services/island-map'
 import { useI18n } from 'vue-i18n'
 import { computed } from 'vue'
 import type { Region } from '@/api/IslandApi'
 import type { ComponentExposed } from 'vue-component-type-helpers'
-import { EVENT_BEGIN_DOWNLOAD, EVENT_FULLSCREEN_ON, EVENT_RELOAD_MAP, EVENT_RESET } from './toolbar'
 
 interface Props {
   loading: boolean
@@ -66,11 +64,9 @@ function onMountedHelpDialog() {
       :loading="loading"
       :translate-x="translateX"
       :translate-y="translateY"
-      @change-translate="
-        (dx: number | null, dy: number | null) => emit(EVENT_CHANGE_TRANSLATE, dx, dy)
-      "
-      @change-scale="(value: number) => emit(EVENT_CHANGE_SCALE, value)"
-      @reset="emit(EVENT_RESET)"
+      @change-translate="(dx: number | null, dy: number | null) => emit('change-translate', dx, dy)"
+      @change-scale="(value: number) => emit('change-scale', value)"
+      @reset="emit('reset')"
     />
 
     <div
@@ -96,7 +92,7 @@ function onMountedHelpDialog() {
         class="btn btn-secondary toolbar-button download-btn"
         :disabled="loading"
         :title="t('common.download')"
-        @click="emit(EVENT_BEGIN_DOWNLOAD)"
+        @click="emit('begin-download')"
       >
         <span class="hero-icon hero-download align-middle" />
       </button>
@@ -110,7 +106,7 @@ function onMountedHelpDialog() {
         class="btn btn-secondary toolbar-button fullscreen-btn"
         :disabled="loading"
         :title="t('common.fullscreenMode')"
-        @click="emit(EVENT_FULLSCREEN_ON)"
+        @click="emit('fullscreen-on')"
       >
         <span class="fullscreen-icon"></span>
       </button>
@@ -138,7 +134,7 @@ function onMountedHelpDialog() {
         class="btn btn-secondary"
         title="Reload"
         :disabled="loading"
-        @click="emit(EVENT_RELOAD_MAP)"
+        @click="emit('reload-map')"
       >
         L
       </button>

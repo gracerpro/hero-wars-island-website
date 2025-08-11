@@ -1,40 +1,39 @@
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n'
-import { EVENT_FIND, EVENT_UPDATE_NAME, filterNameMinCharsCount } from './news'
+import { filterNameMinCharsCount } from './news'
 
 interface Props {
   loading: boolean
-  name: string
 }
 
 defineProps<Props>()
 
 const emit = defineEmits<{
   find: []
-  'update:name': [value: string]
 }>()
+
+const name = defineModel<string>('name', { required: true })
 
 const { t } = useI18n()
 
 function onClearName() {
-  emit(EVENT_UPDATE_NAME, '')
-  emit(EVENT_FIND)
+  name.value = ''
+  emit('find')
 }
 </script>
 
 <template>
   <form
     class="row mb-2"
-    @submit.prevent="emit(EVENT_FIND)"
+    @submit.prevent="emit('find')"
   >
     <div class="col-md-6 mb-3">
       <div class="input-group">
         <input
           id="filter__name"
-          :value="name"
+          v-model.trim="name"
           class="form-control"
           :placeholder="t('common.name')"
-          @input="emit(EVENT_UPDATE_NAME, ($event.target as HTMLInputElement).value.trim())"
         />
         <button
           type="button"

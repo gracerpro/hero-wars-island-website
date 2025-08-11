@@ -4,10 +4,8 @@ import type { DrawedNode, DrawedNodeMap, UserNodeIds } from '@/views/island/map'
 
 export const TRANSLATE_X = 20
 export const TRANSLATE_Y = 20
-export const EVENT_CHANGE_TRANSLATE = 'change-translate'
 
 export const DELTA_SCALE = 0.5
-export const EVENT_CHANGE_SCALE = 'change-scale'
 
 export function canSelectNode(node: Node): boolean {
   return node.type !== TYPE_START && node.type != TYPE_BLOCKER
