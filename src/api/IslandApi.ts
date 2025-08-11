@@ -119,15 +119,17 @@ export class IslandApi {
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private modifyIsland(data: any): Island {
-    let regions: Array<Region> = []
+    const regions: Array<Region> = []
     let image: Image | null = null
 
     if (data.regions) {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      regions = data.regions.map((regionData: any) => {
-        return {
+      data.regions.forEach((regionData: any) => {
+        regions.push({
+          number: regionData.number,
           startAt: regionData.startAt ? new Date(regionData.startAt) : null,
-        }
+          isVisible: regionData.isVisible,
+        })
       })
     }
     if (data.backgroundImage) {

@@ -2,19 +2,15 @@
 import { useI18n } from 'vue-i18n'
 import { getRegionTitle } from './island'
 import type { Region } from '@/api/IslandApi'
-import { EVENT_RESET_REGION_NUMBERS, EVENT_UPDATE_REGION_NUMBERS } from './toolbar'
 
 interface Props {
   regions: Array<Region>
-  regionNumbers: Array<number>
   loading: boolean
 }
 
-const props = defineProps<Props>()
-const emit = defineEmits<{
-  'update:region-numbers': [value: Array<number>]
-  'reset-region-numbers': []
-}>()
+defineProps<Props>()
+
+const regionNumbers = defineModel<Array<number>>('regionNumbers', { required: true })
 
 const { t } = useI18n()
 
@@ -22,7 +18,7 @@ function onChangeNumber(region: Region) {
   if (!region.isVisible) {
     return
   }
-  const numbers = props.regionNumbers
+  const numbers = regionNumbers.value
   const index = numbers.indexOf(region.number)
 
   if (index >= 0) {
@@ -31,7 +27,7 @@ function onChangeNumber(region: Region) {
     numbers.push(region.number)
   }
 
-  emit(EVENT_UPDATE_REGION_NUMBERS, numbers)
+  regionNumbers.value = Array.from(numbers)
 }
 </script>
 
@@ -60,7 +56,7 @@ function onChangeNumber(region: Region) {
       class="btn btn-outline-secondary toolbar-button"
       :disabled="loading || regionNumbers.length === 0"
       :title="t('common.reset')"
-      @click="emit(EVENT_RESET_REGION_NUMBERS)"
+      @click="regionNumbers = []"
     >
       <span class="btn-close"></span>
     </button>

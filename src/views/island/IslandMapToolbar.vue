@@ -8,23 +8,13 @@ import { useI18n } from 'vue-i18n'
 import { computed } from 'vue'
 import type { Region } from '@/api/IslandApi'
 import type { ComponentExposed } from 'vue-component-type-helpers'
-import {
-  EVENT_BEGIN_DOWNLOAD,
-  EVENT_FULLSCREEN_ON,
-  EVENT_RELOAD_MAP,
-  EVENT_RESET,
-  EVENT_RESET_REGION_NUMBERS,
-  EVENT_TOGGLE_IS_SHOW_QUANTITY,
-  EVENT_UPDATE_REGION_NUMBERS,
-} from './toolbar'
+import { EVENT_BEGIN_DOWNLOAD, EVENT_FULLSCREEN_ON, EVENT_RELOAD_MAP, EVENT_RESET } from './toolbar'
 
 interface Props {
-  isShowQuantity: boolean
   loading: boolean
   translateX: number
   translateY: number
   regions: Array<Region>
-  regionNumbers: Array<number>
 }
 
 const { t } = useI18n()
@@ -35,13 +25,13 @@ const emit = defineEmits<{
   reset: []
   'change-translate': [x: number | null, y: number | null]
   'change-scale': [value: number]
-  'update:is-show-quantity': []
   'fullscreen-on': []
   'begin-download': []
   'reload-map': []
-  'update:region-numbers': [value: Array<number>]
-  'reset-region-numbers': []
 }>()
+
+const isShowQuantity = defineModel<boolean>('isShowQuantity', { required: true })
+const regionNumbers = defineModel<Array<number>>('regionNumbers', { required: true })
 
 const helpDialogRef = useTemplateRef<ComponentExposed<typeof HelpDialog>>('helpDialogRef')
 const helpDialogComponent = shallowRef<typeof HelpDialog | null>(null)
@@ -68,13 +58,9 @@ function onMountedHelpDialog() {
   >
     <island-map-toolbar-regions
       v-if="regions && regions.length > 1"
+      v-model:region-numbers="regionNumbers"
       :regions="regions"
-      :region-numbers="regionNumbers"
       :loading="loading"
-      @update:region-numbers="
-        (numbers: Array<number>) => emit(EVENT_UPDATE_REGION_NUMBERS, numbers)
-      "
-      @reset-region-numbers="emit(EVENT_RESET_REGION_NUMBERS)"
     />
     <island-map-toolbar-actions
       :loading="loading"
@@ -96,7 +82,7 @@ function onMountedHelpDialog() {
         :disabled="loading"
         :title="t('page.island.isShowQuantity')"
         :class="['btn toolbar-button', isShowQuantity ? 'btn-secondary' : 'btn-outline-secondary']"
-        @click="emit(EVENT_TOGGLE_IS_SHOW_QUANTITY)"
+        @click="isShowQuantity = !isShowQuantity"
       >
         N
       </button>

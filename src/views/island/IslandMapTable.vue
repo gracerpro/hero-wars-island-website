@@ -1,19 +1,16 @@
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n'
-import { EVENT_UPDATE_IS_SHOW_BLOCK, type ViewReward } from './map'
+import { type ViewReward } from './map'
 
 interface Props {
   header: string
-  isShowBlock: boolean
   rewards: Array<ViewReward>
   visibleRewardsCount: number
 }
 
 defineProps<Props>()
 
-const emit = defineEmits<{
-  'update:is-show-block': [value: boolean]
-}>()
+const isShowBlock = defineModel<boolean>('isShowBlock', { required: true })
 
 const { t } = useI18n()
 
@@ -27,7 +24,7 @@ const getItemName = (item: ViewReward) => {
     <h3>{{ header }}</h3>
     <a
       href="#"
-      @click.prevent="emit(EVENT_UPDATE_IS_SHOW_BLOCK, !isShowBlock)"
+      @click.prevent="isShowBlock = !isShowBlock"
     >
       {{ t(isShowBlock ? 'common.hide' : 'common.show') }}
     </a>

@@ -8,8 +8,6 @@ const IMAGE_SIDE = 24
 
 export const EVENT_SELECT_NODE = 'select-node'
 
-export const EVENT_UPDATE_IS_SHOW_BLOCK = 'update:is-show-block'
-
 export type UserNodeIds = Set<number>
 
 export interface ViewReward {

@@ -13,7 +13,7 @@ const [modelValue, modifiers] = defineModel<string>({
     }
 
     return value
-  }
+  },
 })
 </script>
 

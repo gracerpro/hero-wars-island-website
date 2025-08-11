@@ -305,10 +305,6 @@ function onChangeTranslate(x: number | null, y: number | null) {
   }
 }
 
-function onToggleIsShowQuantity() {
-  isShowQuantity.value = !isShowQuantity.value
-}
-
 function onChangeNode(node: Node) {
   if (!nodes.value.has(node.id)) {
     throw new Error(t('page.island.notFoundNodeAdmin'))
@@ -404,11 +400,6 @@ function onMountedDownloadDialog() {
   downloadDialog.value?.show().finally(() => {
     downloadDialogComponent.value = null
   })
-}
-
-function onResetRegionNumbers() {
-  regionNumbers.value = []
-  reloadMap()
 }
 
 function onChangeRegionNumbers(newNumbers: Array<number>) {
@@ -535,13 +526,12 @@ function saveState() {
   <div>
     <island-map-toolbar
       v-if="!errorMessage"
-      :is-show-quantity="isShowQuantity"
+      v-model:is-show-quantity="isShowQuantity"
       :loading="loading"
       :translate-x="translateX"
       :translate-y="translateY"
       :regions="island.regions"
       :region-numbers="regionNumbers"
-      @update:is-show-quantity="onToggleIsShowQuantity"
       @reset="onResetMap"
       @change-scale="onChangeScale"
       @change-translate="onChangeTranslate"
@@ -549,7 +539,6 @@ function saveState() {
       @begin-download="onBeginDownload"
       @reload-map="forceReloadMap"
       @update:region-numbers="onChangeRegionNumbers"
-      @reset-region-numbers="onResetRegionNumbers"
     />
 
     <island-map-loading v-if="loading" />

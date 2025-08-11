@@ -1,7 +1,4 @@
 <script setup lang="ts">
-/* global Event */
-/* global HTMLInputElement */
-
 import { createI18nRouteTo } from '@/i18n/translation'
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
@@ -15,16 +12,8 @@ import {
   type Type,
 } from '@/api/ItemApi'
 import type { UserNodeIds, SelectMode } from './map'
-import {
-  EVENT_RESET_DISABLE_NODES,
-  EVENT_RESET_USER_NODES,
-  EVENT_UPDATE_IS_SELECT_ANY_NODE,
-  EVENT_UPDATE_SELECT_MODE,
-} from './steps'
 
 interface Props {
-  selectMode: SelectMode
-  isSelectAnyNode: boolean
   disableNodesCount: number
   nodes: NodeMap
   userNodesIds: UserNodeIds
@@ -40,10 +29,11 @@ const { t } = useI18n()
 
 const props = defineProps<Props>()
 
+const isSelectAnyNode = defineModel<boolean>('isSelectAnyNode', { required: true })
+const selectMode = defineModel<SelectMode>('selectMode', { required: true })
+
 const emit = defineEmits<{
-  'update:is-select-any-node': [value: boolean]
   'reset-user-nodes': []
-  'update:select-mode': [value: SelectMode]
   'reset-disable-nodes': []
 }>()
 
@@ -55,7 +45,7 @@ const selectModes = computed(() => {
   ]
 })
 const selectModeHint = computed(() => {
-  switch (props.selectMode) {
+  switch (selectMode.value) {
     case SELECT_MODE_PLAN:
       return t('page.island.canSelectAnyNode')
     case SELECT_MODE_GOING:
@@ -139,14 +129,6 @@ const totalExplorerMoveCount = computed(() => {
 function getStepItemKey(type: Type, gameId: number): string {
   return type + '_' + gameId
 }
-
-function onChangeIsSelectAnyNode(event: Event) {
-  emit(EVENT_UPDATE_IS_SELECT_ANY_NODE, (event.target as HTMLInputElement).checked)
-}
-
-function onChangeSelectMode(event: Event) {
-  emit(EVENT_UPDATE_SELECT_MODE, (event.target as HTMLInputElement).value as SelectMode)
-}
 </script>
 
 <template>
@@ -197,7 +179,7 @@ function onChangeSelectMode(event: Event) {
         <button
           type="button"
           :class="['btn btn-secondary mt-1', explorerMoveCount > 0 ? '' : 'disabled']"
-          @click="emit(EVENT_RESET_USER_NODES)"
+          @click="emit('reset-user-nodes')"
         >
           {{ t('common.reset') }}
         </button>
@@ -209,7 +191,7 @@ function onChangeSelectMode(event: Event) {
         <button
           type="button"
           :class="['btn btn-secondary mt-1', disableNodesCount > 0 ? '' : 'disabled']"
-          @click="emit(EVENT_RESET_DISABLE_NODES)"
+          @click="emit('reset-disable-nodes')"
         >
           {{ t('common.reset') }}
         </button>
@@ -222,10 +204,9 @@ function onChangeSelectMode(event: Event) {
         class="me-2"
       >
         <input
+          v-model="selectMode"
           type="radio"
           :value="mode.value"
-          :checked="selectMode === mode.value"
-          @change="onChangeSelectMode"
         />
         {{ mode.label }}
       </label>
@@ -234,9 +215,8 @@ function onChangeSelectMode(event: Event) {
     <div class="col-sm-6">
       <label class="d-block mb-3">
         <input
+          v-model="isSelectAnyNode"
           type="checkbox"
-          :checked="isSelectAnyNode"
-          @change="onChangeIsSelectAnyNode"
         />
         {{ t('common.selectAnyNodeQuestion') }}
       </label>
