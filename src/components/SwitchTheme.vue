@@ -1,16 +1,15 @@
 <script setup lang="ts">
 import { setTheme, THEME_DARK, THEME_LIGHT } from '@/core/theme'
-import { UPDATE_THEME_MUTATION } from '@/store/mutation-types'
+import { useMainStore } from '@/store/main'
 import { computed } from 'vue'
-import { useStore } from 'vuex'
 
-const store = useStore()
+const store = useMainStore()
 
-const theme = computed(() => store.state.theme)
+const theme = computed(() => store.theme)
 
 const isDark = computed({
   get: () => theme.value === THEME_DARK,
-  set: (newValue) => store.commit(UPDATE_THEME_MUTATION, newValue ? THEME_DARK : THEME_LIGHT),
+  set: (newValue) => store.updateTheme(newValue ? THEME_DARK : THEME_LIGHT),
 })
 
 function onChange() {

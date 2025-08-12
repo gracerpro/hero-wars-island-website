@@ -25,13 +25,13 @@
     "compression": "^1.8.1",
     "express": "^5.1.0",
     "node-fetch": "^3.3.2",
+    "pinia": "^3.0.3",
     "sirv": "^3.0.0",
     "vite-plugin-ejs": "^1.7.0",
     "vue": "^3.5.18",
     "vue-component-type-helpers": "^3.0.4",
     "vue-i18n": "^11.0.1",
-    "vue-router": "^4.5.1",
-    "vuex": "^4.0.0"
+    "vue-router": "^4.5.1"
   },
   "devDependencies": {
     "@types/bootstrap": "^5.2.10",

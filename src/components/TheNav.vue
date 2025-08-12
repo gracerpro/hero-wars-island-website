@@ -6,13 +6,12 @@ import { ref, onMounted } from 'vue'
 import HeroClient from '@/api/HeroClient'
 import SwitchLanguage from './SwitchLanguage.vue'
 import { createI18nRouteTo } from '@/i18n/translation'
-import { useStore } from 'vuex'
 import SwitchTheme from './SwitchTheme.vue'
-import { IS_SHOW_MENU_MUTATION } from '@/store/mutation-types'
 import { type Island } from '@/api/IslandApi'
+import { useMainStore } from '@/store/main'
 
 const { t } = useI18n()
-const store = useStore()
+const store = useMainStore()
 
 const actualIsland = ref<Island | null>(null)
 const navbarNavRef = ref<HTMLElement | null>(null)
@@ -33,13 +32,13 @@ async function InitCollapse(navElement: HTMLElement) {
   const module = await import('bootstrap')
 
   navElement.addEventListener('hide.bs.collapse', () => {
-    store.commit(IS_SHOW_MENU_MUTATION, false)
+    store.updateIsShowMenu(false)
   })
-  navElement.addEventListener('hide.bs.collapse', () => {
-    store.commit(IS_SHOW_MENU_MUTATION, true)
+  navElement.addEventListener('show.bs.collapse', () => {
+    store.updateIsShowMenu(true)
   })
 
-  new module.Collapse(navElement, { toggle: store.state.isShowMenu })
+  new module.Collapse(navElement, { toggle: store.isShowMenu })
 }
 </script>
 
