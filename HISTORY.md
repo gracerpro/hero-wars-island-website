@@ -1,5 +1,15 @@
 # History
 
+## v2.1.1 at 2025-08-12
+
+The technical part
+
+* Rewrite all JavaScript code in TypeScript
+* Replace the storage from Vuex to Pinia
+* Upgrade NodeJS to version 22
+* Update dependencies
+
+
 ## v1.6.7 at 2025-01-26
 
 What has been done
