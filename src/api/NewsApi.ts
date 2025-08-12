@@ -29,12 +29,6 @@ export class NewsApi {
     })
   }
 
-  /**
-   * @param {Number} pageSize
-   * @param {Number} pageNumber
-   * @param {Object|null} filter
-   * @returns {Promise<Object|null>}
-   */
   async getList(
     pageSize: number,
     pageNumber: number = 1,

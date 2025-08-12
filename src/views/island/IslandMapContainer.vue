@@ -280,9 +280,6 @@ function onMouseEnter() {
   mouse.isDown = false
 }
 
-/**
- * @param {Object} button
- */
 function onMouseMove(button: MouseEvent) {
   if (!mouse.isDown) {
     return
@@ -465,6 +462,7 @@ function getItemTitle(item: IconItem): string {
   stroke: #ddd;
 }
 .node-step {
+  /* TODO: move all colors to config or single place */
   fill: #9da7c9;
   cursor: pointer;
 }
