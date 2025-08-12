@@ -9,7 +9,12 @@ interface Props {
 
 defineProps<Props>()
 
-const modelValue = defineModel<number | null>({ default: null })
+const modelValue = defineModel<number | null>({
+  default: null,
+  set(value: string | number | null) {
+    return value === '' ? null : value
+  },
+})
 
 const isDisabled = computed(() => modelValue.value === null || modelValue.value === 0)
 </script>
@@ -18,7 +23,7 @@ const isDisabled = computed(() => modelValue.value === null || modelValue.value 
   <div class="input-group">
     <select
       :id="inputId"
-      v-model="modelValue"
+      v-model.number="modelValue"
       class="form-select"
     >
       <option value=""></option>

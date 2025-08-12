@@ -29,7 +29,7 @@ import { shallowRef } from 'vue'
 import { UserError } from '@/exceptions/UserError'
 import type { Island } from '@/api/IslandApi'
 import type { ViewNodeReward, UserNodeIds, ViewReward, SelectMode } from './map'
-import { getUnknownItem, type ItemMap, type Type } from '@/api/ItemApi'
+import { getUnknownItem, isType, type ItemMap, type Type } from '@/api/ItemApi'
 import type { ComponentExposed } from 'vue-component-type-helpers'
 import { AddOnBeforeUnload, RemoveOnBeforeUnload } from '@/helpers/event'
 
@@ -429,7 +429,12 @@ function loadState() {
 
   if (stateData?.filter) {
     filter.itemName = stateData.filter.itemName ?? ''
-    filter.itemType = stateData.filter.type ?? null
+    filter.itemType =
+      !stateData.filter.itemType ||
+      typeof stateData.filter.itemType !== 'number' ||
+      !isType(stateData.filter.itemType)
+        ? null
+        : stateData.filter.itemType
     filter.isNodeTypeChest = stateData.filter.isNodeTypeChest ?? false
     filter.isNodeTypeTower = stateData.filter.isNodeTypeTower ?? false
   }
@@ -509,7 +514,7 @@ function saveState() {
   }
 
   const state: State = {
-    filter,
+    filter, // Note: may by move it to 'byIsland' property
     isShowQuantity: isShowQuantity.value,
     isSelectAnyNode: isSelectAnyNode.value,
     isShowGroupRewards: isShowGroupRewards.value,
