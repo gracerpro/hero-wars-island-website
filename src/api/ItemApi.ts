@@ -18,6 +18,7 @@ export const TYPE_UNKNOWN = 12
 export const TYPE_AVATAR_FRAME = 13
 export const TYPE_STAMINA = 14
 
+// TODO: to enums, and see other like code
 export type Type = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14
 const allTypes = new Set<number>([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14])
 

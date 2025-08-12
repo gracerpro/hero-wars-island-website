@@ -52,9 +52,6 @@ export default [
       parserOptions: {
         parser: tsEslint.parser,
         tsconfigRootDir: __dirname, // Adjust if tsconfig.json is not in the root
-        // if uncomment then display an error
-        // Parsing error: ESLint was configured to run on `<tsconfigRootDir>
-        //project: "./tsconfig.json", // Path to your tsconfig.json
         extraFileExtensions: [".vue"],
       },
     },

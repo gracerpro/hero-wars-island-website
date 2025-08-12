@@ -8,7 +8,7 @@ import { getIndexedDbSize, getLocalStorageSize } from '@/core/storage'
 
 const { t } = useI18n()
 const ssrContext = import.meta.env.SSR ? useSSRContext() : undefined
-const version = import.meta.env.VITE_VERSION
+const version = import.meta.env.VITE_APP_VERSION
 
 setMetaInfo(
   {
