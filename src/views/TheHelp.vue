@@ -25,7 +25,7 @@ setMetaInfo(
 </script>
 
 <template>
-  <div class="container app-container">
+  <div class="container text-container">
     <h1>{{ t('page.help.helpToProject') }}</h1>
 
     <p>{{ t('page.help.paragraph1') }}</p>

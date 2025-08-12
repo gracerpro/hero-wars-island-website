@@ -1,1 +1,1 @@
-export const filterNameMinCharsCount = 3
+export const NEWS_FILTER_MIN_CHARS_COUNT = 3

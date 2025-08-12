@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n'
-import { filterNameMinCharsCount } from './news'
+import { NEWS_FILTER_MIN_CHARS_COUNT } from './news'
+import { computed, ref } from 'vue'
 
 interface Props {
   loading: boolean
@@ -12,20 +13,47 @@ const emit = defineEmits<{
   find: []
 }>()
 
-const name = defineModel<string>('name', { required: true })
+const name = defineModel<string>('name', {
+  required: true,
+  set: (value: string) => {
+    form.value.name.isValid = value.length === 0 || value.length >= NEWS_FILTER_MIN_CHARS_COUNT
+    form.value.name.message = form.value.name.isValid
+      ? ''
+      : t('common.needEnterAtLeastCharacters', { n: NEWS_FILTER_MIN_CHARS_COUNT })
+
+    return value
+  },
+})
 
 const { t } = useI18n()
 
+const form = ref({
+  name: {
+    isValid: true,
+    message: '',
+  },
+})
+
+const isValid = computed(() => {
+  return form.value.name.isValid
+})
+
 function onClearName() {
   name.value = ''
-  emit('find')
+  onSubmit()
+}
+
+function onSubmit() {
+  if (isValid.value) {
+    emit('find')
+  }
 }
 </script>
 
 <template>
   <form
-    class="row mb-2"
-    @submit.prevent="emit('find')"
+    class="row mb-2 needs-validation"
+    @submit.prevent="onSubmit"
   >
     <div class="col-md-6 mb-3">
       <div class="input-group">
@@ -33,6 +61,7 @@ function onClearName() {
           id="filter__name"
           v-model.trim="name"
           class="form-control"
+          :class="{ 'is-invalid': !form.name.isValid }"
           :placeholder="t('common.name')"
         />
         <button
@@ -44,14 +73,17 @@ function onClearName() {
           X
         </button>
       </div>
-      <div class="form-text">
-        {{ t('common.needEnterAtLeastCharacters', { n: filterNameMinCharsCount }) }}
+      <div
+        class="form-text"
+        :class="{ 'is-invalid': !form.name.isValid }"
+      >
+        {{ t('common.needEnterAtLeastCharacters', { n: NEWS_FILTER_MIN_CHARS_COUNT }) }}
       </div>
     </div>
     <div class="col-md-2 mb-3">
       <button
         type="submit"
-        :disabled="loading"
+        :disabled="loading || !isValid"
         class="btn btn-primary"
       >
         {{ t('common.find') }}
@@ -59,3 +91,9 @@ function onClearName() {
     </div>
   </form>
 </template>
+
+<style scoped>
+.is-invalid {
+  color: var(--bs-form-invalid-color);
+}
+</style>
