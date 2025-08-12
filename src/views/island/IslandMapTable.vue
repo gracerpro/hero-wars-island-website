@@ -1,22 +1,22 @@
-<script>
-const EVENT_UPDATE_IS_SHOW_BLOCK = "update:isShowBlock";
-</script>
-<script setup>
-import { useI18n } from "vue-i18n";
+<script setup lang="ts">
+import { useI18n } from 'vue-i18n'
+import { type ViewReward } from './map'
 
-defineProps({
-  header: { type: String, required: true },
-  isShowBlock: { type: Boolean, required: true },
-  rewards: { type: Array, required: true },
-  visibleRewardsCount: { type: Number, required: true },
-});
-const emit = defineEmits([EVENT_UPDATE_IS_SHOW_BLOCK]);
+interface Props {
+  header: string
+  rewards: Array<ViewReward>
+  visibleRewardsCount: number
+}
 
-const { t } = useI18n();
+defineProps<Props>()
 
-const getItemName = (item) => {
-  return item.item.name ? item.item.name : t("common.noName");
-};
+const isShowBlock = defineModel<boolean>('isShowBlock', { required: true })
+
+const { t } = useI18n()
+
+const getItemName = (item: ViewReward) => {
+  return item.item.name.length > 0 ? item.item.name : t('common.noName')
+}
 </script>
 
 <template>
@@ -24,9 +24,9 @@ const getItemName = (item) => {
     <h3>{{ header }}</h3>
     <a
       href="#"
-      @click.prevent="emit(EVENT_UPDATE_IS_SHOW_BLOCK, !isShowBlock)"
+      @click.prevent="isShowBlock = !isShowBlock"
     >
-      {{ t(isShowBlock ? "common.hide" : "common.show") }}
+      {{ t(isShowBlock ? 'common.hide' : 'common.show') }}
     </a>
     <span class="badge text-bg-secondary ms-2">{{ visibleRewardsCount }}</span>
     <div
@@ -37,30 +37,30 @@ const getItemName = (item) => {
         <thead>
           <tr>
             <th></th>
-            <th>{{ t("common.resource") }}</th>
-            <th>{{ t("common.quantity") }}</th>
+            <th>{{ t('common.resource') }}</th>
+            <th>{{ t('common.quantity') }}</th>
           </tr>
         </thead>
         <tbody>
           <tr v-if="!rewards.length">
-            <td colspan="3">{{ t("common.noData") }}</td>
+            <td colspan="3">{{ t('common.noData') }}</td>
           </tr>
           <tr
-            v-for="item in rewards"
+            v-for="reward in rewards"
             v-else
-            :key="item.uniqueId"
+            :key="reward.uniqueId"
           >
             <td>
               <img
-                v-if="item.item.iconUrl"
-                :src="item.item.iconUrl"
-                :width="item.item.iconWidth"
-                :height="item.item.iconHeight"
+                v-if="reward.item.iconUrl && reward.item.iconWidth && reward.item.iconHeight"
+                :src="reward.item.iconUrl"
+                :width="reward.item.iconWidth"
+                :height="reward.item.iconHeight"
                 class="icon"
               />
             </td>
-            <td>{{ getItemName(item) }}</td>
-            <td class="text-end">{{ item.humanQuantity }}</td>
+            <td>{{ getItemName(reward) }}</td>
+            <td class="text-end">{{ reward.humanQuantity }}</td>
           </tr>
         </tbody>
       </table>

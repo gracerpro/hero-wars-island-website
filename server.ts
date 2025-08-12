@@ -1,0 +1,119 @@
+import fs from 'node:fs/promises'
+import express, { type Request, type Response } from 'express'
+import { type AppSsrManifest, getHtml, type RenderFun } from './src/server-common.ts'
+import { HttpError } from './src/exceptions/HttpError.ts'
+import type { ViteDevServer } from 'vite'
+
+// Constants
+const isProduction = process.env.NODE_ENV === 'production'
+const port = 8082
+const base = '/'
+
+// Cached production assets
+const templateHtml = isProduction ? await fs.readFile('./dist/client/index.html', 'utf-8') : ''
+
+let ssrManifest: AppSsrManifest | undefined
+
+if (isProduction) {
+  const json = await fs.readFile('./dist/client/.vite/ssr-manifest.json', 'utf-8')
+  ssrManifest = JSON.parse(json)
+
+  if (typeof ssrManifest !== 'object') {
+    throw new Error('ssr-manifest.json is not object.')
+  }
+}
+
+// Create http server
+const app = express()
+
+// Add Vite or respective production middlewares
+let vite: ViteDevServer
+
+if (!isProduction) {
+  const { createServer } = await import('vite')
+  vite = await createServer({
+    server: { middlewareMode: true },
+    appType: 'custom',
+    base,
+  })
+  app.use(vite.middlewares)
+} else {
+  const compression = (await import('compression')).default
+  const sirv = (await import('sirv')).default
+  app.use(compression())
+  app.use(base, sirv('./dist/client', { extensions: [] }))
+}
+
+// Serve HTML
+app.use(async (request: Request, response: Response) => {
+  try {
+    const url = request.originalUrl.replace(base, '')
+
+    console.log('recieve url:', url)
+
+    const { html, statusCode } = await getAppHtml(url, ssrManifest)
+
+    response.status(statusCode).set({ 'Content-Type': 'text/html; charset=UTF-8' }).send(html)
+  } catch (e: unknown) {
+    if (e instanceof Error) {
+      vite?.ssrFixStacktrace(e)
+      console.log(e.stack)
+    }
+
+    if (e instanceof HttpError) {
+      response.status(e.statusCode)
+    } else {
+      response.status(500)
+    }
+
+    if (e instanceof Error) {
+      response.end(e.stack)
+    } else {
+      response.end('error')
+    }
+  }
+})
+
+// Start http server
+app.listen(port, () => {
+  console.log(`Server started at http://localhost:${port}`)
+})
+
+async function getAppHtml(url: string, manifest?: AppSsrManifest) {
+  let template: string
+  let render: RenderFun
+
+  if (!isProduction) {
+    // Always read fresh template in development
+    template = await fs.readFile('./index.html', 'utf-8')
+
+    // 2. Apply Vite HTML transforms. This injects the Vite HMR client,
+    //    and also applies HTML transforms from Vite plugins, e.g. global
+    //    preambles from @vitejs/plugin-react
+    template = await vite.transformIndexHtml(url, template)
+
+    // 3a. Load the server entry. ssrLoadModule automatically transforms
+    //    ESM source code to be usable in Node.js! There is no bundling
+    //    required, and provides efficient invalidation similar to HMR.
+    render = (await vite.ssrLoadModule('./src/entry-server.js')).render
+
+    // 3b. Since Vite 5.1, you can use the experimental createViteRuntime API
+    //    instead.
+    //    It fully supports HMR and works in a simillar way to ssrLoadModule
+    //    More advanced use case would be creating a runtime in a separate
+    //    thread or even a different machine using ViteRuntime class
+    //const runtime = await vite.createViteRuntime(server)
+    //const { render } = await runtime.executeEntrypoint('/src/entry-server.js')
+  } else {
+    template = templateHtml
+
+    render = (await import('./dist/server/entry-server.js')).render
+  }
+
+  return getHtml({
+    url,
+    manifest,
+    template,
+    render,
+  })
+}

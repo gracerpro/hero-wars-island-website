@@ -1,59 +1,58 @@
-<script>
-const EVENT_RESET = "reset";
-</script>
-<script setup>
-import {
-  DELTA_SCALE,
-  EVENT_CHANGE_SCALE,
-  EVENT_CHANGE_TRANSLATE,
-  TRANSLATE_X,
-  TRANSLATE_Y,
-} from "@/services/island-map";
-import { useI18n } from "vue-i18n";
+<script setup lang="ts">
+/* global MouseEvent */
 
-const props = defineProps({
-  loading: { type: Boolean, required: true },
-  translateX: { type: Number, required: true },
-  translateY: { type: Number, required: true },
-});
-const emit = defineEmits([EVENT_RESET, EVENT_CHANGE_SCALE, EVENT_CHANGE_TRANSLATE]);
+import { DELTA_SCALE, TRANSLATE_X, TRANSLATE_Y } from '@/services/island-map'
+import { useI18n } from 'vue-i18n'
 
-const { t } = useI18n();
-
-function onChangeScale(zoom, event) {
-  let value = zoom * DELTA_SCALE;
-
-  if (event.ctrlKey) {
-    value /= 10;
-  } else if (event.shiftKey) {
-    value /= 2;
-  }
-
-  emit(EVENT_CHANGE_SCALE, value);
+interface Props {
+  loading: boolean
+  translateX: number
+  translateY: number
 }
 
-function onChangeTranslate(xDirection, yDirection, event) {
+const props = defineProps<Props>()
+const emit = defineEmits<{
+  reset: []
+  'change-scale': [value: number]
+  'change-translate': [x: number | null, y: number | null]
+}>()
+
+const { t } = useI18n()
+
+function onChangeScale(zoom: number, event: MouseEvent) {
+  let value = zoom * DELTA_SCALE
+
+  if (event.ctrlKey) {
+    value /= 10
+  } else if (event.shiftKey) {
+    value /= 2
+  }
+
+  emit('change-scale', value)
+}
+
+function onChangeTranslate(xDirection: number, yDirection: number, event: MouseEvent) {
   let dx = 0,
-    dy = 0;
+    dy = 0
 
   if (xDirection !== 0) {
-    dx = 5 * xDirection * TRANSLATE_X;
+    dx = 5 * xDirection * TRANSLATE_X
     if (event.ctrlKey) {
-      dx /= 10;
+      dx /= 10
     } else if (event.shiftKey) {
-      dx /= 2;
+      dx /= 2
     }
   }
   if (yDirection !== 0) {
-    dy = 5 * yDirection * TRANSLATE_Y;
+    dy = 5 * yDirection * TRANSLATE_Y
     if (event.ctrlKey) {
-      dy /= 10;
+      dy /= 10
     } else if (event.shiftKey) {
-      dy /= 2;
+      dy /= 2
     }
   }
 
-  emit(EVENT_CHANGE_TRANSLATE, props.translateX + dx, props.translateY + dy);
+  emit('change-translate', props.translateX + dx, props.translateY + dy)
 }
 </script>
 
@@ -117,7 +116,7 @@ function onChangeTranslate(xDirection, yDirection, event) {
       class="btn btn-secondary toolbar-button"
       :title="t('common.reset')"
       :disabled="loading"
-      @click="emit(EVENT_RESET)"
+      @click="emit('reset')"
     >
       0
     </button>

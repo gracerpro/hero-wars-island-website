@@ -1,143 +1,133 @@
-<script>
-const EVENT_UPDATE_IS_SELECT_ANY_NODE = "update:is-select-any-node";
-const EVENT_RESET_USER_NODES = "reset-user-nodes";
-const EVENT_RESET_DISABLE_NODES = "reset-disable-nodes";
-const EVENT_UPDATE_SELECT_MODE = "update:select-mode";
-</script>
-<script setup>
-import { createI18nRouteTo } from "@/i18n/translation";
-import { computed } from "vue";
-import { useI18n } from "vue-i18n";
-import { SELECT_MODE_DISABLE, SELECT_MODE_GOING, SELECT_MODE_PLAN } from "./select-mode";
-import { defaultCostItem, isCommonStep, isStepType } from "@/api/Node";
-import { GAME_ID_EXPLORER_MOVE, GAME_ID_WOOD, TYPE_COIN, TYPE_STARMONEY } from "@/api/Item";
+<script setup lang="ts">
+import { createI18nRouteTo } from '@/i18n/translation'
+import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
+import { SELECT_MODE_DISABLE, SELECT_MODE_GOING, SELECT_MODE_PLAN } from './map'
+import { isCommonStep, type CostItem, type NodeMap } from '@/api/NodeApi'
+import {
+  GAME_ID_EXPLORER_MOVE,
+  GAME_ID_WOOD,
+  TYPE_COIN,
+  TYPE_STARMONEY,
+  type Type,
+} from '@/api/ItemApi'
+import type { UserNodeIds, SelectMode } from './map'
 
-const { t } = useI18n();
+interface Props {
+  disableNodesCount: number
+  nodes: NodeMap
+  userNodesIds: UserNodeIds
+}
 
-const props = defineProps({
-  selectMode: { type: String, required: true },
-  isSelectAnyNode: { type: Boolean, required: true },
-  disableNodesCount: { type: Number, required: true },
-  nodes: { type: Object, required: true },
-  userNodesIdsMap: { type: Object, required: true },
-});
+interface StepCostItem {
+  readonly item: CostItem
+  quantity: number
+  readonly iconClass?: string
+}
 
-const emit = defineEmits([
-  EVENT_UPDATE_IS_SELECT_ANY_NODE,
-  EVENT_RESET_USER_NODES,
-  EVENT_UPDATE_SELECT_MODE,
-  EVENT_RESET_DISABLE_NODES,
-]);
+const { t } = useI18n()
+
+const props = defineProps<Props>()
+
+const isSelectAnyNode = defineModel<boolean>('isSelectAnyNode', { required: true })
+const selectMode = defineModel<SelectMode>('selectMode', { required: true })
+
+const emit = defineEmits<{
+  'reset-user-nodes': []
+  'reset-disable-nodes': []
+}>()
 
 const selectModes = computed(() => {
   return [
-    { value: SELECT_MODE_PLAN, label: t("page.island.planning") },
-    { value: SELECT_MODE_GOING, label: t("page.island.going") },
-    { value: SELECT_MODE_DISABLE, label: t("page.island.exclusion") },
-  ];
-});
+    { value: SELECT_MODE_PLAN, label: t('page.island.planning') },
+    { value: SELECT_MODE_GOING, label: t('page.island.going') },
+    { value: SELECT_MODE_DISABLE, label: t('page.island.exclusion') },
+  ]
+})
 const selectModeHint = computed(() => {
-  switch (props.selectMode) {
+  switch (selectMode.value) {
     case SELECT_MODE_PLAN:
-      return t("page.island.canSelectAnyNode");
+      return t('page.island.canSelectAnyNode')
     case SELECT_MODE_GOING:
-      return t("page.island.canSelectOnlyPlannedNode");
+      return t('page.island.canSelectOnlyPlannedNode')
     case SELECT_MODE_DISABLE:
-      return t("page.island.makeExcludedCellDescr");
+      return t('page.island.makeExcludedCellDescr')
   }
-  return "";
-});
+  return ''
+})
 const userStepCostItems = computed(() => {
-  const map = {};
+  const map: { [key: string]: StepCostItem } = {}
 
-  for (let nodeId in props.userNodesIdsMap) {
-    const node = props.nodes[nodeId];
-    if (!node) {
-      continue;
+  props.userNodesIds.forEach((nodeId) => {
+    const node = props.nodes.get(nodeId)
+    if (node) {
+      const key = getStepItemKey(node.costItem.type, node.costItem.gameId)
+
+      if (!map[key]) {
+        map[key] = {
+          item: node.costItem,
+          quantity: 0,
+        }
+      }
+      map[key].quantity += node.costItemCount
     }
+  })
 
-    const costItem = node.cost ?? defaultCostItem;
-    const key = costItem.typeId + "_" + costItem.gameId;
-
-    if (!map[key]) {
-      map[key] = {
-        typeId: costItem.typeId,
-        gameId: costItem.gameId,
-        count: 0,
-      };
-    }
-    map[key].count += costItem.count ?? 1;
-  }
-
-  return map;
-});
+  return map
+})
 const otherStepCostItems = computed(() => {
-  const result = {};
+  const result: { [key: string]: StepCostItem } = {}
 
   for (const key in userStepCostItems.value) {
-    const item = userStepCostItems.value[key];
+    const stepItem = userStepCostItems.value[key]
 
-    if (!isCommonStep(item)) {
-      let icon = null;
+    if (!isCommonStep(stepItem.item)) {
+      let icon
 
-      if (item.typeId === TYPE_STARMONEY) {
-        icon = "item-emerald";
+      if (stepItem.item.type === TYPE_STARMONEY) {
+        icon = 'item-emerald'
       }
 
       result[key] = {
-        ...item,
-        icon,
-      };
+        ...stepItem,
+        iconClass: icon,
+      }
     }
   }
 
-  return result;
-});
+  return result
+})
 const explorerMoveCount = computed(
-  () => userStepCostItems.value[TYPE_COIN + "_" + GAME_ID_EXPLORER_MOVE]?.count ?? 0
-);
+  () => userStepCostItems.value[getStepItemKey(TYPE_COIN, GAME_ID_EXPLORER_MOVE)]?.quantity ?? 0
+)
 const woodMoveCount = computed(
-  () => userStepCostItems.value[TYPE_COIN + "_" + GAME_ID_WOOD]?.count ?? 0
-);
+  () => userStepCostItems.value[getStepItemKey(TYPE_COIN, GAME_ID_WOOD)]?.quantity ?? 0
+)
 const totalWoodMoveCount = computed(() => {
-  let result = 0;
+  let result = 0
 
-  for (const nodeId in props.nodes) {
-    const node = props.nodes[nodeId];
-
-    if (node.cost) {
-      if (node.cost.typeId === TYPE_COIN && node.cost.gameId == GAME_ID_WOOD) {
-        ++result;
-      }
+  props.nodes.forEach((node) => {
+    if (node.costItem.type === TYPE_COIN && node.costItem.gameId == GAME_ID_WOOD) {
+      ++result
     }
-  }
+  })
 
-  return result;
-});
+  return result
+})
 const totalExplorerMoveCount = computed(() => {
-  let result = 0;
+  let result = 0
 
-  for (const nodeId in props.nodes) {
-    const node = props.nodes[nodeId];
-
-    if (!node.cost) {
-      if (isStepType(node.typeId)) {
-        ++result;
-      }
-    } else if (node.cost.typeId === TYPE_COIN && node.cost.gameId == GAME_ID_EXPLORER_MOVE) {
-      ++result;
+  props.nodes.forEach((node) => {
+    if (node.costItem.type === TYPE_COIN && node.costItem.gameId == GAME_ID_EXPLORER_MOVE) {
+      ++result
     }
-  }
+  })
 
-  return result;
-});
+  return result
+})
 
-function onChangeIsSelectAnyNode(event) {
-  emit(EVENT_UPDATE_IS_SELECT_ANY_NODE, event.target.checked);
-}
-
-function onChangeSelectMode(event) {
-  emit(EVENT_UPDATE_SELECT_MODE, event.target.value);
+function getStepItemKey(type: Type, gameId: number): string {
+  return type + '_' + gameId
 }
 </script>
 
@@ -145,7 +135,7 @@ function onChangeSelectMode(event) {
   <div class="row">
     <div class="col-sm-6">
       <div>
-        {{ t("page.island.myExplorersMoves") }}
+        {{ t('page.island.myExplorersMoves') }}
       </div>
       <div>
         <div class="mb-1">
@@ -170,23 +160,17 @@ function onChangeSelectMode(event) {
           </span>
         </div>
         <div
-          v-for="(item, key) in otherStepCostItems"
+          v-for="(stepItem, key) in otherStepCostItems"
           :key="key"
           class="mb-1"
         >
           <span class="d-inline-block">
             <span
-              v-if="item.icon"
-              :class="['hero-color-icon align-middle me-3', item.icon]"
-              :title="'typeId = ' + item.typeId + ' gameId = ' + item.gameId"
-            ></span>
-            <span
-              v-else
-              class="hero-color-icon align-middle me-3"
-              :title="'typeId = ' + item.typeId + ' gameId = ' + item.gameId"
+              :class="['hero-color-icon align-middle me-3', stepItem.iconClass ?? '']"
+              :title="'typeId = ' + stepItem.item.type + ' gameId = ' + stepItem.item.gameId"
             ></span>
             <span class="fs-4 align-middle">
-              <b>{{ item.count }}</b>
+              <b>{{ stepItem.quantity }}</b>
             </span>
           </span>
         </div>
@@ -195,21 +179,21 @@ function onChangeSelectMode(event) {
         <button
           type="button"
           :class="['btn btn-secondary mt-1', explorerMoveCount > 0 ? '' : 'disabled']"
-          @click="emit(EVENT_RESET_USER_NODES)"
+          @click="emit('reset-user-nodes')"
         >
-          {{ t("common.reset") }}
+          {{ t('common.reset') }}
         </button>
       </div>
       <div>
-        {{ t("page.island.excludedCells") }} <b class="fs-4">{{ disableNodesCount }}</b>
+        {{ t('page.island.excludedCells') }} <b class="fs-4">{{ disableNodesCount }}</b>
       </div>
       <div class="mb-3">
         <button
           type="button"
           :class="['btn btn-secondary mt-1', disableNodesCount > 0 ? '' : 'disabled']"
-          @click="emit(EVENT_RESET_DISABLE_NODES)"
+          @click="emit('reset-disable-nodes')"
         >
-          {{ t("common.reset") }}
+          {{ t('common.reset') }}
         </button>
       </div>
     </div>
@@ -220,10 +204,9 @@ function onChangeSelectMode(event) {
         class="me-2"
       >
         <input
+          v-model="selectMode"
           type="radio"
           :value="mode.value"
-          :checked="selectMode === mode.value"
-          @change="onChangeSelectMode"
         />
         {{ mode.label }}
       </label>
@@ -232,18 +215,17 @@ function onChangeSelectMode(event) {
     <div class="col-sm-6">
       <label class="d-block mb-3">
         <input
+          v-model="isSelectAnyNode"
           type="checkbox"
-          :checked="isSelectAnyNode"
-          @change="onChangeIsSelectAnyNode"
         />
-        {{ t("common.selectAnyNodeQuestion") }}
+        {{ t('common.selectAnyNodeQuestion') }}
       </label>
     </div>
     <div class="col-sm-6 text-end">
       <router-link
         :to="createI18nRouteTo({ name: 'contact' })"
         class="d-block mb-3"
-        >{{ t("common.haveErrosOrProposal") }}</router-link
+        >{{ t('common.haveErrosOrProposal') }}</router-link
       >
     </div>
   </div>

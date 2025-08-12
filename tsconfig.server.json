@@ -1,0 +1,11 @@
+{
+  "extends": "./tsconfig.node.json",
+  "files": [
+    "server.ts",
+    "src/entry-server.ts",
+    "src/server-common.ts",
+  ],
+  "compilerOptions": {
+    "allowJs": true
+  }
+}

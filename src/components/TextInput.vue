@@ -1,39 +1,29 @@
-<script>
-const EVENT_UPDATE_VALUE = "update:model-value";
-</script>
-<script setup>
-const props = defineProps({
-  inputId: { type: String, required: true },
-  modelValue: { type: String, default: "" },
-  modelModifiers: {
-    type: Object,
-    default: () => ({}),
+<script setup lang="ts">
+interface Props {
+  inputId: string
+}
+
+defineProps<Props>()
+
+const [modelValue, modifiers] = defineModel<string>({
+  default: '',
+  set(value: string) {
+    if (modifiers.trim) {
+      value = value.trim()
+    }
+
+    return value
   },
-});
-const emit = defineEmits([EVENT_UPDATE_VALUE]);
-
-const onInput = (event) => {
-  let value = event.target.value;
-
-  if (props.modelModifiers.trim) {
-    value = value.trim();
-  }
-
-  emit(EVENT_UPDATE_VALUE, value);
-};
-const onClear = () => {
-  emit(EVENT_UPDATE_VALUE, "");
-};
+})
 </script>
 
 <template>
   <div class="input-group">
     <input
       :id="inputId"
-      :value="modelValue"
+      v-model="modelValue"
       type="text"
       class="form-control"
-      @input="onInput"
     />
     <span class="input-group-text">
       <button
@@ -41,7 +31,7 @@ const onClear = () => {
         class="btn-close"
         aria-label="Close"
         :disabled="modelValue === ''"
-        @click="onClear"
+        @click="modelValue = ''"
       ></button>
     </span>
   </div>

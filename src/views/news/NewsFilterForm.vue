@@ -1,38 +1,68 @@
-<script>
-const EVENT_FIND = "find";
-const EVENT_UPDATE_NAME = "update:name";
-</script>
-<script setup>
-import { useI18n } from "vue-i18n";
-import { filterNameMinCharsCount } from "../news";
+<script setup lang="ts">
+import { useI18n } from 'vue-i18n'
+import { NEWS_FILTER_MIN_CHARS_COUNT } from './news'
+import { computed, ref } from 'vue'
 
-defineProps({
-  loading: { type: Boolean, required: true },
-  name: { type: String, required: true },
-});
-const emit = defineEmits([EVENT_FIND, EVENT_UPDATE_NAME]);
+interface Props {
+  loading: boolean
+}
 
-const { t } = useI18n();
+defineProps<Props>()
+
+const emit = defineEmits<{
+  find: []
+}>()
+
+const name = defineModel<string>('name', {
+  required: true,
+  set: (value: string) => {
+    form.value.name.isValid = value.length === 0 || value.length >= NEWS_FILTER_MIN_CHARS_COUNT
+    form.value.name.message = form.value.name.isValid
+      ? ''
+      : t('common.needEnterAtLeastCharacters', { n: NEWS_FILTER_MIN_CHARS_COUNT })
+
+    return value
+  },
+})
+
+const { t } = useI18n()
+
+const form = ref({
+  name: {
+    isValid: true,
+    message: '',
+  },
+})
+
+const isValid = computed(() => {
+  return form.value.name.isValid
+})
 
 function onClearName() {
-  emit(EVENT_UPDATE_NAME, "");
-  emit(EVENT_FIND);
+  name.value = ''
+  onSubmit()
+}
+
+function onSubmit() {
+  if (isValid.value) {
+    emit('find')
+  }
 }
 </script>
 
 <template>
   <form
-    class="row mb-2"
-    @submit.prevent="emit(EVENT_FIND)"
+    class="row mb-2 needs-validation"
+    @submit.prevent="onSubmit"
   >
     <div class="col-md-6 mb-3">
       <div class="input-group">
         <input
           id="filter__name"
-          :value="name"
+          v-model.trim="name"
           class="form-control"
+          :class="{ 'is-invalid': !form.name.isValid }"
           :placeholder="t('common.name')"
-          @input="emit(EVENT_UPDATE_NAME, $event.target.value.trim())"
         />
         <button
           type="button"
@@ -43,18 +73,27 @@ function onClearName() {
           X
         </button>
       </div>
-      <div class="form-text">
-        {{ t("common.needEnterAtLeastCharacters", { n: filterNameMinCharsCount }) }}
+      <div
+        class="form-text"
+        :class="{ 'is-invalid': !form.name.isValid }"
+      >
+        {{ t('common.needEnterAtLeastCharacters', { n: NEWS_FILTER_MIN_CHARS_COUNT }) }}
       </div>
     </div>
     <div class="col-md-2 mb-3">
       <button
         type="submit"
-        :disabled="loading"
+        :disabled="loading || !isValid"
         class="btn btn-primary"
       >
-        {{ t("common.find") }}
+        {{ t('common.find') }}
       </button>
     </div>
   </form>
 </template>
+
+<style scoped>
+.is-invalid {
+  color: var(--bs-form-invalid-color);
+}
+</style>

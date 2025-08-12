@@ -1,60 +1,55 @@
-<script>
-export const TYPE_SUCCESS = "success";
-export const TYPE_DANGER = "danger";
-</script>
-<script setup>
-import { ref, computed } from "vue";
+<script setup lang="ts">
+/* global HTMLElement */
+/* global document */
 
-let Toast;
+import { ref, computed } from 'vue'
+import { type ToastType, TYPE_DANGER, TYPE_SUCCESS } from './toast'
 
-if (!import.meta.env.SSR) {
-  import("bootstrap").then((module) => (Toast = module.Toast));
+interface Props {
+  elementId: string
 }
 
-const props = defineProps({
-  elementId: { type: String, required: true },
-});
+const props = defineProps<Props>()
 
-const toastMessage = ref("");
-const toastType = ref(TYPE_SUCCESS);
-const isShow = ref(false);
+const toastMessage = ref('')
+const toastType = ref<ToastType>(TYPE_SUCCESS)
+const isShow = ref(false)
 
 const classType = computed(() => {
   if (toastType.value === TYPE_SUCCESS) {
-    return "text-bg-success";
+    return 'text-bg-success'
   }
   if (toastType.value === TYPE_DANGER) {
-    return "text-bg-danger";
+    return 'text-bg-danger'
   }
-  return "";
-});
+  return ''
+})
 
-/**
- * @param {String} message
- * @param {String|null} type
- */
-function show(message, type) {
-  toastMessage.value = message;
+function show(message: string, type?: ToastType) {
+  toastMessage.value = message
+
   if (type) {
-    toastType.value = type;
+    toastType.value = type
   }
 
-  const element = document.getElementById(props.elementId);
-  element.addEventListener("hide.bs.toast", () => (isShow.value = false), {
-    once: true,
-  });
+  import('bootstrap').then((module) => {
+    const element = document.getElementById(props.elementId) as HTMLElement
+    element.addEventListener('hide.bs.toast', () => (isShow.value = false), {
+      once: true,
+    })
 
-  const toast = new Toast(element, {
-    delay: 2000,
-    autohide: true,
-  });
-  toast.show();
-  isShow.value = true;
+    const toast = new module.Toast(element, {
+      delay: 2000,
+      autohide: true,
+    })
+    toast.show()
+    isShow.value = true
+  })
 }
 
 defineExpose({
   show,
-});
+})
 </script>
 
 <template>

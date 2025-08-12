@@ -1,34 +1,33 @@
-<script>
-const EVENT_UPDATE_REGION_NUMBERS = "update:region-numbers";
-const EVENT_RESET_REGION_NUMBERS = "reset-region-numbers";
-</script>
-<script setup>
-import { useI18n } from "vue-i18n";
-import { getRegionTitle } from "./island";
+<script setup lang="ts">
+import { useI18n } from 'vue-i18n'
+import { getRegionTitle } from './island'
+import type { Region } from '@/api/IslandApi'
 
-const { t } = useI18n();
+interface Props {
+  regions: Array<Region>
+  loading: boolean
+}
 
-const props = defineProps({
-  regions: { type: Array, required: true },
-  regionNumbers: { type: Array, required: true },
-  loading: { type: Boolean, required: true },
-});
-const emit = defineEmits([EVENT_UPDATE_REGION_NUMBERS, EVENT_RESET_REGION_NUMBERS]);
+defineProps<Props>()
 
-function onChangeNumber(region) {
+const regionNumbers = defineModel<Array<number>>('regionNumbers', { required: true })
+
+const { t } = useI18n()
+
+function onChangeNumber(region: Region) {
   if (!region.isVisible) {
-    return;
+    return
   }
-  const numbers = props.regionNumbers;
-  const index = numbers.indexOf(region.number);
+  const numbers = regionNumbers.value
+  const index = numbers.indexOf(region.number)
 
   if (index >= 0) {
-    numbers.splice(index, 1);
+    numbers.splice(index, 1)
   } else {
-    numbers.push(region.number);
+    numbers.push(region.number)
   }
 
-  emit(EVENT_UPDATE_REGION_NUMBERS, numbers);
+  regionNumbers.value = Array.from(numbers)
 }
 </script>
 
@@ -57,7 +56,7 @@ function onChangeNumber(region) {
       class="btn btn-outline-secondary toolbar-button"
       :disabled="loading || regionNumbers.length === 0"
       :title="t('common.reset')"
-      @click="emit(EVENT_RESET_REGION_NUMBERS)"
+      @click="regionNumbers = []"
     >
       <span class="btn-close"></span>
     </button>

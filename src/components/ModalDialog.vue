@@ -1,86 +1,91 @@
-<script setup>
-import { computed } from "vue";
-import { useI18n } from "vue-i18n";
+<script setup lang="ts">
+/* global HTMLElement */
+/* global document */
 
-const { t } = useI18n();
+import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
+import type { DialogResult } from './modal-dialog'
+import type { Modal } from 'bootstrap'
+
+const { t } = useI18n()
+
+let moduleResolve: (value: DialogResult) => void
+let modal: Modal | null = null
+let dialogResult: DialogResult = null
+
+interface Props {
+  elementId: string
+  formId: string
+  saving?: boolean
+  header?: string
+  submitButtonText?: string
+  size?: 'sm' | 'lg' | 'xl'
+  isShowSubmit?: boolean
+  initResult?: object | number | string | null
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  saving: false,
+  header: '',
+  submitButtonText: '',
+  size: 'lg',
+  isShowSubmit: true,
+  initResult: null,
+})
+
+const sizeClass = computed(() => {
+  const sizes: { [key: string]: string } = {
+    sm: 'modal-sm',
+    lg: 'modal-lg',
+    xl: 'modal-xl',
+  }
+
+  return sizes[props.size] ?? ''
+})
+
+const hideDialog = () => {
+  modal?.dispose()
+  modal = null
+
+  moduleResolve(dialogResult)
+}
+
+async function show(): Promise<unknown> {
+  if (modal) {
+    throw new Error('The modal dialog is already open.')
+  }
+
+  const module = await import('bootstrap')
+
+  let promise = new Promise((resolve) => {
+    moduleResolve = resolve
+  })
+
+  const modalElement = document.getElementById(props.elementId) as HTMLElement
+  modalElement.addEventListener(
+    'hidden.bs.modal',
+    () => {
+      hideDialog()
+    },
+    { once: true }
+  )
+
+  dialogResult = props.initResult
+
+  modal = new module.Modal(modalElement)
+  modal.show()
+
+  return promise
+}
+
+function hide() {
+  modal?.hide()
+}
 
 defineExpose({
   show,
   hide,
-});
-
-let Modal;
-let moduleResolve = null;
-let modal = null;
-let dialogResult = null;
-
-if (!import.meta.env.SSR) {
-  // Load bootstrap module asynchronously else get an error on SSR
-  // ReferenceError: document is not defined
-  Modal = (await import("bootstrap")).Modal;
-}
-
-const props = defineProps({
-  elementId: { type: String, required: true },
-  saving: { type: Boolean, default: false },
-  formId: { type: String, default: "" },
-  header: { type: String, default: "" },
-  submitButtonText: { type: String, default: "" },
-  size: { type: String, default: "lg" },
-  isShowSubmit: { type: Boolean, default: true },
-  initResult: {
-    type: [Object, Number, String, null, undefined],
-    default: null,
-  },
-});
-
-const sizeClass = computed(() => {
-  const sizes = {
-    sm: "modal-sm",
-    lg: "modal-lg",
-    xl: "modal-xl",
-  };
-
-  return sizes[props.size] ? sizes[props.size] : "";
-});
-
-const hideDialog = () => {
-  modal.dispose();
-  modal = null;
-
-  moduleResolve(dialogResult);
-};
-
-function show() {
-  if (modal) {
-    throw new Error("The modal dialog is already open.");
-  }
-
-  let promise = new Promise((resolve) => {
-    moduleResolve = resolve;
-  });
-
-  const modalElement = document.getElementById(props.elementId);
-  modalElement.addEventListener(
-    "hidden.bs.modal",
-    () => {
-      hideDialog();
-    },
-    { once: true }
-  );
-
-  dialogResult = props.initResult;
-
-  modal = new Modal(modalElement, {});
-  modal.show();
-
-  return promise;
-}
-
-function hide(result) {
-  dialogResult = result;
-  modal.hide();
-}
+})
 </script>
 
 <template>
@@ -127,7 +132,7 @@ function hide(result) {
               class="visually-hidden"
               >Loading...</span
             >
-            {{ submitButtonText ? submitButtonText : t("common.save") }}
+            {{ submitButtonText ? submitButtonText : t('common.save') }}
           </button>
           <button
             type="button"
@@ -135,7 +140,7 @@ function hide(result) {
             data-bs-dismiss="modal"
             :disabled="saving"
           >
-            {{ t("common.cancel") }}
+            {{ t('common.cancel') }}
           </button>
         </div>
       </div>

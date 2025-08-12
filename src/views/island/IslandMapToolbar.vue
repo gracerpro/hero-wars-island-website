@@ -1,59 +1,51 @@
-<script>
-const EVENT_RESET = "reset";
-const EVENT_CHANGE_IS_SHOW_QUANTITY = "update:is-show-quantity";
-const EVENT_FULLSCREEN_ON = "fullscreen-on";
-const EVENT_BEGIN_DOWNLOAD = "begin-download";
-const EVENT_RELOAD_MAP = "reload-map";
-const EVENT_UPDATE_REGION_NUMBERS = "update:region-numbers";
-const EVENT_RESET_REGION_NUMBERS = "reset-region-numbers";
-</script>
-<script setup>
-import HelpDialog from "./IslandMapHelpDialog.vue";
-import IslandMapToolbarRegions from "./IslandMapToolbarRegions.vue";
-import IslandMapToolbarActions from "./IslandMapToolbarActions.vue";
-import { ref, shallowRef } from "vue";
-import { EVENT_CHANGE_TRANSLATE, EVENT_CHANGE_SCALE } from "@/services/island-map";
-import { useI18n } from "vue-i18n";
-import { computed } from "vue";
+<script setup lang="ts">
+import HelpDialog from './IslandMapHelpDialog.vue'
+import IslandMapToolbarRegions from './IslandMapToolbarRegions.vue'
+import IslandMapToolbarActions from './IslandMapToolbarActions.vue'
+import { shallowRef, useTemplateRef } from 'vue'
+import { useI18n } from 'vue-i18n'
+import { computed } from 'vue'
+import type { Region } from '@/api/IslandApi'
+import type { ComponentExposed } from 'vue-component-type-helpers'
 
-const { t } = useI18n();
+interface Props {
+  loading: boolean
+  translateX: number
+  translateY: number
+  regions: Array<Region>
+}
 
-defineProps({
-  isShowQuantity: { type: Boolean, required: true },
-  loading: { type: Boolean, required: true },
-  translateX: { type: Number, required: true },
-  translateY: { type: Number, required: true },
-  regions: { type: Array, required: true },
-  regionNumbers: { type: Array, required: true },
-});
+const { t } = useI18n()
 
-const emit = defineEmits([
-  EVENT_RESET,
-  EVENT_CHANGE_TRANSLATE,
-  EVENT_CHANGE_SCALE,
-  EVENT_CHANGE_IS_SHOW_QUANTITY,
-  EVENT_FULLSCREEN_ON,
-  EVENT_BEGIN_DOWNLOAD,
-  EVENT_RELOAD_MAP,
-  EVENT_UPDATE_REGION_NUMBERS,
-  EVENT_RESET_REGION_NUMBERS,
-]);
+defineProps<Props>()
 
-const helpDialog = ref(null);
-const helpDialogComponent = shallowRef(null);
+const emit = defineEmits<{
+  reset: []
+  'change-translate': [x: number | null, y: number | null]
+  'change-scale': [value: number]
+  'fullscreen-on': []
+  'begin-download': []
+  'reload-map': []
+}>()
+
+const isShowQuantity = defineModel<boolean>('isShowQuantity', { required: true })
+const regionNumbers = defineModel<Array<number>>('regionNumbers', { required: true })
+
+const helpDialogRef = useTemplateRef<ComponentExposed<typeof HelpDialog>>('helpDialogRef')
+const helpDialogComponent = shallowRef<typeof HelpDialog | null>(null)
 
 const isShowReloadMap = computed(() => {
-  return import.meta.env.MODE === "development";
-});
+  return import.meta.env.MODE === 'development'
+})
 
 function onHelpClick() {
-  helpDialogComponent.value = HelpDialog;
+  helpDialogComponent.value = HelpDialog
 }
 
 function onMountedHelpDialog() {
-  helpDialog.value.show().finally(() => {
-    helpDialogComponent.value = null;
-  });
+  helpDialogRef.value?.show().finally(() => {
+    helpDialogComponent.value = null
+  })
 }
 </script>
 
@@ -64,19 +56,17 @@ function onMountedHelpDialog() {
   >
     <island-map-toolbar-regions
       v-if="regions && regions.length > 1"
+      v-model:region-numbers="regionNumbers"
       :regions="regions"
-      :region-numbers="regionNumbers"
       :loading="loading"
-      @update:region-numbers="(numbers) => emit(EVENT_UPDATE_REGION_NUMBERS, numbers)"
-      @reset-region-numbers="emit(EVENT_RESET_REGION_NUMBERS)"
     />
     <island-map-toolbar-actions
       :loading="loading"
       :translate-x="translateX"
       :translate-y="translateY"
-      @change-translate="(dx, dy) => emit(EVENT_CHANGE_TRANSLATE, dx, dy)"
-      @change-scale="(value) => emit(EVENT_CHANGE_SCALE, value)"
-      @reset="emit(EVENT_RESET)"
+      @change-translate="(dx: number | null, dy: number | null) => emit('change-translate', dx, dy)"
+      @change-scale="(value: number) => emit('change-scale', value)"
+      @reset="emit('reset')"
     />
 
     <div
@@ -88,7 +78,7 @@ function onMountedHelpDialog() {
         :disabled="loading"
         :title="t('page.island.isShowQuantity')"
         :class="['btn toolbar-button', isShowQuantity ? 'btn-secondary' : 'btn-outline-secondary']"
-        @click="emit(EVENT_CHANGE_IS_SHOW_QUANTITY)"
+        @click="isShowQuantity = !isShowQuantity"
       >
         N
       </button>
@@ -102,7 +92,7 @@ function onMountedHelpDialog() {
         class="btn btn-secondary toolbar-button download-btn"
         :disabled="loading"
         :title="t('common.download')"
-        @click="emit(EVENT_BEGIN_DOWNLOAD)"
+        @click="emit('begin-download')"
       >
         <span class="hero-icon hero-download align-middle" />
       </button>
@@ -116,7 +106,7 @@ function onMountedHelpDialog() {
         class="btn btn-secondary toolbar-button fullscreen-btn"
         :disabled="loading"
         :title="t('common.fullscreenMode')"
-        @click="emit(EVENT_FULLSCREEN_ON)"
+        @click="emit('fullscreen-on')"
       >
         <span class="fullscreen-icon"></span>
       </button>
@@ -144,7 +134,7 @@ function onMountedHelpDialog() {
         class="btn btn-secondary"
         title="Reload"
         :disabled="loading"
-        @click="emit(EVENT_RELOAD_MAP)"
+        @click="emit('reload-map')"
       >
         L
       </button>
@@ -152,7 +142,7 @@ function onMountedHelpDialog() {
 
     <component
       :is="helpDialogComponent"
-      ref="helpDialog"
+      ref="helpDialogRef"
       @vue:mounted="onMountedHelpDialog"
     />
   </div>

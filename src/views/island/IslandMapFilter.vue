@@ -1,100 +1,77 @@
-<script>
-const EVENT_UPDATE_ITEM_NAME = "update:item-name";
-const EVENT_UPDATE_TYPE = "update:type-id";
-const EVENT_UPDATE_IS_NODE_TYPE_TOWER = "update:is-node-type-tower";
-const EVENT_UPDATE_IS_NODE_TYPE_CHEST = "update:is-node-type-chest";
-</script>
-<script setup>
-import TextInput from "@/components/TextInput.vue";
-import ClearSelect from "@/components/ClearSelect.vue";
-import { getLabelsByTypes } from "@/api/Item";
-import { useI18n } from "vue-i18n";
-import { TYPE_CHEST, TYPE_TOWER } from "@/api/Node";
-import { computed } from "vue";
+<script setup lang="ts">
+import TextInput from '@/components/TextInput.vue'
+import ClearSelect from '@/components/ClearSelect.vue'
+import { getLabelsByTypes, type Type } from '@/api/ItemApi'
+import { useI18n } from 'vue-i18n'
+import { TYPE_CHEST, TYPE_TOWER } from '@/api/NodeApi'
+import { computed } from 'vue'
+import type { SelectItemMap } from '@/components/select'
+import type { ViewNodeReward } from './map'
 
-const { t } = useI18n();
+interface Props {
+  rewards: Array<ViewNodeReward>
+  minCharsCount: number
+}
 
-const formId = "nodesForm";
+const itemName = defineModel<string>('itemName', { required: true })
+const itemType = defineModel<Type | null>('itemType', { required: true })
+const isNodeTypeTower = defineModel<boolean>('isNodeTypeTower', { required: true })
+const isNodeTypeChest = defineModel<boolean>('isNodeTypeChest', { required: true })
 
-const props = defineProps({
-  rewards: { type: Object, required: true },
-  itemName: { type: String, required: true },
-  typeId: { type: [Number, null], required: true },
-  isNodeTypeTower: { type: Boolean, required: true },
-  isNodeTypeChest: { type: Boolean, required: true },
-  minCharsCount: { type: Number, required: true },
-});
-const emit = defineEmits([
-  EVENT_UPDATE_ITEM_NAME,
-  EVENT_UPDATE_TYPE,
-  EVENT_UPDATE_IS_NODE_TYPE_TOWER,
-  EVENT_UPDATE_IS_NODE_TYPE_CHEST,
-]);
+const props = defineProps<Props>()
 
-const visibleTypes = computed(() => {
-  const map = {};
-  const labels = getLabelsByTypes(t);
+const { t } = useI18n()
 
-  props.rewards.forEach((item) => {
-    map[item.item.typeId] = true;
-  });
+const formId = 'nodesForm'
 
-  const types = {};
-  Object.keys(map).forEach((typeId) => {
-    if (typeId > 0) {
-      types[typeId] = labels[typeId];
+const visibleTypes = computed<SelectItemMap>(() => {
+  const map = new Map<number, boolean>()
+  const labels = getLabelsByTypes(t)
+
+  props.rewards.forEach((reward) => {
+    map.set(reward.item.type, true)
+  })
+
+  const types: SelectItemMap = {}
+  for (const type of map.keys()) {
+    if (type > 0) {
+      types[type] = labels[type as Type] ?? t('common.unknown')
     }
-  });
-
-  return types;
-});
-const isCheckedFlags = computed(() => {
-  return props.isNodeTypeTower || props.isNodeTypeChest;
-});
-const filledFilterCount = computed(() => {
-  let count = 0;
-
-  if (props.typeId !== null) {
-    ++count;
   }
-  if (props.itemName !== "") {
-    ++count;
+
+  return types
+})
+const isCheckedFlags = computed(() => {
+  return isNodeTypeTower.value || isNodeTypeChest.value
+})
+const filledFilterCount = computed(() => {
+  let count = 0
+
+  if (itemType.value !== null) {
+    ++count
+  }
+  if (itemName.value !== '') {
+    ++count
   }
   if (isCheckedFlags.value) {
-    ++count;
+    ++count
   }
 
-  return count;
-});
+  return count
+})
 
-function onUpdateName(name) {
-  emit(EVENT_UPDATE_ITEM_NAME, name);
-}
-function onChangeType(typeId) {
-  emit(EVENT_UPDATE_TYPE, typeId);
-}
-function onChangeNodeType(event) {
-  const typeId = parseInt(event.target.value);
-
-  if (typeId === TYPE_TOWER) {
-    emit(EVENT_UPDATE_IS_NODE_TYPE_TOWER, event.target.checked);
-  }
-  if (typeId === TYPE_CHEST) {
-    emit(EVENT_UPDATE_IS_NODE_TYPE_CHEST, event.target.checked);
-  }
-}
 function onReset() {
-  if (props.typeId !== null) {
-    emit(EVENT_UPDATE_TYPE, null);
+  if (itemType.value !== null) {
+    itemType.value = null
   }
-  if (props.itemName !== "") {
-    emit(EVENT_UPDATE_ITEM_NAME, "");
+  if (itemName.value !== '') {
+    itemName.value = ''
   }
-  if (props.isNodeTypeTower) {
-    emit(EVENT_UPDATE_IS_NODE_TYPE_TOWER, false);
+  if (isNodeTypeTower.value) {
+    isNodeTypeTower.value = false
   }
-  if (props.isNodeTypeChest) {
-    emit(EVENT_UPDATE_IS_NODE_TYPE_CHEST, false);
+  if (isNodeTypeChest.value) {
+    isNodeTypeChest.value = false
   }
 }
 </script>
@@ -105,73 +82,68 @@ function onReset() {
       <label
         :for="formId + '__itemName'"
         :class="['form-label', itemName.length > 0 ? 'not-empty' : '']"
-        >{{ t("common.resource") }}
+        >{{ t('common.resource') }}
         <span
-          v-if="itemName"
+          v-if="itemName !== ''"
           class="badge rounded-pill text-bg-warning"
           >&nbsp;</span
         >
       </label>
       <text-input
-        :model-value="itemName"
-        :model-modifiers="{ trim: true }"
+        v-model.trim="itemName"
         :input-id="formId + '__itemName'"
         :class="{ 'not-empty': itemName.length > 0 }"
-        @update:model-value="onUpdateName"
       />
       <div class="form-text fw-normal">
-        {{ t("common.needEnterAtLeastCharacters", { n: minCharsCount }) }}
+        {{ t('common.needEnterAtLeastCharacters', { n: minCharsCount }) }}
       </div>
     </div>
     <div class="col-md-6 mb-3">
       <label
-        :for="formId + '__typeId'"
-        :class="['form-label', typeId != null ? 'not-empty' : '']"
+        :for="formId + '__itemType'"
+        :class="['form-label', itemType != null ? 'not-empty' : '']"
       >
-        {{ t("common.type") }}
+        {{ t('common.type') }}
         <span
-          v-if="typeId != null"
+          v-if="itemType != null"
           class="badge rounded-pill text-bg-warning"
           >&nbsp;</span
         >
       </label>
       <clear-select
-        :model-value="typeId"
-        :input-id="formId + '__typeId'"
+        v-model="itemType"
+        :input-id="formId + '__itemType'"
         :select-values="visibleTypes"
-        :class="{ 'not-empty': typeId != null }"
-        @update:model-value="onChangeType"
+        :class="{ 'not-empty': itemType != null }"
       />
     </div>
     <div class="col-md-6 mb-3">
       <div class="form-check form-check-inline">
         <input
           :id="formId + '__nodeTypeTower'"
+          v-model="isNodeTypeTower"
           class="form-check-input"
           type="checkbox"
           :value="TYPE_TOWER"
-          :checked="isNodeTypeTower"
-          @change="onChangeNodeType"
         />
         <label
           class="form-check-label"
           :for="formId + '__nodeTypeTower'"
-          >{{ t("common.tower") }}</label
+          >{{ t('common.tower') }}</label
         >
       </div>
       <div class="form-check form-check-inline">
         <input
           :id="formId + '__nodeTypeChest'"
+          v-model="isNodeTypeChest"
           class="form-check-input"
           type="checkbox"
           :value="TYPE_CHEST"
-          :checked="isNodeTypeChest"
-          @change="onChangeNodeType"
         />
         <label
           class="form-check-label"
           :for="formId + '__nodeTypeChest'"
-          >{{ t("common.chest") }}</label
+          >{{ t('common.chest') }}</label
         >
       </div>
       <span
@@ -187,7 +159,7 @@ function onReset() {
         :disabled="filledFilterCount === 0"
         @click="onReset"
       >
-        {{ t("common.reset") }}
+        {{ t('common.reset') }}
       </button>
     </div>
   </div>

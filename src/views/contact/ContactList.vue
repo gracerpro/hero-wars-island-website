@@ -1,77 +1,79 @@
-<script setup>
-import { useI18n } from "vue-i18n";
-import { ref, computed } from "vue";
-import RowLoading from "@/components/RowLoading.vue";
-import HeroClient from "@/api/HeroClient";
-import { fromCurrentDate } from "@/helpers/formatter";
+<script setup lang="ts">
+import { useI18n } from 'vue-i18n'
+import { ref, computed } from 'vue'
+import RowLoading from '@/components/RowLoading.vue'
+import HeroClient from '@/api/HeroClient'
+import { fromCurrentDate } from '@/helpers/formatter'
 import {
   STATUS_CREATED,
   STATUS_ABORT,
   STATUS_CLOSED,
   STATUS_QUEUE,
   getStatusName,
-} from "@/api/Feedback";
+  type Status,
+  type Feedback,
+} from '@/api/FeedbackApi'
 
-const { t } = useI18n();
-const client = new HeroClient();
+const { t } = useI18n()
+const client = new HeroClient()
 
-const loaded = ref(false);
-const loading = ref(false);
-const feedbackItems = ref([]);
-const feedbackTotalCount = ref(0);
-const errorMessage = ref("");
-const pageSize = 5;
-const pageNumber = ref(1);
+const loaded = ref(false)
+const loading = ref(false)
+const feedbackItems = ref<Array<Feedback>>([])
+const feedbackTotalCount = ref(0)
+const errorMessage = ref('')
+const pageSize = 5
+const pageNumber = ref(1)
 
-const hasMoreItems = computed(() => (pageNumber.value - 1) * pageSize < feedbackTotalCount.value);
+const hasMoreItems = computed(() => (pageNumber.value - 1) * pageSize < feedbackTotalCount.value)
 const isShowNoData = computed(
   () => loaded.value && !feedbackItems.value.length && !errorMessage.value
-);
+)
 
-loadFeedbackItems();
+loadFeedbackItems()
 
-function getStatusClass(status) {
-  let classes = {
-    [STATUS_CREATED]: "text-bg-primary",
-    [STATUS_ABORT]: "text-bg-danger",
-    [STATUS_CLOSED]: "text-bg-success",
-    [STATUS_QUEUE]: "text-bg-secondary",
-  };
+function getStatusClass(status: Status): string {
+  const classes: { [key: string]: string } = {
+    [STATUS_CREATED]: 'text-bg-primary',
+    [STATUS_ABORT]: 'text-bg-danger',
+    [STATUS_CLOSED]: 'text-bg-success',
+    [STATUS_QUEUE]: 'text-bg-secondary',
+  }
 
-  return classes[status] ? classes[status] : "text-bg-info";
+  return classes[status] ?? 'text-bg-info'
 }
 
 function loadFeedbackItems() {
   if (loading.value) {
-    return;
+    return
   }
 
-  loading.value = true;
+  loading.value = true
   client.feedback
     .getList(pageSize, pageNumber.value)
     .then((list) => {
-      list.items.forEach((item) => feedbackItems.value.push(item));
-      feedbackTotalCount.value = list.totalCount;
+      list.items.forEach((item) => feedbackItems.value.push(item))
+      feedbackTotalCount.value = list.totalCount
 
-      ++pageNumber.value;
+      ++pageNumber.value
     })
     .catch(() => {
-      errorMessage.value = t("common.loadingFailDeveloperShow");
+      errorMessage.value = t('common.loadingFailDeveloperShow')
     })
     .finally(() => {
-      loading.value = false;
-      loaded.value = true;
-    });
+      loading.value = false
+      loaded.value = true
+    })
 }
 </script>
 
 <template>
   <div>
-    <h2 class="mt-3">{{ t("common.feedback") }}</h2>
-    <p class="fst-italic">{{ t("page.contact.messagesDisplayedByAdministrator") }}</p>
+    <h2 class="mt-3">{{ t('common.feedback') }}</h2>
+    <p class="fst-italic">{{ t('page.contact.messagesDisplayedByAdministrator') }}</p>
 
     <p v-if="isShowNoData">
-      {{ t("common.noData") }}
+      {{ t('common.noData') }}
     </p>
     <div
       v-for="item in feedbackItems"
@@ -89,7 +91,7 @@ function loadFeedbackItems() {
       </div>
       <div class="mt-2">{{ item.message }}</div>
       <div v-if="item.answer">
-        <span class="text-danger-emphasis">{{ t("common.administratorAnswer") }}:</span>
+        <span class="text-danger-emphasis">{{ t('common.administratorAnswer') }}:</span>
         {{ item.answer }}
       </div>
     </div>
@@ -111,7 +113,7 @@ function loadFeedbackItems() {
         :disabled="loading"
         @click="loadFeedbackItems"
       >
-        {{ t("common.showMore") }}
+        {{ t('common.showMore') }}
       </button>
     </div>
   </div>
