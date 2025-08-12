@@ -514,7 +514,7 @@ function saveState() {
   }
 
   const state: State = {
-    filter, // Note: may by move it to 'byIsland' property
+    filter, // Note: may be move it to 'byIsland' property
     isShowQuantity: isShowQuantity.value,
     isSelectAnyNode: isSelectAnyNode.value,
     isShowGroupRewards: isShowGroupRewards.value,
