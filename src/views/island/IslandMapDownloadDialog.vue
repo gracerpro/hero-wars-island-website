@@ -23,6 +23,7 @@ import {
   STATUS_NOT_SURE,
   TYPE_BLOCKER,
   TYPE_BUBBLE,
+  TYPE_BANNER,
   TYPE_CHEST,
   TYPE_NODE,
   TYPE_START,
@@ -217,6 +218,7 @@ function drawMap(context: CanvasRenderingContext2D, imagesByUrls: ImagesByUrls) 
     [TYPE_BUBBLE]: '#deb28d',
     [TYPE_CHEST]: '#1a660b',
     [TYPE_BLOCKER]: '#867878',
+    [TYPE_BANNER]: '#0000ff',
   }
 
   context.strokeStyle = '#ddd'

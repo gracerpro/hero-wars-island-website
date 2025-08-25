@@ -19,6 +19,7 @@ import {
   TYPE_WOOD,
   TYPE_BUBBLE,
   type Node,
+  TYPE_BANNER,
 } from '@/api/NodeApi'
 import { ref, shallowRef, computed, onMounted, onUnmounted, useTemplateRef } from 'vue'
 import {
@@ -210,6 +211,7 @@ function getNodeClass(node: Node): string {
     [TYPE_BUBBLE]: 'node-bubble',
     [TYPE_CHEST]: 'node-chest',
     [TYPE_BLOCKER]: 'node-blocker',
+    [TYPE_BANNER]: 'node-banner',
   }
   let nodeClass = classes[node.type] ?? ''
 
@@ -460,6 +462,7 @@ function getItemTitle(item: IconItem): string {
 .node {
   stroke-width: 1;
   stroke: #ddd;
+  fill: #9da7c9;
 }
 .node-step {
   /* TODO: move all colors to config or single place */
@@ -480,6 +483,18 @@ function getItemTitle(item: IconItem): string {
 }
 .node-tower:hover {
   fill: #da8237;
+}
+.node-presents {
+  fill: #fa4040;
+}
+.node-presents:hover {
+  fill: #fa7272;
+}
+.node-banner {
+  fill: #0000ff;
+}
+.node-banner:hover {
+  fill: #5959ff;
 }
 .node-wood {
   fill: #773e23;

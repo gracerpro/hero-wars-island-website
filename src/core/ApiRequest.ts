@@ -43,12 +43,12 @@ class ApiRequest {
       this.beforeRequest(this)
     }
 
-    let searchParams = ''
+    let queryParams = ''
 
     if (params) {
-      searchParams = '?' + params.toString()
+      queryParams = '?' + params.toString()
     }
-    const response = await this.fetch(this.backendUrl + url + searchParams, this.getOptions('GET'))
+    const response = await this.fetch(this.backendUrl + url + queryParams, this.getOptions('GET'))
 
     if (!response.ok) {
       if (response.status >= 400) {

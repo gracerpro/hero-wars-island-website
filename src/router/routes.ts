@@ -123,8 +123,7 @@ const routes: Array<RouteRecordRaw> = [
     ],
   },
   {
-    // [Vue Router warn]: Discarded invalid param(s) "catchAll" when navigating. See https://github.com/vuejs/router/blob/main/packages/router/CHANGELOG.md#414-2022-08-22 for more details
-    path: '/:catchAll(.*)',
+    path: '/:path(.*)*',
     redirect: (to) => {
       return createI18nRouteTo(
         { name: 'page-not-found', query: { returnUrl: to.path } },

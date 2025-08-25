@@ -78,8 +78,8 @@ export class FeedbackApi {
       status: response.status,
       subject: response.subject,
       message: response.message,
-      answer: response.answer || '',
-      username: response.username || '',
+      answer: response.answer ?? '',
+      username: response.username ?? '',
     }
   }
 }

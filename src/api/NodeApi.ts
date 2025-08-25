@@ -18,8 +18,11 @@ export const TYPE_CHEST = 3
 export const TYPE_BLOCKER = 4
 export const TYPE_WOOD = 6
 export const TYPE_BUBBLE = 7
+export const TYPE_SUMMER_FEST_2025 = 8
+export const TYPE_BANNER = 9
+export const TYPE_PRESENTS = 10
 
-export type Type = 0 | 1 | 2 | 3 | 4 | 6 | 7
+export type Type = 0 | 1 | 2 | 3 | 4 | 6 | 7 | 8 | 9 | 10
 
 export const STATUS_CREATED = 0
 export const STATUS_NOT_SURE = 3
@@ -176,6 +179,9 @@ export function getTypeName(type: Type): string {
     [TYPE_BLOCKER]: 'TYPE_BLOCKER',
     [TYPE_WOOD]: 'TYPE_WOOD',
     [TYPE_BUBBLE]: 'TYPE_BUBBLE',
+    [TYPE_SUMMER_FEST_2025]: 'TYPE_SUMMER_FEST_2025',
+    [TYPE_BANNER]: 'TYPE_BANNER',
+    [TYPE_PRESENTS]: 'TYPE_PRESENTS',
   }
 
   return map[type] ?? ''
