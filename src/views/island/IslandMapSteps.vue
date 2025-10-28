@@ -4,13 +4,7 @@ import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { SELECT_MODE_DISABLE, SELECT_MODE_GOING, SELECT_MODE_PLAN } from './map'
 import { isCommonStep, type CostItem, type NodeMap } from '@/api/NodeApi'
-import {
-  GAME_ID_EXPLORER_MOVE,
-  GAME_ID_WOOD,
-  TYPE_COIN,
-  TYPE_STARMONEY,
-  type Type,
-} from '@/api/ItemApi'
+import { GAME_ID_EXPLORER_MOVE, GAME_ID_WOOD, Type } from '@/api/ItemApi'
 import type { UserNodeIds, SelectMode } from './map'
 
 interface Props {
@@ -84,7 +78,7 @@ const otherStepCostItems = computed(() => {
     if (!isCommonStep(stepItem.item)) {
       let icon
 
-      if (stepItem.item.type === TYPE_STARMONEY) {
+      if (stepItem.item.type === Type.StarMoney) {
         icon = 'item-emerald'
       }
 
@@ -98,16 +92,16 @@ const otherStepCostItems = computed(() => {
   return result
 })
 const explorerMoveCount = computed(
-  () => userStepCostItems.value[getStepItemKey(TYPE_COIN, GAME_ID_EXPLORER_MOVE)]?.quantity ?? 0
+  () => userStepCostItems.value[getStepItemKey(Type.Coin, GAME_ID_EXPLORER_MOVE)]?.quantity ?? 0
 )
 const woodMoveCount = computed(
-  () => userStepCostItems.value[getStepItemKey(TYPE_COIN, GAME_ID_WOOD)]?.quantity ?? 0
+  () => userStepCostItems.value[getStepItemKey(Type.Coin, GAME_ID_WOOD)]?.quantity ?? 0
 )
 const totalWoodMoveCount = computed(() => {
   let result = 0
 
   props.nodes.forEach((node) => {
-    if (node.costItem.type === TYPE_COIN && node.costItem.gameId == GAME_ID_WOOD) {
+    if (node.costItem.type === Type.Coin && node.costItem.gameId == GAME_ID_WOOD) {
       ++result
     }
   })
@@ -118,7 +112,7 @@ const totalExplorerMoveCount = computed(() => {
   let result = 0
 
   props.nodes.forEach((node) => {
-    if (node.costItem.type === TYPE_COIN && node.costItem.gameId == GAME_ID_EXPLORER_MOVE) {
+    if (node.costItem.type === Type.Coin && node.costItem.gameId == GAME_ID_EXPLORER_MOVE) {
       ++result
     }
   })

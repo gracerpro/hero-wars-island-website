@@ -3,24 +3,23 @@ import ApiRequest from '../core/ApiRequest'
 import { ApiList } from './common'
 import type { ComposerTranslation } from 'vue-i18n'
 
-export const TYPE_RECIPES = 1
-export const TYPE_CONSUMABLE = 2
-export const TYPE_COIN = 3
-export const TYPE_BANNER_STONE = 4
-export const TYPE_FRAGMENT = 5
-export const TYPE_SOUL_STONE = 6
-export const TYPE_EQUIPMENT = 7
-export const TYPE_GOLD = 8
-export const TYPE_STARMONEY = 9
-export const TYPE_AVATAR = 10
-export const TYPE_BANNER = 11
-export const TYPE_UNKNOWN = 12
-export const TYPE_AVATAR_FRAME = 13
-export const TYPE_STAMINA = 14
-
-// TODO: to enums, and see other like code
-export type Type = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14
-const allTypes = new Set<number>([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14])
+export enum Type {
+  Recipes = 1,
+  Consumable = 2,
+  Coin = 3,
+  BannerStone = 4,
+  Fragment = 5,
+  SoulStone = 6,
+  Equipment = 7,
+  Gold = 8,
+  StarMoney = 9,
+  Avatar = 10,
+  Banner = 11,
+  Unknown = 12,
+  AvatarFrame = 13,
+  Stamina = 14,
+}
+const allTypes = new Set<number>(Object.values(Type).filter((a) => typeof a === 'number'))
 
 export function isType(a: number): a is Type {
   return allTypes.has(a as Type)
@@ -47,7 +46,7 @@ const unknownItem: Item = {
   name: 'Unknown',
   gameId: null,
   gameType: null,
-  type: TYPE_UNKNOWN,
+  type: Type.Unknown,
   iconUrl: null,
   iconWidth: null,
   iconHeight: null,
@@ -105,7 +104,7 @@ export function modifyItem(data: any): Item {
   return {
     id: data.id,
     name: data.name,
-    type: isType(data.typeId) ? data.typeId : TYPE_UNKNOWN,
+    type: isType(data.typeId) ? data.typeId : Type.Unknown,
     gameId: data.gameId ?? null,
     gameType: data.gameType ?? null,
     iconUrl: data.iconUrl ?? null,
@@ -118,20 +117,20 @@ export function modifyItem(data: any): Item {
 
 export function getLabelsByTypes(t: ComposerTranslation) {
   return {
-    [TYPE_EQUIPMENT]: t('common.equipment'),
-    [TYPE_RECIPES]: t('common.recipes'),
-    [TYPE_CONSUMABLE]: t('common.consumable'),
-    [TYPE_COIN]: t('common.coins'),
-    [TYPE_BANNER_STONE]: t('common.bannerStone', 2),
-    [TYPE_FRAGMENT]: t('common.fragment', 2),
-    [TYPE_SOUL_STONE]: t('common.soulStones'),
-    [TYPE_GOLD]: t('common.gold'),
-    [TYPE_STARMONEY]: t('common.starmoney'),
-    [TYPE_AVATAR]: t('common.avatarType'),
-    [TYPE_BANNER]: t('common.bannerType'),
-    [TYPE_UNKNOWN]: t('common.unknown'),
-    [TYPE_AVATAR_FRAME]: t('common.avatarFrame'),
-    [TYPE_STAMINA]: t('common.stamina'),
+    [Type.Equipment]: t('common.equipment'),
+    [Type.Recipes]: t('common.recipes'),
+    [Type.Consumable]: t('common.consumable'),
+    [Type.Coin]: t('common.coins'),
+    [Type.BannerStone]: t('common.bannerStone', 2),
+    [Type.Fragment]: t('common.fragment', 2),
+    [Type.SoulStone]: t('common.soulStones'),
+    [Type.Gold]: t('common.gold'),
+    [Type.StarMoney]: t('common.starmoney'),
+    [Type.Avatar]: t('common.avatarType'),
+    [Type.Banner]: t('common.bannerType'),
+    [Type.Unknown]: t('common.unknown'),
+    [Type.AvatarFrame]: t('common.avatarFrame'),
+    [Type.Stamina]: t('common.stamina'),
   }
 }
 

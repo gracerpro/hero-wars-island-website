@@ -4,15 +4,7 @@ import { ref, computed } from 'vue'
 import RowLoading from '@/components/RowLoading.vue'
 import HeroClient from '@/api/HeroClient'
 import { fromCurrentDate } from '@/helpers/formatter'
-import {
-  STATUS_CREATED,
-  STATUS_ABORT,
-  STATUS_CLOSED,
-  STATUS_QUEUE,
-  getStatusName,
-  type Status,
-  type Feedback,
-} from '@/api/FeedbackApi'
+import { getStatusName, Status, type Feedback } from '@/api/FeedbackApi'
 
 const { t } = useI18n()
 const client = new HeroClient()
@@ -34,10 +26,10 @@ loadFeedbackItems()
 
 function getStatusClass(status: Status): string {
   const classes: { [key: string]: string } = {
-    [STATUS_CREATED]: 'text-bg-primary',
-    [STATUS_ABORT]: 'text-bg-danger',
-    [STATUS_CLOSED]: 'text-bg-success',
-    [STATUS_QUEUE]: 'text-bg-secondary',
+    [Status.Created]: 'text-bg-primary',
+    [Status.Abort]: 'text-bg-danger',
+    [Status.Closed]: 'text-bg-success',
+    [Status.Queue]: 'text-bg-secondary',
   }
 
   return classes[status] ?? 'text-bg-info'

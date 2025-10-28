@@ -9,18 +9,7 @@
 
 import { TYPE_DANGER } from '@/components/toast'
 import ToastMessage from '@/components/ToastMessage.vue'
-import {
-  TYPE_START,
-  TYPE_TOWER,
-  TYPE_CHEST,
-  TYPE_BLOCKER,
-  TYPE_NODE,
-  STATUS_NOT_SURE,
-  TYPE_WOOD,
-  TYPE_BUBBLE,
-  type Node,
-  TYPE_BANNER,
-} from '@/api/NodeApi'
+import { type Node, Status, Type } from '@/api/NodeApi'
 import { ref, shallowRef, computed, onMounted, onUnmounted, useTemplateRef } from 'vue'
 import {
   TRANSLATE_X,
@@ -204,18 +193,18 @@ function onKeyDownMap(event: KeyboardEvent) {
 
 function getNodeClass(node: Node): string {
   const classes: { [key: string]: string } = {
-    [TYPE_NODE]: 'node-step',
-    [TYPE_START]: 'node-start',
-    [TYPE_TOWER]: 'node-tower',
-    [TYPE_WOOD]: 'node-wood',
-    [TYPE_BUBBLE]: 'node-bubble',
-    [TYPE_CHEST]: 'node-chest',
-    [TYPE_BLOCKER]: 'node-blocker',
-    [TYPE_BANNER]: 'node-banner',
+    [Type.Node]: 'node-step',
+    [Type.Start]: 'node-start',
+    [Type.Tower]: 'node-tower',
+    [Type.Wood]: 'node-wood',
+    [Type.Bubble]: 'node-bubble',
+    [Type.Chest]: 'node-chest',
+    [Type.Blocker]: 'node-blocker',
+    [Type.Banner]: 'node-banner',
   }
   let nodeClass = classes[node.type] ?? ''
 
-  if (node.status == STATUS_NOT_SURE) {
+  if (node.status == Status.NotSure) {
     nodeClass += ' -warning'
   }
   if (node.costItem.gameId === GAME_ID_WOOD) {

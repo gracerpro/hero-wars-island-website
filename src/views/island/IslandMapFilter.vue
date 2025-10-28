@@ -3,7 +3,7 @@ import TextInput from '@/components/TextInput.vue'
 import ClearSelect from '@/components/ClearSelect.vue'
 import { getLabelsByTypes, type Type } from '@/api/ItemApi'
 import { useI18n } from 'vue-i18n'
-import { TYPE_CHEST, TYPE_TOWER } from '@/api/NodeApi'
+import { Type as NodeType } from '@/api/NodeApi'
 import { computed } from 'vue'
 import type { SelectItemMap } from '@/components/select'
 import type { ViewNodeReward } from './map'
@@ -21,6 +21,8 @@ const isNodeTypeChest = defineModel<boolean>('isNodeTypeChest', { required: true
 const props = defineProps<Props>()
 
 const { t } = useI18n()
+const TYPE_TOWER = NodeType.Tower
+const TYPE_CHEST = NodeType.Chest
 
 const formId = 'nodesForm'
 

@@ -3,31 +3,35 @@ import ApiRequest from '../core/ApiRequest'
 import {
   GAME_ID_EXPLORER_MOVE,
   GAME_ID_WOOD,
+  Type as ItemType,
   modifyItem,
-  TYPE_COIN,
-  TYPE_UNKNOWN,
   type ItemMap,
-  type Type as ItemType,
 } from './ItemApi'
 import type { ComposerTranslation } from 'vue-i18n'
 
-export const TYPE_NODE = 0
-export const TYPE_START = 1
-export const TYPE_TOWER = 2
-export const TYPE_CHEST = 3
-export const TYPE_BLOCKER = 4
-export const TYPE_WOOD = 6
-export const TYPE_BUBBLE = 7
-export const TYPE_SUMMER_FEST_2025 = 8
-export const TYPE_BANNER = 9
-export const TYPE_PRESENTS = 10
+export enum Type {
+  Node = 0,
+  Start = 1,
+  Tower = 2,
+  Chest = 3,
+  Blocker = 4,
+  // 5
+  Wood = 6,
+  Bubble = 7,
+  SummerFest2025 = 8,
+  Banner = 9,
+  Presents = 10,
+}
+const allTypes = new Set<number>(Object.values(Type).filter((a) => typeof a === 'number'))
 
-export type Type = 0 | 1 | 2 | 3 | 4 | 6 | 7 | 8 | 9 | 10
+export function isType(a: number): a is Type {
+  return allTypes.has(a as Type)
+}
 
-export const STATUS_CREATED = 0
-export const STATUS_NOT_SURE = 3
-
-export type Status = 0 | 3
+export enum Status {
+  Created = 0,
+  NotSure = 3,
+}
 
 export interface CostItem {
   readonly type: ItemType
@@ -35,7 +39,7 @@ export interface CostItem {
 }
 
 const defaultCostItem: CostItem = {
-  type: TYPE_COIN,
+  type: ItemType.Coin,
   gameId: GAME_ID_EXPLORER_MOVE,
 }
 
@@ -143,15 +147,28 @@ export class NodeApi {
     if (data.cost) {
       costItem = {
         gameId: data.cost.gameId,
-        type: data.cost.typeId ?? TYPE_UNKNOWN,
+        type: data.cost.typeId ?? ItemType.Unknown,
       }
       costItemCount = data.cost.count ?? 1
     }
 
+    let resultType: Type
+
+    if (data.typeId) {
+      if (isType(data.typeId)) {
+        resultType = data.typeId
+      } else {
+        console.warn('Unknown node type "' + data.typeId + '".')
+        resultType = Type.Blocker
+      }
+    } else {
+      resultType = Type.Node
+    }
+
     return {
       id: data.id,
-      type: data.typeId ?? TYPE_NODE,
-      status: data.statusId ?? STATUS_CREATED,
+      type: resultType,
+      status: data.statusId ?? Status.Created,
       costItem,
       costItemCount,
       rewards,
@@ -163,8 +180,8 @@ export class NodeApi {
 
 export function getStatusName(t: ComposerTranslation, status: Status): string {
   const names = {
-    [STATUS_CREATED]: t('common.created'),
-    [STATUS_NOT_SURE]: t('common.haveDoubts'),
+    [Status.Created]: t('common.created'),
+    [Status.NotSure]: t('common.haveDoubts'),
   }
 
   return names[status] ?? t('common.unknownStatus')
@@ -172,28 +189,28 @@ export function getStatusName(t: ComposerTranslation, status: Status): string {
 
 export function getTypeName(type: Type): string {
   const map = {
-    [TYPE_NODE]: 'TYPE_NODE',
-    [TYPE_START]: 'TYPE_START',
-    [TYPE_TOWER]: 'TYPE_TOWER',
-    [TYPE_CHEST]: 'TYPE_CHEST',
-    [TYPE_BLOCKER]: 'TYPE_BLOCKER',
-    [TYPE_WOOD]: 'TYPE_WOOD',
-    [TYPE_BUBBLE]: 'TYPE_BUBBLE',
-    [TYPE_SUMMER_FEST_2025]: 'TYPE_SUMMER_FEST_2025',
-    [TYPE_BANNER]: 'TYPE_BANNER',
-    [TYPE_PRESENTS]: 'TYPE_PRESENTS',
+    [Type.Node]: 'TYPE_NODE',
+    [Type.Start]: 'TYPE_START',
+    [Type.Tower]: 'TYPE_TOWER',
+    [Type.Chest]: 'TYPE_CHEST',
+    [Type.Blocker]: 'TYPE_BLOCKER',
+    [Type.Wood]: 'TYPE_WOOD',
+    [Type.Bubble]: 'TYPE_BUBBLE',
+    [Type.SummerFest2025]: 'TYPE_SUMMER_FEST_2025',
+    [Type.Banner]: 'TYPE_BANNER',
+    [Type.Presents]: 'TYPE_PRESENTS',
   }
 
   return map[type] ?? ''
 }
 
 export function isStepType(type: Type) {
-  return !(type === TYPE_START || type === TYPE_BLOCKER)
+  return !(type === Type.Start || type === Type.Blocker)
 }
 
 export function isCommonStep(costItem: CostItem) {
   return (
-    costItem.type === TYPE_COIN &&
+    costItem.type === ItemType.Coin &&
     (costItem.gameId === GAME_ID_EXPLORER_MOVE || costItem.gameId === GAME_ID_WOOD)
   )
 }
