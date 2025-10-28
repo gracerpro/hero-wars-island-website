@@ -3,14 +3,14 @@ import ApiRequest from '../core/ApiRequest'
 import { ApiList } from './common'
 import type { ComposerTranslation } from 'vue-i18n'
 
-export const STATUS_CREATED = 'created'
-export const STATUS_IN_PROCESS = 'in_process'
-export const STATUS_MODERATED = 'moderated'
-export const STATUS_ABORT = 'abort'
-export const STATUS_CLOSED = 'closed'
-export const STATUS_QUEUE = 'queue'
-
-export type Status = 'created' | 'in_process' | 'moderated' | 'abort' | 'closed' | 'queue'
+export enum Status {
+  Created = 'created',
+  InProgress = 'in_process',
+  Moderated = 'moderated',
+  Abort = 'abort',
+  Closed = 'closed',
+  Queue = 'queue',
+}
 
 export interface Feedback {
   id: number
@@ -86,12 +86,12 @@ export class FeedbackApi {
 
 export function getStatusName(t: ComposerTranslation, status: Status): string {
   const names = {
-    [STATUS_CREATED]: t('common.created'),
-    [STATUS_IN_PROCESS]: t('common.inProgress'),
-    [STATUS_MODERATED]: t('common.moderated'),
-    [STATUS_ABORT]: t('common.abort'),
-    [STATUS_CLOSED]: t('common.closed'),
-    [STATUS_QUEUE]: t('common.inQueue'),
+    [Status.Created]: t('common.created'),
+    [Status.InProgress]: t('common.inProgress'),
+    [Status.Moderated]: t('common.moderated'),
+    [Status.Abort]: t('common.abort'),
+    [Status.Closed]: t('common.closed'),
+    [Status.Queue]: t('common.inQueue'),
   }
 
   return names[status]

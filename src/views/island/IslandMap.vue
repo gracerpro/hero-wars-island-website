@@ -14,13 +14,12 @@ import { getHumanQuantity } from '@/helpers/formatter'
 import { useI18n } from 'vue-i18n'
 import { fullscreenElement } from '@/core/fullscreen'
 import {
-  TYPE_CHEST,
-  TYPE_TOWER,
   type IslandNodeList,
   type Node,
   type NodeFilter,
   type NodeMap,
   type NodeReward,
+  Type as NodeType,
 } from '@/api/NodeApi'
 import { isObject } from '@/helpers/core'
 import { getNodesMap } from '@/services/api/island-node'
@@ -132,10 +131,10 @@ const visibleRewards = computed(() => {
     const typeMap: { [key: number]: boolean } = {}
 
     if (filter.isNodeTypeChest) {
-      typeMap[TYPE_CHEST] = true
+      typeMap[NodeType.Chest] = true
     }
     if (filter.isNodeTypeTower) {
-      typeMap[TYPE_TOWER] = true
+      typeMap[NodeType.Tower] = true
     }
 
     resultRewards = resultRewards.filter((item) => {

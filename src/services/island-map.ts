@@ -1,4 +1,4 @@
-import { TYPE_BLOCKER, TYPE_START, type Node } from '@/api/NodeApi'
+import { type Node, Type } from '@/api/NodeApi'
 import { useI18n } from '@/i18n'
 import type { DrawedNode, DrawedNodeMap, UserNodeIds } from '@/views/island/map'
 
@@ -8,7 +8,7 @@ export const TRANSLATE_Y = 20
 export const DELTA_SCALE = 0.5
 
 export function canSelectNode(node: Node): boolean {
-  return node.type !== TYPE_START && node.type != TYPE_BLOCKER
+  return node.type !== Type.Start && node.type != Type.Blocker
 }
 
 export function canSelectNextNode(
@@ -19,7 +19,7 @@ export function canSelectNextNode(
   const { t } = useI18n()
   let result = null
 
-  if (nextDrawedNode.node.type === TYPE_START) {
+  if (nextDrawedNode.node.type === Type.Start) {
     return t('page.island.canNotSelectStartNode')
   }
 
@@ -31,7 +31,7 @@ export function canSelectNextNode(
     let isNearStart = false
 
     for (const drawedNode of drawedNodes.values()) {
-      if (drawedNode.node.type === TYPE_START) {
+      if (drawedNode.node.type === Type.Start) {
         isFound = true
 
         if (isNearNode(nextDrawedNode, drawedNode)) {
@@ -52,7 +52,7 @@ export function canSelectNextNode(
         continue
       }
       if (isNearNode(nextDrawedNode, drawedNode)) {
-        if (drawedNode.node.type === TYPE_START) {
+        if (drawedNode.node.type === Type.Start) {
           isFound = true
           break
         }

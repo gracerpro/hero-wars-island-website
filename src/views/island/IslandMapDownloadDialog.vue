@@ -19,19 +19,7 @@ import {
   type ViewNodeReward,
   type IconItem,
 } from './map'
-import {
-  STATUS_NOT_SURE,
-  TYPE_BLOCKER,
-  TYPE_BUBBLE,
-  TYPE_BANNER,
-  TYPE_CHEST,
-  TYPE_NODE,
-  TYPE_START,
-  TYPE_TOWER,
-  TYPE_WOOD,
-  type Node,
-  type NodeMap,
-} from '@/api/NodeApi'
+import { type Node, type NodeMap, Status, Type } from '@/api/NodeApi'
 import type { Island } from '@/api/IslandApi'
 import type { ComponentExposed } from 'vue-component-type-helpers'
 
@@ -211,14 +199,14 @@ function drawMap(context: CanvasRenderingContext2D, imagesByUrls: ImagesByUrls) 
   const FONT_SIZE = 20
   const FONT_SIZE_SMALL = 15
   const colors: { [key: string]: string } = {
-    [TYPE_NODE]: '#9da7c9',
-    [TYPE_START]: '#94fdfe',
-    [TYPE_TOWER]: '#ba662c',
-    [TYPE_WOOD]: '#773e23',
-    [TYPE_BUBBLE]: '#deb28d',
-    [TYPE_CHEST]: '#1a660b',
-    [TYPE_BLOCKER]: '#867878',
-    [TYPE_BANNER]: '#0000ff',
+    [Type.Node]: '#9da7c9',
+    [Type.Start]: '#94fdfe',
+    [Type.Tower]: '#ba662c',
+    [Type.Wood]: '#773e23',
+    [Type.Bubble]: '#deb28d',
+    [Type.Chest]: '#1a660b',
+    [Type.Blocker]: '#867878',
+    [Type.Banner]: '#0000ff',
   }
 
   context.strokeStyle = '#ddd'
@@ -228,7 +216,7 @@ function drawMap(context: CanvasRenderingContext2D, imagesByUrls: ImagesByUrls) 
 
     context.fillStyle = colors[node.type] ?? '#ffff00'
 
-    if (node.status == STATUS_NOT_SURE) {
+    if (node.status == Status.NotSure) {
       context.fillStyle = '#ffff00'
     }
 
