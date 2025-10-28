@@ -154,7 +154,7 @@ export class NodeApi {
 
     let resultType: Type
 
-    if (data.typeId) {
+    if (data.typeId !== undefined && data.typeId !== null) {
       if (isType(data.typeId)) {
         resultType = data.typeId
       } else {
