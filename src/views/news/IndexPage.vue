@@ -1,37 +1,33 @@
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n'
-import { ref, watch } from 'vue'
+import { watch } from 'vue'
 import RowLoading from '@/components/RowLoading.vue'
-import HeroClient from '@/api/HeroClient'
 import { createI18nRouteTo } from '@/i18n/translation'
 import { useSSRContext } from 'vue'
 import { setMetaInfo } from '@/services/page-meta'
 import { fromCurrentDate } from '@/helpers/formatter'
 import { useRoute } from 'vue-router'
-import { NEWS_FILTER_MIN_CHARS_COUNT } from './news/news'
-import NewsFilterForm from './news/NewsFilterForm.vue'
-import type { NewsFilter, OneNews } from '@/api/NewsApi'
-
-interface Filter {
-  name: string
-}
+import FilterForm from './FilterForm.vue'
+import { useNews } from '@/use/use-news'
 
 const { t, locale } = useI18n()
 const ssrContext = import.meta.env.SSR ? useSSRContext() : undefined
 const route = useRoute()
 
-const PAGE_SIZE = 6
+const {
+  news,
+  isLoading,
+  pagination,
+  filter,
+  totalCount,
+  visibleCount,
+  load: loadNews,
+  reset: resetNews,
+  loadAppend,
+} = useNews()
 
-const client = new HeroClient()
-
-const news = ref<Array<OneNews>>([])
-const visibleCount = ref(0)
-const totalCount = ref(0)
-const loading = ref(true)
-const pageNumber = ref(1)
-const filter = ref<Filter>({
-  name: '',
-})
+isLoading.value = true
+pagination.pageSize = 6
 
 watch(
   () => route.params.locale,
@@ -53,41 +49,6 @@ if (!import.meta.env.SSR) {
   loadNews()
 }
 
-function resetNews() {
-  pageNumber.value = 1
-  news.value = []
-  visibleCount.value = 0
-
-  loadNews()
-}
-
-function showMore() {
-  pageNumber.value++
-  loadNews()
-}
-
-function loadNews() {
-  loading.value = true
-
-  let requestFilter: NewsFilter = {}
-
-  if (filter.value.name.length >= NEWS_FILTER_MIN_CHARS_COUNT) {
-    requestFilter.name = filter.value.name
-  }
-
-  client.news
-    .getList(PAGE_SIZE, pageNumber.value, requestFilter)
-    .then((list) => {
-      list.items.forEach((oneNews) => {
-        news.value.push(oneNews)
-      })
-      totalCount.value = list.totalCount
-
-      visibleCount.value += list.items.length
-    })
-    .finally(() => (loading.value = false))
-}
-
 defineExpose({
   news,
 })
@@ -97,9 +58,9 @@ defineExpose({
   <div class="container app-container">
     <h1>{{ t('common.news') }}</h1>
 
-    <news-filter-form
+    <filter-form
       v-model:name="filter.name"
-      :loading="loading"
+      :loading="isLoading"
       @find="resetNews()"
     />
 
@@ -117,7 +78,7 @@ defineExpose({
       <div v-html="oneNews.snippet"></div>
     </div>
 
-    <row-loading v-if="loading" />
+    <row-loading v-if="isLoading" />
     <div
       v-else-if="!totalCount"
       class="alert alert-info"
@@ -131,8 +92,8 @@ defineExpose({
       <button
         type="button"
         class="btn btn-link"
-        :disabled="loading"
-        @click="showMore()"
+        :disabled="isLoading"
+        @click="loadAppend()"
       >
         {{ t('common.showMore') }}
       </button>

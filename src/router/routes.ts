@@ -103,7 +103,7 @@ const routes: Array<RouteRecordRaw> = [
       {
         path: 'news',
         name: 'news',
-        component: () => import('../views/TheNews.vue'),
+        component: () => import('../views/news/IndexPage.vue'),
       },
       {
         path: 'news/:slug([a-zA-Z0-9\\-]+)',

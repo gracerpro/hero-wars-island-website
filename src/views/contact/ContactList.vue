@@ -81,8 +81,11 @@ function loadFeedbackItems() {
           getStatusName(t, item.status)
         }}</span>
       </div>
-      <div class="mt-2">{{ item.message }}</div>
-      <div v-if="item.answer">
+      <div class="pre-line-text mt-2">{{ item.message }}</div>
+      <div
+        v-if="item.answer"
+        class="pre-line-text"
+      >
         <span class="text-danger-emphasis">{{ t('common.administratorAnswer') }}:</span>
         {{ item.answer }}
       </div>
@@ -110,3 +113,9 @@ function loadFeedbackItems() {
     </div>
   </div>
 </template>
+
+<style lang="css" scoped>
+.pre-line-text {
+  white-space: pre-line;
+}
+</style>

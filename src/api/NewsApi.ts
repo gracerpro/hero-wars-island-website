@@ -43,7 +43,7 @@ export class NewsApi {
       params.append('pageNumber', pageNumber.toString())
     }
     if (filter) {
-      if (filter.name) {
+      if (filter.name !== undefined && filter.name.length > 0) {
         params.append('filter[name]', filter.name)
       }
     }

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n'
-import { NEWS_FILTER_MIN_CHARS_COUNT } from './news'
 import { computed, ref } from 'vue'
+import { useNews } from '@/use/use-news'
 
 interface Props {
   loading: boolean
@@ -13,13 +13,15 @@ const emit = defineEmits<{
   find: []
 }>()
 
+const { filterNameMinCharsCount } = useNews()
+
 const name = defineModel<string>('name', {
   required: true,
   set: (value: string) => {
-    form.value.name.isValid = value.length === 0 || value.length >= NEWS_FILTER_MIN_CHARS_COUNT
+    form.value.name.isValid = value.length === 0 || value.length >= filterNameMinCharsCount
     form.value.name.message = form.value.name.isValid
       ? ''
-      : t('common.needEnterAtLeastCharacters', { n: NEWS_FILTER_MIN_CHARS_COUNT })
+      : t('common.needEnterAtLeastCharacters', { n: filterNameMinCharsCount })
 
     return value
   },
@@ -77,7 +79,7 @@ function onSubmit() {
         class="form-text"
         :class="{ 'is-invalid': !form.name.isValid }"
       >
-        {{ t('common.needEnterAtLeastCharacters', { n: NEWS_FILTER_MIN_CHARS_COUNT }) }}
+        {{ t('common.needEnterAtLeastCharacters', { n: filterNameMinCharsCount }) }}
       </div>
     </div>
     <div class="col-md-2 mb-3">

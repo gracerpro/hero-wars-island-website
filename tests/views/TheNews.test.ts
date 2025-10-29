@@ -1,5 +1,5 @@
 import { flushPromises, shallowMount } from '@vue/test-utils'
-import TheNews from '../../src/views/TheNews.vue'
+import IndexPage from '../../src/views/news/IndexPage.vue'
 import { describe, it, expect, vi } from 'vitest'
 import { NewsApi } from '@/api/NewsApi'
 import { responseNews } from '../data/news'
@@ -10,9 +10,9 @@ describe('The news page', () => {
     const getList = vi.spyOn(NewsApi.prototype, 'getList')
     getList.mockResolvedValue(responseEmptyList)
 
-    expect(TheNews).toBeTruthy()
+    expect(IndexPage).toBeTruthy()
 
-    const wrapper = shallowMount(TheNews)
+    const wrapper = shallowMount(IndexPage)
     const h1 = wrapper.get('h1')
 
     expect(h1.text()).toBe('News')
@@ -22,7 +22,7 @@ describe('The news page', () => {
     const getList = vi.spyOn(NewsApi.prototype, 'getList')
     getList.mockResolvedValue(responseEmptyList)
 
-    const wrapper = shallowMount(TheNews)
+    const wrapper = shallowMount(IndexPage)
 
     await wrapper.vm.$nextTick()
     await flushPromises()
@@ -37,7 +37,7 @@ describe('The news page', () => {
     const getList = vi.spyOn(NewsApi.prototype, 'getList')
     getList.mockResolvedValue(responseNews)
 
-    const wrapper = shallowMount(TheNews)
+    const wrapper = shallowMount(IndexPage)
 
     await wrapper.vm.$nextTick()
     await flushPromises()

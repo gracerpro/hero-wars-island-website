@@ -1,27 +1,10 @@
 # Hero-wars island
 
-## Quick hints
-
-```bash
-# Up the containers
-docker compose up --detach
-docker compose up --detach --build --force-recreate
-
-# Log in to the container
-docker exec -it hero-wars-website__node bash
-npm run dev
-
-# Run a command, without log in to the container
-docker exec hero-wars-website__node npm run lint
-docker exec hero-wars-website__node npm run format
-```
-
-
 ## Project setup
 
 Add to `/etc/hosts` file on host computer this text
 
-```
+```txt
 127.0.0.1 hero-wars.local
 ```
 
@@ -31,7 +14,7 @@ and
 
 Download the source code
 
-```
+```bash
 git clone git@github.com:gracerpro/hero-wars-island-website.git
 ```
 
@@ -43,7 +26,7 @@ TODO: For variable VITE_BACKEND_API_URL need a backend server, mock all client m
 
 Up the docker containers
 
-```
+```bash
 docker-compose up --detach --build --force-recreate
 ```
 
@@ -55,14 +38,13 @@ docker exec hero-wars-website__node npm install
 
 And run the dev server
 
-```
+```bash
 docker exec hero-wars-website__node npm run dev
 ```
 
 Go to `http://hero-wars.local:8082`
 
 The end.
-
 
 ## Build the release
 
@@ -92,9 +74,32 @@ build the `swagger.json` and move it to `/dist/static/backend-api`
 
 copy `dist/static/*` to `/public` on server
 
+## Debug SSG
 
-##
+todo
 
-`npm update` warnings
+build static files `dist/static`
 
-npm warn deprecated @humanwhocodes/config-array@0.13.0: Use @eslint/config-array instead
+```bash
+./node_modules/.bin/vite build --outDir dist/static --ssrManifest .vite/ssr-manifest.json
+```
+
+```bash
+NODE_ENV=production ./node_modules/.bin/ts-node --project tsconfig.ssg.json prerender.ts --clean=0
+```
+
+## Quick hints
+
+```bash
+# Up the containers
+docker compose up --detach
+docker compose up --detach --build --force-recreate
+
+# Log in to the container
+docker exec -it hero-wars-website__node bash
+npm run dev
+
+# Run a command, without log in to the container
+docker exec hero-wars-website__node npm run lint
+docker exec hero-wars-website__node npm run format
+```

@@ -1,34 +1,27 @@
 <script setup lang="ts">
-/* global console */
-
-import HeroClient from '@/api/HeroClient'
 import { fromCurrentDate } from '@/helpers/formatter'
 import { setMetaInfo } from '@/services/page-meta'
-import { ref, watch, onMounted } from 'vue'
+import { watch, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { createI18nRouteTo } from '@/i18n/translation'
 import { useRoute } from 'vue-router'
 import { useSSRContext } from 'vue'
 import { getRegionTitle } from './island/island'
-import type { OneNews } from '@/api/NewsApi'
 import type { Island } from '@/api/IslandApi'
-
-const visibleNewsMax = 5
+import { useIslands } from '@/use/use-islands'
+import { useNews } from '@/use/use-news'
 
 const { t, locale } = useI18n()
 const route = useRoute()
 const ssrContext = import.meta.env.SSR ? useSSRContext() : undefined
 
-const client = new HeroClient()
 const now = new Date()
 
-const news = ref<Array<OneNews>>([])
-const newsLoading = ref(true)
-const newsTotalCount = ref(0)
+const { islands, isLoading: islandsLoading, errorMessage, load: loadIslands } = useIslands()
 
-const islands = ref<Array<Island>>([])
-const islandsLoading = ref(true)
-const errorMessage = ref('')
+const { news, pagination: newsPagination, isLoading: isLoadingNews, load: loadNews } = useNews()
+isLoadingNews.value = true
+newsPagination.pageSize = 5
 
 setMetaInfo(
   {
@@ -49,36 +42,8 @@ onMounted(() => {
 })
 
 function load() {
-  loadIslands()
+  loadIslands({ pageSize: 10 })
   loadNews()
-}
-
-function loadIslands() {
-  islandsLoading.value = true
-  client.island
-    .getList(10)
-    .then((list) => {
-      islands.value = list.items
-    })
-    .catch((error) => {
-      console.error(error)
-      errorMessage.value = t('common.loadingFailDeveloperShow')
-    })
-    .finally(() => (islandsLoading.value = false))
-}
-
-function loadNews() {
-  newsLoading.value = true
-  client.news
-    .getList(visibleNewsMax)
-    .then((list) => {
-      news.value = list.items
-      newsTotalCount.value = list.totalCount
-    })
-    .catch((error) => {
-      console.error(error)
-    })
-    .finally(() => (newsLoading.value = false))
 }
 
 function isActual(island: Island) {
@@ -201,9 +166,9 @@ defineExpose({
       </div>
     </div>
 
-    <div v-if="newsLoading">
+    <div v-if="isLoadingNews">
       <div
-        v-for="i in visibleNewsMax"
+        v-for="i in newsPagination.pageSize"
         :key="i"
         class="mb-3"
       >
