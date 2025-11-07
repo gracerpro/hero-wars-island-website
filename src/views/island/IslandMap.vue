@@ -76,18 +76,21 @@ const componentId = props.parentPageId + '__map'
 const errorMessage = ref('')
 const regionNumbers = ref<Array<number>>([])
 
+const isReloadingMap = ref(true)
 const isLoadingNodes = ref(true)
 const nodes = ref<NodeMap>(new Map<number, Node>())
 const rewards = ref<Array<ViewNodeReward>>([])
 const originRewards = ref<ItemMap>({})
-const calculatingRewards = ref(false)
+const calculatingRewards = ref(true)
 const userNodesIds = ref<UserNodeIds>(new Set())
 const userNodesGoingIds = ref<UserNodeIds>(new Set())
 const disableNodesIds = ref<UserNodeIds>(new Set())
 
+let storageScale: number | null = null
 const scale = ref(1)
 const translateX = ref(0)
 const translateY = ref(0)
+const resetTransformScale = ref<number | null>(null)
 
 const isSelectAnyNode = ref(true)
 const selectMode = ref<SelectMode>(SELECT_MODE_PLAN)
@@ -109,7 +112,9 @@ const downloadDialog =
   useTemplateRef<ComponentExposed<typeof IslandMapDownloadDialog>>('downloadDialog')
 const downloadDialogComponent = shallowRef<typeof IslandMapDownloadDialog | null>(null)
 
-const loading = computed(() => isLoadingNodes.value || calculatingRewards.value)
+const loading = computed(() => {
+  return isLoadingNodes.value || calculatingRewards.value || isReloadingMap.value
+})
 
 const visibleRewards = computed(() => {
   let resultRewards = rewards.value.filter((reward) => {
@@ -264,35 +269,37 @@ function getUniqueId(node: Node, nodeReward: NodeReward, index: number): string 
   return 'mx' + node.mx + '_my' + node.my + '_id' + nodeReward.itemId + '_i' + index
 }
 
-function onChangeScale(value: number) {
-  scale.value += value
+function onChangeScale(delta: number) {
+  scale.value = getScale(scale.value + delta)
+}
 
+function getScale(newValue: number): number {
   const MAX_SCALE = 8
   const MIN_SCALE = 0.3
 
-  if (scale.value > MAX_SCALE) {
-    scale.value = MAX_SCALE
-  } else if (scale.value < MIN_SCALE) {
-    scale.value = MIN_SCALE
+  if (newValue > MAX_SCALE) {
+    newValue = MAX_SCALE
+  } else if (newValue < MIN_SCALE) {
+    newValue = MIN_SCALE
   }
+
+  return newValue
+}
+
+function resetTransform(newScale: number) {
+  resetTransformScale.value = getScale(newScale)
+
+  if (storageScale === null) {
+    translateX.value = 0
+    translateY.value = 0
+    scale.value = resetTransformScale.value
+  }  
 }
 
 function onResetMap() {
-  if (props.island.initMap?.scale !== undefined) {
-    scale.value = props.island.initMap.scale
-  } else {
-    scale.value = 1
-  }
-  if (props.island.initMap?.offsetX !== undefined) {
-    translateX.value = props.island.initMap.offsetX
-  } else {
-    translateX.value = 0
-  }
-  if (props.island.initMap?.offsetY !== undefined) {
-    translateY.value = props.island.initMap.offsetY
-  } else {
-    translateY.value = 0
-  }
+  translateX.value = 0
+  translateY.value = 0
+  scale.value = resetTransformScale.value ?? 1
 }
 
 function onChangeTranslate(x: number | null, y: number | null) {
@@ -381,6 +388,7 @@ function forceReloadMap() {
 }
 
 function reloadMap(isForce = false) {
+  isReloadingMap.value = true
   loadNodes(isForce).then((nodeList: IslandNodeList) => {
     nodes.value = nodeList.nodes
     rewards.value = calculateRewards(nodeList)
@@ -393,6 +401,7 @@ function reloadMap(isForce = false) {
       }
     })
   })
+  .finally(() => isReloadingMap.value = false)
 }
 
 function onMountedDownloadDialog() {
@@ -446,29 +455,19 @@ function loadState() {
   const byIsland = byIslandState[props.island.id] ?? {}
 
   if (byIsland.scale === undefined) {
-    if (props.island.initMap?.scale !== undefined) {
-      scale.value = props.island.initMap.scale
-    } else {
-      scale.value = 1
-    }
+    scale.value = 1
   } else {
     scale.value = byIsland.scale
+    storageScale = byIsland.scale
   }
+
   if (byIsland.translateX === undefined) {
-    if (props.island.initMap?.offsetX !== undefined) {
-      translateX.value = props.island.initMap.offsetX
-    } else {
-      translateX.value = 0
-    }
+    translateX.value = 0
   } else {
     translateX.value = byIsland.translateX
   }
   if (byIsland.translateY === undefined) {
-    if (props.island.initMap?.offsetY !== undefined) {
-      translateY.value = props.island.initMap.offsetY
-    } else {
-      translateY.value = 0
-    }
+    translateY.value = 0
   } else {
     translateY.value = byIsland.translateY
   }
@@ -571,6 +570,7 @@ function saveState() {
         @change-scale="onChangeScale"
         @change-node="onChangeNode"
         @select-node="onSelectNode"
+        @reset-transform="resetTransform"
       />
       <div
         class="text-end mb-3"

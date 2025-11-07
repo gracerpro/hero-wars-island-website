@@ -3,7 +3,7 @@ import { isCommonStep, type Node, type NodeMap } from '@/api/NodeApi'
 
 export const SIDE = 50
 const HALF_SIDE = SIDE / 2
-const HEIGHT = 34
+export const HEIGHT = 34
 const IMAGE_SIDE = 24
 
 export type UserNodeIds = Set<number>
@@ -257,7 +257,7 @@ function getDrawedNode(node: Node): DrawedNode {
 }
 
 export function getHorizontalStep(): number {
-  return 1.5 * SIDE
+  return SIDE + HALF_SIDE
 }
 
 export function getVerticalStep(): number {

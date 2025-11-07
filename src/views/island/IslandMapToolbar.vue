@@ -22,7 +22,7 @@ defineProps<Props>()
 const emit = defineEmits<{
   reset: []
   'change-translate': [x: number | null, y: number | null]
-  'change-scale': [value: number]
+  'change-scale': [delta: number]
   'fullscreen-on': []
   'begin-download': []
   'reload-map': []
@@ -65,7 +65,7 @@ function onMountedHelpDialog() {
       :translate-x="translateX"
       :translate-y="translateY"
       @change-translate="(dx: number | null, dy: number | null) => emit('change-translate', dx, dy)"
-      @change-scale="(value: number) => emit('change-scale', value)"
+      @change-scale="(delta: number) => emit('change-scale', delta)"
       @reset="emit('reset')"
     />
 

@@ -13,7 +13,7 @@ interface Props {
 const props = defineProps<Props>()
 const emit = defineEmits<{
   reset: []
-  'change-scale': [value: number]
+  'change-scale': [delta: number]
   'change-translate': [x: number | null, y: number | null]
 }>()
 
