@@ -9,14 +9,14 @@
 
 import { TYPE_DANGER } from '@/components/toast'
 import ToastMessage from '@/components/ToastMessage.vue'
-import { type Node, Status, Type } from '@/api/NodeApi'
-import { ref, shallowRef, computed, onMounted, onUnmounted, useTemplateRef } from 'vue'
+import { type Node, type NodeMap, Status, Type } from '@/api/NodeApi'
+import { ref, shallowRef, computed, onMounted, onUnmounted, useTemplateRef, reactive } from 'vue'
 import {
   TRANSLATE_X,
   TRANSLATE_Y,
-  DELTA_SCALE,
   canSelectNode,
   canSelectNextNode,
+  getDeltaScale,
 } from '@/services/island-map'
 import {
   getIconsItems,
@@ -30,6 +30,8 @@ import {
   type WarningPointsMap,
   type IconItem,
   type RewardQuantity,
+  type DrawedNodeMap,
+  HEIGHT,
 } from './map'
 import { useI18n } from 'vue-i18n'
 import IslandMapInfoDialog from './IslandMapInfoDialog.vue'
@@ -44,7 +46,7 @@ interface Props {
   translateY: number
   isShowQuantity: boolean
   rewards: Array<ViewNodeReward>
-  nodes: Map<number, Node>
+  nodes: NodeMap
   originRewards: ItemMap
   userNodesIds: UserNodeIds
   userNodesGoingIds: UserNodeIds
@@ -61,11 +63,14 @@ const emit = defineEmits<{
   'change-translate': [x: number | null, y: number | null]
   'change-scale': [value: number]
   'select-node': [nodeId: number]
+  'reset-transform': [scale: number]
 }>()
 
 const { t } = useI18n()
 
 const BUTTON_MAIN = 0
+
+const isDebug = false
 
 type MouseState = {
   isDown: boolean
@@ -99,12 +104,18 @@ defineExpose({
   svgMapRef,
 })
 
-const viewSide = computed(() => SIDE * 5 * props.scale)
-const viewWidth = computed(() => viewSide.value * 2)
-const viewHeight = computed(() => viewSide.value * 2)
-const viewBox = computed(() => {
-  return `-${viewSide.value} -${viewSide.value} ${viewSide.value * 2} ${viewSide.value * 2}`
+const initTranslate = reactive({
+  x: 0,
+  y: 0,
 })
+const viewBox = reactive({
+  x: -500,
+  y: -500,
+  width: 1000,
+  height: 1000,
+})
+const viewBoxValue = computed(() => `${viewBox.x} ${viewBox.y} ${viewBox.width} ${viewBox.height}`)
+
 const totalNodes = computed<Map<number, SvgDrawedNode>>(() => {
   const result = new Map<number, SvgDrawedNode>()
   const drawedNodes = getDrawedNodes(props.nodes)
@@ -134,6 +145,8 @@ const rewardQuantities = computed<Array<RewardQuantity>>(() => {
 
 onMounted(() => {
   window.addEventListener('keydown', onKeyDownMap)
+
+  centerNodes(totalNodes.value)
 })
 onUnmounted(() => {
   window.removeEventListener('keydown', onKeyDownMap)
@@ -148,12 +161,12 @@ function onKeyDownMap(event: KeyboardEvent) {
   }
 
   if (event.key === 'PageDown') {
-    emitNewScale(event, -DELTA_SCALE)
+    emitNewScale(event, -getDeltaScale(props.scale))
     event.preventDefault()
     return
   }
   if (event.key === 'PageUp') {
-    emitNewScale(event, DELTA_SCALE)
+    emitNewScale(event, getDeltaScale(props.scale))
     event.preventDefault()
     return
   }
@@ -212,6 +225,61 @@ function getNodeClass(node: Node): string {
   }
 
   return nodeClass
+}
+
+const cellsBounds = ref<null | {
+  minX: number
+  maxX: number
+  minY: number
+  maxY: number
+}>(null)
+
+function centerNodes(nodes: DrawedNodeMap) {
+  initTranslate.x = 0
+  initTranslate.y = 0
+
+  const firstEntry = nodes.entries().next().value
+  if (!firstEntry) {
+    return
+  }
+  const firstNode = firstEntry[1]
+  let minX = firstNode.x
+  let maxX = firstNode.x
+  let minY = firstNode.y
+  let maxY = firstNode.y
+
+  nodes.forEach((cell) => {
+    if (cell.x < minX) {
+      minX = cell.x
+    }
+    if (cell.x > maxX) {
+      maxX = cell.x
+    }
+    if (cell.y < minY) {
+      minY = cell.y
+    }
+    if (cell.y > maxY) {
+      maxY = cell.y
+    }
+  })
+  cellsBounds.value = {
+    minX: minX - SIDE,
+    maxX: maxX + SIDE,
+    minY: minY - HEIGHT,
+    maxY: maxY + HEIGHT,
+  }
+
+  const cellsHeight = cellsBounds.value.maxY - cellsBounds.value.minY
+  const cellsHeightEven = cellsHeight % 2 === 0 ? cellsHeight : cellsHeight + 1
+  const scaleY = viewBox.height / cellsHeightEven
+
+  emit('reset-transform', scaleY)
+
+  const cellsCenterX = (maxX + minX) / 2
+  const cellsCenterY = (maxY + minY) / 2
+
+  initTranslate.x = -cellsCenterX
+  initTranslate.y = -cellsCenterY
 }
 
 function getPoints(coordinates: NodeCoordinates): string {
@@ -280,14 +348,14 @@ function onMouseMove(button: MouseEvent) {
   let resultY = null
 
   if (mouse.x0 !== null && mouse.tx0 !== null) {
-    const fx = viewWidth.value / svgMapRef.value!.clientHeight
+    const fx = viewBox.width / svgMapRef.value!.clientHeight // YES, clientHeight, not clientWidth
     const dx = button.pageX - mouse.x0
-    resultX = mouse.tx0 + dx * fx
+    resultX = mouse.tx0 + (dx * fx) / props.scale
   }
   if (mouse.y0 !== null && mouse.ty0 !== null) {
-    const fy = viewHeight.value / svgMapRef.value!.clientHeight
+    const fy = viewBox.height / svgMapRef.value!.clientHeight
     const dy = button.pageY - mouse.y0
-    resultY = mouse.ty0 + dy * fy
+    resultY = mouse.ty0 + (dy * fy) / props.scale
   }
 
   if (resultX !== null || resultY !== null) {
@@ -302,7 +370,8 @@ function onMouseUp(event: MouseEvent) {
 }
 
 function onMouseWheel(event: WheelEvent) {
-  const value = event.deltaY > 0 ? DELTA_SCALE : -DELTA_SCALE
+  const delta = getDeltaScale(props.scale)
+  const value = event.deltaY > 0 ? delta : -delta
   emitNewScale(event, value)
   event.preventDefault()
 }
@@ -355,7 +424,7 @@ function getItemTitle(item: IconItem): string {
       class="canvas prevent-select"
       width="100%"
       tabindex="0"
-      :viewBox="viewBox"
+      :viewBox="viewBoxValue"
       :style="{ 'background-image': backgroundImageUrl ? 'url(' + backgroundImageUrl + ')' : '' }"
       xmlns="http://www.w3.org/2000/svg"
       @mousedown="onMouseDown"
@@ -365,7 +434,79 @@ function getItemTitle(item: IconItem): string {
       @wheel="onMouseWheel"
       @mousewheel="onMouseWheel"
     >
-      <g :transform="'translate(' + translateX + ' ' + translateY + ')'">
+      <template v-if="isDebug">
+        <line
+          :x1="viewBox.x"
+          :y1="viewBox.y"
+          :x2="viewBox.x"
+          :y2="viewBox.y + viewBox.height"
+          stroke="blue"
+        />
+        <line
+          :x1="viewBox.x"
+          :y1="viewBox.y + viewBox.height"
+          :x2="viewBox.x + viewBox.width"
+          :y2="viewBox.y + viewBox.height"
+          stroke="blue"
+        />
+        <line
+          :x1="viewBox.x + viewBox.width"
+          :y1="viewBox.y + viewBox.height"
+          :x2="viewBox.x + viewBox.width"
+          :y2="viewBox.y"
+          stroke="blue"
+        />
+        <line
+          :x1="viewBox.x"
+          :y1="viewBox.y"
+          :x2="viewBox.x + viewBox.width"
+          :y2="viewBox.y"
+          stroke="blue"
+        />
+      </template>
+
+      <g
+        :transform="
+          'scale(' +
+          scale +
+          ') translate(' +
+          (initTranslate.x + translateX) +
+          ' ' +
+          (initTranslate.y + translateY) +
+          ')'
+        "
+      >
+        <template v-if="isDebug && cellsBounds">
+          <line
+            :x1="cellsBounds.minX"
+            :y1="cellsBounds.minY"
+            :x2="cellsBounds.minX"
+            :y2="cellsBounds.maxY"
+            stroke="black"
+          />
+          <line
+            :x1="cellsBounds.minX"
+            :y1="cellsBounds.maxY"
+            :x2="cellsBounds.maxX"
+            :y2="cellsBounds.maxY"
+            stroke="black"
+          />
+          <line
+            :x1="cellsBounds.maxX"
+            :y1="cellsBounds.maxY"
+            :x2="cellsBounds.maxX"
+            :y2="cellsBounds.minY"
+            stroke="black"
+          />
+          <line
+            :x1="cellsBounds.minX"
+            :y1="cellsBounds.minY"
+            :x2="cellsBounds.maxX"
+            :y2="cellsBounds.minY"
+            stroke="black"
+          />
+        </template>
+
         <polygon
           v-for="[, node] in totalNodes"
           :key="node.xyId"

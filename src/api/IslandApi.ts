@@ -21,11 +21,6 @@ export interface Island {
   eventEndAt: Date
   name: string
   description?: string
-  initMap: {
-    scale: number
-    offsetX: number
-    offsetY: number
-  }
   nodesLastUpdatedAt?: Date | null
   syncGameVersion: string | null
   syncAt: Date | null
@@ -148,11 +143,6 @@ export class IslandApi {
       name: data.name,
       nodesLastUpdatedAt: data.nodesLastUpdatedAt ? new Date(data.nodesLastUpdatedAt) : null,
       regions,
-      initMap: {
-        scale: data.initMap.scale,
-        offsetX: data.initMap.offsetX,
-        offsetY: data.initMap.offsetY,
-      },
       syncGameVersion: data.syncGameVersion ?? null,
       syncAt: data.syncAt ?? null,
       backgroundImage: image,

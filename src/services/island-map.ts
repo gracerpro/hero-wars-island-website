@@ -11,6 +11,16 @@ export function canSelectNode(node: Node): boolean {
   return node.type !== Type.Start && node.type != Type.Blocker
 }
 
+export function getDeltaScale(scale: number): number {
+  if (scale > 1.5) {
+    return DELTA_SCALE
+  }
+  if (scale > 0.7) {
+    return DELTA_SCALE * 0.5
+  }
+  return DELTA_SCALE * 0.2
+}
+
 export function canSelectNextNode(
   drawedNodes: DrawedNodeMap,
   userNodesIds: UserNodeIds,
