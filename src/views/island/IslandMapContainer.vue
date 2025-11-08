@@ -14,9 +14,9 @@ import { ref, shallowRef, computed, onMounted, onUnmounted, useTemplateRef, reac
 import {
   TRANSLATE_X,
   TRANSLATE_Y,
-  DELTA_SCALE,
   canSelectNode,
   canSelectNextNode,
+  getDeltaScale,
 } from '@/services/island-map'
 import {
   getIconsItems,
@@ -70,6 +70,8 @@ const { t } = useI18n()
 
 const BUTTON_MAIN = 0
 
+const isDebug = false
+
 type MouseState = {
   isDown: boolean
   x0: number | null
@@ -104,7 +106,7 @@ defineExpose({
 
 const initTranslate = reactive({
   x: 0,
-  y: 0
+  y: 0,
 })
 const viewBox = reactive({
   x: -500,
@@ -159,12 +161,12 @@ function onKeyDownMap(event: KeyboardEvent) {
   }
 
   if (event.key === 'PageDown') {
-    emitNewScale(event, -DELTA_SCALE)
+    emitNewScale(event, -getDeltaScale(props.scale))
     event.preventDefault()
     return
   }
   if (event.key === 'PageUp') {
-    emitNewScale(event, DELTA_SCALE)
+    emitNewScale(event, getDeltaScale(props.scale))
     event.preventDefault()
     return
   }
@@ -225,6 +227,13 @@ function getNodeClass(node: Node): string {
   return nodeClass
 }
 
+const cellsBounds = ref<null | {
+  minX: number
+  maxX: number
+  minY: number
+  maxY: number
+}>(null)
+
 function centerNodes(nodes: DrawedNodeMap) {
   initTranslate.x = 0
   initTranslate.y = 0
@@ -253,35 +262,24 @@ function centerNodes(nodes: DrawedNodeMap) {
       maxY = cell.y
     }
   })
-  const cellsBounds = {
+  cellsBounds.value = {
     minX: minX - SIDE,
     maxX: maxX + SIDE,
     minY: minY - HEIGHT,
     maxY: maxY + HEIGHT,
   }
-  console.log(cellsBounds)
-  const cellsWidth = cellsBounds.maxX - cellsBounds.minX
-  const cellsHeight = cellsBounds.maxY - cellsBounds.minY
-  const width = cellsWidth % 2 === 0 ? cellsWidth : cellsWidth + 1
-  const height = cellsHeight % 2 === 0 ? cellsHeight : cellsHeight + 1
 
-  console.log(width, height)
+  const cellsHeight = cellsBounds.value.maxY - cellsBounds.value.minY
+  const cellsHeightEven = cellsHeight % 2 === 0 ? cellsHeight : cellsHeight + 1
+  const scaleY = viewBox.height / cellsHeightEven
 
-  const side = width > height ? width : height
-  viewBox.x = - side / 2
-  viewBox.y = - side / 2
-  viewBox.width = side
-  viewBox.height = side
+  emit('reset-transform', scaleY)
 
-  const scale = width / height
-  console.log("calc scale", scale)
-  emit('reset-transform', scale)
+  const cellsCenterX = (maxX + minX) / 2
+  const cellsCenterY = (maxY + minY) / 2
 
-  const сenterX = (maxX + minX) / 2
-  const centerY = (maxY + minY) / 2
-
-  initTranslate.x = -сenterX
-  initTranslate.y = -centerY
+  initTranslate.x = -cellsCenterX
+  initTranslate.y = -cellsCenterY
 }
 
 function getPoints(coordinates: NodeCoordinates): string {
@@ -372,7 +370,8 @@ function onMouseUp(event: MouseEvent) {
 }
 
 function onMouseWheel(event: WheelEvent) {
-  const value = event.deltaY > 0 ? DELTA_SCALE : -DELTA_SCALE
+  const delta = getDeltaScale(props.scale)
+  const value = event.deltaY > 0 ? delta : -delta
   emitNewScale(event, value)
   event.preventDefault()
 }
@@ -435,13 +434,78 @@ function getItemTitle(item: IconItem): string {
       @wheel="onMouseWheel"
       @mousewheel="onMouseWheel"
     >
-    <line :x1="viewBox.x" :y1="viewBox.y" :x2="viewBox.x" :y2="viewBox.y + viewBox.height" stroke="black" />
-        <line :x1="viewBox.x" :y1="viewBox.y + viewBox.height" :x2="viewBox.x + viewBox.width" :y2="viewBox.y + viewBox.height" stroke="black" />
-        <line :x1="viewBox.x + viewBox.width" :y1="viewBox.y + viewBox.height" :x2="viewBox.x + viewBox.width" :y2="viewBox.y" stroke="black" />
-        <line :x1="viewBox.x" :y1="viewBox.y" :x2="viewBox.x + viewBox.width" :y2="viewBox.y" stroke="black" />
+      <template v-if="isDebug">
+        <line
+          :x1="viewBox.x"
+          :y1="viewBox.y"
+          :x2="viewBox.x"
+          :y2="viewBox.y + viewBox.height"
+          stroke="blue"
+        />
+        <line
+          :x1="viewBox.x"
+          :y1="viewBox.y + viewBox.height"
+          :x2="viewBox.x + viewBox.width"
+          :y2="viewBox.y + viewBox.height"
+          stroke="blue"
+        />
+        <line
+          :x1="viewBox.x + viewBox.width"
+          :y1="viewBox.y + viewBox.height"
+          :x2="viewBox.x + viewBox.width"
+          :y2="viewBox.y"
+          stroke="blue"
+        />
+        <line
+          :x1="viewBox.x"
+          :y1="viewBox.y"
+          :x2="viewBox.x + viewBox.width"
+          :y2="viewBox.y"
+          stroke="blue"
+        />
+      </template>
 
-      <g :transform="'scale(' + scale + ') translate(' + (initTranslate.x + translateX) + ' ' + (initTranslate.y + translateY) + ')'">
-        
+      <g
+        :transform="
+          'scale(' +
+          scale +
+          ') translate(' +
+          (initTranslate.x + translateX) +
+          ' ' +
+          (initTranslate.y + translateY) +
+          ')'
+        "
+      >
+        <template v-if="isDebug && cellsBounds">
+          <line
+            :x1="cellsBounds.minX"
+            :y1="cellsBounds.minY"
+            :x2="cellsBounds.minX"
+            :y2="cellsBounds.maxY"
+            stroke="black"
+          />
+          <line
+            :x1="cellsBounds.minX"
+            :y1="cellsBounds.maxY"
+            :x2="cellsBounds.maxX"
+            :y2="cellsBounds.maxY"
+            stroke="black"
+          />
+          <line
+            :x1="cellsBounds.maxX"
+            :y1="cellsBounds.maxY"
+            :x2="cellsBounds.maxX"
+            :y2="cellsBounds.minY"
+            stroke="black"
+          />
+          <line
+            :x1="cellsBounds.minX"
+            :y1="cellsBounds.minY"
+            :x2="cellsBounds.maxX"
+            :y2="cellsBounds.minY"
+            stroke="black"
+          />
+        </template>
 
         <polygon
           v-for="[, node] in totalNodes"

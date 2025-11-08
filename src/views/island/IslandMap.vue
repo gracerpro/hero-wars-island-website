@@ -275,7 +275,7 @@ function onChangeScale(delta: number) {
 
 function getScale(newValue: number): number {
   const MAX_SCALE = 8
-  const MIN_SCALE = 0.3
+  const MIN_SCALE = 0.2
 
   if (newValue > MAX_SCALE) {
     newValue = MAX_SCALE
@@ -293,7 +293,7 @@ function resetTransform(newScale: number) {
     translateX.value = 0
     translateY.value = 0
     scale.value = resetTransformScale.value
-  }  
+  }
 }
 
 function onResetMap() {
@@ -389,19 +389,20 @@ function forceReloadMap() {
 
 function reloadMap(isForce = false) {
   isReloadingMap.value = true
-  loadNodes(isForce).then((nodeList: IslandNodeList) => {
-    nodes.value = nodeList.nodes
-    rewards.value = calculateRewards(nodeList)
-    originRewards.value = nodeList.rewards
+  loadNodes(isForce)
+    .then((nodeList: IslandNodeList) => {
+      nodes.value = nodeList.nodes
+      rewards.value = calculateRewards(nodeList)
+      originRewards.value = nodeList.rewards
 
-    userNodesIds.value.forEach((nodeId) => {
-      const node = nodes.value.get(nodeId)
-      if ((node && !canSelectNode(node)) || disableNodesIds.value.has(nodeId)) {
-        userNodesIds.value.delete(nodeId)
-      }
+      userNodesIds.value.forEach((nodeId) => {
+        const node = nodes.value.get(nodeId)
+        if ((node && !canSelectNode(node)) || disableNodesIds.value.has(nodeId)) {
+          userNodesIds.value.delete(nodeId)
+        }
+      })
     })
-  })
-  .finally(() => isReloadingMap.value = false)
+    .finally(() => (isReloadingMap.value = false))
 }
 
 function onMountedDownloadDialog() {
@@ -531,6 +532,7 @@ function saveState() {
       v-if="!errorMessage"
       v-model:is-show-quantity="isShowQuantity"
       :loading="loading"
+      :scale="scale"
       :translate-x="translateX"
       :translate-y="translateY"
       :regions="island.regions"

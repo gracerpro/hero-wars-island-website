@@ -1,13 +1,14 @@
 <script setup lang="ts">
 /* global MouseEvent */
 
-import { DELTA_SCALE, TRANSLATE_X, TRANSLATE_Y } from '@/services/island-map'
+import { getDeltaScale, TRANSLATE_X, TRANSLATE_Y } from '@/services/island-map'
 import { useI18n } from 'vue-i18n'
 
 interface Props {
   loading: boolean
   translateX: number
   translateY: number
+  scale: number
 }
 
 const props = defineProps<Props>()
@@ -20,7 +21,7 @@ const emit = defineEmits<{
 const { t } = useI18n()
 
 function onChangeScale(zoom: number, event: MouseEvent) {
-  let value = zoom * DELTA_SCALE
+  let value = zoom * getDeltaScale(props.scale)
 
   if (event.ctrlKey) {
     value /= 10

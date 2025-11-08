@@ -12,6 +12,7 @@ interface Props {
   loading: boolean
   translateX: number
   translateY: number
+  scale: number
   regions: Array<Region>
 }
 
@@ -64,6 +65,7 @@ function onMountedHelpDialog() {
       :loading="loading"
       :translate-x="translateX"
       :translate-y="translateY"
+      :scale="scale"
       @change-translate="(dx: number | null, dy: number | null) => emit('change-translate', dx, dy)"
       @change-scale="(delta: number) => emit('change-scale', delta)"
       @reset="emit('reset')"
