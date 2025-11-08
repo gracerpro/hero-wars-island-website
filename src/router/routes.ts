@@ -78,7 +78,7 @@ const routes: Array<RouteRecordRaw> = [
         // route level code-splitting
         // this generates a separate chunk (about.[hash].js) for this route
         // which is lazy-loaded when the route is visited.
-        component: () => import('../views/TheHome.vue'),
+        component: () => import('../views/home/IndexPage.vue'),
       },
       {
         path: 'about',
@@ -94,6 +94,11 @@ const routes: Array<RouteRecordRaw> = [
         path: 'islands/:id(\\d+)',
         name: 'island',
         component: () => import('../views/TheIsland.vue'),
+      },
+      {
+        path: 'islands',
+        name: 'islands',
+        component: () => import('../views/island-list/IndexPage.vue'),
       },
       {
         path: 'help',
