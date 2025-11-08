@@ -79,14 +79,19 @@ async function InitCollapse(navElement: HTMLElement) {
             >{{ t('common.actualIsland') }}</router-link
           >
           <router-link
-            :to="createI18nRouteTo({ name: 'contact' })"
+            :to="createI18nRouteTo({ name: 'islands' })"
             class="nav-link"
-            >{{ t('common.contacts') }}</router-link
+            >{{ t('common.history') }}</router-link
           >
           <router-link
             :to="createI18nRouteTo({ name: 'news' })"
             class="nav-link"
             >{{ t('common.news') }}</router-link
+          >
+          <router-link
+            :to="createI18nRouteTo({ name: 'contact' })"
+            class="nav-link"
+            >{{ t('common.contacts') }}</router-link
           >
           <router-link
             :to="createI18nRouteTo({ name: 'about' })"

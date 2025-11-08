@@ -1,50 +1,27 @@
 <script setup lang="ts">
-import { fromCurrentDate } from '@/helpers/formatter'
-import { setMetaInfo } from '@/services/page-meta'
-import { watch, onMounted } from 'vue'
-import { useI18n } from 'vue-i18n'
-import { createI18nRouteTo } from '@/i18n/translation'
-import { useRoute } from 'vue-router'
-import { useSSRContext } from 'vue'
-import { getRegionTitle } from './island/island'
-import type { Island } from '@/api/IslandApi'
 import { useIslands } from '@/use/use-islands'
-import { useNews } from '@/use/use-news'
+import { onMounted, watch } from 'vue'
+import { createI18nRouteTo } from '@/i18n/translation'
+import { fromCurrentDate } from '@/helpers/formatter'
+import type { Island } from '@/api/IslandApi'
+import { useRoute } from 'vue-router'
+import { useI18n } from 'vue-i18n'
+import { getRegionTitle } from '../island/island'
 
-const { t, locale } = useI18n()
-const route = useRoute()
-const ssrContext = import.meta.env.SSR ? useSSRContext() : undefined
+const { islands, isLoading, errorMessage, pagination: islandsPagination, load } = useIslands()
+isLoading.value = true
+islandsPagination.pageSize = 5
 
 const now = new Date()
+const route = useRoute()
+const { t, locale } = useI18n()
 
-const { islands, isLoading: islandsLoading, errorMessage, load: loadIslands } = useIslands()
+onMounted(() => load())
 
-const { news, pagination: newsPagination, isLoading: isLoadingNews, load: loadNews } = useNews()
-isLoadingNews.value = true
-newsPagination.pageSize = 5
-
-setMetaInfo(
-  {
-    title: t('common.projectName'),
-    description: t('seo.home.description'),
-    keywords: t('seo.home.keywords'),
-  },
-  ssrContext
+watch(
+  () => route.params.locale,
+  () => load()
 )
-
-onMounted(() => {
-  watch(
-    () => route.params.locale,
-    () => load()
-  )
-
-  load()
-})
-
-function load() {
-  loadIslands({ pageSize: 10 })
-  loadNews()
-}
 
 function isActual(island: Island) {
   return island.eventEndAt > now
@@ -86,19 +63,12 @@ function getIslandHint(island: Island) {
 defineExpose({
   islands,
   errorMessage,
-  news,
 })
 </script>
 
 <template>
-  <div class="container app-container">
-    <h1>
-      {{ t('page.home.adventureIsland', 2) }} -
-      {{ t('common.heroWarsDominionEra') }}
-    </h1>
-    <p v-html="t('page.home.firstParagraph')"></p>
-
-    <div v-if="islandsLoading">
+  <div>
+    <div v-if="isLoading">
       <ol>
         <li>
           <div><span class="placeholder col-5"></span></div>
@@ -154,59 +124,5 @@ defineExpose({
         >
       </li>
     </ol>
-
-    <div class="row">
-      <div class="col-lg-6 mb-3">
-        <h2 class="mb-0">{{ t('common.news') }}</h2>
-      </div>
-      <div class="col-lg-6 mb-3 text-end">
-        <router-link :to="createI18nRouteTo({ name: 'news' })">{{
-          t('page.home.readAllNews')
-        }}</router-link>
-      </div>
-    </div>
-
-    <div v-if="isLoadingNews">
-      <div
-        v-for="i in newsPagination.pageSize"
-        :key="i"
-        class="mb-3"
-      >
-        <div class="placeholder-glow">
-          <div class="placeholder col-6"></div>
-        </div>
-        <div class="placeholder-glow">
-          <div class="placeholder placeholder-sm col-3"></div>
-        </div>
-      </div>
-    </div>
-    <p v-else-if="!news.length">
-      {{ t('common.noData') }}
-    </p>
-    <div>
-      <div
-        v-for="oneNews in news"
-        :key="oneNews.id"
-        class="mb-2"
-      >
-        <h4>
-          <router-link
-            :to="createI18nRouteTo({ name: 'newsView', params: { slug: oneNews.slug } })"
-            >{{ oneNews.name }}</router-link
-          >
-        </h4>
-        <div class="fst-italic">{{ fromCurrentDate(oneNews.createdAt, locale) }}</div>
-        <div
-          class="news-item"
-          v-html="oneNews.snippet"
-        ></div>
-      </div>
-    </div>
   </div>
 </template>
-
-<style>
-.news-item p {
-  margin-bottom: 0;
-}
-</style>

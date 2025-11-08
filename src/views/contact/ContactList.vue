@@ -62,7 +62,9 @@ function loadFeedbackItems() {
 <template>
   <div>
     <h2 class="mt-3">{{ t('common.feedback') }}</h2>
-    <p class="fst-italic">{{ t('page.contact.messagesDisplayedByAdministrator') }}</p>
+    <p class="fst-italic text-warning-emphasis">
+      {{ t('page.contact.messagesDisplayedByAdministrator') }}
+    </p>
 
     <p v-if="isShowNoData">
       {{ t('common.noData') }}

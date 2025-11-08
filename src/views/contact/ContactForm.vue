@@ -76,7 +76,7 @@ function onSubmit() {
 
 <template>
   <form
-    class="p-2 border border-secondary-subtle rounded-3"
+    class="p-3 border border-secondary-subtle rounded-3"
     @submit.prevent="onSubmit"
   >
     <div class="mb-3">
