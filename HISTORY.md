@@ -1,5 +1,17 @@
 # History
 
+## v2.1.2 at 2025-11-08
+
+What has been done
+
+* Add auto scale of the map
+* Add islands page
+
+The technical part
+
+* Add enums
+* Update dependencies
+
 ## v2.1.1 at 2025-08-12
 
 The technical part
@@ -8,7 +20,6 @@ The technical part
 * Replace the storage from Vuex to Pinia
 * Upgrade NodeJS to version 22
 * Update dependencies
-
 
 ## v1.6.7 at 2025-01-26
 
