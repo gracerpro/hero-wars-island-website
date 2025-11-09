@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { setMetaInfo } from '@/services/page-meta'
-import ContactForm from './contact/ContactForm.vue'
-import ContactList from './contact/ContactList.vue'
+import ContactForm from './ContactForm.vue'
+import ContactList from './ContactList.vue'
 import { useI18n } from 'vue-i18n'
 import { useSSRContext } from 'vue'
 

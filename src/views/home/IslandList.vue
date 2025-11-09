@@ -69,7 +69,7 @@ defineExpose({
 <template>
   <div>
     <div v-if="isLoading">
-      <ol>
+      <ul>
         <li>
           <div><span class="placeholder col-5"></span></div>
           <span class="placeholder col-1 ms-2"></span>
@@ -85,7 +85,7 @@ defineExpose({
           <span class="placeholder col-1 ms-2"></span>
           <span class="placeholder col-1 ms-2"></span>
         </li>
-      </ol>
+      </ul>
     </div>
     <div
       v-else-if="errorMessage"
@@ -99,7 +99,7 @@ defineExpose({
     >
       {{ t('page.home.notFound') }}
     </div>
-    <ol v-else>
+    <ul v-else>
       <li
         v-for="island in islands"
         :key="island.id"
@@ -123,6 +123,6 @@ defineExpose({
           >{{ region.number }}</span
         >
       </li>
-    </ol>
+    </ul>
   </div>
 </template>

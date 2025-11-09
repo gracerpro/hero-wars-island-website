@@ -88,12 +88,12 @@ const routes: Array<RouteRecordRaw> = [
       {
         path: 'contact',
         name: 'contact',
-        component: () => import('../views/TheContact.vue'),
+        component: () => import('../views/contact/IndexPage.vue'),
       },
       {
         path: 'islands/:id(\\d+)',
         name: 'island',
-        component: () => import('../views/TheIsland.vue'),
+        component: () => import('../views/island/IndexPage.vue'),
       },
       {
         path: 'islands',

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import HeroClient from '@/api/HeroClient'
-import IslandMap from './island/IslandMap.vue'
+import IslandMap from './IslandMap.vue'
 import RowLoading from '@/components/RowLoading.vue'
 import { HttpError } from '@/exceptions/HttpError'
 import { setMetaInfo } from '@/services/page-meta'
@@ -17,6 +17,8 @@ const ssrContext = import.meta.env.SSR ? useSSRContext() : undefined
 const currentIsland = ref<Island | null>(null)
 const islandLoading = ref(true)
 const errorMessage = ref('')
+
+const isShowGameVersion = ref(false)
 
 const islandName = computed(() => currentIsland.value?.name)
 const islandDescription = computed(() => currentIsland.value?.description)
@@ -119,22 +121,24 @@ async function loadIsland(id: number) {
       <div class="col-lg-6 mb-3">
         <h1 class="mb-0">{{ islandName }}</h1>
       </div>
-      <div class="col-lg-6 mb-3 d-flex align-items-center">
+      <div class="col-lg-6 mb-3 d-flex align-items-center justify-content-end">
         <span
           v-if="currentIsland"
           class="fst-italic"
         >
           <span
-            v-if="currentIsland.syncGameVersion"
-            :title="t('page.island.gameVersionWhenSyncCells')"
-            class="game-version"
-            >{{ currentIsland.syncGameVersion }}</span
-          >
-          <span
             v-if="currentIsland.syncAt"
             :title="t('page.island.whenWasCellSynchronization')"
-            class="sync-at ms-2"
+            class="sync-at"
             >{{ currentIsland.syncAt }}</span
+          >
+          <span
+            v-if="currentIsland.syncGameVersion"
+            :title="t('page.island.gameVersionWhenSyncCells')"
+            class="game-version text-truncate ms-2"
+            :class="{ show: isShowGameVersion }"
+            @click="isShowGameVersion = !isShowGameVersion"
+            >{{ currentIsland.syncGameVersion }}</span
           >
         </span>
       </div>
@@ -180,7 +184,7 @@ async function loadIsland(id: number) {
   </div>
 </template>
 
-<style scoped>
+<style lang="css" scoped>
 .description {
   border-top: 1px solid #ccc;
   padding-top: 10px;
@@ -188,8 +192,11 @@ async function loadIsland(id: number) {
 .game-version {
   display: inline-block;
   max-width: 5em;
-  overflow: hidden;
   vertical-align: middle;
+  cursor: pointer;
+}
+.game-version.show {
+  max-width: none;
 }
 .sync-at {
   vertical-align: middle;

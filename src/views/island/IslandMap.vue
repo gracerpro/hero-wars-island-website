@@ -162,15 +162,16 @@ const groupRewards = computed(() => {
   rewards.value
     .filter((reward) => !disableNodesIds.value.has(reward.node.id))
     .forEach((reward) => {
-      if (!map[reward.item.id]) {
-        map[reward.item.id] = {
+      const rewardId = reward.item.id
+      if (!map[rewardId]) {
+        map[rewardId] = {
           uniqueId: reward.uniqueId,
           quantity: 0,
           item: reward.item,
           humanQuantity: '',
         }
       }
-      map[reward.item.id].quantity += reward.quantity
+      map[rewardId].quantity += reward.quantity
     })
 
   let arr = Object.values(map)
@@ -453,39 +454,39 @@ function loadState() {
   }
   byIslandState = stateData.byIsland
 
-  const byIsland = byIslandState[props.island.id] ?? {}
+  const byIsland = byIslandState[props.island.id]
 
-  if (byIsland.scale === undefined) {
+  if (byIsland?.scale === undefined) {
     scale.value = 1
   } else {
     scale.value = byIsland.scale
     storageScale = byIsland.scale
   }
 
-  if (byIsland.translateX === undefined) {
+  if (byIsland?.translateX === undefined) {
     translateX.value = 0
   } else {
     translateX.value = byIsland.translateX
   }
-  if (byIsland.translateY === undefined) {
+  if (byIsland?.translateY === undefined) {
     translateY.value = 0
   } else {
     translateY.value = byIsland.translateY
   }
 
-  regionNumbers.value = byIsland.regionNumbers || []
+  regionNumbers.value = byIsland?.regionNumbers ?? []
 
   userNodesIds.value.clear()
   userNodesGoingIds.value.clear()
   disableNodesIds.value.clear()
 
-  if (byIsland.userNodesIds) {
+  if (byIsland?.userNodesIds) {
     byIsland.userNodesIds.forEach((id) => userNodesIds.value.add(id))
   }
-  if (byIsland.userNodesGoingIds) {
+  if (byIsland?.userNodesGoingIds) {
     byIsland.userNodesGoingIds.forEach((id) => userNodesGoingIds.value.add(id))
   }
-  if (byIsland.disableNodesIds) {
+  if (byIsland?.disableNodesIds) {
     byIsland.disableNodesIds.forEach((id) => disableNodesIds.value.add(id))
   }
 
