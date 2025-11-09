@@ -75,7 +75,7 @@ const otherStepCostItems = computed(() => {
   for (const key in userStepCostItems.value) {
     const stepItem = userStepCostItems.value[key]
 
-    if (!isCommonStep(stepItem.item)) {
+    if (stepItem && !isCommonStep(stepItem.item)) {
       let icon
 
       if (stepItem.item.type === Type.StarMoney) {
