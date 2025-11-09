@@ -51,7 +51,7 @@ The end.
 Get commits history
 
 ```bash
-git log --since=2025-11-08 --pretty=format:"%cD %s"
+git log --since=2025-11-09 --pretty=format:"%cD %s"
 ```
 
 Run some commands

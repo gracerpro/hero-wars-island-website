@@ -1,11 +1,13 @@
 # History
 
-## v2.1.2 at 2025-11-08
+## v2.1.3 at 2025-11-09
 
 What has been done
 
 * Add auto scale of the map
 * Add islands page
+* Add sort to the rewards table
+* Small UI changes
 
 The technical part
 
