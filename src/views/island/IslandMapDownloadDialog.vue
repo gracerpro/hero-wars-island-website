@@ -234,9 +234,11 @@ function drawMap(context: CanvasRenderingContext2D, imagesByUrls: ImagesByUrls) 
 
   context.lineWidth = 1
   iconItems.value.forEach((iconItem) => {
-    if (iconItem.iconUrl) {
-      if (imagesByUrls[iconItem.iconUrl]) {
-        const image = imagesByUrls[iconItem.iconUrl]
+    const iconUrl = iconItem.iconUrl
+
+    if (iconUrl) {
+      if (imagesByUrls[iconUrl]) {
+        const image = imagesByUrls[iconUrl]
         context.drawImage(
           image,
           iconItem.iconX,
@@ -303,6 +305,8 @@ defineExpose({
         }}
       </div>
       <div>{{ t('page.island.downloadMapSize', { mapSize: mapSize }) }}</div>
+
+      <div class="alert alert-warning mt-3 mb-0">{{ t('page.island.downloadMapWarning') }}</div>
 
       <form
         :id="formId"

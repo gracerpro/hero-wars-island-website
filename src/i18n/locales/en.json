@@ -144,6 +144,7 @@
       "canSelectNearStart": "You can select a node near the entry.",
       "downloadMapInFormat": "Download map in {format} format",
       "downloadMapSize": "Map size {mapSize} points",
+      "downloadMapWarning": "It does not work in all browsers. You can take a screenshot of the map in full-screen mode.",
       "downloadVerticalAndHorizontalCount": "Vertical cells quantity {verticalCount}, horizontal cells quantity {horizontalCount}",
       "gameVersionWhenSyncCells": "The version of the game when syncing cells",
       "going": "Going",
@@ -170,6 +171,11 @@
       "planning": "Planing",
       "resourcesOnMap": "Map resources",
       "selectedResources": "Selected resources",
+      "toolbarActionCtrlHint": "By holding down, you can slow down 10 times\nBy pressing Shift - 2 times",
+      "translateLeft": "Shift to the left",
+      "translateRight": "Shift to the right",
+      "translateUp": "Shift to the up",
+      "translateDown": "Shift to the down",
       "whenWasCellSynchronization": "When was cell synchronization",
       "unusualStepPrice": "Unusual step price"
     }

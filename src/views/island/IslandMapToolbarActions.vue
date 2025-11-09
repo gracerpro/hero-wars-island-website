@@ -2,6 +2,7 @@
 /* global MouseEvent */
 
 import { getDeltaScale, TRANSLATE_X, TRANSLATE_Y } from '@/services/island-map'
+import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 interface Props {
@@ -19,6 +20,8 @@ const emit = defineEmits<{
 }>()
 
 const { t } = useI18n()
+
+const actionHint = computed(() => '\n' + t('page.island.toolbarActionCtrlHint'))
 
 function onChangeScale(zoom: number, event: MouseEvent) {
   let value = zoom * getDeltaScale(props.scale)
@@ -66,7 +69,7 @@ function onChangeTranslate(xDirection: number, yDirection: number, event: MouseE
       type="button"
       class="btn btn-secondary toolbar-button"
       :disabled="loading"
-      :title="t('common.zoomOut')"
+      :title="t('common.zoomOut') + actionHint"
       @click="onChangeScale(1, $event)"
     >
       -
@@ -75,7 +78,7 @@ function onChangeTranslate(xDirection: number, yDirection: number, event: MouseE
       type="button"
       class="btn btn-secondary toolbar-button"
       :disabled="loading"
-      :title="t('common.zoomIn')"
+      :title="t('common.zoomIn') + actionHint"
       @click="onChangeScale(-1, $event)"
     >
       +
@@ -83,6 +86,7 @@ function onChangeTranslate(xDirection: number, yDirection: number, event: MouseE
     <button
       type="button"
       class="btn btn-secondary toolbar-button"
+      :title="t('page.island.translateLeft') + actionHint"
       :disabled="loading"
       @click="onChangeTranslate(-1, 0, $event)"
     >
@@ -91,6 +95,7 @@ function onChangeTranslate(xDirection: number, yDirection: number, event: MouseE
     <button
       type="button"
       class="btn btn-secondary toolbar-button"
+      :title="t('page.island.translateRight') + actionHint"
       :disabled="loading"
       @click="onChangeTranslate(1, 0, $event)"
     >
@@ -99,6 +104,7 @@ function onChangeTranslate(xDirection: number, yDirection: number, event: MouseE
     <button
       type="button"
       class="btn btn-secondary toolbar-button"
+      :title="t('page.island.translateUp') + actionHint"
       :disabled="loading"
       @click="onChangeTranslate(0, -1, $event)"
     >
@@ -107,6 +113,7 @@ function onChangeTranslate(xDirection: number, yDirection: number, event: MouseE
     <button
       type="button"
       class="btn btn-secondary toolbar-button"
+      :title="t('page.island.translateDown') + actionHint"
       :disabled="loading"
       @click="onChangeTranslate(0, 1, $event)"
     >

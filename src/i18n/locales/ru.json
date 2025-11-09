@@ -144,6 +144,7 @@
       "canSelectNearStart": "Выделить узел можно около входа.",
       "downloadMapInFormat": "Скачать карту в формате {format}",
       "downloadMapSize": "Размер изображения {mapSize} точек",
+      "downloadMapWarning": "Работает не во всех браузерах. Как вариант можно сделать скриншот карты в полноэкранном режиме.",
       "downloadVerticalAndHorizontalCount": "Количество ячеек по вертикали {verticalCount}, по горизонтали {horizontalCount}",
       "gameVersionWhenSyncCells": "Версия игры при синхронизации ячеек",
       "exclusion": "Исключение",
@@ -170,6 +171,11 @@
       "planning": "Планирование",
       "resourcesOnMap": "Ресурсы на карте",
       "selectedResources": "Выбранные ресурсы",
+      "toolbarActionCtrlHint": "Зажав Ctrl можно замедлить в 10 раз\nНажав Shift - в 2 раза",
+      "translateLeft": "Сместить влево",
+      "translateRight": "Сместить вправо",
+      "translateUp": "Сместить вверх",
+      "translateDown": "Сместить вниз",
       "whenWasCellSynchronization": "Когда была синхронизация ячеек",
       "unusualStepPrice": "Необычная цена хода"
     }
