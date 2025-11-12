@@ -6,6 +6,8 @@ export const TRANSLATE_X = 20
 export const TRANSLATE_Y = 20
 
 export const DELTA_SCALE = 0.5
+export const MAX_SCALE = 8
+export const MIN_SCALE = 0.2
 
 export function canSelectNode(node: Node): boolean {
   return node.type !== Type.Start && node.type != Type.Blocker

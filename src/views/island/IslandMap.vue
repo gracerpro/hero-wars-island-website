@@ -8,7 +8,7 @@ import IslandMapContainer from './IslandMapContainer.vue'
 import IslandMapDownloadDialog from './IslandMapDownloadDialog.vue'
 import IslandMapFilter from './IslandMapFilter.vue'
 import IslandMapTable from './IslandMapTable.vue'
-import { canSelectNode } from '@/services/island-map'
+import { canSelectNode, MAX_SCALE, MIN_SCALE } from '@/services/island-map'
 import { onMounted, onUnmounted, ref, computed, useTemplateRef, shallowReactive } from 'vue'
 import { getHumanQuantity } from '@/helpers/formatter'
 import { useI18n } from 'vue-i18n'
@@ -275,9 +275,6 @@ function onChangeScale(delta: number) {
 }
 
 function getScale(newValue: number): number {
-  const MAX_SCALE = 8
-  const MIN_SCALE = 0.2
-
   if (newValue > MAX_SCALE) {
     newValue = MAX_SCALE
   } else if (newValue < MIN_SCALE) {

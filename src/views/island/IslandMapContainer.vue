@@ -17,6 +17,7 @@ import {
   canSelectNode,
   canSelectNextNode,
   getDeltaScale,
+  MAX_SCALE,
 } from '@/services/island-map'
 import {
   getIconsItems,
@@ -160,13 +161,23 @@ function onKeyDownMap(event: KeyboardEvent) {
     return
   }
 
-  if (event.key === 'PageDown') {
+  if (event.key === 'PageDown' || event.key === '-') {
     emitNewScale(event, -getDeltaScale(props.scale))
     event.preventDefault()
     return
   }
-  if (event.key === 'PageUp') {
+  if (event.key === 'PageUp' || event.key === '+') {
     emitNewScale(event, getDeltaScale(props.scale))
+    event.preventDefault()
+    return
+  }
+  if (event.key === 'Home') {
+    emitNewScale(event, MAX_SCALE)
+    event.preventDefault()
+    return
+  }
+  if (event.key === 'End') {
+    emitNewScale(event, -MAX_SCALE)
     event.preventDefault()
     return
   }
@@ -371,19 +382,19 @@ function onMouseUp(event: MouseEvent) {
 
 function onMouseWheel(event: WheelEvent) {
   const delta = getDeltaScale(props.scale)
-  const value = event.deltaY > 0 ? delta : -delta
+  const value = event.deltaY > 0 ? -delta : delta
   emitNewScale(event, value)
   event.preventDefault()
 }
 
-function emitNewScale(event: MouseEvent | KeyboardEvent, value: number) {
+function emitNewScale(event: MouseEvent | KeyboardEvent, delta: number) {
   if (event.ctrlKey) {
-    value /= 10
+    delta /= 10
   } else if (event.shiftKey) {
-    value /= 2
+    delta /= 2
   }
 
-  emit('change-scale', value)
+  emit('change-scale', delta)
 }
 
 function onMountedInfoDialog() {

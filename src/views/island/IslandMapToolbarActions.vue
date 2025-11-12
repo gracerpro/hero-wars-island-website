@@ -70,7 +70,7 @@ function onChangeTranslate(xDirection: number, yDirection: number, event: MouseE
       class="btn btn-secondary toolbar-button"
       :disabled="loading"
       :title="t('common.zoomOut') + actionHint"
-      @click="onChangeScale(1, $event)"
+      @click="onChangeScale(-1, $event)"
     >
       -
     </button>
@@ -79,7 +79,7 @@ function onChangeTranslate(xDirection: number, yDirection: number, event: MouseE
       class="btn btn-secondary toolbar-button"
       :disabled="loading"
       :title="t('common.zoomIn') + actionHint"
-      @click="onChangeScale(-1, $event)"
+      @click="onChangeScale(1, $event)"
     >
       +
     </button>
