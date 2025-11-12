@@ -28,10 +28,10 @@ setMetaInfo(
     <p v-html="t('page.home.firstParagraph')"></p>
 
     <div class="row">
-      <div class="col-lg-6 mb-3">
+      <div class="col-lg-9 mb-3">
         <island-list />
       </div>
-      <div class="col-lg-6 mb-3 text-end">
+      <div class="col-lg-3 mb-3 text-end">
         <router-link :to="createI18nRouteTo({ name: 'islands' })">{{
           t('common.islandsHistory')
         }}</router-link>
