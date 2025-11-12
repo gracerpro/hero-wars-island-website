@@ -4,7 +4,7 @@ import RowLoading from '@/components/RowLoading.vue'
 import { useI18n } from 'vue-i18n'
 import { createI18nRouteTo } from '@/i18n/translation'
 import { formatDate } from '@/helpers/formatter'
-import { getRegionTitle } from '../island/island'
+import { getRegionTitle } from '../island-view/island'
 import { watch } from 'vue'
 import { useRoute } from 'vue-router'
 

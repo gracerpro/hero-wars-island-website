@@ -93,12 +93,12 @@ const routes: Array<RouteRecordRaw> = [
       {
         path: 'islands/:id(\\d+)',
         name: 'island',
-        component: () => import('../views/island/IndexPage.vue'),
+        component: () => import('../views/island-view/IndexPage.vue'),
       },
       {
         path: 'islands',
         name: 'islands',
-        component: () => import('../views/island-list/IndexPage.vue'),
+        component: () => import('../views/islands/IndexPage.vue'),
       },
       {
         path: 'help',

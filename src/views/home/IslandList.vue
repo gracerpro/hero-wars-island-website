@@ -6,7 +6,7 @@ import { fromCurrentDate } from '@/helpers/formatter'
 import type { Island } from '@/api/IslandApi'
 import { useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
-import { getRegionTitle } from '../island/island'
+import { getRegionTitle } from '../island-view/island'
 
 const { islands, isLoading, errorMessage, pagination: islandsPagination, load } = useIslands()
 isLoading.value = true

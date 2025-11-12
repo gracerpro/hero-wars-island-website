@@ -14,8 +14,10 @@ const manifest: AppSsrManifest = JSON.parse(
 const template = fs.readFileSync('./dist/static/index.html', 'utf-8')
 const { render } = await import('./dist/server/entry-server.js')
 
-const NAME_ISLAND = 'island'
+const NAME_ISLAND = 'island-view'
 const NAME_NEWS_VIEW = 'news-view'
+
+const STATUS_PAGES_NAME = 'status-pages'
 
 const enLocale = 'en'
 
@@ -23,6 +25,7 @@ const { isClean } = parseParameters(process.argv)
 
 initDirectories()
 const urls = await readUrlsFromView()
+console.log(urls)
 await createFiles(urls)
 
 if (isClean) {
@@ -110,11 +113,12 @@ async function readUrlsFromView(): Promise<Array<string>> {
   for (let i = 0; i < files.length; ++i) {
     const file = files[i]
 
-    if (!file.isFile()) {
+    if (file.name === STATUS_PAGES_NAME) {
       continue
     }
 
-    const name = getUrlName(file.name)
+    const name = file.isFile() ? getUrlName(file.name) : file.name
+    console.log('NAME', name)
 
     if (dynamicNamesMap[name]) {
       console.log(`- dynamic name! "${name}", get names...`)
@@ -138,18 +142,19 @@ async function readUrlsFromView(): Promise<Array<string>> {
     }
   }
 
-  fs.readdirSync('./src/views/status-pages', { withFileTypes: true, recursive: false }).forEach(
-    (file) => {
-      if (!file.isFile()) {
-        return
-      }
-
-      const name = getUrlName(file.name)
-      console.log('-', name)
-
-      urls.push(`/${name}`)
+  fs.readdirSync('./src/views/' + STATUS_PAGES_NAME, {
+    withFileTypes: true,
+    recursive: false,
+  }).forEach((file) => {
+    if (!file.isFile()) {
+      return
     }
-  )
+
+    const name = getUrlName(file.name)
+    console.log('-', name)
+
+    urls.push(`/${name}`)
+  })
 
   return urls
 }

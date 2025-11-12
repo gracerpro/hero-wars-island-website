@@ -1,6 +1,6 @@
 import { type Node, Type } from '@/api/NodeApi'
 import { useI18n } from '@/i18n'
-import type { DrawedNode, DrawedNodeMap, UserNodeIds } from '@/views/island/map'
+import type { DrawedNode, DrawedNodeMap, UserNodeIds } from '@/views/island-view/map'
 
 export const TRANSLATE_X = 20
 export const TRANSLATE_Y = 20
