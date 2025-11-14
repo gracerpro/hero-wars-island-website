@@ -18,6 +18,8 @@ export enum Type {
   Unknown = 12,
   AvatarFrame = 13,
   Stamina = 14,
+  FragmentScroll = 15,
+  FragmentTitanArtifact = 16,
 }
 const allTypes = new Set<number>(Object.values(Type).filter((a) => typeof a === 'number'))
 
@@ -131,6 +133,8 @@ export function getLabelsByTypes(t: ComposerTranslation) {
     [Type.Unknown]: t('common.unknown'),
     [Type.AvatarFrame]: t('common.avatarFrame'),
     [Type.Stamina]: t('common.stamina'),
+    [Type.FragmentScroll]: t('common.recipes'),
+    [Type.FragmentTitanArtifact]: t('common.fragmentTitanArtifact'),
   }
 }
 

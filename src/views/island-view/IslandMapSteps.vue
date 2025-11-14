@@ -97,6 +97,8 @@ const explorerMoveCount = computed(
 const woodMoveCount = computed(
   () => userStepCostItems.value[getStepItemKey(Type.Coin, GAME_ID_WOOD)]?.quantity ?? 0
 )
+const totalMoveCount = computed(() => explorerMoveCount.value + woodMoveCount.value)
+
 const totalWoodMoveCount = computed(() => {
   let result = 0
 
@@ -172,7 +174,7 @@ function getStepItemKey(type: Type, gameId: number): string {
       <div class="mb-3">
         <button
           type="button"
-          :class="['btn btn-secondary mt-1', explorerMoveCount > 0 ? '' : 'disabled']"
+          :class="['btn btn-secondary mt-1', totalMoveCount > 0 ? '' : 'disabled']"
           @click="emit('reset-user-nodes')"
         >
           {{ t('common.reset') }}
