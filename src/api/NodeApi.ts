@@ -21,6 +21,7 @@ export enum Type {
   SummerFest2025 = 8,
   Banner = 9,
   Presents = 10,
+  Presents_2 = 11,
 }
 const allTypes = new Set<number>(Object.values(Type).filter((a) => typeof a === 'number'))
 
@@ -199,6 +200,7 @@ export function getTypeName(type: Type): string {
     [Type.SummerFest2025]: 'TYPE_SUMMER_FEST_2025',
     [Type.Banner]: 'TYPE_BANNER',
     [Type.Presents]: 'TYPE_PRESENTS',
+    [Type.Presents_2]: 'TYPE_PRESENTS_2',
   }
 
   return map[type] ?? ''
