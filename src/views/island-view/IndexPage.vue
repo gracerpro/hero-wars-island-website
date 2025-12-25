@@ -121,7 +121,7 @@ async function loadIsland(id: number) {
       <div class="col-lg-8 mb-3">
         <h1 class="mb-0">{{ islandName }}</h1>
       </div>
-      <div class="col-lg-8 mb-3 d-flex align-items-center justify-content-end">
+      <div class="col-lg-4 mb-3 d-flex align-items-center justify-content-end">
         <span
           v-if="currentIsland"
           class="fst-italic"

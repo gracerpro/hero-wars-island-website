@@ -96,7 +96,7 @@ defineExpose({
     aria-hidden="true"
   >
     <div
-      class="modal-dialog modal-dialog-centered"
+      class="modal-dialog modal-dialog-centered modal-dialog-scrollable"
       :class="sizeClass"
     >
       <div class="modal-content">
