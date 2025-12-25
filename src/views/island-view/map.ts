@@ -111,7 +111,6 @@ export function getIconsItems(
     const isShowText = nodeReward.quantity > 1
 
     let rewardQuantity: RewardQuantity | null = null
-
     let item: IconItem | null = null
 
     if (count === 1) {
@@ -134,7 +133,7 @@ export function getIconsItems(
           nodeId,
           isSmallText: false,
           humanQuantity: nodeReward.humanQuantity,
-          x: item!.iconX + item!.iconWidth * 0.02,
+          x: item.iconX + item.iconWidth * 0.02,
           y: drawedNode.y + HEIGHT - 3,
           uid: nodeId + '_0',
         }

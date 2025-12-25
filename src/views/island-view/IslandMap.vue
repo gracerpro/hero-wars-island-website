@@ -248,17 +248,21 @@ function calculateRewards(nodeList: IslandNodeList): Array<ViewNodeReward> {
   let index = 0
 
   nodeList.nodes.forEach((node) => {
-    node.rewards.forEach((nodeReward) => {
-      rewards.push({
-        quantity: nodeReward.quantity,
-        uniqueId: getUniqueId(node, nodeReward, index),
-        humanQuantity: getHumanQuantity(nodeReward.quantity),
-        item: nodeList.rewards[nodeReward.itemId] ?? getUnknownItem(),
-        node,
-      })
+    if (node.type === NodeType.Lantern) { // countdown node
+      // different list/map
+    } else {
+      node.rewards.forEach((nodeReward) => {
+        rewards.push({
+          quantity: nodeReward.quantity,
+          uniqueId: getUniqueId(node, nodeReward, index),
+          humanQuantity: getHumanQuantity(nodeReward.quantity),
+          item: nodeList.rewards[nodeReward.itemId] ?? getUnknownItem(),
+          node,
+        })
 
-      ++index
-    })
+        ++index
+      })
+    }
   })
 
   calculatingRewards.value = false

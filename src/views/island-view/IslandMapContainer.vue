@@ -28,7 +28,6 @@ import {
   type NodeCoordinates,
   type DrawedNode,
   type IconItemsResult,
-  type WarningPointsMap,
   type IconItem,
   type RewardQuantity,
   type DrawedNodeMap,
@@ -138,8 +137,6 @@ const backgroundImageUrl = computed(() => {
 const iconItems = computed<IconItemsResult>(() => {
   return getIconsItems(props.rewards, totalNodes.value)
 })
-const rewardIcons = computed(() => iconItems.value.icons)
-const warningPoints = computed<WarningPointsMap>(() => iconItems.value.warningPoints)
 const rewardQuantities = computed<Array<RewardQuantity>>(() => {
   return props.isShowQuantity ? iconItems.value.quantities : []
 })
@@ -526,7 +523,7 @@ function getItemTitle(item: IconItem): string {
           @click="onNodeClick(node, $event)"
         />
         <template
-          v-for="item in rewardIcons"
+          v-for="item in iconItems.icons"
           :key="item.uniqueId"
         >
           <image
@@ -558,7 +555,7 @@ function getItemTitle(item: IconItem): string {
           </rect>
         </template>
         <circle
-          v-for="[nodeId, point] in warningPoints"
+          v-for="[nodeId, point] in iconItems.warningPoints"
           :key="nodeId"
           :cx="point.x"
           :cy="point.y"

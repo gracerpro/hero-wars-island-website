@@ -27,6 +27,48 @@ export function isType(a: number): a is Type {
   return allTypes.has(a as Type)
 }
 
+export enum GameType {
+  Null = "null",
+  //
+  Avatar = "avatar",
+  AvatarFrame = "avatarFrame",
+  Coin = "coin",
+  Consumable = "consumable",
+  Banner = "banner",
+  BannerStone = "bannerStone",
+  Fragment = "fragmentGear",
+  FragmentScroll = "fragmentScroll",
+  FragmentTitanArtifact = 'fragmentTitanArtifact',
+  //
+  Gold = "gold",
+  StarMoney = "starmoney",
+  Stamina = "stamina",
+}
+
+export function getGameType(type: Type): GameType {
+  const map: { [key in Type]: GameType } = {
+    [Type.Consumable]: GameType.Consumable,
+    [Type.Coin]: GameType.Coin,
+    [Type.BannerStone]: GameType.BannerStone,
+    [Type.Fragment]: GameType.Fragment,
+    [Type.Gold]: GameType.Gold,
+    [Type.StarMoney]: GameType.StarMoney,
+    [Type.Avatar]: GameType.Avatar,
+    [Type.Banner]: GameType.Banner,
+    [Type.AvatarFrame]: GameType.AvatarFrame,
+    [Type.Stamina]: GameType.Stamina,
+    [Type.FragmentScroll]: GameType.FragmentScroll,
+    [Type.FragmentTitanArtifact]: GameType.FragmentTitanArtifact,
+    // my
+    [Type.Unknown]: GameType.Null,
+    [Type.Recipes]: GameType.Null,
+    [Type.SoulStone]: GameType.Null,
+    [Type.Equipment]: GameType.Null,
+  }
+
+  return map[type] ?? GameType.Null
+}
+
 export const GAME_ID_EXPLORER_MOVE = 41
 export const GAME_ID_WOOD = 53
 

@@ -3,6 +3,8 @@ import ApiRequest from '../core/ApiRequest'
 import {
   GAME_ID_EXPLORER_MOVE,
   GAME_ID_WOOD,
+  GameType,
+  getGameType,
   Type as ItemType,
   modifyItem,
   type ItemMap,
@@ -22,6 +24,7 @@ export enum Type {
   Banner = 9,
   Presents = 10,
   Presents_2 = 11,
+  Lantern = 12,
 }
 const allTypes = new Set<number>(Object.values(Type).filter((a) => typeof a === 'number'))
 
@@ -36,12 +39,7 @@ export enum Status {
 
 export interface CostItem {
   readonly type: ItemType
-  readonly gameId: number
-}
-
-const defaultCostItem: CostItem = {
-  type: ItemType.Coin,
-  gameId: GAME_ID_EXPLORER_MOVE,
+  readonly gameId: number | null
 }
 
 export interface NodeReward {
@@ -49,6 +47,21 @@ export interface NodeReward {
   readonly quantity: number
   gameId?: number
   gameType?: string
+}
+
+export interface StepItem {
+  readonly itemId: number | null
+  readonly quantity: number
+  readonly gameId: number | null
+  readonly gameType: GameType
+}
+
+export interface Step {
+  readonly id: number
+  readonly costs: StepItem[]
+  readonly rewards: StepItem[]
+  readonly countdownEndDate?: Date
+  readonly countdownInterval?: number
 }
 
 export interface Node {
@@ -60,6 +73,7 @@ export interface Node {
   readonly costItem: CostItem
   readonly costItemCount: number
   readonly rewards: Array<NodeReward>
+  readonly steps?: Step[]
 }
 
 export type NodeMap = Map<number, Node>
@@ -122,7 +136,7 @@ export class NodeApi {
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private modifyNode(data: any): Node {
-    let rewards: Array<NodeReward> = []
+    let rewards: NodeReward[] = []
 
     if (data.rewards) {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -142,15 +156,18 @@ export class NodeApi {
       })
     }
 
-    let costItem = defaultCostItem
-    let costItemCount = 1
+    let costItem: CostItem = {
+      gameId: null,
+      type: ItemType.Unknown
+    }
+    let costItemCount = 0
 
     if (data.cost) {
       costItem = {
         gameId: data.cost.gameId,
         type: data.cost.typeId ?? ItemType.Unknown,
       }
-      costItemCount = data.cost.count ?? 1
+      costItemCount = data.cost.count
     }
 
     let resultType: Type
@@ -166,6 +183,49 @@ export class NodeApi {
       resultType = Type.Node
     }
 
+    let steps: Step[] | undefined = undefined
+
+    if (data.steps) {
+      data.steps
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      .sort((a: any, b: any) => {
+        if (a.id === b.id) {
+          return 0
+        }
+        return a.id < b.id ? -1 : 1;
+      })
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      steps = data.steps.map((item: any) => {
+        return {
+          id: item.id,
+          rewards: getRewardCostItems(item.reward),
+          costs: getRewardCostItems(item.cost),
+          countdownEndDate: item.countdownEndDate ? getCountdownEndDate(item.countdownEndDate) : null,
+          countdownInterval: item.countdownInterval ?? 0,
+        }
+      })
+    } else {
+      steps = [
+        {
+          id: 1,
+          costs: [
+            {
+              itemId: null,
+              quantity: costItemCount,
+              gameId: costItem.gameId,
+              gameType: getGameType(costItem.type),
+            }
+          ],
+          rewards: rewards.map((reward) => ({
+            itemId: reward.itemId,
+            quantity: reward.quantity,
+            gameId: reward.gameId ?? null,
+            gameType: reward.gameType as (GameType | undefined) ?? GameType.Null,
+          }))
+        }
+      ]
+    }
+
     return {
       id: data.id,
       type: resultType,
@@ -175,8 +235,57 @@ export class NodeApi {
       rewards,
       mx: data.mx,
       my: data.my,
+      steps
     }
   }
+}
+
+function getCountdownEndDate(gameDate: string): Date | null {
+  let date = null
+
+  try {
+    if (gameDate.length === 16 /* 16 = '9999-01-01 01:00'.length */) {
+      const arr = gameDate.split(' ')
+      date = new Date(arr[0] + 'T' + arr[1] + ':00Z')
+      console.log(arr[0] + 'T' + arr[1] + ':00Z')
+    } else {
+      date = new Date(gameDate);
+    }
+  } catch (error: unknown) {
+    console.error(error)
+    date = null
+  }
+
+  return date
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function getRewardCostItems(gameMap: any): StepItem[] {
+  const items: StepItem[] = []
+
+  for (const gameType in gameMap) {
+    const itemCost = gameMap[gameType]
+
+    if (typeof itemCost === 'number') {
+      items.push({
+        itemId: null,
+        quantity: itemCost,
+        gameId: null,
+        gameType: gameType as GameType
+      })
+    } else {
+      for (const id in itemCost) {
+        items.push({
+          itemId: null,
+          quantity: itemCost[id],
+          gameId: parseInt(id),
+          gameType: gameType as GameType
+        })
+      }
+    }
+  }
+
+  return items
 }
 
 export function getStatusName(t: ComposerTranslation, status: Status): string {
@@ -201,6 +310,7 @@ export function getTypeName(type: Type): string {
     [Type.Banner]: 'TYPE_BANNER',
     [Type.Presents]: 'TYPE_PRESENTS',
     [Type.Presents_2]: 'TYPE_PRESENTS_2',
+    [Type.Lantern]: 'TYPE_LANTERN',
   }
 
   return map[type] ?? ''

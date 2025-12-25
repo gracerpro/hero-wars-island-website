@@ -122,7 +122,7 @@ const totalExplorerMoveCount = computed(() => {
   return result
 })
 
-function getStepItemKey(type: Type, gameId: number): string {
+function getStepItemKey(type: Type, gameId: number | null): string {
   return type + '_' + gameId
 }
 </script>

@@ -58,13 +58,23 @@ defineExpose({
       :header="t('common.cell')"
       @vue:mounted="onMountedDialog"
     >
-      <div>ID = {{ drawedNode.node.id }}</div>
-      <div>X = {{ drawedNode.node.mx }}, Y = {{ drawedNode.node.my }}</div>
-      <div>
-        status: {{ getStatusName(t, drawedNode.node.status) }}, id =
-        {{ drawedNode.node.status }}
+      <div class="row">
+        <div class="col-lg-4">
+          <div>ID = {{ drawedNode.node.id }}</div>
+          <div>X = {{ drawedNode.node.mx }}, Y = {{ drawedNode.node.my }}</div>
+          <div>
+            status: {{ getStatusName(t, drawedNode.node.status) }}, id =
+            {{ drawedNode.node.status }}
+          </div>
+          <div>type: {{ getTypeName(drawedNode.node.type) }}, id = {{ drawedNode.node.type }}</div>
+        </div>
+        <div class="col-lg-8">
+          <b>Steps</b><br />
+          <div v-if="drawedNode.node.steps">
+            <div v-for="step in drawedNode.node.steps" :key="step.id" class="mb-2">{{ step }}</div>
+          </div>
+        </div>
       </div>
-      <div>type: {{ getTypeName(drawedNode.node.type) }}, id = {{ drawedNode.node.type }}</div>
 
       <h4 class="mt-3 mb-0">Rewards</h4>
       <div v-if="!hasRewards">No</div>
