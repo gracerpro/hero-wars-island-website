@@ -50,7 +50,6 @@ export interface NodeReward {
 }
 
 export interface StepItem {
-  readonly itemId: number | null
   readonly quantity: number
   readonly gameId: number | null
   readonly gameType: GameType
@@ -82,10 +81,13 @@ export type NodeFilter = {
   regionNumbers?: Array<number>
 }
 
+export type TypeGameIdToItemMap = { [typeAndId: string]: number }
+
 export type IslandNodeList = {
   nodes: NodeMap
   nodesTotalCount: number
   rewards: ItemMap
+  gameItemMap: TypeGameIdToItemMap
 }
 
 export class NodeApi {
@@ -113,6 +115,7 @@ export class NodeApi {
     const nodes = new Map<number, Node>()
     let totalCount = 0
     const rewards: ItemMap = {}
+    let gameItemMap: TypeGameIdToItemMap = {}
 
     if (response.items) {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -125,12 +128,15 @@ export class NodeApi {
         const reward = response.rewards[id]
         rewards[parseInt(id)] = modifyItem(reward)
       }
+
+      gameItemMap = response.gameItemMap
     }
 
     return {
       nodes,
       nodesTotalCount: totalCount,
       rewards,
+      gameItemMap,
     }
   }
 
@@ -163,6 +169,7 @@ export class NodeApi {
     let costItemCount = 0
 
     if (data.cost) {
+      console.log("data.cost", data.cost)
       costItem = {
         gameId: data.cost.gameId,
         type: data.cost.typeId ?? ItemType.Unknown,
@@ -210,14 +217,12 @@ export class NodeApi {
           id: 1,
           costs: [
             {
-              itemId: null,
               quantity: costItemCount,
               gameId: costItem.gameId,
               gameType: getGameType(costItem.type),
             }
           ],
           rewards: rewards.map((reward) => ({
-            itemId: reward.itemId,
             quantity: reward.quantity,
             gameId: reward.gameId ?? null,
             gameType: reward.gameType as (GameType | undefined) ?? GameType.Null,
@@ -268,7 +273,6 @@ function getRewardCostItems(gameMap: any): StepItem[] {
 
     if (typeof itemCost === 'number') {
       items.push({
-        itemId: null,
         quantity: itemCost,
         gameId: null,
         gameType: gameType as GameType
@@ -276,7 +280,6 @@ function getRewardCostItems(gameMap: any): StepItem[] {
     } else {
       for (const id in itemCost) {
         items.push({
-          itemId: null,
           quantity: itemCost[id],
           gameId: parseInt(id),
           gameType: gameType as GameType

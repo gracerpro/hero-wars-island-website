@@ -18,7 +18,6 @@ import {
   type Node,
   type NodeFilter,
   type NodeMap,
-  type NodeReward,
   Type as NodeType,
 } from '@/api/NodeApi'
 import { isObject } from '@/helpers/core'
@@ -28,7 +27,7 @@ import { shallowRef } from 'vue'
 import { UserError } from '@/exceptions/UserError'
 import type { Island } from '@/api/IslandApi'
 import type { ViewNodeReward, UserNodeIds, ViewReward, SelectMode } from './map'
-import { getUnknownItem, isType, type ItemMap, type Type } from '@/api/ItemApi'
+import { getType, getUnknownItem, isType, type ItemMap, type Type } from '@/api/ItemApi'
 import type { ComponentExposed } from 'vue-component-type-helpers'
 import { AddOnBeforeUnload, RemoveOnBeforeUnload } from '@/helpers/event'
 
@@ -212,6 +211,7 @@ async function loadNodes(isForce: boolean): Promise<IslandNodeList> {
     nodes: new Map<number, Node>(),
     nodesTotalCount: 0,
     rewards: {},
+    gameItemMap: {},
   }
   let filter: NodeFilter = {}
 
@@ -237,6 +237,9 @@ async function loadNodes(isForce: boolean): Promise<IslandNodeList> {
   } finally {
     isLoadingNodes.value = false
   }
+  if (nodeList.gameItemMap === undefined) {
+    nodeList.gameItemMap = {}
+  }
 
   return nodeList
 }
@@ -250,11 +253,51 @@ function calculateRewards(nodeList: IslandNodeList): Array<ViewNodeReward> {
   nodeList.nodes.forEach((node) => {
     if (node.type === NodeType.Lantern) { // countdown node
       // different list/map
+      console.log(node)
+
+      // - target reward
+      // - sum quantity?
+
+      const countdownRewards = []
+
+      node.steps?.forEach((step) => {
+        const stepRewards = step.rewards.map((stepReward) => {
+          const type = getType(stepReward.gameType)
+          const gameId = (stepReward.gameId && stepReward.gameId > 0) ? stepReward.gameId : '0'
+          const itemId = nodeList.gameItemMap[type + '_' + gameId] ?? null
+
+          return {
+            ...stepReward,
+            itemId,
+            item: (itemId && nodeList.rewards[itemId]) ? nodeList.rewards[itemId] : getUnknownItem(),
+          }
+        })
+
+        countdownRewards.push({
+          rewards: stepRewards,
+          node,
+        })
+      })
+
+      console.log("countdownRewards", countdownRewards)
+
+      if (countdownRewards.length > 0) {
+        const firstReward = countdownRewards[0].rewards[0]
+        console.log("1 ", firstReward)
+
+        rewards.push({
+          uniqueId: getUniqueId(node, firstReward.itemId, index),
+          quantity: firstReward.quantity,
+          humanQuantity: getHumanQuantity(firstReward.quantity),
+          item: firstReward.item,
+          node,
+        })
+      }
     } else {
       node.rewards.forEach((nodeReward) => {
         rewards.push({
+          uniqueId: getUniqueId(node, nodeReward.itemId, index),
           quantity: nodeReward.quantity,
-          uniqueId: getUniqueId(node, nodeReward, index),
           humanQuantity: getHumanQuantity(nodeReward.quantity),
           item: nodeList.rewards[nodeReward.itemId] ?? getUnknownItem(),
           node,
@@ -270,8 +313,8 @@ function calculateRewards(nodeList: IslandNodeList): Array<ViewNodeReward> {
   return rewards
 }
 
-function getUniqueId(node: Node, nodeReward: NodeReward, index: number): string {
-  return 'mx' + node.mx + '_my' + node.my + '_id' + nodeReward.itemId + '_i' + index
+function getUniqueId(node: Node, itemId: number, index: number): string {
+  return 'mx' + node.mx + '_my' + node.my + '_id' + itemId + '_i' + index
 }
 
 function onChangeScale(delta: number) {
@@ -393,6 +436,7 @@ function reloadMap(isForce = false) {
   isReloadingMap.value = true
   loadNodes(isForce)
     .then((nodeList: IslandNodeList) => {
+      console.log("!!! nodeList", nodeList)
       nodes.value = nodeList.nodes
       rewards.value = calculateRewards(nodeList)
       originRewards.value = nodeList.rewards
@@ -404,7 +448,10 @@ function reloadMap(isForce = false) {
         }
       })
     })
-    .finally(() => (isReloadingMap.value = false))
+    .finally(() => {
+      isReloadingMap.value = false
+      calculatingRewards.value = false
+    })
 }
 
 function onMountedDownloadDialog() {

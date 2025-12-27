@@ -52,6 +52,7 @@ export async function getNodesMap(
       nodes: new Map<number, Node>(),
       nodesTotalCount: 0,
       rewards: {},
+      gameItemMap: {},
     }
   }
 

@@ -45,28 +45,49 @@ export enum GameType {
   Stamina = "stamina",
 }
 
-export function getGameType(type: Type): GameType {
-  const map: { [key in Type]: GameType } = {
-    [Type.Consumable]: GameType.Consumable,
-    [Type.Coin]: GameType.Coin,
-    [Type.BannerStone]: GameType.BannerStone,
-    [Type.Fragment]: GameType.Fragment,
-    [Type.Gold]: GameType.Gold,
-    [Type.StarMoney]: GameType.StarMoney,
-    [Type.Avatar]: GameType.Avatar,
-    [Type.Banner]: GameType.Banner,
-    [Type.AvatarFrame]: GameType.AvatarFrame,
-    [Type.Stamina]: GameType.Stamina,
-    [Type.FragmentScroll]: GameType.FragmentScroll,
-    [Type.FragmentTitanArtifact]: GameType.FragmentTitanArtifact,
-    // my
-    [Type.Unknown]: GameType.Null,
-    [Type.Recipes]: GameType.Null,
-    [Type.SoulStone]: GameType.Null,
-    [Type.Equipment]: GameType.Null,
-  }
 
-  return map[type] ?? GameType.Null
+const typeMap: { [key in Type]: GameType } = {
+  [Type.Consumable]: GameType.Consumable,
+  [Type.Coin]: GameType.Coin,
+  [Type.BannerStone]: GameType.BannerStone,
+  [Type.Fragment]: GameType.Fragment,
+  [Type.Gold]: GameType.Gold,
+  [Type.StarMoney]: GameType.StarMoney,
+  [Type.Avatar]: GameType.Avatar,
+  [Type.Banner]: GameType.Banner,
+  [Type.AvatarFrame]: GameType.AvatarFrame,
+  [Type.Stamina]: GameType.Stamina,
+  [Type.FragmentScroll]: GameType.FragmentScroll,
+  [Type.FragmentTitanArtifact]: GameType.FragmentTitanArtifact,
+  // my
+  [Type.Unknown]: GameType.Null,
+  [Type.Recipes]: GameType.Null,
+  [Type.SoulStone]: GameType.Null,
+  [Type.Equipment]: GameType.Null,
+}
+
+const gameTypeMap: { [key in GameType]: Type } = {
+  [GameType.Consumable]: Type.Consumable,
+  [GameType.Coin]: Type.Coin,
+  [GameType.BannerStone]: Type.BannerStone,
+  [GameType.Fragment]: Type.Fragment,
+  [GameType.Gold]: Type.Gold,
+  [GameType.StarMoney]: Type.StarMoney,
+  [GameType.Avatar]: Type.Avatar,
+  [GameType.Banner]: Type.Banner,
+  [GameType.AvatarFrame]: Type.AvatarFrame,
+  [GameType.Stamina]: Type.Stamina,
+  [GameType.FragmentScroll]: Type.FragmentScroll,
+  [GameType.FragmentTitanArtifact]: Type.FragmentTitanArtifact,
+  [GameType.Null]: Type.Unknown,
+}
+
+export function getGameType(type: Type): GameType {
+  return typeMap[type] ?? GameType.Null
+}
+
+export function getType(gameType: GameType): Type {
+  return gameTypeMap[gameType] ?? Type.Unknown
 }
 
 export const GAME_ID_EXPLORER_MOVE = 41
