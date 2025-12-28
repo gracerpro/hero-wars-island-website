@@ -19,6 +19,13 @@ export interface ViewNodeReward extends ViewReward {
   readonly node: Node
 }
 
+export type ViewCountdownReward = {
+  readonly uniqueId: string
+  readonly item: Item
+  readonly node: Node
+  readonly stepsCount: number
+}
+
 export interface Coordinate {
   x: number
   y: number
@@ -94,6 +101,49 @@ export function getDrawedNodes(nodes: NodeMap): DrawedNodeMap {
   return drawedNodes
 }
 
+export function getCountdownIcons(
+  countdownRewards: ViewCountdownReward[],
+  drawedNodes: DrawedNodeMap
+) {
+  const resultItems: IconItem[] = []
+
+  countdownRewards.forEach((reward) => {
+    const nodeId = reward.node.id
+    const drawedNode = drawedNodes.get(nodeId) as DrawedNode
+
+    const side = getImageSide(1)
+    const iconWidth = side
+    const iconHeight = side
+
+    resultItems.push({
+      iconX: drawedNode.x - iconWidth / 2,
+      iconY: drawedNode.y - iconHeight / 2,
+      iconWidth,
+      iconHeight,
+      node: reward.node,
+      uniqueId: reward.uniqueId,
+      iconUrl: reward.item.iconUrl,
+      itemName: reward.item.name,
+      quantity: 0 // don`t used
+    })
+  })
+
+  return {
+    icons: resultItems,
+  }
+}
+
+function getImageSide(count: 1 | 2 | 3): number {
+  if (count === 1) {
+    return IMAGE_SIDE * 2.2
+  }
+  if (count === 2) {
+    return IMAGE_SIDE * 1.4
+  }
+
+  return IMAGE_SIDE * 1.1
+}
+
 export function getIconsItems(
   nodeRewards: Array<ViewNodeReward>,
   drawedNodes: DrawedNodeMap
@@ -114,8 +164,9 @@ export function getIconsItems(
     let item: IconItem | null = null
 
     if (count === 1) {
-      const iconWidth = IMAGE_SIDE * 2.2
-      const iconHeight = IMAGE_SIDE * 2.2
+      const side = getImageSide(1)
+      const iconWidth = side
+      const iconHeight = side
       item = {
         node: nodeReward.node,
         uniqueId: nodeReward.uniqueId,
@@ -146,8 +197,9 @@ export function getIconsItems(
       const borderWidth = 2
 
       if (count === 2) {
-        const iconWidth = IMAGE_SIDE * 1.4
-        const iconHeight = IMAGE_SIDE * 1.4
+        const side = getImageSide(2)
+        const iconWidth = side
+        const iconHeight = side
         const cx = iconWidth + borderWidth
         const srartX = drawedNode.x - cx + borderWidth / 2
 
@@ -179,8 +231,9 @@ export function getIconsItems(
         // 0,0   1,0
         //     *
         // 0,1   1,1
-        const iconWidth = IMAGE_SIDE * 1.1
-        const iconHeight = IMAGE_SIDE * 1.1
+        const side = getImageSide(3)
+        const iconWidth = side
+        const iconHeight = side
         const cx = iconWidth + borderWidth
         const srartX = drawedNode.x - cx + borderWidth / 2
         const cy = iconHeight + borderWidth

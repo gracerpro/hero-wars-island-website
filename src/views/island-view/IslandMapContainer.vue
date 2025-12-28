@@ -21,6 +21,7 @@ import {
 } from '@/services/island-map'
 import {
   getIconsItems,
+  getCountdownIcons,
   getDrawedNodes,
   SIDE,
   type UserNodeIds,
@@ -32,6 +33,7 @@ import {
   type RewardQuantity,
   type DrawedNodeMap,
   HEIGHT,
+  type ViewCountdownReward,
 } from './map'
 import { useI18n } from 'vue-i18n'
 import IslandMapInfoDialog from './IslandMapInfoDialog.vue'
@@ -45,7 +47,8 @@ interface Props {
   translateX: number
   translateY: number
   isShowQuantity: boolean
-  rewards: Array<ViewNodeReward>
+  rewards: ViewNodeReward[]
+  countdownRewards: ViewCountdownReward[]
   nodes: NodeMap
   originRewards: ItemMap
   userNodesIds: UserNodeIds
@@ -139,6 +142,9 @@ const iconItems = computed<IconItemsResult>(() => {
 })
 const rewardQuantities = computed<Array<RewardQuantity>>(() => {
   return props.isShowQuantity ? iconItems.value.quantities : []
+})
+const countdownIcons = computed(() => {
+  return getCountdownIcons(props.countdownRewards, totalNodes.value).icons
 })
 
 onMounted(() => {
@@ -522,6 +528,7 @@ function getItemTitle(item: IconItem): string {
           :class="['node', node.nodeClass, getUserNodeClass(node)]"
           @click="onNodeClick(node, $event)"
         />
+
         <template
           v-for="item in iconItems.icons"
           :key="item.uniqueId"
@@ -554,6 +561,41 @@ function getItemTitle(item: IconItem): string {
             </title>
           </rect>
         </template>
+
+        <template
+          v-for="item in countdownIcons"
+          :key="item.uniqueId"
+        >
+          <image
+            v-if="item.iconUrl"
+            :x="item.iconX"
+            :y="item.iconY"
+            :width="item.iconWidth"
+            :height="item.iconHeight"
+            :href="item.iconUrl"
+            class="item-image"
+          >
+            <title>{{ getItemTitle(item) }}</title>
+          </image>
+          <rect
+            v-else
+            :x="item.iconX"
+            :y="item.iconY"
+            :width="item.iconWidth"
+            :height="item.iconHeight"
+            class="item-empty-image"
+            :class="item.uniqueId"
+          >
+            <title>
+              {{ getItemTitle(item) }},
+              {{ t('page.island.notLinkedImage') }}
+            </title>
+          </rect>
+          <circle :cx="item.iconX + item.iconWidth" :cy="item.iconY + item.iconHeight / 2" r="16">
+
+          </circle>
+        </template>
+
         <circle
           v-for="[nodeId, point] in iconItems.warningPoints"
           :key="nodeId"

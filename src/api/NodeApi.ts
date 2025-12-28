@@ -169,7 +169,6 @@ export class NodeApi {
     let costItemCount = 0
 
     if (data.cost) {
-      console.log("data.cost", data.cost)
       costItem = {
         gameId: data.cost.gameId,
         type: data.cost.typeId ?? ItemType.Unknown,

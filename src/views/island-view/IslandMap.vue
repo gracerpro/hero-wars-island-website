@@ -19,6 +19,7 @@ import {
   type NodeFilter,
   type NodeMap,
   Type as NodeType,
+  type StepItem,
 } from '@/api/NodeApi'
 import { isObject } from '@/helpers/core'
 import { getNodesMap } from '@/services/api/island-node'
@@ -26,8 +27,8 @@ import { SELECT_MODE_DISABLE, SELECT_MODE_GOING, SELECT_MODE_PLAN } from './map'
 import { shallowRef } from 'vue'
 import { UserError } from '@/exceptions/UserError'
 import type { Island } from '@/api/IslandApi'
-import type { ViewNodeReward, UserNodeIds, ViewReward, SelectMode } from './map'
-import { getType, getUnknownItem, isType, type ItemMap, type Type } from '@/api/ItemApi'
+import type { ViewNodeReward, UserNodeIds, ViewReward, SelectMode, ViewCountdownReward } from './map'
+import { getType, getUnknownItem, isType, type Item, type ItemMap, type Type } from '@/api/ItemApi'
 import type { ComponentExposed } from 'vue-component-type-helpers'
 import { AddOnBeforeUnload, RemoveOnBeforeUnload } from '@/helpers/event'
 
@@ -79,6 +80,7 @@ const isReloadingMap = ref(true)
 const isLoadingNodes = ref(true)
 const nodes = ref<NodeMap>(new Map<number, Node>())
 const rewards = ref<Array<ViewNodeReward>>([])
+const countdownRewards = ref<ViewCountdownReward[]>([])
 const originRewards = ref<ItemMap>({})
 const calculatingRewards = ref(true)
 const userNodesIds = ref<UserNodeIds>(new Set())
@@ -244,54 +246,28 @@ async function loadNodes(isForce: boolean): Promise<IslandNodeList> {
   return nodeList
 }
 
-function calculateRewards(nodeList: IslandNodeList): Array<ViewNodeReward> {
+function calculateRewards(nodeList: IslandNodeList): {
+  rewards: ViewNodeReward[],
+  countdownRewards: ViewCountdownReward[]
+} {
   calculatingRewards.value = true
 
-  const rewards: Array<ViewNodeReward> = []
+  const rewards: ViewNodeReward[] = []
+  const countdownRewards: ViewCountdownReward[] = []
   let index = 0
 
   nodeList.nodes.forEach((node) => {
     if (node.type === NodeType.Lantern) { // countdown node
-      // different list/map
-      console.log(node)
+      const item = getFirstRewardItem(node, nodeList)
 
-      // - target reward
-      // - sum quantity?
-
-      const countdownRewards = []
-
-      node.steps?.forEach((step) => {
-        const stepRewards = step.rewards.map((stepReward) => {
-          const type = getType(stepReward.gameType)
-          const gameId = (stepReward.gameId && stepReward.gameId > 0) ? stepReward.gameId : '0'
-          const itemId = nodeList.gameItemMap[type + '_' + gameId] ?? null
-
-          return {
-            ...stepReward,
-            itemId,
-            item: (itemId && nodeList.rewards[itemId]) ? nodeList.rewards[itemId] : getUnknownItem(),
-          }
-        })
-
+      if (item) {
         countdownRewards.push({
-          rewards: stepRewards,
+          uniqueId: getUniqueId(node, item.id, index),
+          item,
           node,
+          stepsCount: node.steps?.length ?? 0
         })
-      })
-
-      console.log("countdownRewards", countdownRewards)
-
-      if (countdownRewards.length > 0) {
-        const firstReward = countdownRewards[0].rewards[0]
-        console.log("1 ", firstReward)
-
-        rewards.push({
-          uniqueId: getUniqueId(node, firstReward.itemId, index),
-          quantity: firstReward.quantity,
-          humanQuantity: getHumanQuantity(firstReward.quantity),
-          item: firstReward.item,
-          node,
-        })
+        ++index
       }
     } else {
       node.rewards.forEach((nodeReward) => {
@@ -310,7 +286,38 @@ function calculateRewards(nodeList: IslandNodeList): Array<ViewNodeReward> {
 
   calculatingRewards.value = false
 
-  return rewards
+  return {
+    rewards,
+    countdownRewards,
+  }
+}
+
+function getFirstRewardItem(node: Node, nodeList: IslandNodeList): Item | null {
+  if (!node.steps || node.steps.length === 0) {
+    return null
+  }
+
+  let firstReward: StepItem | null = null
+
+  if (node.steps[0]) {
+    const rewards = node.steps[0].rewards
+
+    if (rewards.length > 0 && rewards[0]) {
+      firstReward = rewards[0]
+    }
+  }
+
+  if (firstReward) {
+    const type = getType(firstReward.gameType)
+    const gameId = (firstReward.gameId && firstReward.gameId > 0) ? firstReward.gameId : 0
+    const itemId = nodeList.gameItemMap[type + '_' + gameId] ?? null
+
+    if (itemId && nodeList.rewards[itemId]) {
+      return nodeList.rewards[itemId]
+    }
+  }
+
+  return getUnknownItem()
 }
 
 function getUniqueId(node: Node, itemId: number, index: number): string {
@@ -436,9 +443,10 @@ function reloadMap(isForce = false) {
   isReloadingMap.value = true
   loadNodes(isForce)
     .then((nodeList: IslandNodeList) => {
-      console.log("!!! nodeList", nodeList)
       nodes.value = nodeList.nodes
-      rewards.value = calculateRewards(nodeList)
+      const rewardsResult = calculateRewards(nodeList)
+      rewards.value = rewardsResult.rewards
+      countdownRewards.value = rewardsResult.countdownRewards
       originRewards.value = nodeList.rewards
 
       userNodesIds.value.forEach((nodeId) => {
@@ -612,6 +620,7 @@ function saveState() {
         :is-select-any-node="isSelectAnyNode"
         :rewards="visibleRewards"
         :origin-rewards="originRewards"
+        :countdown-rewards="countdownRewards"
         :nodes="nodes"
         :user-nodes-ids="userNodesIds"
         :user-nodes-going-ids="userNodesGoingIds"
