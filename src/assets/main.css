@@ -12,6 +12,10 @@
   max-width: 860px;
 }
 
+.cursorable {
+  cursor: pointer;
+}
+
 @media (max-width: 991px) {
   #mainMenu {
     margin-top: 10px;

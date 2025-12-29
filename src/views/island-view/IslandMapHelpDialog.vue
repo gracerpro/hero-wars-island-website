@@ -46,7 +46,6 @@ defineExpose({
         <li><span class="node-box node-blocker"></span>{{ t('common.blockerExNames') }}</li>
         <li><span class="node-box -warning"></span>{{ t('common.warningCellDescription') }}</li>
         <li><span class="node-box node-bubble"></span>{{ t('common.bubbleName') }}</li>
-        <li><span class="node-box node-banner"></span>{{ t('common.banner') }}</li>
       </ul>
     </modal-dialog>
   </suspense>
@@ -75,9 +74,6 @@ defineExpose({
 }
 .node-bubble {
   background-color: #deb28d;
-}
-.node-banner {
-  background-color: #0000ff;
 }
 .node-chest {
   background-color: #1a660b;

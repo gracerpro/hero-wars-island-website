@@ -15,7 +15,7 @@ let dialogResult: DialogResult = null
 
 interface Props {
   elementId: string
-  formId: string
+  formId?: string
   saving?: boolean
   header?: string
   submitButtonText?: string
@@ -31,6 +31,7 @@ const props = withDefaults(defineProps<Props>(), {
   size: 'lg',
   isShowSubmit: true,
   initResult: null,
+  formId: undefined,
 })
 
 const sizeClass = computed(() => {

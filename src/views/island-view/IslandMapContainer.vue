@@ -29,11 +29,12 @@ import {
   type NodeCoordinates,
   type DrawedNode,
   type IconItemsResult,
-  type IconItem,
   type RewardQuantity,
   type DrawedNodeMap,
   HEIGHT,
   type ViewCountdownReward,
+  type IconTitle,
+  type CountdownIconItem,
 } from './map'
 import { useI18n } from 'vue-i18n'
 import IslandMapInfoDialog from './IslandMapInfoDialog.vue'
@@ -41,6 +42,8 @@ import { GAME_ID_WOOD, type ItemMap } from '@/api/ItemApi'
 import type { Image } from '@/api/IslandApi'
 import type { ComponentExposed } from 'vue-component-type-helpers'
 import ClientOnly from '@/components/ClientOnly.vue'
+import ModalDialog from '@/components/ModalDialog.vue'
+import StepsView from './StepsView.vue'
 
 interface Props {
   scale: number
@@ -96,9 +99,21 @@ const mouse: MouseState = {
   ty0: null,
 }
 
-const infoDialog = useTemplateRef<ComponentExposed<typeof IslandMapInfoDialog>>('infoDialog')
+const infoDialogRef = useTemplateRef<ComponentExposed<typeof IslandMapInfoDialog>>('infoDialogRef')
 const infoDialogComponent = shallowRef<typeof IslandMapInfoDialog | null>(null)
 const infoDialogDrawedNode = ref<SvgDrawedNode | null>(null)
+
+const stepsDialogRef = useTemplateRef<ComponentExposed<typeof IslandMapInfoDialog>>('stepsDialogRef')
+const stepsDialogComponent = shallowRef<typeof ModalDialog | null>(null)
+const stepsDialog = reactive<{
+  x: number
+  y: number
+  node: Node | null
+}>({
+  x: 0,
+  y: 0,
+  node: null
+})
 
 const svgMapRef = useTemplateRef<SVGElement>('svgMapRef')
 const toastRef = useTemplateRef<ComponentExposed<typeof ToastMessage>>('toastRef')
@@ -221,13 +236,14 @@ function onKeyDownMap(event: KeyboardEvent) {
 function getNodeClass(node: Node): string {
   const classes: { [key: string]: string } = {
     [Type.Node]: 'node-step',
+    [Type.Lantern]: 'node-step',
+    [Type.Banner]: 'node-step',
     [Type.Start]: 'node-start',
     [Type.Tower]: 'node-tower',
     [Type.Wood]: 'node-wood',
     [Type.Bubble]: 'node-bubble',
     [Type.Chest]: 'node-chest',
     [Type.Blocker]: 'node-blocker',
-    [Type.Banner]: 'node-banner',
   }
   let nodeClass = classes[node.type] ?? ''
 
@@ -339,6 +355,23 @@ function selectNode(drawedNode: SvgDrawedNode) {
   emit('select-node', drawedNode.node.id)
 }
 
+function showCountdownInfo(item: CountdownIconItem) {
+  if (item.node.type !== Type.Lantern) {
+    return
+  }
+
+  stepsDialog.node = item.node
+  stepsDialogComponent.value = ModalDialog
+}
+
+function onMountedStepsDialog() {
+  console.log("!123")
+  stepsDialogRef.value?.show().finally(() => {
+    stepsDialog.node = null
+    stepsDialogComponent.value = null
+  })
+}
+
 function onMouseDown(event: MouseEvent) {
   if (event.button === BUTTON_MAIN) {
     mouse.isDown = true
@@ -401,7 +434,7 @@ function emitNewScale(event: MouseEvent | KeyboardEvent, delta: number) {
 }
 
 function onMountedInfoDialog() {
-  infoDialog.value?.show().finally(() => {
+  infoDialogRef.value?.show().finally(() => {
     infoDialogDrawedNode.value = null
     infoDialogComponent.value = null
   })
@@ -419,10 +452,10 @@ function getUserNodeClass(drawedNode: SvgDrawedNode): string {
   return ''
 }
 
-function getItemTitle(item: IconItem): string {
+function getItemTitle(item: IconTitle): string {
   let result = item.itemName ?? t('common.noName')
 
-  if (item.quantity > 1) {
+  if (item.quantity && item.quantity > 1) {
     result += ', ' + item.quantity
   }
 
@@ -591,9 +624,24 @@ function getItemTitle(item: IconItem): string {
               {{ t('page.island.notLinkedImage') }}
             </title>
           </rect>
-          <circle :cx="item.iconX + item.iconWidth" :cy="item.iconY + item.iconHeight / 2" r="16">
-
-          </circle>
+          <circle
+            :cx="item.levelX"
+            :cy="item.levelY"
+            r="16"
+            class="level cursorable" 
+            @click="showCountdownInfo(item)"
+          />
+          <text
+            :x="item.levelX"
+            :y="item.levelY"
+            text-anchor="middle"
+            stroke="#51c5cf"
+            dy="5"
+            stroke-width="2px"
+            class="level-text cursorable"
+            @click="showCountdownInfo(item)"
+          >0
+          </text>
         </template>
 
         <circle
@@ -623,11 +671,21 @@ function getItemTitle(item: IconItem): string {
     <component
       :is="infoDialogComponent"
       v-if="infoDialogDrawedNode"
-      ref="infoDialog"
+      ref="infoDialogRef"
       :drawed-node="infoDialogDrawedNode"
       :origin-rewards="originRewards"
       @vue:mounted="onMountedInfoDialog"
     />
+    <component
+      :is="stepsDialogComponent"
+      v-if="stepsDialog.node"
+      ref="stepsDialogRef"
+      element-id="stepsDialog"
+      :is-show-submit="false"
+      @vue:mounted="onMountedStepsDialog"
+    >
+      <steps-view :node="stepsDialog.node" />
+    </component>
 
     <client-only>
       <toast-message
@@ -660,6 +718,7 @@ function getItemTitle(item: IconItem): string {
 }
 .node-tower {
   fill: #ba662c;
+  cursor: pointer;
 }
 .node-tower:hover {
   fill: #da8237;
@@ -669,12 +728,6 @@ function getItemTitle(item: IconItem): string {
 }
 .node-presents:hover {
   fill: #fa7272;
-}
-.node-banner {
-  fill: #0000ff;
-}
-.node-banner:hover {
-  fill: #5959ff;
 }
 .node-wood {
   fill: #773e23;
@@ -758,5 +811,17 @@ function getItemTitle(item: IconItem): string {
   fill: red;
   stroke-width: 1;
   stroke: #000;
+}
+.level {
+  fill: #c8d444;
+  stroke-width: 1;
+  stroke: #000;
+  cursor: help;
+}
+.level:hover {
+  fill: #f3fc92;
+}
+.level-text {
+  cursor: help;
 }
 </style>

@@ -79,6 +79,24 @@ export interface IconItem {
   quantity: number
 }
 
+export interface CountdownIconItem {
+  iconX: number
+  iconY: number
+  iconWidth: number
+  iconHeight: number
+  node: Node
+  uniqueId: string
+  iconUrl: string | null
+  itemName: string
+  levelX: number
+  levelY: number
+}
+
+export interface IconTitle {
+  itemName: string
+  quantity?: number
+}
+
 export interface WarningPoint {
   x: number
   y: number
@@ -105,7 +123,7 @@ export function getCountdownIcons(
   countdownRewards: ViewCountdownReward[],
   drawedNodes: DrawedNodeMap
 ) {
-  const resultItems: IconItem[] = []
+  const resultItems: CountdownIconItem[] = []
 
   countdownRewards.forEach((reward) => {
     const nodeId = reward.node.id
@@ -124,7 +142,8 @@ export function getCountdownIcons(
       uniqueId: reward.uniqueId,
       iconUrl: reward.item.iconUrl,
       itemName: reward.item.name,
-      quantity: 0 // don`t used
+      levelX: drawedNode.x + HALF_SIDE,
+      levelY: drawedNode.y,
     })
   })
 
@@ -167,6 +186,7 @@ export function getIconsItems(
       const side = getImageSide(1)
       const iconWidth = side
       const iconHeight = side
+
       item = {
         node: nodeReward.node,
         uniqueId: nodeReward.uniqueId,
