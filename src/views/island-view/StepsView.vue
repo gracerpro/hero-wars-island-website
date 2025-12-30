@@ -1,23 +1,65 @@
 <script setup lang="ts">
-import type { Node } from '@/api/NodeApi';
-import { fromCurrentDate, getHumanQuantity } from '@/helpers/formatter';
+import { getType, getUnknownItem, type ItemMap } from '@/api/ItemApi';
+import type { Node, TypeGameIdToItemMap } from '@/api/NodeApi';
+import { getHumanQuantity } from '@/helpers/formatter';
 import { formatDate } from '@/helpers/formatter';
+import { computed } from 'vue';
+
 interface Props {
   node: Node
+  gameItemMap: TypeGameIdToItemMap
+  originRewards: ItemMap
 }
 
 const props = defineProps<Props>()
 
-console.log("props.node", props.node)
+const steps = computed(() => {
+  const result = props.node.steps?.map((stepItem, index) => {
+    const rewards = stepItem.rewards.map((reward) => {
+      const type = getType(reward.gameType)
+      const gameId = (reward.gameId && reward.gameId > 0) ? reward.gameId : 0
+      const itemId = props.gameItemMap[type + '_' + gameId] ?? null
+
+      return {
+        ...reward,
+        item: itemId && props.originRewards[itemId] ? props.originRewards[itemId] : getUnknownItem()
+      }
+    })
+    const costs = stepItem.costs.map((costItem) => {
+      const type = getType(costItem.gameType)
+      const gameId = (costItem.gameId && costItem.gameId > 0) ? costItem.gameId : 0
+      const itemId = props.gameItemMap[type + '_' + gameId] ?? null
+
+      return {
+        ...costItem,
+        item: itemId && props.originRewards[itemId] ? props.originRewards[itemId] : getUnknownItem()
+      }
+    })
+
+    return {
+      number: index + 1,
+      rewards,
+      costs,
+      countdownInterval: stepItem.countdownInterval ?
+        (stepItem.countdownInterval / 3600).toFixed()
+        : '',
+      countdownEndDate: stepItem.countdownEndDate ?
+        formatDate(stepItem.countdownEndDate)
+        : ''
+    }
+  })
+
+  return result
+})
 
 </script>
 
 <template>
   <div>
-    <table>
+    <table class="table table-striped table-hover table-sm">
       <thead>
         <tr>
-          <th>Уровень, шаг</th>
+          <th></th>
           <th>Награда</th>
           <th>Цена хода</th>
           <th>Каждые __ ч.</th>
@@ -26,20 +68,20 @@ console.log("props.node", props.node)
         </tr>
       </thead>
       <tbody>
-        <tr v-for="(stepItem, index) in props.node.steps" :key="index">
+        <tr v-for="(stepItem, index) in steps" :key="index">
           <td>{{ index + 1 }}</td>
           <td>
             <div v-for="(reward, index2) in stepItem.rewards" :key="index + '_' + index2">
-              gameId {{ reward.gameId }} gameType {{ reward.gameType }} <b>{{ getHumanQuantity(reward.quantity) }}</b>
+              {{ reward.item.name }} <b>{{ getHumanQuantity(reward.quantity) }}</b>
             </div>
           </td>
           <td>
             <div v-for="(cost, index3) in stepItem.costs" :key="index + '_' + index3">
-              gameId {{ cost.gameId }} gameType {{ cost.gameType }} <b>{{ getHumanQuantity(cost.quantity) }}</b>
+              {{ cost.item.name }} <b>{{ getHumanQuantity(cost.quantity) }}</b>
             </div>
           </td>
-          <td>{{ stepItem.countdownInterval ? (stepItem.countdownInterval / 3600).toFixed() : '' }}</td>
-          <td>{{ stepItem.countdownEndDate ? formatDate(stepItem.countdownEndDate) : '' }}</td>
+          <td>{{ stepItem.countdownInterval }}</td>
+          <td>{{ stepItem.countdownEndDate }}</td>
           <td></td>
         </tr>
       </tbody>

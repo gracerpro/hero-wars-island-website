@@ -9,7 +9,7 @@
 
 import { TYPE_DANGER } from '@/components/toast'
 import ToastMessage from '@/components/ToastMessage.vue'
-import { type Node, type NodeMap, Status, Type } from '@/api/NodeApi'
+import { type Node, type NodeMap, Status, Type, type TypeGameIdToItemMap } from '@/api/NodeApi'
 import { ref, shallowRef, computed, onMounted, onUnmounted, useTemplateRef, reactive } from 'vue'
 import {
   TRANSLATE_X,
@@ -54,6 +54,7 @@ interface Props {
   countdownRewards: ViewCountdownReward[]
   nodes: NodeMap
   originRewards: ItemMap
+  gameItemMap: TypeGameIdToItemMap
   userNodesIds: UserNodeIds
   userNodesGoingIds: UserNodeIds
   disableNodesIds: UserNodeIds
@@ -365,7 +366,6 @@ function showCountdownInfo(item: CountdownIconItem) {
 }
 
 function onMountedStepsDialog() {
-  console.log("!123")
   stepsDialogRef.value?.show().finally(() => {
     stepsDialog.node = null
     stepsDialogComponent.value = null
@@ -684,7 +684,7 @@ function getItemTitle(item: IconTitle): string {
       :is-show-submit="false"
       @vue:mounted="onMountedStepsDialog"
     >
-      <steps-view :node="stepsDialog.node" />
+      <steps-view :node="stepsDialog.node" :game-item-map="gameItemMap" :origin-rewards="originRewards" />
     </component>
 
     <client-only>

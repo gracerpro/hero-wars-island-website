@@ -20,6 +20,7 @@ import {
   type NodeMap,
   Type as NodeType,
   type StepItem,
+  type TypeGameIdToItemMap,
 } from '@/api/NodeApi'
 import { isObject } from '@/helpers/core'
 import { getNodesMap } from '@/services/api/island-node'
@@ -82,6 +83,7 @@ const nodes = ref<NodeMap>(new Map<number, Node>())
 const rewards = ref<Array<ViewNodeReward>>([])
 const countdownRewards = ref<ViewCountdownReward[]>([])
 const originRewards = ref<ItemMap>({})
+const gameItemMap = ref<TypeGameIdToItemMap>({})
 const calculatingRewards = ref(true)
 const userNodesIds = ref<UserNodeIds>(new Set())
 const userNodesGoingIds = ref<UserNodeIds>(new Set())
@@ -446,6 +448,7 @@ function reloadMap(isForce = false) {
       nodes.value = nodeList.nodes
       const rewardsResult = calculateRewards(nodeList)
       rewards.value = rewardsResult.rewards
+      gameItemMap.value = nodeList.gameItemMap
       countdownRewards.value = rewardsResult.countdownRewards
       originRewards.value = nodeList.rewards
 
@@ -620,6 +623,7 @@ function saveState() {
         :is-select-any-node="isSelectAnyNode"
         :rewards="visibleRewards"
         :origin-rewards="originRewards"
+        :game-item-map="gameItemMap"
         :countdown-rewards="countdownRewards"
         :nodes="nodes"
         :user-nodes-ids="userNodesIds"
