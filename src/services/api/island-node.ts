@@ -140,6 +140,7 @@ async function writeNodesToCache(
         nodesTotalCount: nodeList.nodesTotalCount,
         rewards: nodeList.rewards,
         nodes: newNodes,
+        gameItemMap: nodeList.gameItemMap,
       },
     })
 

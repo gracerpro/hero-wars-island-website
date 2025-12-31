@@ -2,7 +2,7 @@
 import { getType, getUnknownItem, type ItemMap } from '@/api/ItemApi';
 import type { Node, TypeGameIdToItemMap } from '@/api/NodeApi';
 import { getHumanQuantity } from '@/helpers/formatter';
-import { formatDate } from '@/helpers/formatter';
+import { formatShortDateTime } from '@/helpers/formatter';
 import { computed } from 'vue';
 
 interface Props {
@@ -22,7 +22,7 @@ const steps = computed(() => {
 
       return {
         ...reward,
-        item: itemId && props.originRewards[itemId] ? props.originRewards[itemId] : getUnknownItem()
+        item: itemId && props.originRewards[itemId] ? props.originRewards[itemId] : getUnknownItem(),
       }
     })
     const costs = stepItem.costs.map((costItem) => {
@@ -44,7 +44,7 @@ const steps = computed(() => {
         (stepItem.countdownInterval / 3600).toFixed()
         : '',
       countdownEndDate: stepItem.countdownEndDate ?
-        formatDate(stepItem.countdownEndDate)
+        formatShortDateTime(stepItem.countdownEndDate)
         : ''
     }
   })
@@ -71,13 +71,31 @@ const steps = computed(() => {
         <tr v-for="(stepItem, index) in steps" :key="index">
           <td>{{ index + 1 }}</td>
           <td>
-            <div v-for="(reward, index2) in stepItem.rewards" :key="index + '_' + index2">
-              {{ reward.item.name }} <b>{{ getHumanQuantity(reward.quantity) }}</b>
+            <div v-for="(reward, index2) in stepItem.rewards" :key="index + '_' + index2" class="item">
+              <img
+                v-if="reward.item.iconUrl && reward.item.iconWidth && reward.item.iconHeight"
+                :src="reward.item.iconUrl"
+                :width="reward.item.iconWidth"
+                :height="reward.item.iconHeight"
+                class="icon"
+                :title="reward.item.name"
+              />
+              <span v-else class="icon -no-image" :title="reward.item.name"></span>
+              <b>{{ getHumanQuantity(reward.quantity) }}</b>
             </div>
           </td>
           <td>
-            <div v-for="(cost, index3) in stepItem.costs" :key="index + '_' + index3">
-              {{ cost.item.name }} <b>{{ getHumanQuantity(cost.quantity) }}</b>
+            <div v-for="(cost, index3) in stepItem.costs" :key="index + '_' + index3" class="item">
+              <img
+                v-if="cost.item.iconUrl && cost.item.iconWidth && cost.item.iconHeight"
+                :src="cost.item.iconUrl"
+                :width="cost.item.iconWidth"
+                :height="cost.item.iconHeight"
+                class="icon"
+                :title="cost.item.name"
+              />
+              <span v-else class="icon -no-image" :title="cost.item.name"></span>
+              <b>{{ getHumanQuantity(cost.quantity) }}</b>
             </div>
           </td>
           <td>{{ stepItem.countdownInterval }}</td>
@@ -88,3 +106,23 @@ const steps = computed(() => {
     </table>
   </div>
 </template>
+
+<style scoped>
+.icon {
+  width: 32px;
+  height: 32px;
+  margin-right: 5px;
+}
+.-no-image {
+  display: inline-block;
+  outline: 1px solid #ddd;
+}
+.item {
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+}
+.item:last-child {
+  margin-bottom: 0;
+}
+</style>

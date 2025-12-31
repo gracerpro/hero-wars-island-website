@@ -6,6 +6,16 @@ export function formatDate(date: Date): string {
   return date.toLocaleDateString('ru-RU')
 }
 
+export function formatShortDateTime(date: Date) {
+  const hours = date.getHours();
+  const minutes = date.getMinutes();
+
+  return formatDate(date) + ' ' +
+    (hours < 10 ? "0" + hours : hours) +
+    ":" +
+    (minutes < 10 ? "0" + minutes : minutes)
+}
+
 export function fromCurrentDate(date: Date, locale?: string): string {
   const now = new Date()
   let result =
